@@ -1,0 +1,156 @@
+#!/usr/bin/env python
+
+import sys, re, shutil, os
+import Numeric
+from optparse import OptionParser
+
+parser = OptionParser( description = 'Transforms a set of model files (.mod) ' 
+                       'from MLP to SVM networks, and optionally applies some '
+                       'changes',
+                       usage = 'usage: %prog [options] file1.mod [file2.mod] '
+                       '[...]' )
+parser.add_option( '-r', '--rates', dest='rates', help='rates file: contains '
+                   'the error rates for each model' )
+parser.add_option( '-m', '--mode', dest='mode', help='set/change SVM mode '
+                   '(classifier, probability, regression, quality)' )
+parser.add_option( '-p', '--property', dest='properties', action='append',
+                   help='set/change a property value - must specify the same '
+                   'number of -v options' )
+parser.add_option( '-v', '--value', dest='values', action='append',
+                   help='property value going with a -p option' )
+
+(options, args) = parser.parse_args()
+
+if options.properties is None:
+  options.properties = []
+if options.values is None:
+  options.values = []
+
+if len( args ) == 0 or len( options.properties ) != len( options.values ):
+  parser.parse_args( [ '-h' ] )
+
+ratesfile = options.rates
+svmmode = options.mode
+files = args
+
+netre = re.compile( '^(net\\s+)(.+)$' )
+gengoodre = re.compile( '^(gen_good_error_rate\\s+)(.+)$' )
+genbadre = re.compile( '^(gen_bad_error_rate\\s+)(.+)$' )
+genre = re.compile( '^(gen_error_rate\\s+)(.+)$' )
+modere = re.compile( '^(svm_mode\\s+)(.+)$' )
+propsre = [ re.compile( '^(' + x + '\\s+)(.+)$' ) for x in options.properties ]
+
+if len( sys.argv ) == 1 or sys.argv[1] == '-h' or sys.argv[1] == '--help':
+  print 'usage:'
+  print sys.argv[0], '-h|--help'
+  print sys.argv[0], '[-r ratesfilename] model1.mod [model2.mod] ...'
+  sys.exit(0)
+
+rates = {}
+
+if ratesfile:
+  f = open( ratesfile )
+  for l in f.xreadlines():
+    x = l.split()
+    fname = os.path.basename( x[4] )
+    c = fname.rfind( '_left' )
+    if c >0 :
+      fname = fname[:c+5]
+    else:
+      c = fname.rfind( '_right' )
+      if c >0 :
+        fname = fname[:c+6]
+    if not fname.endswith( '.mod' ):
+      fname += '.mod'
+    # print 'file:', fname
+    def makerate( x ):
+      y = 1-float(x)/100
+      if not Numeric.equal( y, y ): # NaN
+        return 0.5
+      return y
+    rates[ fname ] = map( makerate, x[:-1] )
+  f.close()
+  del f
+
+for file in files:
+  f = open( file )
+  outfile = file + '.tmp'
+  out = open( outfile, 'w' )
+  bn = os.path.basename( file )
+  if bn.startswith( 'edg' ):
+    bn = bn[3:]
+  rx = rates.get( bn )
+  subad = 0
+  svmmodedone = 0
+  propsdone = [ 0 ] * len( options.properties )
+
+  for line in f.xreadlines():
+    if line.startswith( '*BEGIN TREE sub_ad_mlp' ):
+      out.write( '*BEGIN TREE sub_ad_svm\n' )
+      subad = 1
+    elif line.startswith( '*BEGIN TREE sub_ad_' ):
+      subad = 1
+      out.write( line )
+    elif line.startswith( '*END' ):
+      if subad:
+        if svmmodedone == 0 and svmmode:
+          out.write( 'svm_mode      ' + svmmode + '\n' )
+          svmmodedone = 1
+        for i in xrange( len( options.properties ) ):
+          if propsdone[i] == 0 and options.values[i]:
+            out.write( options.properties[i] + '   ' + options.values[i] \
+                       + '\n' )
+        subad = 0
+      out.write( line )
+    elif line.startswith( 'eta' ):
+      pass
+    elif netre.match( line ):
+      m = netre.match( line )
+      netname = m.group(2)[:-3] + 'svm'
+      line2 = m.group(1) + netname
+      out.write( line2 + '\n' )
+    elif rates and genre.match( line ):
+      m = genre.match( line )
+      r = 0
+      if rx:
+        r = rx[1]
+      line2 = m.group(1) + str( r )
+      out.write( line2 + '\n' )
+    elif rates and gengoodre.match( line ):
+      m = gengoodre.match( line )
+      r = 0
+      if rx:
+        r = rx[2]
+      line2 = m.group(1) + str( r )
+      out.write( line2 + '\n' )
+    elif rates and genbadre.match( line ):
+      m = genbadre.match( line )
+      r = 0
+      if rx:
+        r = rx[3]
+      line2 = m.group(1) + str( r )
+      out.write( line2 + '\n' )
+    elif modere.match( line ):
+      svmmodedone = 1
+      if svmmode:
+        m = modere.match( line )
+        out.write( m.group(1) + svmmode + '\n' )
+      else:
+        out.write( line )
+    else:
+      done = 0
+      for i in xrange( len( options.properties ) ):
+        m = propsre[i].match( line )
+        if m:
+          if options.values[i]:
+            out.write( m.group(1) + options.values[i] + '\n' )
+          propsdone[i] = 1
+          done = 1
+          break
+      if not done:
+        out.write( line )
+  f.close()
+  out.close()
+  os.unlink( file )
+  shutil.copyfile( outfile, file )
+  os.unlink( outfile )

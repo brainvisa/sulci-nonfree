@@ -1,0 +1,21 @@
+*BEGIN BINARYGRAPH 1.0 model_graph
+clique_descriptor standard1
+
+*BEGIN NODE model_node 1
+domain_file /home/riviere/sigraph-0.1/dependencies/graphs/dom_box_01.arg
+label       S.F.median. left
+model_file  /home/riviere/sigraph-0.1/dependencies/graphs/ad_003.arg
+*END
+
+*BEGIN NODE model_node 2
+domain_file /home/riviere/sigraph-0.1/dependencies/graphs/dom_box_02.arg
+label       S.F.sup. left
+model_file  /home/riviere/sigraph-0.1/dependencies/graphs/ad_002.arg
+*END
+
+*BEGIN UEDGE model_edge 1 2
+model_file /home/riviere/sigraph-0.1/dependencies/graphs/ad_002.arg
+label      S.Pe.C.sup. right
+*END
+
+*END

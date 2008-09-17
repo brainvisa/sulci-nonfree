@@ -1,0 +1,13 @@
+*BEGIN SYNTAX siMkModelEdges
+
+model		string	!
+graphs		string	!
+adap		string  !
+labels		string
+frequency_min	float
+remove_void	int
+# Obsolete
+remove_brain	int
+set_weights	int
+
+*END

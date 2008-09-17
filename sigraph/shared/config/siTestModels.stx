@@ -1,0 +1,14 @@
+*BEGIN SYNTAX siTestModels
+
+netFiles	string	!
+learnCfgFiles	string	!
+learnerFiles	string	!
+netTarget	string	!
+outputDir	string	!
+plotFields	string	!
+outPlotField	string	!
+errPlotField	string	!
+plotCmd		string
+
+*END
+

@@ -1,0 +1,819 @@
+#!/usr/bin/env python
+
+import os, sys, numpy, pickle, time, copy
+from optparse import OptionParser, OptionGroup
+from soma import aims
+import sigraph
+from sulci.common import io, add_translation_option_to_parser
+from sulci.features.descriptors import descriptorFactory
+
+
+################################################################################
+class Observer(object):
+	def update(self, tagger):
+		state = tagger.getState()
+		if state == 'init':
+			self.init(tagger)
+			return
+		elif state == 'label_changed':
+			self.label_changed(tagger)
+		elif state == 'after_pass':
+			self.after_pass(tagger)
+
+	def label_changed(self, tagger): pass
+	
+	def after_pass(self, tagger): pass
+
+class GuiObserver(Observer):
+	def __init__(self):
+		Observer.__init__(self)
+		import anatomist.direct.api as anatomist
+		self._a = anatomist.Anatomist()
+		self._win = self._a.createWindow(wintype='3D')
+		self._win.setHasCursor(0)
+		self._aobjects = []
+		self._hie = None
+		self._n = 0
+		self.load_hie()
+
+	def load_hie(self):
+		shared_path = aims.carto.Paths.shfjShared()
+		hiename = os.path.join(shared_path, 'nomenclature',
+				'hierarchy', 'sulcal_root_colors.hie')
+		self._hie = self._a.loadObject(hiename)
+
+	def init(self, tagger):
+		import anatomist.cpp as cpp
+		import brainvisa.quaternion as quaternion
+		import qt
+		self._ag = self._a.toAObject(tagger.graph())
+		# default : names color, we want labels
+		self._aobjects = [self._ag]
+		self._a.addObjects(self._aobjects, [self._win])
+		motion = aims.GraphManip.talairach(self._ag.graph())
+		vector = motion.toMatrix()[:3,3].tolist() + \
+			motion.toMatrix()[:3, :3].T.ravel().tolist()
+		destination = self._a.centralRef
+		origin = self._a.createReferential()
+		t = self._a.execute("LoadTransformation", 
+			**{ 'matrix' : vector,
+			'origin' : origin.getInternalRep(),
+			'destination' : destination.getInternalRep()})
+    		t = self._a.Transformation(self._a, t.trans())
+		#if mesh: amesh.setReferential(origin.internalRep)
+		self._ag.setReferential(origin.internalRep)
+		c = self._a.getControlWindow()
+		c.SelectWindow(self._win.internalRep)
+		cpp.ObjectActions.displayGraphChildrenMenuCallback().doit(\
+						[self._ag.internalRep])
+		c.UnselectAllWindows()
+		self._a.execute("GraphParams", label_attribute='label')
+
+		self._win.setWindowState(self._win.windowState() | \
+					qt.Qt.WindowFullScreen)
+		self._win.setFocus()
+		self._win.raiseW()
+		q, q2 = quaternion.Quaternion(), quaternion.Quaternion()
+		q.fromAxis([0, 1, 0], numpy.pi / 2.)
+		q2.fromAxis([1, 0, 0], numpy.pi / 2.)
+		q = q.compose(q2)
+		self._a.camera(windows=[self._win], zoom=1,
+			view_quaternion=q.vector(), force_redraw=True)
+		imagename = 'snapshot.jpg'
+		self._a.execute("WindowConfig", windows=[self._win],
+				record_mode=1, record_basename=imagename)
+		# build the video :
+		# mencoder "mf://*.jpg" -mf fps=5 -ovc lavc -o plop.avi
+
+	def after_pass(self, tagger):
+		import qt
+		for s in tagger._segments:
+			id = s['index']
+			tag_label = tagger._taglabels[id]
+			s['label'] = tagger._availablelabels[id][tag_label]
+		self._ag.updateColors()
+		self._ag.setChanged()
+		self._ag.notifyObservers()
+		qt.qApp.processEvents()
+		time.sleep(0.001)
+		desktop_geometry = qt.qApp.desktop().geometry()
+		self._n += 1
+
+
+class GuiLabelsObserver(GuiObserver):
+	def __init__(self):
+		GuiObserver.__init__(self)
+
+	def init(self, tagger):
+		GuiObserver.init(self, tagger)
+		self._ag.setColorMode(self._ag.Normal)
+		self._ag.updateColors()
+		self._ag.notifyObservers()
+		self._ag.setChanged()
+
+	def after_pass(self, tagger):
+		import qt
+		for s in tagger._segments:
+			id = s['index']
+			tag_label = tagger._taglabels[id]
+			s['label'] = tagger._availablelabels[id][tag_label]
+		self._ag.updateColors()
+		self._ag.setChanged()
+		self._ag.notifyObservers()
+		qt.qApp.processEvents()
+		time.sleep(0.001)
+		self._n += 1
+
+
+class GuiChangesObserver(GuiObserver):
+	def __init__(self):
+		GuiObserver.__init__(self)
+
+	def init(self, tagger):
+		GuiObserver.init(self, tagger)
+		self._ag.setColorMode(self._ag.PropertyMap)
+		self._ag.setColorProperty('changes')
+		self._ag.updateColors()
+		self._ag.notifyObservers()
+		self._ag.setChanged()
+
+	def after_pass(self, tagger):
+		import qt
+		for s in tagger._segments:
+			id = s['index']
+			s['changes'] = tagger._changes[id]
+		self._ag.updateColors()
+		self._ag.setChanged()
+		self._ag.notifyObservers()
+		qt.qApp.processEvents()
+		time.sleep(0.001)
+		self._n += 1
+
+
+################################################################################
+class Tagger(object):
+	def __init__(self, sulcimodel, init_prior_distr, graph, motion, nrjname,
+			csvname, selected_sulci, node_indices,
+			anneal_opt, normalize_weights):
+		self._sulcimodel = sulcimodel
+		self._init_prior_distr = init_prior_distr
+		self._segments_distrib = sulcimodel.segments_distrib()
+		segments_data_type = self._segments_distrib['data_type']
+		self._segments_descriptor = \
+			descriptorFactory(segments_data_type)
+		self._relations_distrib = sulcimodel.relations_distrib()
+		relations_data_type = self._relations_distrib['data_type']
+		self._relations_descriptor = \
+			descriptorFactory(relations_data_type)
+		self._labels_prior = sulcimodel.labels_prior()
+		self._states = sulcimodel.labels()
+		self._states_n = len(self._states)
+		self._graph = graph
+		self._motion = aims.GraphManip.talairach(graph)
+		if motion: self._motion = motion * self._motion
+		self._selected_sulci = selected_sulci
+		self._node_indices = node_indices
+		self._anneal_opt = anneal_opt
+		self._observers = []
+		self._state = 'init'
+		# output nrj file
+		self._nrj_fd = open(nrjname, 'w')
+		self._nrj_fd.write("Iteration\tTemperature\tEnergy\tChanges\n")
+		self._csvname = csvname
+		self._normalize_weights = normalize_weights
+
+	def graph(self): return self._graph
+
+	def addObserver(self, observer):
+		self._observers.append(observer)
+
+	def getState(self): return self._state
+
+	def notifyObservers(self):
+		for o in self._observers:
+			o.update(self)
+
+	def initialize_prior(self):
+		if not self._labels_prior: return
+		prior_data_type = self._labels_prior['data_type']
+		if prior_data_type in ['size_generalized_dirichlet',
+						'size_dirichlet']:
+			self._prior_descriptor = \
+				descriptorFactory('size_global_frequency')
+		elif prior_data_type in ['label_generalized_dirichlet',
+						'label_dirichlet']:
+			self._prior_descriptor = \
+				descriptorFactory('label_global_frequency')
+		elif prior_data_type in ['size_frequency', 'label_frequency']:
+			self._prior_descriptor = \
+				descriptorFactory('local_frequency')
+		else:
+			self._prior_descriptor = None
+			return
+		prior_labels = self._labels_prior['labels']
+		self._prior_descriptor.compute_data(self._graph,
+			self._taglabels, self._availablelabels,
+				self._seg_indices, prior_labels)
+		if self._states != prior_labels:
+			print "error : labels order differs "+ \
+					"between sulcimodel and prior"
+			sys.exit(1)
+		self._prior_distrib = self._labels_prior['prior']
+
+	def initialize_init_prior(self):
+		if not self._init_prior_distr: return
+		d = self._init_prior_distr['prior']
+		self._init_priors = numpy.ravel(numpy.asarray(\
+						d.frequencies()))
+		prior_labels = self._init_prior_distr['labels']
+		if self._states != prior_labels:
+			print "error : labels order differs "+ \
+					"between sulcimodel and prior"
+			sys.exit(1)
+
+	def precompute_from_data(self, init_mode, weighting_mode,
+				select_mode, picklename=None):
+		segdescr = self._segments_descriptor
+		reldescr = self._relations_descriptor
+		segdistr = self._segments_distrib['vertices']
+		reldistr = self._relations_distrib['edges']
+
+		print "compute initialization..."
+		self._availablelabels = {}
+		self._labelsind = {}
+		self._taglabels = {}
+		self._seg_indices = []
+		self._neighbours = {}
+		self._seg_potentials = {}
+		self._seg_weights = {}
+		seg_edges = {}
+		for s in self._segments:
+			node_index = s['index']
+			self._neighbours[node_index] = set()
+			logli = numpy.zeros(self._states_n, dtype=numpy.float96)
+			li = numpy.zeros(self._states_n, dtype=numpy.float96)
+			for i, label in enumerate(self._states):
+				distrib = segdistr[label]
+				logli[i], li[i] = segdescr.likelihood(\
+						distrib, self._motion, s)
+			if self._init_prior_distr: li *= self._init_priors
+			p = li / li.sum()
+			if select_mode == 'threshold': sel = p >= 0.01
+			elif select_mode == 'all': sel = (p == p)
+			self._seg_potentials[node_index] = -logli[sel]
+			labels=[t for i, t in enumerate(self._states) if sel[i]]
+			self._availablelabels[node_index] = labels
+			self._labelsind[node_index] = [i for i, t in \
+					enumerate(self._states) if sel[i]]
+			if init_mode == 'store_labels':
+				init_label = s['label']
+			elif init_mode == 'segments_potentials':
+				init_label = self._states[numpy.argmax(logli)]
+			elif init_mode == 'random':
+				r = numpy.random.randint(0, len(labels))
+				init_label = labels[r]
+			# convert indice from all labels to available labels set
+			self._taglabels[node_index] = [i for i, l in \
+				enumerate(labels) if (l == init_label)][0]
+			if ((self._node_indices is None) or \
+				(node_index in self._node_indices)):
+				self._seg_indices.append(node_index)
+			self._seg_weights[node_index] = 0.
+			seg_edges[node_index] = []
+
+
+		print "compute potentials and neighbourhood..."
+		graph_edges = reldescr.edges_from_graph(self._graph)
+		if weighting_mode == 'number':
+			for edge_infos in graph_edges.items():
+				(r1, r2), ((v1, v2), edges) = edge_infos
+				seg_edges[r1].append(edges)
+				seg_edges[r2].append(edges)
+		self._rel_potentials = {}
+		for edge_infos in graph_edges.items():
+			(r1, r2), ((v1, v2), edges) = edge_infos
+			self._neighbours[r1].add(r2)
+			self._neighbours[r2].add(r1)
+			# relation potential
+			P12, indices = reldescr.potential_matrix(reldistr,
+					edge_infos, self._availablelabels)
+			# segment potential
+			self._rel_potentials[indices] = P12
+			if weighting_mode == 'sizes':
+				w = v1['refsize'] * v2['refsize']
+			elif weighting_mode == 'contact_area':
+				if edges.has_key('cortical'):
+					w = edges['cortical']['reflength']
+				elif edges.has_key('junction'):
+				# note : some buried segments may have cortical
+				# relation missing because the voronoi used to
+				# define the relation is only define in surface.
+				# In this case, I choose to use the length of
+				# the contact area between the 2 segments rather
+				# than those between the 2 voronoi ROIs.
+					w = edges['junction']['reflength']
+				else: # note : strange rare relations
+					w = 0.
+			elif weighting_mode in ['number', 'none']: w = 1
+			self._rel_potentials[indices] *= w
+			self._seg_weights[r1] += w
+			self._seg_weights[r2] += w
+		if weighting_mode != 'none':
+			for ind, p in self._seg_potentials.items():
+				self._seg_potentials[ind] *= \
+					self._seg_weights[ind]
+		if picklename:
+			fd = open(picklename, 'w')
+			obj = (self._availablelabels, self._labelsind,
+				self._taglabels, self._seg_indices,
+				self._neighbours, self._seg_potentials,
+				self._rel_potentials, self._seg_weights)
+			pickle.dump(obj, fd)
+			fd.close()
+
+	def precompute_from_pickle(self, filename):
+		print "read from precomputing data from '%s'" % filename
+		fd = open(filename, 'r')
+		obj = pickle.load(fd)
+		(self._availablelabels, self._labelsind, self._taglabels,
+			self._seg_indices, self._neighbours,
+			self._seg_potentials, self._rel_potentials,
+			self._seg_weights) = obj
+		fd.close()
+
+	def restore_state(self):
+		self._taglabels = self._best_taglabels
+		if self._labels_prior:
+			self._prior_descriptor.set_data(self._best_prior_data)
+
+	def store_state(self, en):
+		self._best_en = en
+		self._best_taglabels = copy.copy(self._taglabels)
+		if self._labels_prior:
+			self._best_prior_data = copy.copy(\
+				self._prior_descriptor.get_data())
+
+	def tag(self, mode='icm', init_mode='store_labels',
+		weighting_mode='none', select_mode='threshold',
+		precomputing='from_data', picklename=None):
+		self._segments = []
+		for xi in self._graph.vertices():
+			if xi.getSyntax() != 'fold': continue
+			sulcus = xi['name']
+			self._segments.append(xi)
+
+		self.initialize_init_prior()
+		# init data / potentials
+		if precomputing == 'from_data':
+			self.precompute_from_data(init_mode, weighting_mode,
+				select_mode, picklename)
+		elif precomputing == 'from_pickle':
+			self.precompute_from_pickle(picklename)
+		self.initialize_prior()
+
+		# infered labels
+		self.algo(mode)
+
+		# fill graph with infered labels
+		for s in self._segments:
+			id = s['index']
+			tag_label = self._taglabels[id]
+			s['label'] = self._availablelabels[id][tag_label]
+		self.write_csv()
+
+	def algo(self, mode='icm'):
+		self.notifyObservers()
+		self._changes = {}
+		for id in self._seg_indices: self._changes[id] = 0.
+		if mode == 'icm': return self.algo_icm()
+		if mode == 'mpm': return self.algo_mpm()
+		elif mode == 'sa': return self.algo_simulated_annealing()
+		elif mode == 'init': return
+
+	def algo_simulated_annealing(self):
+		print "start simulated annealing..."
+		self._temp, rate, stopRate, tmax = self._anneal_opt
+		segments_n = len(self._segments)
+		en = self.energy()
+		self._best_en = numpy.inf
+		self._best_taglabels = copy.copy(self._taglabels)
+		t = 0
+		while 1:
+			#numpy.random.shuffle(self._seg_indices) #FIXME
+			chgmt = 0.
+			for id in self._seg_indices:
+				c, d = self.gibbs(id)
+				self._changes[id] += c
+				chgmt += c
+				en -= d
+				if c: self._state = 'label_changed'
+				else: self._state = 'unchanged'
+				self.notifyObservers()
+			self._state = 'after_pass'
+			self.notifyObservers()
+			chgmt /= segments_n
+			print "t = %d, temp = %3.4f, en = %3.3f, chgmt = %2.2f"\
+				% (t, self._temp, en, chgmt)
+			self._nrj_fd.write("%d\t%3.4f\t%3.3f\t%2.2f\n" % (t, \
+							self._temp, en, chgmt))
+			t += 1
+			self._temp *= rate
+			if en < self._best_en: self.store_state(en)
+			if chgmt < stopRate: break
+			if t > tmax: break
+		self.restore_state()
+		self.algo_icm()
+
+	def algo_icm(self):
+		print "start icm..."
+		self._temp, rate, stopRate, tmax = self._anneal_opt
+		en = self.energy()
+		best_en = numpy.inf
+		best_taglabels = copy.copy(self._taglabels)
+		t = 0
+		while 1:
+			numpy.random.shuffle(self._seg_indices)
+			chgmt = 0.
+			for id in self._seg_indices:
+				c, d = self.icm(id)
+				self._changes[id] += c
+				chgmt += c
+				en -= d
+				if c: self._state = 'label_changed'
+				else: self._state = 'unchanged'
+				self.notifyObservers()
+			self._state = 'after_pass'
+			self.notifyObservers()
+			print "t = %d, en = %3.3f, chgmt = %2.2f" % (t, \
+								en, chgmt)
+			t += 1
+			if en < best_en: self.store_state(en)
+			if chgmt == 0: break
+			if t > tmax: break
+		self.restore_state()
+
+	def algo_mpm(self):
+		print "start mpm..."
+		self._freq = {}
+		for id in self._seg_indices:
+			size = len(self._availablelabels[id1])
+			self._freq[id] = numpy.zeros(size, dtype=numpy.float96)
+		self._temp, rate, stopRate, tmax = self._anneal_opt
+		t = 0
+		print "burning period..."
+		self._state = 'running'
+		while 1:
+			numpy.random.shuffle(self._seg_indices)
+			if t >= 100:
+				if t == 100:
+					print "start computing frequencies..."
+				for id in self._seg_indices:
+					self.gibbs(id)
+					self._freq[id][self._taglabels[id]] += 1
+					self.notifyObservers()
+			self._state = 'after_pass'
+			self.notifyObservers()
+			print "t = %d" % t
+			t += 1
+			if t > tmax: break
+		for id in self._seg_indices:
+			self._taglabels[id] = numpy.argmax(self._freq[id])
+
+	def energy(self):
+		en_rel = en_seg = 0.
+		for id1 in self._seg_indices:
+			l1 = self._taglabels[id1]
+			for id2 in list(self._neighbours[id1]):
+				l2 = self._taglabels[id2]
+				if id1 > id2:
+					P12 = self._rel_potentials[id2, id1].T
+				else:	P12 = self._rel_potentials[id1, id2]
+				en_rel += P12[l1,l2]
+			P1 = self._seg_potentials[id1]
+			en_seg += P1[l1]
+		en_rel /= 2.
+		return en_rel + en_seg + self.eval_prior()
+
+	def gibbs(self, id1):
+		l1 = self._taglabels[id1]
+		availablelabels_n = len(self._availablelabels[id1])
+		if availablelabels_n == 1: return 0, 0
+		en = numpy.zeros(availablelabels_n, dtype=numpy.float96)
+		for id2 in self._neighbours[id1]:
+			l2 = self._taglabels[id2]
+			if id1 > id2:
+				P12 = self._rel_potentials[id2, id1].T
+			else:	P12 = self._rel_potentials[id1, id2]
+			en += P12[:,l2].T
+		P1 = self._seg_potentials[id1]
+		priors = self.eval_priors(id1)
+		en += P1[:] + priors
+		delta_e = en[l1] - en
+		if self._normalize_weights:
+			w = self._seg_weights[id1]
+			if not w: w = 1.
+			p = numpy.exp(delta_e / (self._temp * w))
+		else:	p = numpy.exp(delta_e / self._temp)
+		p = p.cumsum()
+		p /= p[-1]
+		r = numpy.random.uniform(0, 1)
+		l2 = (p < r).sum() # new label
+		chgmt = (l2 != l1)
+		self._taglabels[id1]= l2
+		self.update_prior(id1, l1, l2)
+
+		return chgmt, delta_e[l2]
+			
+	def icm(self, id1):
+		l1 = self._taglabels[id1]
+		availablelabels_n = len(self._availablelabels[id1])
+		if availablelabels_n == 1: return 0, 0
+		en = numpy.zeros(availablelabels_n, dtype=numpy.float96)
+		for id2 in self._neighbours[id1]:
+			l2 = self._taglabels[id2]
+			if id1 > id2:
+				P12 = self._rel_potentials[id2, id1].T
+			else:	P12 = self._rel_potentials[id1, id2]
+			en += P12[:,l2].T # FIXME : add weight
+		priors = self.eval_priors(id1)
+		en += self._seg_potentials[id1] + priors
+		delta_e = en[l1] - en
+		l2 = numpy.argmin(en) # new label
+		chgmt = (l2 != l1)
+		self._taglabels[id1] = l2
+		self.update_prior(id1, l1, l2)
+		return chgmt, delta_e[l2]
+
+	def eval_priors(self, id):
+		'''
+    id : segment id
+		'''
+		if not self._labels_prior: return 0.
+		l1 = self._taglabels[id]
+		en = numpy.zeros(len(self._labelsind[id]), dtype=numpy.float96)
+		if self._prior_descriptor:
+			old_l2 = l1 = self._labelsind[id][l1]
+			for i, l2 in enumerate(self._labelsind[id]):
+				self._prior_descriptor.update_data(\
+						id, old_l2, l2)
+				logli = self._prior_descriptor.likelihood(\
+						self._prior_distrib, l2)
+				en[i] = -logli
+				old_l2 = l2
+			self._prior_descriptor.update_data(id, old_l2, l1)
+		return en
+
+	def eval_prior(self):
+		if not self._labels_prior: return 0.
+		en = 0.
+		if self._prior_descriptor:
+			logli = self._prior_descriptor.full_likelihood(\
+					self._prior_distrib, self._taglabels)
+			en = -logli
+		return en
+
+		
+
+	def update_prior(self, id, l1, l2):
+		'''
+    id : segment id
+    l1 : local label id (old)
+    l2 : local label id (new)
+		'''
+		if not self._labels_prior: return
+		l1 = self._labelsind[id][l1]
+		l2 = self._labelsind[id][l2]
+		self._prior_descriptor.update_data(id, l1, l2)
+
+	def write_csv(self):
+		fd = open(self._csvname, 'w')
+		s = "nodes\tproba"
+		for si in range(self._states_n):
+			s += '\tproba_' + self._states[si]
+		fd.write(s + '\n')
+		P = numpy.zeros(self._states_n)
+		for id1 in self._seg_indices:
+			l1 = self._taglabels[id1]
+			availablelabels_n = len(self._availablelabels[id1])
+			en = numpy.zeros(availablelabels_n, dtype=numpy.float96)
+			for id2 in self._neighbours[id1]:
+				l2 = self._taglabels[id2]
+				if id1 > id2:
+					P12 = self._rel_potentials[id2, id1].T
+				else:	P12 = self._rel_potentials[id1, id2]
+				en += P12[:,l2].T
+			# the prior may be global, without any local component
+			en += self._seg_potentials[id1] # no prior
+			P[:] = 0.
+			for i, ind in enumerate(self._labelsind[id1]):
+				P[ind] = numpy.exp(-en[i])
+			P /= P.sum()
+			m = P.max()
+			s = '\t'.join(str(e) for e in P) + '\n'
+			fd.write('%d\t%f\t' % (id1, m) + s)
+
+
+
+################################################################################
+class OptionParser2(OptionParser):
+	def check_required(self, opt):
+        	option = self.get_option(opt)
+
+		# Assumes the option's 'default' is set to None!
+	        if getattr(self.values, option.dest) is None:
+        		self.error("%s option not supplied" % option)
+	def check(self):
+		option1 = self.get_option('-d')
+		option2 = self.get_option('--distrib_nodes')
+		if (getattr(self.values, option1.dest) is None) and \
+			(getattr(self.values, option2.dest) is None):
+			self.error("need at least one model among nodes " +
+				"and relations ones")
+
+
+def parseOpts(argv):
+	description = 'Simulated annealing to tag sulci.'
+	parser = OptionParser2(description)
+	add_translation_option_to_parser(parser)
+
+	# inputs data
+	data_group = OptionGroup(parser, "Input data")
+	data_group.add_option('-i', '--ingraph', dest='input_graphname',
+		metavar = 'FILE', action='store', default = None,
+		help='data graph')
+	data_group.add_option('--motion', dest='motion',
+		metavar = 'FILE', action='store', default = None,
+		help='motion file (.trm) from Talairach to the ' + \
+		'space of segments model')
+	parser.add_option_group(data_group)
+
+	# input models
+	models_group = OptionGroup(parser, "Input models")
+	models_group.add_option('-m', '--graphmodel', dest='graphmodelname',
+		metavar = 'FILE', action='store',
+		default = 'bayesian_graphmodel.dat', help='bayesian model : ' \
+			'graphical model structure (default : %default)')
+	models_group.add_option('-d', '--distrib_segments',
+		dest='distribsegmentsname', metavar = 'FILE', action='store',
+		default = None, help='distribution models for segments ' + \
+		'(default : no model)')
+	models_group.add_option('--distrib_relations', dest='distribrelname',
+		metavar = 'FILE', action='store', default = None,
+		help='distribution models for relations (default : no model)')
+	models_group.add_option('-p', '--prior', dest='priorname',
+		metavar = 'FILE', action='store', default=None,
+		help='prior file (default : no prior)')
+	models_group.add_option('--init-prior', dest='init_priorname',
+		metavar = 'FILE', action='store', default=None,
+		help='prior model for label initialization ' + \
+		'(default : no prior)') #FIXME : ajouter
+	parser.add_option_group(models_group)
+
+	# outputs
+	outputs_group = OptionGroup(parser, "Outputs")
+	outputs_group.add_option('-o', '--outgraph', dest='output_graphname',
+		metavar = 'FILE', action='store', default = 'output.arg',
+		help='output tagged graph (default : %default)')
+	outputs_group.add_option('--nrj', dest='nrj', metavar = 'FILE',
+		action='store', default='output.nrj',
+		help='output markov field energy along temperature decrease')
+	outputs_group.add_option('-c', '--csv', dest='csvname',
+		metavar = 'FILE', action='store',
+		default = 'output.csv',
+		help='csv storing posterior probabilities (default : %default)')
+	parser.add_option_group(outputs_group)
+
+	# algo options
+	algo_group = OptionGroup(parser, "Algorithms options")
+	algo_group.add_option('--mode', dest='mode',
+		metavar = 'MODE', action='store', default='icm', type='choice',
+		help="'init' : only initialisation with segments potential " + \
+		"is done, 'icm' : init + Iterated Conditional Mode, 'mpm' : "+ \
+		"init + Marginal Posterior Mode, 'sa' : init + Simulated " + \
+		"Annealing)", choices=('icm', 'sa', 'mpm', 'init'))
+	algo_group.add_option('--init-mode', dest='init_mode',
+		metavar = 'MODE', action='store', default='store_labels',
+		type='choice', help="initialization of labels. " + \
+		"'segments_potentials': argmax from segments potentials, " + \
+		"'store_labels' : from data graph label attributes, " + \
+		"'random' : random initialization from available labels",
+		choices=('segments_potentials', 'store_labels', 'random'))
+	algo_group.add_option('--select-mode', dest='select_mode',
+		metavar = 'MODE', action='store', default='threshold',
+		type='choice', help="select available labels on each " + \
+		"segment. 'threshold' : select labels with posterior of " + \
+		"local segment potential over the threshold, 'all' : keep " + \
+		"all labels defined in graph_model", choices=('threshold',
+		'all'))
+	algo_group.add_option('--init-temperature', dest='init_temp',
+		metavar = 'FLOAT', action='store', default='50', type='float',
+		help='initial temperature for simulated annealing ' + \
+		'(default : %default)')
+	algo_group.add_option('--temperature-rate', dest='temp_rate',
+		metavar = 'FLOAT', action='store', default='0.995',type='float',
+		help='decreasing rate for temperature in simulated annealing '+\
+		'(default : %default)')
+	algo_group.add_option('--stop-rate', dest='stop_rate', metavar='FLOAT',
+		action='store', default='0.02', type='float',
+		help='rate of label modified over the whole segments on ' + \
+		'one algo pass. Below this rate, the  simulated annealing ' + \
+		'is stopped (default : %default)')
+	algo_group.add_option('--tmax', dest='tmax', metavar = 'FLOAT',
+		action='store', default='10000', type='float',
+		help='max number of iteration (for all modes) (default : ' + \
+		'%default)')
+	parser.add_option_group(algo_group)
+
+	# misc	
+	misc_group = OptionGroup(parser, "Miscelleneous")
+	misc_group.add_option('-s', '--sulci', dest='sulci',
+		metavar = 'LIST', action='store', default=None,
+		help='tag only specified manually tagged sulci.')
+	misc_group.add_option('-n', '--nodes', dest='node_indices',
+		metavar = 'INDEX', action='store', default=None, type='str',
+		help='init label on all segments, then start algo ' + \
+		'only on specified segments (according to their indices)')
+	misc_group.add_option('--precomputing-mode', dest='precomputing',
+		metavar = 'MODE', action='store', default='from_data',
+		type='choice', choices=('from_data', 'from_pickle'),
+		help="'from_data' : based on input data graph, " + \
+		"'from_pickle' : based on pickled information from another " + \
+		"run of this program (see --picklename) (default: %default)")
+	misc_group.add_option('--picklename', dest='picklename',
+		metavar = 'FILE', action='store', default=None,
+		help="if specified precomputed data are stored in this file " +\
+		"and can be reused with --precomputing-mode from_pickle")
+	misc_group.add_option('--gui', dest='gui', action='store_true',
+		default=False, help="display and save images of labels " + \
+		"with anatomist during labeling process")
+	misc_group.add_option('--gui-mode', dest='gui_mode', action='store',
+		type='choice', choices=('labels', 'changes'), default='labels',
+		 help="'labels' : display labels, 'changes' : display " + \
+		"number of changes")
+	misc_group.add_option('--weighting-mode', dest='weighting_mode',
+		metavar = 'MODE', action='store', default='none', type='choice',
+		choices=('contact_area', 'sizes', 'number', 'none'),
+		help="to weight segments potential and relations ones " + \
+		"from each other (to take into accounte unbalance number " + \
+		"of relations). 'contact_area' : the length of the contact " + \
+		"area between the ROIs of the 2 related segments, 'sizes' : " +\
+		"volumes product of the 2 connected ROIs, 'none' : no " + \
+		"weighting, 'number' : number of relation of the relation")
+	misc_group.add_option('--normalize-weights', dest='normalize_weights',
+		action='store_true', default=False, help="divide energies " + \
+		"difference by the weights of the considered segment")
+	parser.add_option_group(misc_group)
+
+	return parser, parser.parse_args(argv)
+
+def main():
+	# read options
+	parser, (options, args) = parseOpts(sys.argv)
+	parser.check_required('-i')
+	parser.check()
+
+	print "read..."
+	if options.sulci is None:
+		selected_sulci = None
+	else:	selected_sulci = options.sulci.split(',')
+	if options.node_indices:
+		node_indices = options.node_indices.split(','), 
+	else:	node_indices = None
+	anneal_opt = options.init_temp, options.temp_rate, \
+			options.stop_rate, options.tmax
+	if options.motion:
+		motion = aims.Reader().read(options.motion)
+	else:	motion = None
+
+	# read graph_model and distrib models
+	graph = io.load_graph(options.transfile, options.input_graphname)
+	sulcimodel = io.read_full_model(options.graphmodelname,
+		segmentsdistribname=options.distribsegmentsname,
+		reldistribname=options.distribrelname,
+		labelspriorname=options.priorname,
+		selected_sulci=selected_sulci)
+	if options.init_priorname:
+		init_prior_distr = io.read_labels_prior_model(\
+					options.init_priorname)
+	else:	init_prior_distr = None
+
+	# sulci tag
+	tagger = Tagger(sulcimodel, init_prior_distr, graph, motion,
+		options.nrj, options.csvname, selected_sulci, node_indices,
+		anneal_opt, options.normalize_weights)
+	if options.gui:
+		if options.gui_mode == 'labels': obs = GuiLabelsObserver()
+		elif options.gui_mode == 'changes': obs = GuiChangesObserver()
+		tagger.addObserver(obs)
+	print "tag..."
+	tagger.tag(options.mode, options.init_mode, options.weighting_mode,
+		options.select_mode, options.precomputing, options.picklename)
+
+	graph['filename_base'] = '*'
+	w = sigraph.FoldWriter(options.output_graphname)
+	w.write(graph)
+
+
+
+
+if __name__ == '__main__' : main()

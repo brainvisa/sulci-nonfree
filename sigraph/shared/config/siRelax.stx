@@ -1,0 +1,32 @@
+*BEGIN SYNTAX siRelax
+
+modelFile		string	!
+graphFile		string	!
+output			string
+labelsMapFile		string
+initflg			int
+save			int
+temp			float
+mode			string
+rate			float
+tempICM			float
+stopRate		float
+gibbsChange		int
+verbose			int
+grouping_mode		string
+set_weights		float
+remove_brain		int
+plotfile		string
+initLabelsType		string
+voidLabel		string
+voidMode		string
+voidOccurency		int
+extensionMode		string
+extensionPassOccurency	int
+doubleDrawingLots	int
+niterBelowStopProp	int
+allowThreads            int
+maxIterations           int
+MPMUnrecordedIterations int
+
+*END

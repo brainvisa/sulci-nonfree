@@ -1,0 +1,60 @@
+*BEGIN SYNTAX siErrorStats
+graphs_count		int
+baseGraphs		int
+testGraphs		int
+genGraphs		int
+*END
+
+*BEGIN SYNTAX folds
+*END
+
+*BEGIN SYNTAX graphs
+*END
+
+*BEGIN SYNTAX fold
+
+label			string
+graphs_count		int
+mean_common		float
+min_common		float
+sigma_common		float
+mean_added		float
+max_added		float
+sigma_added		float
+mean_rejected		float
+max_rejected		float
+sigma_rejected		float
+mean_error		float
+max_error		float
+sigma_error		float
+pmass_error		float
+pmass_added		float
+pmass_rejected		float
+errors_count		int
+total_errors_count	int
+occurence_count		int
+mass			float
+adds_vector		float_vector
+rejects_vector		float_vector
+sizes_vector		float_vector
+weight_size		float
+weight_genErrorRate	float
+weight_fold		float
+weight_global		float
+
+*END
+
+*BEGIN SYNTAX graph
+
+name			string	!
+nodes_count		int	!
+node_errors_count	int	!
+mass			float	!
+pmass_error		float	!
+folds_count		int	!
+partly_recogn_folds	int	!
+initial_energy		float
+final_energy		float
+
+*END
+

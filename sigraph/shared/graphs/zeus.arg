@@ -1,0 +1,10716 @@
+*BEGIN BINARYGRAPH 1.0 graphe_sillon
+
+#Talairach_rotation 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000
+#Talairach_translation -130.000000 -111.000000 -88.399994
+#Talairach_scale 0.011628 0.007634 0.013263
+#bounding_box_min 44 35 10
+#bounding_box_max 207 242 123
+#voxel_size 0.781000 0.781000 1.200000
+#anterior_commissure 130 111 68
+
+*BEGIN NODE hull 290
+name brain_hull
+# external hull of the brain used to compute some Voronoi diagrams
+# this object is implied in hull_junctions
+*END
+
+*BEGIN NODE fold 300
+squelette_label 300
+name S.F.median. right
+size 19.000
+#gravity_center 115.875 118.500 19.500
+profondeur 5.880
+point_number 19
+ss_point_number 8
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 310
+squelette_label 310
+name S.F.median. left
+size 22.000
+#gravity_center 148.077 127.154 20.200
+profondeur 6.780
+point_number 22
+ss_point_number 13
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 320
+squelette_label 320
+name S.F.sup. left
+size 349.000
+#normal 0.905 -0.420 0.073
+#gravity_center 161.043 132.788 29.619
+profondeur 16.280
+point_number 349
+ss_point_number 278
+edge_point_number 71
+*END
+
+*BEGIN NODE fold 330
+squelette_label 330
+name S.Pe.C.median. right
+size 135.000
+#normal -0.237 0.968 -0.082
+#gravity_center 122.655 134.327 26.189
+profondeur 18.200
+point_number 135
+ss_point_number 110
+edge_point_number 25
+*END
+
+*BEGIN NODE fold 340
+squelette_label 340
+name S.Pe.C.sup. right
+size 523.000
+#normal -0.557 0.805 0.206
+#gravity_center 96.206 132.504 30.771
+profondeur 20.500
+point_number 523
+ss_point_number 452
+edge_point_number 71
+*END
+
+*BEGIN NODE fold 350
+squelette_label 350
+name P.I.Hemi unknown
+size 1721.000
+#normal 0.997 0.048 0.058
+#gravity_center 130.943 121.063 34.546
+profondeur 25.720
+point_number 1721
+ss_point_number 1707
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 360
+squelette_label 360
+name S.C.sup. right
+size 609.000
+#normal -0.380 0.884 0.273
+#gravity_center 97.259 156.765 30.182
+profondeur 20.520
+point_number 609
+ss_point_number 557
+edge_point_number 52
+*END
+
+*BEGIN NODE fold 370
+squelette_label 370
+name S.C. left
+size 1279.000
+#normal 0.404 0.816 0.413
+#gravity_center 175.742 153.371 42.644
+profondeur 24.000
+point_number 1279
+ss_point_number 1159
+edge_point_number 120
+*END
+
+*BEGIN NODE fold 380
+squelette_label 380
+name S.F.median. right
+size 38.000
+#gravity_center 117.792 97.875 24.429
+profondeur 6.900
+point_number 38
+ss_point_number 24
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 390
+squelette_label 390
+name S.F.sup. right
+size 220.000
+#normal 0.779 0.516 -0.356
+#gravity_center 106.294 119.206 26.325
+profondeur 15.480
+point_number 220
+ss_point_number 180
+edge_point_number 40
+*END
+
+*BEGIN NODE fold 400
+squelette_label 400
+name S.Pe.C.median. left
+size 119.000
+#normal 0.268 0.959 0.089
+#gravity_center 139.376 142.139 25.138
+profondeur 14.980
+point_number 119
+ss_point_number 101
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 410
+squelette_label 410
+name I.Pe.C.sup. right
+size 38.000
+#normal 0.739 0.628 -0.243
+#gravity_center 96.462 142.192 25.600
+profondeur 9.100
+point_number 38
+ss_point_number 26
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 420
+squelette_label 420
+name S.Pe.C.marginal. left
+size 56.000
+#normal 0.516 0.810 0.279
+#gravity_center 158.872 148.974 24.433
+profondeur 8.760
+point_number 56
+ss_point_number 39
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 430
+squelette_label 430
+name S.Po.C. right
+size 119.000
+#normal 0.170 0.973 0.157
+#gravity_center 98.609 167.805 28.376
+profondeur 12.320
+point_number 119
+ss_point_number 87
+edge_point_number 32
+*END
+
+*BEGIN NODE fold 440
+squelette_label 440
+name S.Pe.C.marginal. left
+size 32.000
+#gravity_center 148.714 155.476 25.257
+profondeur 6.500
+point_number 32
+ss_point_number 21
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 450
+squelette_label 450
+name F.C.M.r.asc. right
+size 941.000
+#normal 0.745 0.324 0.583
+#gravity_center 120.034 160.025 42.492
+profondeur 42.560
+point_number 941
+ss_point_number 863
+edge_point_number 78
+*END
+
+*BEGIN NODE fold 460
+squelette_label 460
+name S.F.sup. right
+size 212.000
+#normal 0.977 0.087 0.196
+#gravity_center 99.705 99.392 32.581
+profondeur 13.680
+point_number 212
+ss_point_number 176
+edge_point_number 36
+*END
+
+*BEGIN NODE fold 470
+squelette_label 470
+name S.Po.C.sup. left
+size 183.000
+#normal 0.171 0.968 0.186
+#gravity_center 163.170 178.102 32.535
+profondeur 13.560
+point_number 183
+ss_point_number 147
+edge_point_number 36
+*END
+
+*BEGIN NODE fold 480
+squelette_label 480
+name S.F.sup. left
+size 29.000
+#gravity_center 162.556 113.333 27.011
+profondeur 6.160
+point_number 29
+ss_point_number 18
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 490
+squelette_label 490
+name F.C.M.r.asc. left
+size 1518.000
+#normal 0.995 0.033 0.090
+#gravity_center 136.795 137.584 45.886
+profondeur 41.460
+point_number 1518
+ss_point_number 1360
+edge_point_number 158
+*END
+
+*BEGIN NODE fold 500
+squelette_label 500
+name S.F.sup.r.desc. right
+size 39.000
+#gravity_center 92.333 110.083 29.358
+profondeur 5.580
+point_number 39
+ss_point_number 24
+edge_point_number 15
+*END
+
+*BEGIN NODE fold 510
+squelette_label 510
+name S.F.sup. left
+size 334.000
+#normal 0.881 -0.453 0.138
+#gravity_center 158.065 96.018 34.623
+profondeur 13.980
+point_number 334
+ss_point_number 275
+edge_point_number 59
+*END
+
+*BEGIN NODE fold 520
+squelette_label 520
+name inconnu inconnu
+size 66.000
+#normal 0.796 0.586 0.149
+#gravity_center 135.674 104.326 31.714
+profondeur 15.600
+point_number 66
+ss_point_number 43
+edge_point_number 23
+*END
+
+*BEGIN NODE fold 530
+squelette_label 530
+name F.C.M. right
+size 99.000
+#normal 0.804 0.199 -0.560
+#gravity_center 135.360 122.240 33.557
+profondeur 25.500
+point_number 99
+ss_point_number 75
+edge_point_number 24
+*END
+
+*BEGIN NODE fold 540
+squelette_label 540
+name S.C.inf. right
+size 738.000
+#normal -0.243 0.855 0.458
+#gravity_center 70.156 132.738 50.129
+profondeur 26.480
+point_number 738
+ss_point_number 667
+edge_point_number 71
+*END
+
+*BEGIN NODE fold 550
+squelette_label 550
+name S.Po.C. right
+size 106.000
+#normal 0.902 0.217 -0.374
+#gravity_center 94.293 178.073 32.484
+profondeur 10.460
+point_number 106
+ss_point_number 82
+edge_point_number 24
+*END
+
+*BEGIN NODE fold 560
+squelette_label 560
+name S.Pe.C.inter. left
+size 167.000
+#normal 0.579 0.785 0.222
+#gravity_center 180.302 120.248 41.766
+profondeur 20.020
+point_number 167
+ss_point_number 149
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 570
+squelette_label 570
+name S.Pe.C.sup. left
+size 101.000
+#normal 0.137 0.976 0.171
+#gravity_center 174.524 138.405 34.063
+profondeur 13.680
+point_number 101
+ss_point_number 84
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 580
+squelette_label 580
+name S.Po.C.sup. left
+size 80.000
+#normal 0.732 0.673 0.106
+#gravity_center 151.246 188.702 32.546
+profondeur 7.860
+point_number 80
+ss_point_number 57
+edge_point_number 23
+*END
+
+*BEGIN NODE fold 590
+squelette_label 590
+name S.F.median. right
+size 164.000
+#normal 0.416 0.520 0.746
+#gravity_center 112.092 66.831 40.020
+profondeur 11.960
+point_number 164
+ss_point_number 130
+edge_point_number 34
+*END
+
+*BEGIN NODE fold 600
+squelette_label 600
+name S.Pe.C.inter. right
+size 655.000
+#normal 0.469 0.801 -0.372
+#gravity_center 78.876 110.708 46.764
+profondeur 29.140
+point_number 655
+ss_point_number 582
+edge_point_number 73
+*END
+
+*BEGIN NODE fold 610
+squelette_label 610
+name S.F.sup.r.desc. right
+size 23.000
+#gravity_center 83.308 104.769 34.500
+profondeur 5.640
+point_number 23
+ss_point_number 13
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 620
+squelette_label 620
+name P.I.Hemi unknown
+size 20.000
+#gravity_center 128.300 104.700 31.980
+profondeur 14.640
+point_number 20
+ss_point_number 10
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 630
+squelette_label 630
+name S.p.C. left
+size 69.000
+#normal 0.125 0.984 -0.127
+#gravity_center 135.518 153.000 38.164
+profondeur 29.400
+point_number 69
+ss_point_number 56
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 640
+squelette_label 640
+name S.F.sup. left
+size 10.000
+#gravity_center 154.000 77.500 34.450
+profondeur 4.280
+point_number 10
+ss_point_number 4
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 650
+squelette_label 650
+name S.F.sup. right
+size 104.000
+#normal 0.697 0.335 -0.634
+#gravity_center 100.174 81.446 39.763
+profondeur 17.460
+point_number 104
+ss_point_number 92
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 660
+squelette_label 660
+name S.F.sup.r.desc. right
+size 91.000
+#normal 0.159 0.961 -0.225
+#gravity_center 92.686 87.043 40.096
+profondeur 14.920
+point_number 91
+ss_point_number 70
+edge_point_number 21
+*END
+
+*BEGIN NODE fold 670
+squelette_label 670
+name S.Po.C.sup. left
+size 11.000
+#gravity_center 179.000 177.400 34.840
+profondeur 4.560
+point_number 11
+ss_point_number 5
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 680
+squelette_label 680
+name P.I.Hemi unknown
+size 31.000
+#normal 0.922 -0.026 -0.387
+#gravity_center 126.677 182.290 37.197
+profondeur 12.680
+point_number 31
+ss_point_number 31
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 690
+squelette_label 690
+name F.I.P.r.asc. right
+size 31.000
+#gravity_center 74.550 158.850 39.585
+profondeur 11.120
+point_number 31
+ss_point_number 20
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 700
+squelette_label 700
+name S.F.sup.r.asc. right
+size 37.000
+#normal 0.589 0.619 -0.519
+#gravity_center 102.571 73.214 39.836
+profondeur 8.760
+point_number 37
+ss_point_number 28
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 710
+squelette_label 710
+name P.I.Hemi unknown
+size 47.000
+#normal 0.644 0.765 -0.031
+#gravity_center 136.400 95.033 38.133
+profondeur 17.700
+point_number 47
+ss_point_number 30
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 720
+squelette_label 720
+name F.I.P. right
+size 1746.000
+#normal -0.595 0.490 0.637
+#gravity_center 86.363 182.660 49.653
+profondeur 28.400
+point_number 1746
+ss_point_number 1575
+edge_point_number 171
+*END
+
+*BEGIN NODE fold 730
+squelette_label 730
+name P.I.Hemi unknown
+size 57.000
+#normal 0.985 0.153 0.075
+#gravity_center 127.400 182.182 42.711
+profondeur 20.060
+point_number 57
+ss_point_number 55
+edge_point_number 2
+*END
+
+*BEGIN NODE fold 740
+squelette_label 740
+name F.I.P.r.asc. right
+size 154.000
+#normal 0.260 0.605 0.753
+#gravity_center 101.691 197.959 41.304
+profondeur 15.480
+point_number 154
+ss_point_number 123
+edge_point_number 31
+*END
+
+*BEGIN NODE fold 750
+squelette_label 750
+name S.Pa.sup. left
+size 43.000
+#normal -0.464 0.798 0.384
+#gravity_center 148.846 206.000 39.750
+profondeur 7.840
+point_number 43
+ss_point_number 26
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 760
+squelette_label 760
+name S.F.inf. left
+size 557.000
+#normal 0.404 -0.173 0.898
+#gravity_center 176.796 104.427 48.359
+profondeur 25.400
+point_number 557
+ss_point_number 506
+edge_point_number 51
+*END
+
+*BEGIN NODE fold 770
+squelette_label 770
+name P.I.Hemi unknown
+size 23.000
+#gravity_center 127.000 123.571 39.186
+profondeur 26.820
+point_number 23
+ss_point_number 14
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 780
+squelette_label 780
+name S.C.br. right
+size 17.000
+#gravity_center 78.889 142.222 38.278
+profondeur 12.600
+point_number 17
+ss_point_number 9
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 790
+squelette_label 790
+name S.C.br. left
+size 20.000
+#gravity_center 175.417 150.083 40.950
+profondeur 18.260
+point_number 20
+ss_point_number 12
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 800
+squelette_label 800
+name S.F.median. right
+size 35.000
+#gravity_center 124.500 56.136 41.009
+profondeur 6.760
+point_number 35
+ss_point_number 22
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 810
+squelette_label 810
+name S.F.sup. right
+size 200.000
+#normal 0.996 -0.036 -0.077
+#gravity_center 95.784 68.290 49.171
+profondeur 18.000
+point_number 200
+ss_point_number 176
+edge_point_number 24
+*END
+
+*BEGIN NODE fold 820
+squelette_label 820
+name S.F.sup. left
+size 42.000
+#normal 0.868 0.497 -0.013
+#gravity_center 160.444 71.963 43.044
+profondeur 6.780
+point_number 42
+ss_point_number 27
+edge_point_number 15
+*END
+
+*BEGIN NODE fold 830
+squelette_label 830
+name P.I.Hemi unknown
+size 21.000
+#gravity_center 135.556 78.556 40.733
+profondeur 13.020
+point_number 21
+ss_point_number 9
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 840
+squelette_label 840
+name P.I.Hemi unknown
+size 17.000
+#gravity_center 129.091 91.818 41.364
+profondeur 17.260
+point_number 17
+ss_point_number 11
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 850
+squelette_label 850
+name P.I.Hemi unknown
+size 20.000
+#gravity_center 129.550 157.450 41.275
+profondeur 27.020
+point_number 20
+ss_point_number 20
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 860
+squelette_label 860
+name S.s.P. right
+size 210.000
+#normal 0.606 0.631 0.484
+#gravity_center 122.636 180.029 51.188
+profondeur 35.500
+point_number 210
+ss_point_number 173
+edge_point_number 37
+*END
+
+*BEGIN NODE fold 870
+squelette_label 870
+name P.I.Hemi unknown
+size 101.000
+#normal 0.999 -0.010 -0.053
+#gravity_center 127.554 184.832 48.396
+profondeur 24.480
+point_number 101
+ss_point_number 101
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 880
+squelette_label 880
+name F.I.P. left
+size 1829.000
+#normal 0.812 0.567 0.139
+#gravity_center 169.076 190.655 54.333
+profondeur 27.400
+point_number 1829
+ss_point_number 1679
+edge_point_number 150
+*END
+
+*BEGIN NODE fold 890
+squelette_label 890
+name S.F.median. else_unknown
+size 26.000
+#gravity_center 139.133 63.867 42.553
+profondeur 6.680
+point_number 26
+ss_point_number 15
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 900
+squelette_label 900
+name F.C.M. left
+size 9.000
+#gravity_center 128.000 170.000 40.300
+profondeur 16.000
+point_number 9
+ss_point_number 9
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 910
+squelette_label 910
+name P.I.Hemi unknown
+size 2161.000
+#normal 0.999 0.051 0.019
+#gravity_center 129.139 154.067 60.910
+profondeur 60.120
+point_number 2161
+ss_point_number 1957
+edge_point_number 204
+*END
+
+*BEGIN NODE fold 920
+squelette_label 920
+name S.s.P. left
+size 274.000
+#normal 0.807 0.449 0.383
+#gravity_center 132.588 184.478 53.403
+profondeur 37.160
+point_number 274
+ss_point_number 228
+edge_point_number 46
+*END
+
+*BEGIN NODE fold 930
+squelette_label 930
+name F.C.M. right
+size 804.000
+#normal 0.995 0.010 -0.098
+#gravity_center 127.376 87.203 57.355
+profondeur 34.920
+point_number 804
+ss_point_number 688
+edge_point_number 116
+*END
+
+*BEGIN NODE fold 940
+squelette_label 940
+name P.I.Hemi unknown
+size 17.000
+#gravity_center 131.882 120.118 43.206
+profondeur 26.680
+point_number 17
+ss_point_number 17
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 950
+squelette_label 950
+name S.Po.C. left
+size 24.000
+#gravity_center 195.200 158.067 44.113
+profondeur 7.400
+point_number 24
+ss_point_number 15
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 960
+squelette_label 960
+name S.s.P. right
+size 10.000
+#gravity_center 126.000 174.833 44.850
+profondeur 20.060
+point_number 10
+ss_point_number 6
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 970
+squelette_label 970
+name P.I.Hemi unknown
+size 17.000
+#gravity_center 130.167 180.667 44.200
+profondeur 19.040
+point_number 17
+ss_point_number 12
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 980
+squelette_label 980
+name F.I.P.r.int.2 right
+size 116.000
+#normal 0.101 0.971 0.218
+#gravity_center 72.242 183.538 47.429
+profondeur 11.300
+point_number 116
+ss_point_number 91
+edge_point_number 25
+*END
+
+*BEGIN NODE fold 990
+squelette_label 990
+name S.F.inter. left
+size 427.000
+#normal 0.716 0.260 0.647
+#gravity_center 168.087 65.240 58.585
+profondeur 15.200
+point_number 427
+ss_point_number 366
+edge_point_number 61
+*END
+
+*BEGIN NODE fold 1000
+squelette_label 1000
+name P.I.Hemi unknown
+size 20.000
+#gravity_center 130.600 136.500 43.940
+profondeur 27.020
+point_number 20
+ss_point_number 20
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1010
+squelette_label 1010
+name F.I.P.r.int.1 right
+size 174.000
+#normal 0.361 0.928 -0.094
+#gravity_center 61.445 175.315 57.975
+profondeur 12.480
+point_number 174
+ss_point_number 146
+edge_point_number 28
+*END
+
+*BEGIN NODE fold 1020
+squelette_label 1020
+name F.I.P. left
+size 28.000
+#gravity_center 172.611 182.778 45.428
+profondeur 14.160
+point_number 28
+ss_point_number 18
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 1030
+squelette_label 1030
+name S.F.inf.r.asc. right
+size 46.000
+#normal 0.094 0.869 -0.486
+#gravity_center 79.973 81.351 49.014
+profondeur 10.040
+point_number 46
+ss_point_number 37
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 1040
+squelette_label 1040
+name S.F.inf. right
+size 550.000
+#normal -0.251 0.359 0.899
+#gravity_center 80.256 88.870 52.962
+profondeur 21.960
+point_number 550
+ss_point_number 500
+edge_point_number 50
+*END
+
+*BEGIN NODE fold 1050
+squelette_label 1050
+name P.I.Hemi unknown
+size 21.000
+#gravity_center 131.095 101.238 45.005
+profondeur 24.700
+point_number 21
+ss_point_number 21
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1060
+squelette_label 1060
+name inconnu right
+size 1.000
+#gravity_center 132.000 113.000 44.200
+profondeur 24.420
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1070
+squelette_label 1070
+name S.Pa.t. right
+size 470.000
+#normal 0.388 0.782 0.488
+#gravity_center 118.104 196.604 55.909
+profondeur 40.900
+point_number 470
+ss_point_number 432
+edge_point_number 38
+*END
+
+*BEGIN NODE fold 1080
+squelette_label 1080
+name I.Pe.C.inf. left
+size 46.000
+#normal 0.546 -0.039 0.837
+#gravity_center 192.148 133.926 48.196
+profondeur 8.980
+point_number 46
+ss_point_number 27
+edge_point_number 19
+*END
+
+*BEGIN NODE fold 1090
+squelette_label 1090
+name S.C.br. left
+size 36.000
+#normal 0.815 0.422 0.397
+#gravity_center 195.071 145.286 50.096
+profondeur 9.260
+point_number 36
+ss_point_number 28
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 1100
+squelette_label 1100
+name S.T.s. left
+size 1898.000
+#normal 0.750 0.298 0.591
+#gravity_center 190.167 158.067 86.652
+profondeur 25.720
+point_number 1898
+ss_point_number 1721
+edge_point_number 177
+*END
+
+*BEGIN NODE fold 1110
+squelette_label 1110
+name S.Pa.t. +F.P.O.inf
+size 570.000
+#normal 0.464 0.732 0.499
+#gravity_center 135.096 200.616 63.545
+profondeur 48.080
+point_number 570
+ss_point_number 513
+edge_point_number 57
+*END
+
+*BEGIN NODE fold 1120
+squelette_label 1120
+name S.F.sup.r.inf right
+size 45.000
+#normal 0.576 0.811 0.101
+#gravity_center 86.594 68.156 50.497
+profondeur 7.060
+point_number 45
+ss_point_number 32
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 1130
+squelette_label 1130
+name S.Pe.C.inf. right
+size 289.000
+#normal -0.265 0.929 0.257
+#gravity_center 69.219 106.223 59.079
+profondeur 20.700
+point_number 289
+ss_point_number 256
+edge_point_number 33
+*END
+
+*BEGIN NODE fold 1140
+squelette_label 1140
+name S.Pe.C.inf. left
+size 309.000
+#normal 0.391 0.904 0.176
+#gravity_center 188.557 115.249 60.557
+profondeur 21.520
+point_number 309
+ss_point_number 273
+edge_point_number 36
+*END
+
+*BEGIN NODE fold 1150
+squelette_label 1150
+name S.F.sup.r.asc. right
+size 96.000
+#normal 0.551 -0.460 0.696
+#gravity_center 100.779 60.117 55.106
+profondeur 17.700
+point_number 96
+ss_point_number 77
+edge_point_number 19
+*END
+
+*BEGIN NODE fold 1160
+squelette_label 1160
+name F.C.M. left
+size 78.000
+#normal 0.109 -0.063 0.992
+#gravity_center 127.421 57.649 50.837
+profondeur 10.100
+point_number 78
+ss_point_number 57
+edge_point_number 21
+*END
+
+*BEGIN NODE fold 1170
+squelette_label 1170
+name P.I.Hemi unknown
+size 1.000
+#gravity_center 132.000 91.000 49.400
+profondeur 21.760
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1180
+squelette_label 1180
+name S.F.inf. left
+size 253.000
+#normal 0.677 0.478 0.559
+#gravity_center 182.577 88.869 57.029
+profondeur 15.200
+point_number 253
+ss_point_number 213
+edge_point_number 40
+*END
+
+*BEGIN NODE fold 1190
+squelette_label 1190
+name P.I.Hemi unknown
+size 9.000
+#gravity_center 129.400 176.200 50.960
+profondeur 25.320
+point_number 9
+ss_point_number 5
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 1200
+squelette_label 1200
+name P.I.Hemi unknown
+size 136.000
+#normal 1.000 -0.020 -0.007
+#gravity_center 126.059 200.154 57.898
+profondeur 23.160
+point_number 136
+ss_point_number 136
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1210
+squelette_label 1210
+name F.I.P.r.int.2 left
+size 49.000
+#normal -0.513 0.645 0.567
+#gravity_center 169.139 207.000 52.939
+profondeur 10.760
+point_number 49
+ss_point_number 36
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 1220
+squelette_label 1220
+name S.F.median. right
+size 56.000
+#normal 0.545 -0.388 0.743
+#gravity_center 120.029 50.543 53.411
+profondeur 9.400
+point_number 56
+ss_point_number 35
+edge_point_number 21
+*END
+
+*BEGIN NODE fold 1230
+squelette_label 1230
+name P.I.Hemi unknown
+size 6.000
+#gravity_center 132.000 86.500 51.133
+profondeur 21.820
+point_number 6
+ss_point_number 6
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1240
+squelette_label 1240
+name F.C.M. left
+size 790.000
+#normal 0.945 -0.161 0.286
+#gravity_center 135.136 65.202 74.842
+profondeur 28.540
+point_number 790
+ss_point_number 722
+edge_point_number 68
+*END
+
+*BEGIN NODE fold 1250
+squelette_label 1250
+name S.F.inf. left
+size 23.000
+#gravity_center 181.692 78.000 54.800
+profondeur 5.420
+point_number 23
+ss_point_number 13
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 1260
+squelette_label 1260
+name inconnu right
+size 1.000
+#gravity_center 132.000 83.000 52.000
+profondeur 20.520
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1270
+squelette_label 1270
+name F.C.L.p. right
+size 2189.000
+#normal -0.090 0.308 0.947
+#gravity_center 68.269 131.513 74.956
+profondeur 44.240
+point_number 2189
+ss_point_number 2049
+edge_point_number 140
+*END
+
+*BEGIN NODE fold 1280
+squelette_label 1280
+name S.s.P. left
+size 2.000
+#gravity_center 128.000 175.000 52.650
+profondeur 24.700
+point_number 2
+ss_point_number 2
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1290
+squelette_label 1290
+name F.I.P. right
+size 17.000
+#gravity_center 83.143 190.286 53.857
+profondeur 17.520
+point_number 17
+ss_point_number 7
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 1300
+squelette_label 1300
+name S.F.polaire left
+size 149.000
+#normal 0.329 -0.434 0.839
+#gravity_center 150.383 50.525 57.666
+profondeur 11.020
+point_number 149
+ss_point_number 120
+edge_point_number 29
+*END
+
+*BEGIN NODE fold 1310
+squelette_label 1310
+name inconnu right
+size 1.000
+#gravity_center 132.000 80.000 53.300
+profondeur 19.320
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1320
+squelette_label 1320
+name P.I.Hemi unknown
+size 11.000
+#gravity_center 130.333 160.000 55.250
+profondeur 36.120
+point_number 11
+ss_point_number 6
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 1330
+squelette_label 1330
+name P.I.Hemi unknown
+size 76.000
+#normal 0.998 0.016 0.053
+#gravity_center 126.079 209.974 59.680
+profondeur 12.480
+point_number 76
+ss_point_number 76
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1340
+squelette_label 1340
+name S.F.marginal. right
+size 315.000
+#normal 0.706 0.708 -0.031
+#gravity_center 106.084 49.260 66.252
+profondeur 18.300
+point_number 315
+ss_point_number 273
+edge_point_number 42
+*END
+
+*BEGIN NODE fold 1350
+squelette_label 1350
+name P.I.Hemi unknown
+size 186.000
+#normal 0.999 -0.025 -0.033
+#gravity_center 132.681 59.957 63.278
+profondeur 19.220
+point_number 186
+ss_point_number 185
+edge_point_number 1
+*END
+
+*BEGIN NODE fold 1360
+squelette_label 1360
+name S.F.sup.r.desc. right
+size 45.000
+#normal 0.549 -0.548 0.631
+#gravity_center 95.000 59.094 57.566
+profondeur 14.240
+point_number 45
+ss_point_number 32
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 1370
+squelette_label 1370
+name inconnu right
+size 1.000
+#gravity_center 132.000 77.000 54.600
+profondeur 19.040
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1380
+squelette_label 1380
+name P.I.Hemi unknown
+size 27.000
+#gravity_center 129.500 119.000 55.250
+profondeur 40.400
+point_number 27
+ss_point_number 14
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 1390
+squelette_label 1390
+name P.I.Hemi unknown
+size 35.000
+#gravity_center 128.667 129.810 55.962
+profondeur 43.540
+point_number 35
+ss_point_number 21
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 1400
+squelette_label 1400
+name S.s.P. right
+size 17.000
+#gravity_center 121.889 172.111 55.756
+profondeur 33.280
+point_number 17
+ss_point_number 9
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 1410
+squelette_label 1410
+name F.I.P.r.asc. left
+size 157.000
+#normal 0.034 0.564 0.825
+#gravity_center 143.896 216.793 57.585
+profondeur 13.020
+point_number 157
+ss_point_number 135
+edge_point_number 22
+*END
+
+*BEGIN NODE fold 1420
+squelette_label 1420
+name S.F.orbitaire. right
+size 163.000
+#normal 0.501 -0.358 0.788
+#gravity_center 80.842 65.278 65.313
+profondeur 14.360
+point_number 163
+ss_point_number 133
+edge_point_number 30
+*END
+
+*BEGIN NODE fold 1430
+squelette_label 1430
+name P.I.Hemi unknown
+size 36.000
+#normal 0.956 0.237 0.171
+#gravity_center 132.278 69.889 59.331
+profondeur 19.680
+point_number 36
+ss_point_number 36
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1440
+squelette_label 1440
+name P.I.Hemi unknown
+size 50.000
+#normal 0.658 0.234 0.716
+#gravity_center 127.806 94.097 58.123
+profondeur 37.060
+point_number 50
+ss_point_number 31
+edge_point_number 19
+*END
+
+*BEGIN NODE fold 1450
+squelette_label 1450
+name S.I.O. right
+size 318.000
+#normal 0.690 0.473 0.548
+#gravity_center 94.739 212.465 67.481
+profondeur 23.400
+point_number 318
+ss_point_number 284
+edge_point_number 34
+*END
+
+*BEGIN NODE fold 1460
+squelette_label 1460
+name S.Cal. left
+size 77.000
+#normal 0.638 -0.019 0.770
+#gravity_center 126.304 154.089 60.032
+profondeur 46.260
+point_number 77
+ss_point_number 56
+edge_point_number 21
+*END
+
+*BEGIN NODE fold 1470
+squelette_label 1470
+name F.C.L.r.asc. right
+size 171.000
+#normal -0.208 0.931 0.301
+#gravity_center 71.278 94.215 68.737
+profondeur 17.280
+point_number 171
+ss_point_number 144
+edge_point_number 27
+*END
+
+*BEGIN NODE fold 1480
+squelette_label 1480
+name F.C.L.r.retroC.tr. right
+size 80.000
+#normal 0.644 0.695 -0.320
+#gravity_center 53.067 140.833 61.988
+profondeur 7.680
+point_number 80
+ss_point_number 60
+edge_point_number 20
+*END
+
+*BEGIN NODE fold 1490
+squelette_label 1490
+name F.P.O. left
+size 259.000
+#normal -0.193 0.703 0.685
+#gravity_center 133.383 212.131 69.972
+profondeur 28.020
+point_number 259
+ss_point_number 222
+edge_point_number 37
+*END
+
+*BEGIN NODE fold 1500
+squelette_label 1500
+name S.F.sup. right
+size 12.000
+#gravity_center 102.167 50.000 60.017
+profondeur 9.320
+point_number 12
+ss_point_number 6
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 1510
+squelette_label 1510
+name S.T.s. right
+size 2223.000
+#normal 0.198 0.272 0.942
+#gravity_center 63.558 140.059 87.136
+profondeur 32.740
+point_number 2223
+ss_point_number 2078
+edge_point_number 145
+*END
+
+*BEGIN NODE fold 1520
+squelette_label 1520
+name S.A. right
+size 604.000
+#normal 0.223 0.752 0.620
+#gravity_center 73.504 190.335 79.020
+profondeur 24.360
+point_number 604
+ss_point_number 552
+edge_point_number 52
+*END
+
+*BEGIN NODE fold 1530
+squelette_label 1530
+name S.A. left
+size 137.000
+#normal 0.180 0.820 0.544
+#gravity_center 173.902 213.205 66.137
+profondeur 9.680
+point_number 137
+ss_point_number 112
+edge_point_number 25
+*END
+
+*BEGIN NODE fold 1540
+squelette_label 1540
+name S.F.sup. left
+size 32.000
+#gravity_center 157.056 46.611 63.122
+profondeur 7.180
+point_number 32
+ss_point_number 18
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 1550
+squelette_label 1550
+name S.F.marginal. right
+size 161.000
+#normal 0.419 -0.213 0.883
+#gravity_center 89.203 52.669 68.265
+profondeur 10.520
+point_number 161
+ss_point_number 133
+edge_point_number 28
+*END
+
+*BEGIN NODE fold 1560
+squelette_label 1560
+name P.I.Hemi unknown
+size 17.000
+#gravity_center 130.417 51.250 64.025
+profondeur 8.700
+point_number 17
+ss_point_number 12
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 1570
+squelette_label 1570
+name F.C.L.r.ter.asc. left
+size 19.000
+#gravity_center 200.000 172.500 62.660
+profondeur 4.420
+point_number 19
+ss_point_number 10
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 1580
+squelette_label 1580
+name S.s.P. left
+size 76.000
+#normal 0.658 0.459 -0.597
+#gravity_center 131.224 185.414 66.098
+profondeur 37.680
+point_number 76
+ss_point_number 58
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 1590
+squelette_label 1590
+name P.I.Hemi unknown
+size 43.000
+#normal -0.178 0.930 -0.320
+#gravity_center 120.667 204.000 64.523
+profondeur 22.320
+point_number 43
+ss_point_number 30
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 1600
+squelette_label 1600
+name P.I.Hemi unknown
+size 14.000
+#gravity_center 132.857 50.071 64.443
+profondeur 6.840
+point_number 14
+ss_point_number 14
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1610
+squelette_label 1610
+name vent inconnu
+size 870.000
+#normal 0.108 0.354 0.929
+#gravity_center 128.501 132.787 68.666
+profondeur 67.400
+point_number 870
+ss_point_number 667
+edge_point_number 203
+*END
+
+*BEGIN NODE fold 1620
+squelette_label 1620
+name F.C.L.r.retroC.tr. left
+size 42.000
+#normal 0.409 0.826 -0.387
+#gravity_center 201.448 147.724 66.883
+profondeur 7.920
+point_number 42
+ss_point_number 29
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 1630
+squelette_label 1630
+name F.I.P.r.int.1 right
+size 59.000
+#normal 0.136 0.768 0.626
+#gravity_center 57.302 172.791 66.119
+profondeur 10.760
+point_number 59
+ss_point_number 43
+edge_point_number 16
+*END
+
+*BEGIN NODE fold 1640
+squelette_label 1640
+name F.P.O. left
+size 2.000
+#gravity_center 126.000 217.500 62.400
+profondeur 1.300
+point_number 2
+ss_point_number 2
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1650
+squelette_label 1650
+name S.F.inf. left
+size 133.000
+#normal 0.585 0.146 0.798
+#gravity_center 179.292 68.038 68.176
+profondeur 10.600
+point_number 133
+ss_point_number 106
+edge_point_number 27
+*END
+
+*BEGIN NODE fold 1660
+squelette_label 1660
+name S.Pa.t. left
+size 5.000
+#gravity_center 126.600 204.400 64.740
+profondeur 15.040
+point_number 5
+ss_point_number 5
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1670
+squelette_label 1670
+name F.P.O. right
+size 398.000
+#normal 0.424 0.485 0.765
+#gravity_center 120.202 200.910 72.376
+profondeur 43.540
+point_number 398
+ss_point_number 356
+edge_point_number 42
+*END
+
+*BEGIN NODE fold 1680
+squelette_label 1680
+name S.O.p. right
+size 213.000
+#normal -0.112 0.830 0.547
+#gravity_center 117.522 223.055 75.971
+profondeur 16.280
+point_number 213
+ss_point_number 182
+edge_point_number 31
+*END
+
+*BEGIN NODE fold 1690
+squelette_label 1690
+name S.R.sup. left
+size 69.000
+#normal 0.935 0.290 -0.205
+#gravity_center 135.764 50.291 68.995
+profondeur 14.680
+point_number 69
+ss_point_number 55
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 1700
+squelette_label 1700
+name S.F.inter. left
+size 12.000
+#gravity_center 175.333 59.667 66.083
+profondeur 5.260
+point_number 12
+ss_point_number 6
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 1710
+squelette_label 1710
+name inconnu inconnu
+size 317.000
+#normal 0.869 0.494 0.032
+#gravity_center 139.798 102.085 81.346
+profondeur 34.660
+point_number 317
+ss_point_number 258
+edge_point_number 59
+*END
+
+*BEGIN NODE fold 1720
+squelette_label 1720
+name F.P.O. left
+size 9.000
+#gravity_center 126.444 212.222 65.722
+profondeur 9.560
+point_number 9
+ss_point_number 9
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1730
+squelette_label 1730
+name P.I.Hemi unknown
+size 694.000
+#normal 0.994 0.076 0.077
+#gravity_center 125.341 213.550 83.613
+profondeur 38.640
+point_number 694
+ss_point_number 687
+edge_point_number 7
+*END
+
+*BEGIN NODE fold 1740
+squelette_label 1740
+name S.I.O. right
+size 109.000
+#normal 0.732 0.279 -0.622
+#gravity_center 99.414 222.253 69.707
+profondeur 16.600
+point_number 109
+ss_point_number 87
+edge_point_number 22
+*END
+
+*BEGIN NODE fold 1750
+squelette_label 1750
+name S.F.marginal. left
+size 71.000
+#normal 0.447 0.269 0.853
+#gravity_center 157.320 47.580 70.070
+profondeur 7.640
+point_number 71
+ss_point_number 50
+edge_point_number 21
+*END
+
+*BEGIN NODE fold 1760
+squelette_label 1760
+name S.F.marginal. left
+size 21.000
+#gravity_center 165.667 50.200 68.640
+profondeur 5.700
+point_number 21
+ss_point_number 15
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 1770
+squelette_label 1770
+name P.I.Hemi unknown
+size 31.000
+#gravity_center 127.615 57.154 67.600
+profondeur 20.660
+point_number 31
+ss_point_number 13
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 1780
+squelette_label 1780
+name F.C.M. right
+size 61.000
+#normal 0.354 0.422 0.835
+#gravity_center 127.000 64.674 68.872
+profondeur 26.860
+point_number 61
+ss_point_number 46
+edge_point_number 15
+*END
+
+*BEGIN NODE fold 1790
+squelette_label 1790
+name F.C.L.r.asc. left
+size 225.000
+#normal 0.071 0.942 0.327
+#gravity_center 182.673 99.704 73.604
+profondeur 22.100
+point_number 225
+ss_point_number 199
+edge_point_number 26
+*END
+
+*BEGIN NODE fold 1800
+squelette_label 1800
+name F.C.L.p. left
+size 2682.000
+#normal 0.348 0.137 0.928
+#gravity_center 184.570 135.403 79.364
+profondeur 43.880
+point_number 2682
+ss_point_number 2474
+edge_point_number 208
+*END
+
+*BEGIN NODE fold 1810
+squelette_label 1810
+name P.I.Hemi unknown
+size 13.000
+#gravity_center 127.000 206.000 67.900
+profondeur 17.400
+point_number 13
+ss_point_number 13
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1820
+squelette_label 1820
+name F.C.L.r.ant. right
+size 170.000
+#normal 0.411 -0.231 0.882
+#gravity_center 79.882 87.081 72.389
+profondeur 24.120
+point_number 170
+ss_point_number 136
+edge_point_number 34
+*END
+
+*BEGIN NODE fold 1830
+squelette_label 1830
+name P.I.Hemi unknown
+size 16.000
+#gravity_center 127.438 199.312 70.200
+profondeur 25.720
+point_number 16
+ss_point_number 16
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 1840
+squelette_label 1840
+name S.R.sup. left
+size 110.000
+#normal 0.835 0.527 -0.158
+#gravity_center 139.238 57.190 73.760
+profondeur 22.680
+point_number 110
+ss_point_number 84
+edge_point_number 26
+*END
+
+*BEGIN NODE fold 1850
+squelette_label 1850
+name F.C.L.r.asc. right
+size 519.000
+#normal 0.754 0.144 0.640
+#gravity_center 82.265 110.864 75.363
+profondeur 40.800
+point_number 519
+ss_point_number 456
+edge_point_number 63
+*END
+
+*BEGIN NODE fold 1860
+squelette_label 1860
+name F.P.O. left
+size 9.000
+#gravity_center 130.500 205.000 70.417
+profondeur 20.580
+point_number 9
+ss_point_number 6
+edge_point_number 3
+*END
+
+*BEGIN NODE fold 1870
+squelette_label 1870
+name S.O.a left
+size 121.000
+#normal 0.918 0.346 0.194
+#gravity_center 163.322 220.433 77.278
+profondeur 18.660
+point_number 121
+ss_point_number 90
+edge_point_number 31
+*END
+
+*BEGIN NODE fold 1880
+squelette_label 1880
+name S.R.sup. right
+size 208.000
+#normal 0.793 -0.388 0.470
+#gravity_center 127.528 61.881 79.423
+profondeur 19.960
+point_number 208
+ss_point_number 159
+edge_point_number 49
+*END
+
+*BEGIN NODE fold 1890
+squelette_label 1890
+name inconnu inconnu
+size 25.000
+#gravity_center 115.333 90.333 72.511
+profondeur 36.180
+point_number 25
+ss_point_number 9
+edge_point_number 16
+*END
+
+*BEGIN NODE fold 1900
+squelette_label 1900
+name F.C.M. left
+size 21.000
+#gravity_center 138.750 66.333 73.450
+profondeur 24.000
+point_number 21
+ss_point_number 12
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 1910
+squelette_label 1910
+name F.C.L.a. right
+size 683.000
+#normal -0.295 0.793 0.533
+#gravity_center 89.998 90.634 92.559
+profondeur 25.180
+point_number 683
+ss_point_number 618
+edge_point_number 65
+*END
+
+*BEGIN NODE fold 1920
+squelette_label 1920
+name inconnu inconnu
+size 79.000
+#normal 0.297 0.777 0.555
+#gravity_center 130.292 107.271 73.585
+profondeur 29.640
+point_number 79
+ss_point_number 48
+edge_point_number 31
+*END
+
+*BEGIN NODE fold 1930
+squelette_label 1930
+name F.C.L.r.temp.t. right
+size 15.000
+#gravity_center 72.143 153.143 72.986
+profondeur 28.320
+point_number 15
+ss_point_number 7
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 1940
+squelette_label 1940
+name inconnu inconnu
+size 15.000
+#gravity_center 145.000 155.200 71.760
+profondeur 69.540
+point_number 15
+ss_point_number 5
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 1950
+squelette_label 1950
+name S.Or.l. right
+size 13.000
+#gravity_center 71.333 71.333 74.100
+profondeur 3.340
+point_number 13
+ss_point_number 6
+edge_point_number 7
+*END
+
+*BEGIN NODE fold 1960
+squelette_label 1960
+name F.C.L.r.ant. left
+size 272.000
+#normal 0.825 0.339 -0.452
+#gravity_center 180.141 86.599 79.440
+profondeur 23.700
+point_number 272
+ss_point_number 242
+edge_point_number 30
+*END
+
+*BEGIN NODE fold 1970
+squelette_label 1970
+name inconnu inconnu
+size 31.000
+#gravity_center 113.909 153.000 72.800
+profondeur 67.280
+point_number 31
+ss_point_number 11
+edge_point_number 20
+*END
+
+*BEGIN NODE fold 1980
+squelette_label 1980
+name inconnu inconnu
+size 11.000
+#gravity_center 135.000 107.429 75.771
+profondeur 21.020
+point_number 11
+ss_point_number 7
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 1990
+squelette_label 1990
+name F.C.L.r.temp.t. right
+size 26.000
+#gravity_center 53.562 148.062 75.644
+profondeur 10.340
+point_number 26
+ss_point_number 16
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 2000
+squelette_label 2000
+name S.Cu. left
+size 223.000
+#normal 0.548 0.828 -0.116
+#gravity_center 130.452 224.486 84.904
+profondeur 15.440
+point_number 223
+ss_point_number 177
+edge_point_number 46
+*END
+
+*BEGIN NODE fold 2010
+squelette_label 2010
+name inconnu inconnu
+size 11.000
+#gravity_center 141.167 101.167 76.700
+profondeur 23.640
+point_number 11
+ss_point_number 6
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 2020
+squelette_label 2020
+name vent inconnu
+size 571.000
+#normal 0.885 0.245 0.395
+#gravity_center 127.308 148.075 83.719
+profondeur 61.460
+point_number 571
+ss_point_number 438
+edge_point_number 133
+*END
+
+*BEGIN NODE fold 2030
+squelette_label 2030
+name F.P.O. left
+size 1.000
+#gravity_center 127.000 192.000 75.400
+profondeur 30.640
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2040
+squelette_label 2040
+name S.O.t. +
+size 497.000
+#normal -0.243 0.409 0.880
+#gravity_center 83.062 209.172 81.640
+profondeur 20.040
+point_number 497
+ss_point_number 435
+edge_point_number 62
+*END
+
+*BEGIN NODE fold 2050
+squelette_label 2050
+name S.I.O. left
+size 18.000
+#gravity_center 136.667 232.222 76.122
+profondeur 5.260
+point_number 18
+ss_point_number 9
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 2060
+squelette_label 2060
+name F.C.L.r.asc. right
+size 24.000
+#gravity_center 76.958 92.083 79.733
+profondeur 10.820
+point_number 24
+ss_point_number 24
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2070
+squelette_label 2070
+name inconnu inconnu
+size 27.000
+#gravity_center 119.400 96.400 79.170
+profondeur 26.460
+point_number 27
+ss_point_number 10
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 2080
+squelette_label 2080
+name F.P.O. right
+size 22.000
+#gravity_center 119.643 187.071 78.836
+profondeur 42.960
+point_number 22
+ss_point_number 14
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2090
+squelette_label 2090
+name F.P.O. right
+size 21.000
+#gravity_center 115.769 189.077 77.900
+profondeur 41.360
+point_number 21
+ss_point_number 13
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2100
+squelette_label 2100
+name P.I.Hemi unknown
+size 10.000
+#gravity_center 127.500 189.400 79.950
+profondeur 40.040
+point_number 10
+ss_point_number 10
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2110
+squelette_label 2110
+name S.A. left
+size 321.000
+#normal 0.242 0.345 0.907
+#gravity_center 179.528 202.420 80.624
+profondeur 17.740
+point_number 321
+ss_point_number 269
+edge_point_number 52
+*END
+
+*BEGIN NODE fold 2120
+squelette_label 2120
+name F.C.L.r.ant. left
+size 96.000
+#normal 0.772 0.626 -0.111
+#gravity_center 172.525 94.100 85.085
+profondeur 19.600
+point_number 96
+ss_point_number 80
+edge_point_number 16
+*END
+
+*BEGIN NODE fold 2130
+squelette_label 2130
+name F.Cal.+ant+cit right
+size 4685.000
+#normal 0.602 0.045 0.798
+#gravity_center 102.060 167.278 104.507
+profondeur 64.980
+point_number 4685
+ss_point_number 4352
+edge_point_number 333
+*END
+
+*BEGIN NODE fold 2140
+squelette_label 2140
+name P.I.Hemi unknown
+size 35.000
+#normal 0.086 0.981 -0.172
+#gravity_center 129.667 205.185 81.852
+profondeur 30.600
+point_number 35
+ss_point_number 27
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2150
+squelette_label 2150
+name S.O.t. left
+size 54.000
+#normal 0.727 0.342 0.596
+#gravity_center 148.244 231.390 81.202
+profondeur 9.040
+point_number 54
+ss_point_number 41
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 2160
+squelette_label 2160
+name S.O.L.sup. right
+size 346.000
+#normal -0.068 0.598 0.799
+#gravity_center 104.072 228.312 84.397
+profondeur 16.200
+point_number 346
+ss_point_number 304
+edge_point_number 42
+*END
+
+*BEGIN NODE fold 2170
+squelette_label 2170
+name F.C.M. left
+size 26.000
+#gravity_center 133.130 104.739 87.326
+profondeur 13.280
+point_number 26
+ss_point_number 23
+edge_point_number 3
+*END
+
+*BEGIN NODE fold 2180
+squelette_label 2180
+name inconnu inconnu
+size 45.000
+#normal 0.810 0.554 0.191
+#gravity_center 134.000 108.062 86.978
+profondeur 15.200
+point_number 45
+ss_point_number 32
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 2190
+squelette_label 2190
+name F.Cal. left
+size 5225.000
+#normal 0.926 0.346 0.151
+#gravity_center 150.938 172.393 107.986
+profondeur 77.120
+point_number 5225
+ss_point_number 4855
+edge_point_number 370
+*END
+
+*BEGIN NODE fold 2200
+squelette_label 2200
+name inconnu inconnu
+size 14.000
+#gravity_center 110.500 158.000 85.150
+profondeur 47.960
+point_number 14
+ss_point_number 6
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2210
+squelette_label 2210
+name F.Cal. right
+size 17.000
+#gravity_center 96.600 178.600 85.280
+profondeur 71.500
+point_number 17
+ss_point_number 5
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 2220
+squelette_label 2220
+name S.O.a right
+size 235.000
+#normal -0.001 0.379 0.925
+#gravity_center 72.091 196.263 90.869
+profondeur 23.600
+point_number 235
+ss_point_number 209
+edge_point_number 26
+*END
+
+*BEGIN NODE fold 2230
+squelette_label 2230
+name F.Cal. left
+size 80.000
+#normal -0.140 0.755 0.641
+#gravity_center 129.091 210.030 88.558
+profondeur 28.140
+point_number 80
+ss_point_number 66
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 2240
+squelette_label 2240
+name S.O.L. post.
+size 399.000
+#normal 0.474 0.445 0.760
+#gravity_center 151.910 229.585 90.192
+profondeur 16.020
+point_number 399
+ss_point_number 357
+edge_point_number 42
+*END
+
+*BEGIN NODE fold 2250
+squelette_label 2250
+name S.O.L.ant left
+size 287.000
+#normal -0.122 0.454 0.883
+#gravity_center 171.917 213.747 89.001
+profondeur 19.780
+point_number 287
+ss_point_number 253
+edge_point_number 34
+*END
+
+*BEGIN NODE fold 2260
+squelette_label 2260
+name S.Cu. left
+size 13.000
+#gravity_center 133.571 226.429 83.571
+profondeur 9.840
+point_number 13
+ss_point_number 7
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 2270
+squelette_label 2270
+name S.O.L.sup. right
+size 16.000
+#gravity_center 117.500 228.833 83.850
+profondeur 6.180
+point_number 16
+ss_point_number 12
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 2280
+squelette_label 2280
+name F.C.L.r.ant. left
+size 7.000
+#gravity_center 179.857 97.000 85.614
+profondeur 4.920
+point_number 7
+ss_point_number 7
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2290
+squelette_label 2290
+name F.C.L.a. left
+size 9.000
+#gravity_center 189.800 105.000 85.020
+profondeur 5.260
+point_number 9
+ss_point_number 5
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 2300
+squelette_label 2300
+name F.C.M. left
+size 47.000
+#normal 0.960 0.280 0.007
+#gravity_center 129.897 106.310 89.476
+profondeur 11.020
+point_number 47
+ss_point_number 29
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 2310
+squelette_label 2310
+name P.I.Hemi unknown
+size 15.000
+#gravity_center 123.000 187.467 86.840
+profondeur 43.300
+point_number 15
+ss_point_number 15
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2320
+squelette_label 2320
+name S.O.i. right
+size 189.000
+#normal 0.383 0.878 -0.287
+#gravity_center 84.384 217.439 93.037
+profondeur 15.280
+point_number 189
+ss_point_number 164
+edge_point_number 25
+*END
+
+*BEGIN NODE fold 2330
+squelette_label 2330
+name F.C.L.a. right
+size 20.000
+#gravity_center 79.846 97.000 86.400
+profondeur 16.660
+point_number 20
+ss_point_number 13
+edge_point_number 7
+*END
+
+*BEGIN NODE fold 2340
+squelette_label 2340
+name S.A. right
+size 204.000
+#normal 0.034 0.281 0.959
+#gravity_center 63.289 178.040 89.114
+profondeur 20.360
+point_number 204
+ss_point_number 173
+edge_point_number 31
+*END
+
+*BEGIN NODE fold 2350
+squelette_label 2350
+name P.I.Hemi unknown
+size 6.000
+#gravity_center 127.667 189.833 86.883
+profondeur 38.380
+point_number 6
+ss_point_number 6
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2360
+squelette_label 2360
+name F.Cal. left
+size 9.000
+#gravity_center 127.375 193.750 87.100
+profondeur 36.500
+point_number 9
+ss_point_number 8
+edge_point_number 1
+*END
+
+*BEGIN NODE fold 2370
+squelette_label 2370
+name F.Cal. left
+size 1.000
+#gravity_center 129.000 193.000 85.800
+profondeur 37.120
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2380
+squelette_label 2380
+name S.Or. right
+size 18.000
+#gravity_center 102.889 73.000 88.400
+profondeur 5.480
+point_number 18
+ss_point_number 9
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 2390
+squelette_label 2390
+name S.Or.l. right
+size 12.000
+#gravity_center 85.500 74.000 88.183
+profondeur 4.240
+point_number 12
+ss_point_number 6
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 2400
+squelette_label 2400
+name S.Or. left
+size 39.000
+#gravity_center 161.958 76.292 89.754
+profondeur 6.840
+point_number 39
+ss_point_number 24
+edge_point_number 15
+*END
+
+*BEGIN NODE fold 2410
+squelette_label 2410
+name S.Or. left
+size 25.000
+#gravity_center 174.231 77.538 89.700
+profondeur 8.760
+point_number 25
+ss_point_number 13
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 2420
+squelette_label 2420
+name F.C.L.a. left
+size 482.000
+#normal 0.547 0.245 0.800
+#gravity_center 166.757 93.580 100.324
+profondeur 21.520
+point_number 482
+ss_point_number 452
+edge_point_number 30
+*END
+
+*BEGIN NODE fold 2430
+squelette_label 2430
+name P.I.Hemi unknown
+size 42.000
+#normal 0.986 -0.164 0.034
+#gravity_center 126.071 187.262 93.879
+profondeur 37.360
+point_number 42
+ss_point_number 42
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2440
+squelette_label 2440
+name F.Coll.r.IL. left
+size 233.000
+#normal 0.113 0.863 0.493
+#gravity_center 137.812 188.736 100.008
+profondeur 46.600
+point_number 233
+ss_point_number 197
+edge_point_number 36
+*END
+
+*BEGIN NODE fold 2450
+squelette_label 2450
+name F.Cal. left
+size 13.000
+#gravity_center 125.077 202.385 89.100
+profondeur 31.880
+point_number 13
+ss_point_number 13
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2460
+squelette_label 2460
+name S.T.i. left
+size 532.000
+#normal 0.043 0.373 0.927
+#gravity_center 185.914 187.936 94.564
+profondeur 22.780
+point_number 532
+ss_point_number 456
+edge_point_number 76
+*END
+
+*BEGIN NODE fold 2470
+squelette_label 2470
+name P.I.Hemi unknown
+size 26.000
+#normal 0.994 0.074 0.086
+#gravity_center 124.846 230.385 92.400
+profondeur 4.000
+point_number 26
+ss_point_number 26
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2480
+squelette_label 2480
+name F.C.L.a. left
+size 19.000
+#gravity_center 153.750 107.000 89.862
+profondeur 24.400
+point_number 19
+ss_point_number 8
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 2490
+squelette_label 2490
+name F.P.O. right
+size 25.000
+#gravity_center 120.824 188.706 89.700
+profondeur 44.280
+point_number 25
+ss_point_number 17
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2500
+squelette_label 2500
+name P.I.Hemi unknown
+size 333.000
+#normal 0.996 -0.005 0.089
+#gravity_center 124.477 200.535 101.876
+profondeur 32.840
+point_number 333
+ss_point_number 333
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2510
+squelette_label 2510
+name F.C.M. left
+size 55.000
+#normal 0.953 -0.092 0.288
+#gravity_center 129.000 92.067 92.213
+profondeur 6.160
+point_number 55
+ss_point_number 30
+edge_point_number 25
+*END
+
+*BEGIN NODE fold 2520
+squelette_label 2520
+name inconnu inconnu
+size 31.000
+#gravity_center 120.905 106.095 93.538
+profondeur 7.740
+point_number 31
+ss_point_number 21
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 2530
+squelette_label 2530
+name P.I.Hemi unknown
+size 6.000
+#gravity_center 126.333 184.667 90.567
+profondeur 37.980
+point_number 6
+ss_point_number 6
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2540
+squelette_label 2540
+name S.O.i. left
+size 68.000
+#normal 0.178 0.927 -0.331
+#gravity_center 165.353 226.392 97.576
+profondeur 8.100
+point_number 68
+ss_point_number 51
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 2550
+squelette_label 2550
+name S.Olf. right
+size 56.000
+#normal 0.963 0.225 -0.147
+#gravity_center 118.270 77.162 93.741
+profondeur 7.740
+point_number 56
+ss_point_number 37
+edge_point_number 19
+*END
+
+*BEGIN NODE fold 2560
+squelette_label 2560
+name S.O.p. right
+size 56.000
+#normal -0.180 0.590 0.787
+#gravity_center 111.071 231.952 95.921
+profondeur 13.360
+point_number 56
+ss_point_number 42
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 2570
+squelette_label 2570
+name F.C.L.a. right
+size 13.000
+#gravity_center 100.400 104.200 94.900
+profondeur 17.020
+point_number 13
+ss_point_number 5
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2580
+squelette_label 2580
+name I.Pr.O. right
+size 284.000
+#normal 0.427 0.615 0.663
+#gravity_center 70.938 182.848 100.403
+profondeur 21.540
+point_number 284
+ss_point_number 257
+edge_point_number 27
+*END
+
+*BEGIN NODE fold 2590
+squelette_label 2590
+name F.Cal. left
+size 7.000
+#gravity_center 124.429 206.714 93.786
+profondeur 24.020
+point_number 7
+ss_point_number 7
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2600
+squelette_label 2600
+name S.Olf. left
+size 16.000
+#gravity_center 143.000 80.714 94.343
+profondeur 5.200
+point_number 16
+ss_point_number 7
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 2610
+squelette_label 2610
+name inconnu inconnu
+size 18.000
+#gravity_center 108.833 104.167 95.983
+profondeur 8.820
+point_number 18
+ss_point_number 6
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 2620
+squelette_label 2620
+name inconnu inconnu
+size 8.000
+#gravity_center 130.000 110.167 94.900
+profondeur 3.560
+point_number 8
+ss_point_number 6
+edge_point_number 2
+*END
+
+*BEGIN NODE fold 2630
+squelette_label 2630
+name S.T.i. right
+size 93.000
+#normal 0.132 -0.124 0.983
+#gravity_center 53.423 156.641 96.567
+profondeur 11.340
+point_number 93
+ss_point_number 78
+edge_point_number 15
+*END
+
+*BEGIN NODE fold 2640
+squelette_label 2640
+name S.Olf. left
+size 88.000
+#normal 0.423 0.842 0.334
+#gravity_center 142.530 95.455 99.706
+profondeur 9.400
+point_number 88
+ss_point_number 66
+edge_point_number 22
+*END
+
+*BEGIN NODE fold 2650
+squelette_label 2650
+name inconnu inconnu
+size 12.000
+#gravity_center 124.400 115.200 96.980
+profondeur 5.280
+point_number 12
+ss_point_number 5
+edge_point_number 7
+*END
+
+*BEGIN NODE fold 2660
+squelette_label 2660
+name F.Coll.r.IL. right
+size 19.000
+#gravity_center 117.600 183.667 96.287
+profondeur 37.600
+point_number 19
+ss_point_number 15
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 2670
+squelette_label 2670
+name F.Coll.r.IL. right
+size 215.000
+#normal -0.270 0.599 0.754
+#gravity_center 110.725 184.108 100.248
+profondeur 45.280
+point_number 215
+ss_point_number 167
+edge_point_number 48
+*END
+
+*BEGIN NODE fold 2680
+squelette_label 2680
+name I.Pr.O. left
+size 213.000
+#normal 0.161 0.908 -0.386
+#gravity_center 177.238 197.409 102.319
+profondeur 19.880
+point_number 213
+ss_point_number 181
+edge_point_number 32
+*END
+
+*BEGIN NODE fold 2690
+squelette_label 2690
+name F.C.L.a. left
+size 30.000
+#gravity_center 154.375 107.938 98.475
+profondeur 16.440
+point_number 30
+ss_point_number 16
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 2700
+squelette_label 2700
+name inconnu inconnu
+size 33.000
+#normal 0.586 0.372 0.720
+#gravity_center 133.840 110.880 96.824
+profondeur 5.640
+point_number 33
+ss_point_number 25
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2710
+squelette_label 2710
+name P.I.Hemi unknown
+size 29.000
+#gravity_center 133.333 174.952 98.862
+profondeur 50.700
+point_number 29
+ss_point_number 21
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2720
+squelette_label 2720
+name S.O.x. right
+size 27.000
+#gravity_center 94.308 230.769 99.100
+profondeur 4.980
+point_number 27
+ss_point_number 13
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 2730
+squelette_label 2730
+name S.Li. right
+size 75.000
+#normal 0.295 0.847 0.442
+#gravity_center 119.387 198.226 103.119
+profondeur 26.900
+point_number 75
+ss_point_number 62
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 2740
+squelette_label 2740
+name S.T.i. right
+size 665.000
+#normal 0.209 0.174 0.962
+#gravity_center 59.744 127.620 102.700
+profondeur 18.480
+point_number 665
+ss_point_number 598
+edge_point_number 67
+*END
+
+*BEGIN NODE fold 2750
+squelette_label 2750
+name S.O.i. right
+size 196.000
+#normal -0.473 0.827 -0.302
+#gravity_center 91.045 221.279 106.313
+profondeur 10.180
+point_number 196
+ss_point_number 154
+edge_point_number 42
+*END
+
+*BEGIN NODE fold 2760
+squelette_label 2760
+name P.I.Hemi unknown
+size 8.000
+#gravity_center 122.600 207.200 99.840
+profondeur 18.660
+point_number 8
+ss_point_number 5
+edge_point_number 3
+*END
+
+*BEGIN NODE fold 2770
+squelette_label 2770
+name S.I.Cir. left
+size 47.000
+#normal 0.285 0.734 0.616
+#gravity_center 154.444 94.028 103.819
+profondeur 11.040
+point_number 47
+ss_point_number 36
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 2780
+squelette_label 2780
+name S.T.i. left
+size 107.000
+#normal 0.103 0.581 0.807
+#gravity_center 194.440 146.286 103.381
+profondeur 16.360
+point_number 107
+ss_point_number 84
+edge_point_number 23
+*END
+
+*BEGIN NODE fold 2790
+squelette_label 2790
+name S.T.i. left
+size 101.000
+#normal 0.880 0.365 0.305
+#gravity_center 196.827 163.720 105.577
+profondeur 9.200
+point_number 101
+ss_point_number 75
+edge_point_number 26
+*END
+
+*BEGIN NODE fold 2800
+squelette_label 2800
+name F.Coll.r.IL. left
+size 27.000
+#gravity_center 152.167 175.333 104.289
+profondeur 46.400
+point_number 27
+ss_point_number 18
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 2810
+squelette_label 2810
+name S.Li. left
+size 59.000
+#normal -0.379 0.825 0.419
+#gravity_center 130.927 198.439 107.171
+profondeur 28.340
+point_number 59
+ss_point_number 41
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 2820
+squelette_label 2820
+name S.O.i. left
+size 60.000
+#normal 0.303 0.907 0.292
+#gravity_center 169.861 217.167 105.047
+profondeur 7.760
+point_number 60
+ss_point_number 36
+edge_point_number 24
+*END
+
+*BEGIN NODE fold 2830
+squelette_label 2830
+name F.Cal. left
+size 346.000
+#normal 0.530 0.079 0.844
+#gravity_center 135.811 225.460 106.320
+profondeur 20.320
+point_number 346
+ss_point_number 302
+edge_point_number 44
+*END
+
+*BEGIN NODE fold 2840
+squelette_label 2840
+name S.I.Cir. left
+size 14.000
+#gravity_center 172.250 91.125 103.025
+profondeur 12.320
+point_number 14
+ss_point_number 8
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 2850
+squelette_label 2850
+name S.h. right
+size 39.000
+#normal 0.645 0.527 0.553
+#gravity_center 101.654 120.538 104.150
+profondeur 18.960
+point_number 39
+ss_point_number 26
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 2860
+squelette_label 2860
+name S.T.s. left
+size 90.000
+#normal 0.038 0.415 0.909
+#gravity_center 194.400 137.200 104.433
+profondeur 13.600
+point_number 90
+ss_point_number 60
+edge_point_number 30
+*END
+
+*BEGIN NODE fold 2870
+squelette_label 2870
+name S.T.x. left
+size 3.000
+#gravity_center 197.667 141.000 101.833
+profondeur 2.000
+point_number 3
+ss_point_number 3
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2880
+squelette_label 2880
+name inconnu inconnu
+size 178.000
+#normal 0.583 0.713 0.390
+#gravity_center 125.223 161.628 109.007
+profondeur 66.420
+point_number 178
+ss_point_number 121
+edge_point_number 57
+*END
+
+*BEGIN NODE fold 2890
+squelette_label 2890
+name F.Coll. left
+size 227.000
+#normal 0.920 0.230 0.318
+#gravity_center 157.625 167.891 106.706
+profondeur 42.040
+point_number 227
+ss_point_number 184
+edge_point_number 43
+*END
+
+*BEGIN NODE fold 2900
+squelette_label 2900
+name S.O.T.lat. left
+size 540.000
+#normal 0.934 0.064 0.352
+#gravity_center 180.183 176.480 111.049
+profondeur 21.240
+point_number 540
+ss_point_number 471
+edge_point_number 69
+*END
+
+*BEGIN NODE fold 2910
+squelette_label 2910
+name S.Li. right
+size 93.000
+#normal 0.687 0.589 -0.425
+#gravity_center 114.603 197.219 105.638
+profondeur 25.420
+point_number 93
+ss_point_number 73
+edge_point_number 20
+*END
+
+*BEGIN NODE fold 2920
+squelette_label 2920
+name F.Coll.r.ter. right
+size 179.000
+#normal -0.474 0.832 -0.289
+#gravity_center 83.049 206.097 108.640
+profondeur 14.300
+point_number 179
+ss_point_number 144
+edge_point_number 35
+*END
+
+*BEGIN NODE fold 2930
+squelette_label 2930
+name S.I.Cir. left
+size 46.000
+#normal 0.732 0.204 0.650
+#gravity_center 156.909 104.091 107.545
+profondeur 14.660
+point_number 46
+ss_point_number 33
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 2940
+squelette_label 2940
+name F.Coll.r.ter. right
+size 221.000
+#normal 0.480 0.077 0.874
+#gravity_center 94.780 158.566 105.729
+profondeur 37.700
+point_number 221
+ss_point_number 182
+edge_point_number 39
+*END
+
+*BEGIN NODE fold 2950
+squelette_label 2950
+name S.O.T.lat. right
+size 426.000
+#normal 0.842 0.008 0.540
+#gravity_center 72.987 172.247 111.052
+profondeur 21.720
+point_number 426
+ss_point_number 372
+edge_point_number 54
+*END
+
+*BEGIN NODE fold 2960
+squelette_label 2960
+name S.Li. right
+size 22.000
+#gravity_center 117.136 184.273 104.827
+profondeur 32.000
+point_number 22
+ss_point_number 22
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2970
+squelette_label 2970
+name S.h. left
+size 17.000
+#gravity_center 155.111 125.111 106.456
+profondeur 20.980
+point_number 17
+ss_point_number 9
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 2980
+squelette_label 2980
+name F.Coll.r.IL. left
+size 25.000
+#normal 0.203 0.977 0.060
+#gravity_center 132.320 186.400 105.560
+profondeur 33.960
+point_number 25
+ss_point_number 25
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 2990
+squelette_label 2990
+name inconnu left
+size 58.000
+#normal 0.966 0.232 -0.114
+#gravity_center 123.431 218.966 106.622
+profondeur 9.440
+point_number 58
+ss_point_number 58
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3000
+squelette_label 3000
+name S.Cal.externe left
+size 23.000
+#gravity_center 154.308 232.308 106.400
+profondeur 5.200
+point_number 23
+ss_point_number 13
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 3010
+squelette_label 3010
+name S.O.T.lat. right
+size 129.000
+#normal 0.611 0.433 0.663
+#gravity_center 77.980 125.980 110.037
+profondeur 10.840
+point_number 129
+ss_point_number 101
+edge_point_number 28
+*END
+
+*BEGIN NODE fold 3020
+squelette_label 3020
+name inconnu inconnu
+size 14.000
+#gravity_center 117.500 174.500 106.383
+profondeur 45.960
+point_number 14
+ss_point_number 6
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3030
+squelette_label 3030
+name inconnu inconnu
+size 263.000
+#normal 0.095 0.653 0.751
+#gravity_center 129.020 182.343 111.010
+profondeur 45.480
+point_number 263
+ss_point_number 204
+edge_point_number 59
+*END
+
+*BEGIN NODE fold 3040
+squelette_label 3040
+name F.Coll.r.ter. right
+size 181.000
+#normal 0.641 0.706 0.301
+#gravity_center 92.248 196.690 112.392
+profondeur 26.680
+point_number 181
+ss_point_number 145
+edge_point_number 36
+*END
+
+*BEGIN NODE fold 3050
+squelette_label 3050
+name S.Li. left
+size 119.000
+#normal 0.887 -0.304 0.349
+#gravity_center 138.182 203.758 111.642
+profondeur 25.440
+point_number 119
+ss_point_number 99
+edge_point_number 20
+*END
+
+*BEGIN NODE fold 3060
+squelette_label 3060
+name S.Li. right
+size 89.000
+#normal 0.393 0.917 -0.068
+#gravity_center 117.932 204.658 110.322
+profondeur 17.520
+point_number 89
+ss_point_number 73
+edge_point_number 16
+*END
+
+*BEGIN NODE fold 3070
+squelette_label 3070
+name F.Coll.r.ter. left
+size 202.000
+#normal 0.253 0.967 0.001
+#gravity_center 151.515 222.969 113.435
+profondeur 15.540
+point_number 202
+ss_point_number 163
+edge_point_number 39
+*END
+
+*BEGIN NODE fold 3080
+squelette_label 3080
+name inconnu inconnu
+size 81.000
+#normal 0.907 0.309 0.286
+#gravity_center 112.820 152.520 110.916
+profondeur 34.940
+point_number 81
+ss_point_number 50
+edge_point_number 31
+*END
+
+*BEGIN NODE fold 3090
+squelette_label 3090
+name inconnu inconnu
+size 26.000
+#gravity_center 127.000 155.538 108.700
+profondeur 51.880
+point_number 26
+ss_point_number 13
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 3100
+squelette_label 3100
+name F.Coll.r.PH. left
+size 85.000
+#normal 0.765 0.571 0.297
+#gravity_center 144.403 165.839 110.185
+profondeur 46.080
+point_number 85
+ss_point_number 62
+edge_point_number 23
+*END
+
+*BEGIN NODE fold 3110
+squelette_label 3110
+name S.O.T.lat. left
+size 11.000
+#gravity_center 185.800 182.800 108.420
+profondeur 9.760
+point_number 11
+ss_point_number 5
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 3120
+squelette_label 3120
+name F.Coll.r.ter. right
+size 33.000
+#gravity_center 93.545 188.455 111.623
+profondeur 25.440
+point_number 33
+ss_point_number 22
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 3130
+squelette_label 3130
+name inconnu right
+size 1.000
+#gravity_center 123.000 189.000 106.600
+profondeur 22.880
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3140
+squelette_label 3140
+name F.Coll.r.ter. left
+size 84.000
+#normal 0.905 0.415 0.090
+#gravity_center 156.212 194.136 112.332
+profondeur 30.680
+point_number 84
+ss_point_number 66
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 3150
+squelette_label 3150
+name S.Li. right
+size 39.000
+#normal 0.279 0.945 0.174
+#gravity_center 111.900 201.167 110.370
+profondeur 19.920
+point_number 39
+ss_point_number 30
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 3160
+squelette_label 3160
+name inconnu inconnu
+size 21.000
+#gravity_center 147.933 118.467 110.673
+profondeur 5.420
+point_number 21
+ss_point_number 15
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 3170
+squelette_label 3170
+name inconnu inconnu
+size 7.000
+#gravity_center 124.000 187.600 109.200
+profondeur 26.800
+point_number 7
+ss_point_number 5
+edge_point_number 2
+*END
+
+*BEGIN NODE fold 3180
+squelette_label 3180
+name F.Coll.r.ter. left
+size 100.000
+#normal 0.943 0.225 0.246
+#gravity_center 156.667 204.487 114.633
+profondeur 23.060
+point_number 100
+ss_point_number 78
+edge_point_number 22
+*END
+
+*BEGIN NODE fold 3190
+squelette_label 3190
+name S.O.T.lat. left
+size 39.000
+#gravity_center 179.000 143.458 111.258
+profondeur 8.700
+point_number 39
+ss_point_number 24
+edge_point_number 15
+*END
+
+*BEGIN NODE fold 3200
+squelette_label 3200
+name inconnu inconnu
+size 25.000
+#gravity_center 105.077 161.923 112.300
+profondeur 35.380
+point_number 25
+ss_point_number 13
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 3210
+squelette_label 3210
+name inconnu inconnu
+size 17.000
+#gravity_center 109.222 177.667 110.933
+profondeur 40.520
+point_number 17
+ss_point_number 9
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3220
+squelette_label 3220
+name inconnu right
+size 7.000
+#gravity_center 121.500 195.000 110.500
+profondeur 15.880
+point_number 7
+ss_point_number 6
+edge_point_number 1
+*END
+
+*BEGIN NODE fold 3230
+squelette_label 3230
+name F.Coll.r.ter. left
+size 44.000
+#normal 0.400 0.890 0.220
+#gravity_center 151.818 200.455 113.848
+profondeur 25.660
+point_number 44
+ss_point_number 33
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 3240
+squelette_label 3240
+name S.O.x. right
+size 13.000
+#gravity_center 117.000 220.000 110.500
+profondeur 5.140
+point_number 13
+ss_point_number 5
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3250
+squelette_label 3250
+name S.T.i. right
+size 50.000
+#normal 0.669 0.515 0.535
+#gravity_center 75.697 102.515 115.267
+profondeur 9.600
+point_number 50
+ss_point_number 33
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 3260
+squelette_label 3260
+name inconnu inconnu
+size 1.000
+#gravity_center 145.000 118.000 110.500
+profondeur 1.000
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3270
+squelette_label 3270
+name F.Coll. right
+size 36.000
+#normal 0.751 0.138 0.646
+#gravity_center 102.704 151.963 112.041
+profondeur 24.800
+point_number 36
+ss_point_number 27
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 3280
+squelette_label 3280
+name F.Coll.r.ter. left
+size 82.000
+#normal 0.986 0.120 -0.118
+#gravity_center 152.062 217.000 116.512
+profondeur 14.980
+point_number 82
+ss_point_number 64
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 3290
+squelette_label 3290
+name S.T.i. left
+size 70.000
+#normal -0.223 0.623 0.750
+#gravity_center 180.698 104.189 115.430
+profondeur 9.100
+point_number 70
+ss_point_number 53
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 3300
+squelette_label 3300
+name F.Coll.r.ter. left
+size 76.000
+#normal 0.700 0.353 0.620
+#gravity_center 151.288 170.019 114.425
+profondeur 39.820
+point_number 76
+ss_point_number 52
+edge_point_number 24
+*END
+
+*BEGIN NODE fold 3310
+squelette_label 3310
+name F.Coll.r.ter. left
+size 1.000
+#gravity_center 153.000 171.000 111.800
+profondeur 33.480
+point_number 1
+ss_point_number 1
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3320
+squelette_label 3320
+name S.Li. left
+size 134.000
+#normal -0.201 0.909 0.364
+#gravity_center 134.883 196.039 118.868
+profondeur 22.620
+point_number 134
+ss_point_number 103
+edge_point_number 31
+*END
+
+*BEGIN NODE fold 3330
+squelette_label 3330
+name S.Li. left
+size 28.000
+#normal -0.071 0.974 -0.216
+#gravity_center 131.857 197.964 114.586
+profondeur 16.340
+point_number 28
+ss_point_number 28
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3340
+squelette_label 3340
+name S.T.x. left
+size 27.000
+#gravity_center 160.286 200.143 115.762
+profondeur 19.440
+point_number 27
+ss_point_number 21
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 3350
+squelette_label 3350
+name F.Coll.r.ter. right
+size 111.000
+#normal -0.099 0.455 0.885
+#gravity_center 107.000 217.649 115.329
+profondeur 11.020
+point_number 111
+ss_point_number 77
+edge_point_number 34
+*END
+
+*BEGIN NODE fold 3360
+squelette_label 3360
+name S.T.i. left
+size 13.000
+#gravity_center 187.200 112.000 113.620
+profondeur 5.760
+point_number 13
+ss_point_number 5
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3370
+squelette_label 3370
+name F.Coll. right
+size 17.000
+#gravity_center 98.222 144.889 114.978
+profondeur 12.480
+point_number 17
+ss_point_number 9
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3380
+squelette_label 3380
+name S.O.T.lat. left
+size 19.000
+#gravity_center 182.545 150.091 115.936
+profondeur 6.840
+point_number 19
+ss_point_number 11
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3390
+squelette_label 3390
+name F.Coll.r.ter. right
+size 10.000
+#gravity_center 98.200 157.200 113.620
+profondeur 22.380
+point_number 10
+ss_point_number 5
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 3400
+squelette_label 3400
+name cereb inconnu
+size 255.000
+#normal -0.144 0.672 0.726
+#gravity_center 100.136 184.908 119.770
+profondeur 32.200
+point_number 255
+ss_point_number 206
+edge_point_number 49
+*END
+
+*BEGIN NODE fold 3410
+squelette_label 3410
+name F.Coll.r.ter. right
+size 417.000
+#normal 0.183 -0.206 0.961
+#gravity_center 104.300 198.175 117.393
+profondeur 23.040
+point_number 417
+ss_point_number 417
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3420
+squelette_label 3420
+name inconnu right
+size 7.000
+#gravity_center 119.571 197.286 113.100
+profondeur 12.820
+point_number 7
+ss_point_number 7
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3430
+squelette_label 3430
+name F.Coll.r.ter. right
+size 46.000
+#normal -0.608 0.766 0.210
+#gravity_center 98.586 206.448 116.866
+profondeur 13.280
+point_number 46
+ss_point_number 29
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 3440
+squelette_label 3440
+name S.T.i. right
+size 48.000
+#normal 0.639 0.605 0.475
+#gravity_center 87.800 94.700 117.563
+profondeur 6.840
+point_number 48
+ss_point_number 30
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 3450
+squelette_label 3450
+name S.T.i. left
+size 28.000
+#gravity_center 168.000 95.250 116.594
+profondeur 6.780
+point_number 28
+ss_point_number 16
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 3460
+squelette_label 3460
+name F.Coll. left
+size 16.000
+#gravity_center 161.000 143.444 116.422
+profondeur 8.140
+point_number 16
+ss_point_number 9
+edge_point_number 7
+*END
+
+*BEGIN NODE fold 3470
+squelette_label 3470
+name inconnu inconnu
+size 78.000
+#normal 0.455 0.709 0.539
+#gravity_center 148.679 183.094 116.730
+profondeur 41.080
+point_number 78
+ss_point_number 53
+edge_point_number 25
+*END
+
+*BEGIN NODE fold 3480
+squelette_label 3480
+name inconnu inconnu
+size 11.000
+#gravity_center 124.600 195.200 115.440
+profondeur 15.960
+point_number 11
+ss_point_number 5
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 3490
+squelette_label 3490
+name F.Coll. right
+size 37.000
+#gravity_center 97.955 112.955 116.705
+profondeur 4.760
+point_number 37
+ss_point_number 22
+edge_point_number 15
+*END
+
+*BEGIN NODE fold 3500
+squelette_label 3500
+name F.Coll. left
+size 24.000
+#gravity_center 154.500 150.000 117.371
+profondeur 18.460
+point_number 24
+ss_point_number 14
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 3510
+squelette_label 3510
+name F.Coll. left
+size 61.000
+#normal 0.676 0.441 0.591
+#gravity_center 161.119 169.595 119.198
+profondeur 31.420
+point_number 61
+ss_point_number 42
+edge_point_number 19
+*END
+
+*BEGIN NODE fold 3520
+squelette_label 3520
+name inconnu inconnu
+size 19.000
+#gravity_center 150.333 185.833 116.892
+profondeur 33.560
+point_number 19
+ss_point_number 12
+edge_point_number 7
+*END
+
+*BEGIN NODE fold 3530
+squelette_label 3530
+name F.Coll. left
+size 14.000
+#gravity_center 171.167 114.667 118.300
+profondeur 5.700
+point_number 14
+ss_point_number 6
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3540
+squelette_label 3540
+name S.O.T.lat. right
+size 37.000
+#gravity_center 86.696 112.609 120.504
+profondeur 6.500
+point_number 37
+ss_point_number 23
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 3550
+squelette_label 3550
+name inconnu inconnu
+size 15.000
+#gravity_center 92.200 142.600 119.340
+profondeur 5.280
+point_number 15
+ss_point_number 10
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 3560
+squelette_label 3560
+name inconnu inconnu
+size 43.000
+#normal -0.181 0.756 0.630
+#gravity_center 90.206 147.824 120.556
+profondeur 11.680
+point_number 43
+ss_point_number 34
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 3570
+squelette_label 3570
+name F.Coll. left
+size 13.000
+#gravity_center 161.429 153.143 119.229
+profondeur 13.440
+point_number 13
+ss_point_number 7
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 3580
+squelette_label 3580
+name inconnu inconnu
+size 156.000
+#normal -0.595 0.272 0.756
+#gravity_center 86.606 160.480 121.463
+profondeur 28.040
+point_number 156
+ss_point_number 127
+edge_point_number 29
+*END
+
+*BEGIN NODE fold 3590
+squelette_label 3590
+name inconnu inconnu
+size 2.000
+#gravity_center 122.500 204.500 117.000
+profondeur 1.920
+point_number 2
+ss_point_number 2
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3600
+squelette_label 3600
+name S.O.T.lat. right
+size 34.000
+#normal 0.466 0.208 0.860
+#gravity_center 69.618 165.853 120.174
+profondeur 4.640
+point_number 34
+ss_point_number 34
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3610
+squelette_label 3610
+name cereb inconnu
+size 568.000
+#normal 0.061 0.221 0.973
+#gravity_center 91.735 193.653 127.600
+profondeur 18.420
+point_number 568
+ss_point_number 475
+edge_point_number 93
+*END
+
+*BEGIN NODE fold 3620
+squelette_label 3620
+name inconnu inconnu
+size 83.000
+#normal 0.210 0.155 0.965
+#gravity_center 111.439 207.707 121.487
+profondeur 5.680
+point_number 83
+ss_point_number 82
+edge_point_number 1
+*END
+
+*BEGIN NODE fold 3630
+squelette_label 3630
+name inconnu inconnu
+size 21.000
+#gravity_center 78.231 165.231 121.200
+profondeur 13.940
+point_number 21
+ss_point_number 13
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3640
+squelette_label 3640
+name F.Coll. left
+size 10.000
+#gravity_center 165.800 173.200 119.860
+profondeur 23.960
+point_number 10
+ss_point_number 5
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 3650
+squelette_label 3650
+name inconnu inconnu
+size 50.000
+#normal 0.573 0.276 0.772
+#gravity_center 161.567 182.700 122.417
+profondeur 27.600
+point_number 50
+ss_point_number 30
+edge_point_number 20
+*END
+
+*BEGIN NODE fold 3660
+squelette_label 3660
+name inconnu inconnu
+size 58.000
+#normal 0.214 0.539 0.815
+#gravity_center 153.514 193.946 122.516
+profondeur 28.140
+point_number 58
+ss_point_number 37
+edge_point_number 21
+*END
+
+*BEGIN NODE fold 3670
+squelette_label 3670
+name inconnu inconnu
+size 28.000
+#gravity_center 161.550 147.050 123.435
+profondeur 7.840
+point_number 28
+ss_point_number 20
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3680
+squelette_label 3680
+name inconnu inconnu
+size 19.000
+#gravity_center 81.636 154.818 122.318
+profondeur 7.700
+point_number 19
+ss_point_number 11
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3690
+squelette_label 3690
+name S.O.T.lat. left
+size 93.000
+#normal -0.195 0.170 0.966
+#gravity_center 181.118 164.333 123.248
+profondeur 8.760
+point_number 93
+ss_point_number 93
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3700
+squelette_label 3700
+name inconnu inconnu
+size 78.000
+#normal 0.963 0.165 -0.213
+#gravity_center 137.891 207.745 124.965
+profondeur 13.300
+point_number 78
+ss_point_number 55
+edge_point_number 23
+*END
+
+*BEGIN NODE fold 3710
+squelette_label 3710
+name inconnu inconnu
+size 122.000
+#normal 0.286 0.951 -0.115
+#gravity_center 126.625 157.887 129.074
+profondeur 35.980
+point_number 122
+ss_point_number 80
+edge_point_number 42
+*END
+
+*BEGIN NODE fold 3720
+squelette_label 3720
+name inconnu inconnu
+size 24.000
+#gravity_center 167.545 164.818 123.736
+profondeur 21.460
+point_number 24
+ss_point_number 11
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 3730
+squelette_label 3730
+name inconnu inconnu
+size 88.000
+#normal 0.576 0.255 0.777
+#gravity_center 176.377 180.455 125.357
+profondeur 17.940
+point_number 88
+ss_point_number 77
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 3740
+squelette_label 3740
+name inconnu inconnu
+size 17.000
+#gravity_center 124.538 200.923 123.900
+profondeur 8.340
+point_number 17
+ss_point_number 13
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 3750
+squelette_label 3750
+name inconnu inconnu
+size 52.000
+#normal 0.745 0.307 0.592
+#gravity_center 178.973 167.622 126.768
+profondeur 12.460
+point_number 52
+ss_point_number 37
+edge_point_number 15
+*END
+
+*BEGIN NODE fold 3760
+squelette_label 3760
+name inconnu inconnu
+size 59.000
+#normal 0.788 0.613 0.065
+#gravity_center 121.250 184.964 130.696
+profondeur 22.700
+point_number 59
+ss_point_number 28
+edge_point_number 31
+*END
+
+*BEGIN NODE fold 3770
+squelette_label 3770
+name inconnu inconnu
+size 21.000
+#gravity_center 164.250 201.188 124.394
+profondeur 9.100
+point_number 21
+ss_point_number 16
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 3780
+squelette_label 3780
+name inconnu inconnu
+size 152.000
+#normal 0.308 0.432 0.848
+#gravity_center 164.060 150.838 133.000
+profondeur 9.260
+point_number 152
+ss_point_number 117
+edge_point_number 35
+*END
+
+*BEGIN NODE fold 3790
+squelette_label 3790
+name inconnu inconnu
+size 77.000
+#normal 0.650 0.716 -0.257
+#gravity_center 129.267 202.450 131.473
+profondeur 8.900
+point_number 77
+ss_point_number 60
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 3800
+squelette_label 3800
+name inconnu inconnu
+size 24.000
+#gravity_center 121.857 202.929 126.471
+profondeur 7.400
+point_number 24
+ss_point_number 14
+edge_point_number 10
+*END
+
+*BEGIN NODE fold 3810
+squelette_label 3810
+name inconnu inconnu
+size 16.000
+#gravity_center 177.125 155.125 129.675
+profondeur 4.760
+point_number 16
+ss_point_number 8
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3820
+squelette_label 3820
+name inconnu inconnu
+size 53.000
+#normal 0.957 0.015 0.289
+#gravity_center 71.000 161.200 132.897
+profondeur 6.920
+point_number 53
+ss_point_number 35
+edge_point_number 18
+*END
+
+*BEGIN NODE fold 3830
+squelette_label 3830
+name inconnu inconnu
+size 11.000
+#gravity_center 181.600 158.200 127.660
+profondeur 4.840
+point_number 11
+ss_point_number 5
+edge_point_number 6
+*END
+
+*BEGIN NODE fold 3840
+squelette_label 3840
+name inconnu inconnu
+size 22.000
+#gravity_center 120.556 168.556 126.678
+profondeur 26.280
+point_number 22
+ss_point_number 9
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 3850
+squelette_label 3850
+name inconnu inconnu
+size 19.000
+#gravity_center 68.167 174.833 128.483
+profondeur 4.840
+point_number 19
+ss_point_number 12
+edge_point_number 7
+*END
+
+*BEGIN NODE fold 3860
+squelette_label 3860
+name inconnu inconnu
+size 13.000
+#gravity_center 183.333 181.667 126.967
+profondeur 6.840
+point_number 13
+ss_point_number 6
+edge_point_number 7
+*END
+
+*BEGIN NODE fold 3870
+squelette_label 3870
+name inconnu inconnu
+size 88.000
+#normal 0.944 0.317 0.086
+#gravity_center 124.632 197.118 133.096
+profondeur 13.620
+point_number 88
+ss_point_number 76
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 3880
+squelette_label 3880
+name inconnu inconnu
+size 82.000
+#normal 0.919 0.188 0.346
+#gravity_center 121.203 197.932 131.102
+profondeur 13.520
+point_number 82
+ss_point_number 59
+edge_point_number 23
+*END
+
+*BEGIN NODE fold 3890
+squelette_label 3890
+name inconnu inconnu
+size 15.000
+#gravity_center 124.067 202.733 129.307
+profondeur 4.920
+point_number 15
+ss_point_number 15
+edge_point_number 0
+*END
+
+*BEGIN NODE fold 3900
+squelette_label 3900
+name inconnu inconnu
+size 45.000
+#normal 0.115 0.051 0.992
+#gravity_center 93.529 146.118 128.738
+profondeur 7.680
+point_number 45
+ss_point_number 34
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 3910
+squelette_label 3910
+name inconnu inconnu
+size 15.000
+#gravity_center 68.545 161.636 131.064
+profondeur 3.920
+point_number 15
+ss_point_number 11
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 3920
+squelette_label 3920
+name inconnu inconnu
+size 9.000
+#gravity_center 86.000 199.000 128.960
+profondeur 4.840
+point_number 9
+ss_point_number 5
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 3930
+squelette_label 3930
+name inconnu inconnu
+size 180.000
+#normal 0.036 0.525 0.850
+#gravity_center 157.638 204.167 131.620
+profondeur 12.660
+point_number 180
+ss_point_number 138
+edge_point_number 42
+*END
+
+*BEGIN NODE fold 3940
+squelette_label 3940
+name inconnu inconnu
+size 15.000
+#gravity_center 88.800 148.400 129.480
+profondeur 5.260
+point_number 15
+ss_point_number 10
+edge_point_number 5
+*END
+
+*BEGIN NODE fold 3950
+squelette_label 3950
+name inconnu inconnu
+size 16.000
+#gravity_center 86.000 151.500 129.350
+profondeur 7.260
+point_number 16
+ss_point_number 8
+edge_point_number 8
+*END
+
+*BEGIN NODE fold 3960
+squelette_label 3960
+name inconnu inconnu
+size 28.000
+#gravity_center 134.588 208.471 130.765
+profondeur 8.180
+point_number 28
+ss_point_number 17
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 3970
+squelette_label 3970
+name inconnu inconnu
+size 27.000
+#gravity_center 182.133 166.600 131.733
+profondeur 7.480
+point_number 27
+ss_point_number 15
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 3980
+squelette_label 3980
+name inconnu inconnu
+size 35.000
+#normal 0.974 0.151 0.171
+#gravity_center 90.192 148.577 136.550
+profondeur 5.840
+point_number 35
+ss_point_number 26
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 3990
+squelette_label 3990
+name cereb inconnu
+size 231.000
+#normal -0.486 0.871 0.071
+#gravity_center 116.939 152.724 147.489
+profondeur 14.920
+point_number 231
+ss_point_number 181
+edge_point_number 50
+*END
+
+*BEGIN NODE fold 4000
+squelette_label 4000
+name inconnu inconnu
+size 54.000
+#normal 0.225 0.092 0.970
+#gravity_center 173.867 193.100 134.680
+profondeur 11.020
+point_number 54
+ss_point_number 30
+edge_point_number 24
+*END
+
+*BEGIN NODE fold 4010
+squelette_label 4010
+name inconnu inconnu
+size 71.000
+#normal -0.193 0.183 0.964
+#gravity_center 177.116 182.884 136.167
+profondeur 14.100
+point_number 71
+ss_point_number 43
+edge_point_number 28
+*END
+
+*BEGIN NODE fold 4020
+squelette_label 4020
+name inconnu inconnu
+size 27.000
+#gravity_center 103.455 148.091 137.564
+profondeur 9.200
+point_number 27
+ss_point_number 11
+edge_point_number 16
+*END
+
+*BEGIN NODE fold 4030
+squelette_label 4030
+name inconnu inconnu
+size 26.000
+#gravity_center 71.214 167.143 137.614
+profondeur 4.560
+point_number 26
+ss_point_number 14
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 4040
+squelette_label 4040
+name inconnu inconnu
+size 33.000
+#gravity_center 122.765 180.471 139.100
+profondeur 8.820
+point_number 33
+ss_point_number 17
+edge_point_number 16
+*END
+
+*BEGIN NODE fold 4050
+squelette_label 4050
+name inconnu inconnu
+size 32.000
+#gravity_center 123.944 190.000 139.606
+profondeur 7.180
+point_number 32
+ss_point_number 18
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 4060
+squelette_label 4060
+name inconnu inconnu
+size 32.000
+#gravity_center 141.333 147.000 139.447
+profondeur 9.620
+point_number 32
+ss_point_number 15
+edge_point_number 17
+*END
+
+*BEGIN NODE fold 4070
+squelette_label 4070
+name inconnu inconnu
+size 34.000
+#gravity_center 181.550 168.000 139.815
+profondeur 5.580
+point_number 34
+ss_point_number 20
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 4080
+squelette_label 4080
+name inconnu inconnu
+size 19.000
+#gravity_center 132.143 173.571 140.214
+profondeur 9.140
+point_number 19
+ss_point_number 7
+edge_point_number 12
+*END
+
+*BEGIN NODE fold 4090
+squelette_label 4090
+name inconnu inconnu
+size 40.000
+#normal 0.356 0.896 -0.266
+#gravity_center 127.852 157.407 149.644
+profondeur 10.320
+point_number 40
+ss_point_number 27
+edge_point_number 13
+*END
+
+*BEGIN NODE fold 4100
+squelette_label 4100
+name inconnu inconnu
+size 60.000
+#normal 0.980 -0.127 -0.151
+#gravity_center 114.482 146.714 152.634
+profondeur 6.760
+point_number 60
+ss_point_number 56
+edge_point_number 4
+*END
+
+*BEGIN NODE fold 4110
+squelette_label 4110
+name inconnu inconnu
+size 103.000
+#normal 0.685 -0.155 0.712
+#gravity_center 137.270 146.292 153.429
+profondeur 6.760
+point_number 103
+ss_point_number 89
+edge_point_number 14
+*END
+
+*BEGIN NODE fold 4120
+squelette_label 4120
+name inconnu inconnu
+size 57.000
+#normal -0.220 0.480 0.849
+#gravity_center 87.900 174.880 152.308
+profondeur 5.200
+point_number 57
+ss_point_number 50
+edge_point_number 7
+*END
+
+*BEGIN RELATION hull_junction 290 300
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION hull_junction 290 310
+point_number 26
+size 33.800
+*END
+
+*BEGIN RELATION hull_junction 290 320
+point_number 126
+size 163.800
+*END
+
+*BEGIN RELATION hull_junction 290 330
+point_number 20
+size 26.000
+*END
+
+*BEGIN RELATION hull_junction 290 340
+point_number 161
+size 209.300
+*END
+
+*BEGIN RELATION hull_junction 290 350
+point_number 323
+size 419.900
+*END
+
+*BEGIN RELATION hull_junction 290 360
+point_number 168
+size 218.400
+*END
+
+*BEGIN RELATION hull_junction 290 370
+point_number 268
+size 348.400
+*END
+
+*BEGIN RELATION hull_junction 290 380
+point_number 31
+size 40.300
+*END
+
+*BEGIN RELATION hull_junction 290 390
+point_number 78
+size 101.400
+*END
+
+*BEGIN RELATION hull_junction 290 400
+point_number 42
+size 54.600
+*END
+
+*BEGIN RELATION hull_junction 290 410
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION hull_junction 290 420
+point_number 52
+size 67.600
+*END
+
+*BEGIN RELATION hull_junction 290 430
+point_number 52
+size 67.600
+*END
+
+*BEGIN RELATION hull_junction 290 440
+point_number 20
+size 26.000
+*END
+
+*BEGIN RELATION hull_junction 290 450
+point_number 53
+size 68.900
+*END
+
+*BEGIN RELATION hull_junction 290 460
+point_number 70
+size 91.000
+*END
+
+*BEGIN RELATION hull_junction 290 470
+point_number 62
+size 80.600
+*END
+
+*BEGIN RELATION hull_junction 290 480
+point_number 27
+size 35.100
+*END
+
+*BEGIN RELATION hull_junction 290 490
+point_number 50
+size 65.000
+*END
+
+*BEGIN RELATION hull_junction 290 500
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION hull_junction 290 510
+point_number 141
+size 183.300
+*END
+
+*BEGIN RELATION hull_junction 290 540
+point_number 185
+size 240.500
+*END
+
+*BEGIN RELATION hull_junction 290 550
+point_number 57
+size 74.100
+*END
+
+*BEGIN RELATION hull_junction 290 560
+point_number 75
+size 97.500
+*END
+
+*BEGIN RELATION hull_junction 290 570
+point_number 38
+size 49.400
+*END
+
+*BEGIN RELATION hull_junction 290 580
+point_number 47
+size 61.100
+*END
+
+*BEGIN RELATION hull_junction 290 590
+point_number 84
+size 109.200
+*END
+
+*BEGIN RELATION hull_junction 290 600
+point_number 132
+size 171.600
+*END
+
+*BEGIN RELATION hull_junction 290 610
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION hull_junction 290 640
+point_number 13
+size 16.900
+*END
+
+*BEGIN RELATION hull_junction 290 650
+point_number 34
+size 44.200
+*END
+
+*BEGIN RELATION hull_junction 290 660
+point_number 31
+size 40.300
+*END
+
+*BEGIN RELATION hull_junction 290 670
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION hull_junction 290 680
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION hull_junction 290 690
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION hull_junction 290 700
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION hull_junction 290 720
+point_number 354
+size 460.200
+*END
+
+*BEGIN RELATION hull_junction 290 730
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION hull_junction 290 740
+point_number 48
+size 62.400
+*END
+
+*BEGIN RELATION hull_junction 290 750
+point_number 36
+size 46.800
+*END
+
+*BEGIN RELATION hull_junction 290 760
+point_number 91
+size 118.300
+*END
+
+*BEGIN RELATION hull_junction 290 800
+point_number 36
+size 46.800
+*END
+
+*BEGIN RELATION hull_junction 290 810
+point_number 66
+size 85.800
+*END
+
+*BEGIN RELATION hull_junction 290 820
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION hull_junction 290 870
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION hull_junction 290 880
+point_number 340
+size 442.000
+*END
+
+*BEGIN RELATION hull_junction 290 890
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION hull_junction 290 910
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION hull_junction 290 950
+point_number 16
+size 20.800
+*END
+
+*BEGIN RELATION hull_junction 290 980
+point_number 51
+size 66.300
+*END
+
+*BEGIN RELATION hull_junction 290 990
+point_number 140
+size 182.000
+*END
+
+*BEGIN RELATION hull_junction 290 1010
+point_number 63
+size 81.900
+*END
+
+*BEGIN RELATION hull_junction 290 1030
+point_number 27
+size 35.100
+*END
+
+*BEGIN RELATION hull_junction 290 1040
+point_number 108
+size 140.400
+*END
+
+*BEGIN RELATION hull_junction 290 1070
+point_number 45
+size 58.500
+*END
+
+*BEGIN RELATION hull_junction 290 1080
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION hull_junction 290 1090
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION hull_junction 290 1100
+point_number 428
+size 556.400
+*END
+
+*BEGIN RELATION hull_junction 290 1110
+point_number 51
+size 66.300
+*END
+
+*BEGIN RELATION hull_junction 290 1120
+point_number 27
+size 35.100
+*END
+
+*BEGIN RELATION hull_junction 290 1130
+point_number 77
+size 100.100
+*END
+
+*BEGIN RELATION hull_junction 290 1140
+point_number 105
+size 136.500
+*END
+
+*BEGIN RELATION hull_junction 290 1150
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION hull_junction 290 1160
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION hull_junction 290 1180
+point_number 85
+size 110.500
+*END
+
+*BEGIN RELATION hull_junction 290 1200
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION hull_junction 290 1210
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION hull_junction 290 1220
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION hull_junction 290 1240
+point_number 169
+size 219.700
+*END
+
+*BEGIN RELATION hull_junction 290 1250
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION hull_junction 290 1270
+point_number 231
+size 300.300
+*END
+
+*BEGIN RELATION hull_junction 290 1300
+point_number 83
+size 107.900
+*END
+
+*BEGIN RELATION hull_junction 290 1330
+point_number 28
+size 36.400
+*END
+
+*BEGIN RELATION hull_junction 290 1340
+point_number 70
+size 91.000
+*END
+
+*BEGIN RELATION hull_junction 290 1350
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION hull_junction 290 1360
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION hull_junction 290 1410
+point_number 43
+size 55.900
+*END
+
+*BEGIN RELATION hull_junction 290 1420
+point_number 71
+size 92.300
+*END
+
+*BEGIN RELATION hull_junction 290 1450
+point_number 55
+size 71.500
+*END
+
+*BEGIN RELATION hull_junction 290 1470
+point_number 47
+size 61.100
+*END
+
+*BEGIN RELATION hull_junction 290 1480
+point_number 52
+size 67.600
+*END
+
+*BEGIN RELATION hull_junction 290 1490
+point_number 33
+size 42.900
+*END
+
+*BEGIN RELATION hull_junction 290 1510
+point_number 365
+size 474.500
+*END
+
+*BEGIN RELATION hull_junction 290 1520
+point_number 117
+size 152.100
+*END
+
+*BEGIN RELATION hull_junction 290 1530
+point_number 72
+size 93.600
+*END
+
+*BEGIN RELATION hull_junction 290 1540
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION hull_junction 290 1550
+point_number 90
+size 117.000
+*END
+
+*BEGIN RELATION hull_junction 290 1560
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION hull_junction 290 1570
+point_number 16
+size 20.800
+*END
+
+*BEGIN RELATION hull_junction 290 1600
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION hull_junction 290 1620
+point_number 28
+size 36.400
+*END
+
+*BEGIN RELATION hull_junction 290 1630
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION hull_junction 290 1640
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION hull_junction 290 1650
+point_number 61
+size 79.300
+*END
+
+*BEGIN RELATION hull_junction 290 1670
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION hull_junction 290 1680
+point_number 65
+size 84.500
+*END
+
+*BEGIN RELATION hull_junction 290 1690
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION hull_junction 290 1700
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION hull_junction 290 1710
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION hull_junction 290 1730
+point_number 52
+size 67.600
+*END
+
+*BEGIN RELATION hull_junction 290 1740
+point_number 50
+size 65.000
+*END
+
+*BEGIN RELATION hull_junction 290 1750
+point_number 34
+size 44.200
+*END
+
+*BEGIN RELATION hull_junction 290 1760
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION hull_junction 290 1790
+point_number 52
+size 67.600
+*END
+
+*BEGIN RELATION hull_junction 290 1800
+point_number 266
+size 345.800
+*END
+
+*BEGIN RELATION hull_junction 290 1820
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION hull_junction 290 1870
+point_number 39
+size 50.700
+*END
+
+*BEGIN RELATION hull_junction 290 1910
+point_number 185
+size 240.500
+*END
+
+*BEGIN RELATION hull_junction 290 1950
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION hull_junction 290 1960
+point_number 65
+size 84.500
+*END
+
+*BEGIN RELATION hull_junction 290 1990
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION hull_junction 290 2000
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION hull_junction 290 2040
+point_number 122
+size 158.600
+*END
+
+*BEGIN RELATION hull_junction 290 2050
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION hull_junction 290 2110
+point_number 82
+size 106.600
+*END
+
+*BEGIN RELATION hull_junction 290 2130
+point_number 356
+size 462.800
+*END
+
+*BEGIN RELATION hull_junction 290 2150
+point_number 29
+size 37.700
+*END
+
+*BEGIN RELATION hull_junction 290 2160
+point_number 131
+size 170.300
+*END
+
+*BEGIN RELATION hull_junction 290 2170
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION hull_junction 290 2180
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION hull_junction 290 2190
+point_number 392
+size 509.600
+*END
+
+*BEGIN RELATION hull_junction 290 2220
+point_number 49
+size 63.700
+*END
+
+*BEGIN RELATION hull_junction 290 2240
+point_number 111
+size 144.300
+*END
+
+*BEGIN RELATION hull_junction 290 2250
+point_number 90
+size 117.000
+*END
+
+*BEGIN RELATION hull_junction 290 2270
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION hull_junction 290 2290
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION hull_junction 290 2300
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION hull_junction 290 2320
+point_number 74
+size 96.200
+*END
+
+*BEGIN RELATION hull_junction 290 2340
+point_number 50
+size 65.000
+*END
+
+*BEGIN RELATION hull_junction 290 2380
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION hull_junction 290 2390
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION hull_junction 290 2400
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION hull_junction 290 2410
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION hull_junction 290 2420
+point_number 128
+size 166.400
+*END
+
+*BEGIN RELATION hull_junction 290 2460
+point_number 115
+size 149.500
+*END
+
+*BEGIN RELATION hull_junction 290 2470
+point_number 39
+size 50.700
+*END
+
+*BEGIN RELATION hull_junction 290 2500
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION hull_junction 290 2510
+point_number 31
+size 40.300
+*END
+
+*BEGIN RELATION hull_junction 290 2520
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION hull_junction 290 2540
+point_number 58
+size 75.400
+*END
+
+*BEGIN RELATION hull_junction 290 2550
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION hull_junction 290 2560
+point_number 31
+size 40.300
+*END
+
+*BEGIN RELATION hull_junction 290 2580
+point_number 50
+size 65.000
+*END
+
+*BEGIN RELATION hull_junction 290 2600
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION hull_junction 290 2610
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION hull_junction 290 2620
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION hull_junction 290 2630
+point_number 40
+size 52.000
+*END
+
+*BEGIN RELATION hull_junction 290 2640
+point_number 81
+size 105.300
+*END
+
+*BEGIN RELATION hull_junction 290 2650
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION hull_junction 290 2680
+point_number 42
+size 54.600
+*END
+
+*BEGIN RELATION hull_junction 290 2700
+point_number 33
+size 42.900
+*END
+
+*BEGIN RELATION hull_junction 290 2720
+point_number 35
+size 45.500
+*END
+
+*BEGIN RELATION hull_junction 290 2740
+point_number 206
+size 267.800
+*END
+
+*BEGIN RELATION hull_junction 290 2750
+point_number 128
+size 166.400
+*END
+
+*BEGIN RELATION hull_junction 290 2770
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION hull_junction 290 2780
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION hull_junction 290 2790
+point_number 57
+size 74.100
+*END
+
+*BEGIN RELATION hull_junction 290 2820
+point_number 28
+size 36.400
+*END
+
+*BEGIN RELATION hull_junction 290 2830
+point_number 93
+size 120.900
+*END
+
+*BEGIN RELATION hull_junction 290 2860
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION hull_junction 290 2870
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION hull_junction 290 2900
+point_number 68
+size 88.400
+*END
+
+*BEGIN RELATION hull_junction 290 2920
+point_number 81
+size 105.300
+*END
+
+*BEGIN RELATION hull_junction 290 2950
+point_number 84
+size 109.200
+*END
+
+*BEGIN RELATION hull_junction 290 2990
+point_number 29
+size 37.700
+*END
+
+*BEGIN RELATION hull_junction 290 3000
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION hull_junction 290 3010
+point_number 54
+size 70.200
+*END
+
+*BEGIN RELATION hull_junction 290 3040
+point_number 16
+size 20.800
+*END
+
+*BEGIN RELATION hull_junction 290 3060
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION hull_junction 290 3070
+point_number 91
+size 118.300
+*END
+
+*BEGIN RELATION hull_junction 290 3160
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION hull_junction 290 3190
+point_number 26
+size 33.800
+*END
+
+*BEGIN RELATION hull_junction 290 3240
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION hull_junction 290 3250
+point_number 32
+size 41.600
+*END
+
+*BEGIN RELATION hull_junction 290 3260
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION hull_junction 290 3280
+point_number 20
+size 26.000
+*END
+
+*BEGIN RELATION hull_junction 290 3290
+point_number 46
+size 59.800
+*END
+
+*BEGIN RELATION hull_junction 290 3350
+point_number 68
+size 88.400
+*END
+
+*BEGIN RELATION hull_junction 290 3360
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION hull_junction 290 3380
+point_number 16
+size 20.800
+*END
+
+*BEGIN RELATION hull_junction 290 3410
+point_number 24
+size 31.200
+*END
+
+*BEGIN RELATION hull_junction 290 3440
+point_number 39
+size 50.700
+*END
+
+*BEGIN RELATION hull_junction 290 3450
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION hull_junction 290 3460
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION hull_junction 290 3490
+point_number 47
+size 61.100
+*END
+
+*BEGIN RELATION hull_junction 290 3530
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION hull_junction 290 3540
+point_number 31
+size 40.300
+*END
+
+*BEGIN RELATION hull_junction 290 3550
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION hull_junction 290 3560
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION hull_junction 290 3580
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION hull_junction 290 3590
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION hull_junction 290 3600
+point_number 41
+size 53.300
+*END
+
+*BEGIN RELATION hull_junction 290 3610
+point_number 114
+size 148.200
+*END
+
+*BEGIN RELATION hull_junction 290 3620
+point_number 65
+size 84.500
+*END
+
+*BEGIN RELATION hull_junction 290 3670
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION hull_junction 290 3680
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION hull_junction 290 3690
+point_number 62
+size 80.600
+*END
+
+*BEGIN RELATION hull_junction 290 3700
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION hull_junction 290 3730
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION hull_junction 290 3780
+point_number 72
+size 93.600
+*END
+
+*BEGIN RELATION hull_junction 290 3790
+point_number 44
+size 57.200
+*END
+
+*BEGIN RELATION hull_junction 290 3800
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION hull_junction 290 3810
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION hull_junction 290 3820
+point_number 43
+size 55.900
+*END
+
+*BEGIN RELATION hull_junction 290 3830
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION hull_junction 290 3850
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION hull_junction 290 3860
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION hull_junction 290 3870
+point_number 25
+size 32.500
+*END
+
+*BEGIN RELATION hull_junction 290 3880
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION hull_junction 290 3890
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION hull_junction 290 3900
+point_number 34
+size 44.200
+*END
+
+*BEGIN RELATION hull_junction 290 3910
+point_number 25
+size 32.500
+*END
+
+*BEGIN RELATION hull_junction 290 3920
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION hull_junction 290 3930
+point_number 62
+size 80.600
+*END
+
+*BEGIN RELATION hull_junction 290 3940
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION hull_junction 290 3950
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION hull_junction 290 3960
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION hull_junction 290 3970
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION hull_junction 290 3980
+point_number 25
+size 32.500
+*END
+
+*BEGIN RELATION hull_junction 290 3990
+point_number 77
+size 100.100
+*END
+
+*BEGIN RELATION hull_junction 290 4000
+point_number 32
+size 41.600
+*END
+
+*BEGIN RELATION hull_junction 290 4010
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION hull_junction 290 4020
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION hull_junction 290 4030
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION hull_junction 290 4040
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION hull_junction 290 4050
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION hull_junction 290 4060
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION hull_junction 290 4070
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION hull_junction 290 4090
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION hull_junction 290 4100
+point_number 54
+size 70.200
+*END
+
+*BEGIN RELATION hull_junction 290 4110
+point_number 116
+size 150.800
+*END
+
+*BEGIN RELATION hull_junction 290 4120
+point_number 61
+size 79.300
+*END
+
+*BEGIN RELATION junction 320 570
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 330 350
+point_number 16
+size 20.800
+*END
+
+*BEGIN RELATION junction 340 390
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION junction 340 410
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 350 400
+point_number 20
+size 26.000
+*END
+
+*BEGIN RELATION junction 350 450
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 350 490
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 350 520
+point_number 49
+size 63.700
+*END
+
+*BEGIN RELATION junction 350 530
+point_number 34
+size 44.200
+*END
+
+*BEGIN RELATION junction 350 620
+point_number 13
+size 16.900
+*END
+
+*BEGIN RELATION junction 350 630
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 350 680
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 350 710
+point_number 16
+size 20.800
+*END
+
+*BEGIN RELATION junction 350 770
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 350 830
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 350 840
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 350 850
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 350 930
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 350 1000
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 350 1050
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 350 1160
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 350 1170
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 350 1230
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 350 1240
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 350 1350
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 350 1430
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 360 540
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION junction 360 780
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 370 790
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION junction 370 1090
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION junction 430 550
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION junction 450 770
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 450 850
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 450 910
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 450 930
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 450 960
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 460 500
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 460 650
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 460 660
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 470 580
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 490 630
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION junction 490 680
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 490 730
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 490 850
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 490 910
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 490 940
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 490 970
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION junction 490 1060
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 490 1240
+point_number 29
+size 37.700
+*END
+
+*BEGIN RELATION junction 490 1430
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 540 780
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 540 1270
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 560 760
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 560 1140
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 600 1040
+point_number 60
+size 78.000
+*END
+
+*BEGIN RELATION junction 600 1130
+point_number 43
+size 55.900
+*END
+
+*BEGIN RELATION junction 650 660
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 650 700
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 650 810
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 680 730
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 690 720
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION junction 720 740
+point_number 24
+size 31.200
+*END
+
+*BEGIN RELATION junction 720 980
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION junction 720 1290
+point_number 13
+size 16.900
+*END
+
+*BEGIN RELATION junction 720 1450
+point_number 41
+size 53.300
+*END
+
+*BEGIN RELATION junction 730 860
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 730 870
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 730 970
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 730 1190
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 760 1140
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 760 1180
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION junction 810 1120
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 810 1150
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 810 1360
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 840 930
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 850 910
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 860 870
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 860 910
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 860 960
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 860 1400
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 870 910
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION junction 880 950
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 880 1020
+point_number 35
+size 45.500
+*END
+
+*BEGIN RELATION junction 880 1210
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 880 1410
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 880 2150
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION junction 910 920
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 910 930
+point_number 41
+size 53.300
+*END
+
+*BEGIN RELATION junction 910 940
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 910 1000
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 910 1050
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 910 1070
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 910 1190
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 910 1200
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 910 1230
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 910 1320
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION junction 910 1380
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 910 1390
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 910 1430
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 910 1440
+point_number 16
+size 20.800
+*END
+
+*BEGIN RELATION junction 910 1460
+point_number 29
+size 37.700
+*END
+
+*BEGIN RELATION junction 910 1580
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION junction 910 1670
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 910 2100
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 910 2130
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 910 2190
+point_number 51
+size 66.300
+*END
+
+*BEGIN RELATION junction 910 2310
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 910 2710
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 920 1190
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 920 1280
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 920 1580
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 930 940
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 930 1050
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 930 1240
+point_number 47
+size 61.100
+*END
+
+*BEGIN RELATION junction 930 1350
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 930 1430
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 930 1780
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION junction 990 1750
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 1010 1630
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION junction 1030 1040
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION junction 1040 1420
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 1070 1670
+point_number 28
+size 36.400
+*END
+
+*BEGIN RELATION junction 1100 2780
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 1110 1200
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 1110 1730
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1110 1810
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1110 1830
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1110 1860
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 1110 2100
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1110 2190
+point_number 34
+size 44.200
+*END
+
+*BEGIN RELATION junction 1150 1340
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION junction 1180 1250
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1200 1330
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 1200 1590
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1200 1670
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1240 1350
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 1240 1430
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1240 1690
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1240 1880
+point_number 71
+size 92.300
+*END
+
+*BEGIN RELATION junction 1240 1900
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION junction 1270 1850
+point_number 116
+size 150.800
+*END
+
+*BEGIN RELATION junction 1270 1930
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION junction 1270 1990
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION junction 1270 2060
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1330 1490
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1330 1590
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1340 1500
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 1340 1550
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 1350 1560
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1350 1770
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 1350 1780
+point_number 13
+size 16.900
+*END
+
+*BEGIN RELATION junction 1450 1740
+point_number 34
+size 44.200
+*END
+
+*BEGIN RELATION junction 1450 2040
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION junction 1470 1820
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1470 1850
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION junction 1470 2060
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1490 1730
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 1490 1860
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 1490 2140
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 1510 2630
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 1520 2220
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1520 2340
+point_number 40
+size 52.000
+*END
+
+*BEGIN RELATION junction 1520 2580
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 1540 1750
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1560 1600
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1590 1670
+point_number 26
+size 33.800
+*END
+
+*BEGIN RELATION junction 1670 1730
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 1670 1830
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1670 2080
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 1670 2090
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION junction 1670 2130
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION junction 1670 2310
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1680 1730
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION junction 1690 1840
+point_number 20
+size 26.000
+*END
+
+*BEGIN RELATION junction 1710 1920
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1710 2010
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 1710 2170
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1710 2180
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1730 1810
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1730 1830
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 1730 2000
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 1730 2100
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1730 2130
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 1730 2140
+point_number 16
+size 20.800
+*END
+
+*BEGIN RELATION junction 1730 2190
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 1730 2230
+point_number 38
+size 49.400
+*END
+
+*BEGIN RELATION junction 1730 2350
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1730 2470
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1730 2990
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1750 1760
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1790 1800
+point_number 38
+size 49.400
+*END
+
+*BEGIN RELATION junction 1790 2280
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1800 1960
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1800 2120
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1800 2290
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 1800 2420
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 1820 1910
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1850 1910
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1850 2060
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1850 2330
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 1870 2250
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1910 2060
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 1910 2130
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 1910 2330
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 1910 2570
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 1960 2120
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2000 2260
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 2040 2320
+point_number 25
+size 32.500
+*END
+
+*BEGIN RELATION junction 2080 2090
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2120 2420
+point_number 27
+size 35.100
+*END
+
+*BEGIN RELATION junction 2130 2190
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 2130 2200
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 2130 2310
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2130 2360
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2130 2430
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 2130 2450
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2130 2490
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 2130 2500
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 2130 2560
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION junction 2130 2660
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION junction 2130 2670
+point_number 36
+size 46.800
+*END
+
+*BEGIN RELATION junction 2130 2760
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 2130 2850
+point_number 30
+size 39.000
+*END
+
+*BEGIN RELATION junction 2130 2910
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 2130 2940
+point_number 87
+size 113.100
+*END
+
+*BEGIN RELATION junction 2130 2950
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2130 2990
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 2130 3020
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 2130 3030
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 2130 3040
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2130 3080
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 2130 3120
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 2130 3200
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 2130 3210
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 2130 3270
+point_number 17
+size 22.100
+*END
+
+*BEGIN RELATION junction 2130 3370
+point_number 13
+size 16.900
+*END
+
+*BEGIN RELATION junction 2130 3390
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 2130 3400
+point_number 77
+size 100.100
+*END
+
+*BEGIN RELATION junction 2130 3410
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 2130 3550
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION junction 2130 3560
+point_number 23
+size 29.900
+*END
+
+*BEGIN RELATION junction 2130 3580
+point_number 53
+size 68.900
+*END
+
+*BEGIN RELATION junction 2130 3600
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 2130 3630
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION junction 2130 3680
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 2160 2270
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 2170 2300
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 2190 2230
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION junction 2190 2360
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2190 2370
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2190 2430
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2190 2440
+point_number 25
+size 32.500
+*END
+
+*BEGIN RELATION junction 2190 2500
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION junction 2190 2690
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION junction 2190 2710
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 2190 2800
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION junction 2190 2810
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 2190 2830
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION junction 2190 2890
+point_number 98
+size 127.400
+*END
+
+*BEGIN RELATION junction 2190 2900
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 2190 2930
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 2190 2970
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 2190 2980
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 2190 2990
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 2190 3030
+point_number 35
+size 45.500
+*END
+
+*BEGIN RELATION junction 2190 3050
+point_number 34
+size 44.200
+*END
+
+*BEGIN RELATION junction 2190 3100
+point_number 54
+size 70.200
+*END
+
+*BEGIN RELATION junction 2190 3140
+point_number 35
+size 45.500
+*END
+
+*BEGIN RELATION junction 2190 3160
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 2190 3180
+point_number 25
+size 32.500
+*END
+
+*BEGIN RELATION junction 2190 3220
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 2190 3230
+point_number 13
+size 16.900
+*END
+
+*BEGIN RELATION junction 2190 3300
+point_number 27
+size 35.100
+*END
+
+*BEGIN RELATION junction 2190 3320
+point_number 39
+size 50.700
+*END
+
+*BEGIN RELATION junction 2190 3340
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION junction 2190 3460
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION junction 2190 3470
+point_number 37
+size 48.100
+*END
+
+*BEGIN RELATION junction 2190 3480
+point_number 14
+size 18.200
+*END
+
+*BEGIN RELATION junction 2190 3500
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 2190 3510
+point_number 45
+size 58.500
+*END
+
+*BEGIN RELATION junction 2190 3520
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 2190 3570
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION junction 2190 3610
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 2190 3640
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 2190 3650
+point_number 32
+size 41.600
+*END
+
+*BEGIN RELATION junction 2190 3660
+point_number 21
+size 27.300
+*END
+
+*BEGIN RELATION junction 2190 3670
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION junction 2190 3690
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 2190 3700
+point_number 38
+size 49.400
+*END
+
+*BEGIN RELATION junction 2190 3720
+point_number 15
+size 19.500
+*END
+
+*BEGIN RELATION junction 2190 3730
+point_number 49
+size 63.700
+*END
+
+*BEGIN RELATION junction 2190 3740
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 2190 3750
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION junction 2190 3770
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION junction 2190 3780
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 2190 3810
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2220 2580
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 2240 2250
+point_number 6
+size 7.800
+*END
+
+*BEGIN RELATION junction 2300 2620
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 2420 2770
+point_number 26
+size 33.800
+*END
+
+*BEGIN RELATION junction 2420 2840
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 2420 2930
+point_number 7
+size 9.100
+*END
+
+*BEGIN RELATION junction 2430 2500
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 2430 2530
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2440 2500
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 2460 2680
+point_number 29
+size 37.700
+*END
+
+*BEGIN RELATION junction 2500 2730
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION junction 2500 2760
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 2500 2830
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2500 2990
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 2500 3060
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 2580 2950
+point_number 45
+size 58.500
+*END
+
+*BEGIN RELATION junction 2660 2670
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 2670 2960
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 2680 2900
+point_number 29
+size 37.700
+*END
+
+*BEGIN RELATION junction 2730 2910
+point_number 34
+size 44.200
+*END
+
+*BEGIN RELATION junction 2740 3250
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 2780 2860
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2800 2890
+point_number 8
+size 10.400
+*END
+
+*BEGIN RELATION junction 2810 3050
+point_number 11
+size 14.300
+*END
+
+*BEGIN RELATION junction 2810 3330
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2860 2870
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2880 3090
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 2900 3110
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 2900 3690
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2910 3060
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2910 3150
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 2950 3600
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 2980 3030
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3030 3170
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 3040 3120
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 3040 3410
+point_number 25
+size 32.500
+*END
+
+*BEGIN RELATION junction 3060 3150
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 3060 3420
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3070 3280
+point_number 19
+size 24.700
+*END
+
+*BEGIN RELATION junction 3140 3230
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3150 3410
+point_number 13
+size 16.900
+*END
+
+*BEGIN RELATION junction 3180 3230
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 3180 3340
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 3320 3330
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 3350 3620
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3400 3410
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 3410 3430
+point_number 9
+size 11.700
+*END
+
+*BEGIN RELATION junction 3410 3610
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 3470 3520
+point_number 12
+size 15.600
+*END
+
+*BEGIN RELATION junction 3560 3900
+point_number 3
+size 3.900
+*END
+
+*BEGIN RELATION junction 3580 3680
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 3610 3620
+point_number 4
+size 5.200
+*END
+
+*BEGIN RELATION junction 3610 3920
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3690 3750
+point_number 24
+size 31.200
+*END
+
+*BEGIN RELATION junction 3690 3830
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 3740 3790
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3740 3800
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3740 3870
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3800 3880
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 3800 3890
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 3820 3910
+point_number 5
+size 6.500
+*END
+
+*BEGIN RELATION junction 3820 4030
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3870 3880
+point_number 13
+size 16.900
+*END
+
+*BEGIN RELATION junction 3870 3890
+point_number 2
+size 2.600
+*END
+
+*BEGIN RELATION junction 3870 4050
+point_number 10
+size 13.000
+*END
+
+*BEGIN RELATION junction 3880 3890
+point_number 1
+size 1.300
+*END
+
+*BEGIN RELATION junction 3990 4090
+point_number 18
+size 23.400
+*END
+
+*BEGIN RELATION junction 3990 4100
+point_number 22
+size 28.600
+*END
+
+*BEGIN RELATION cortical 300 330
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 300 350
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 300 390
+point_number 57
+size 0.000
+*END
+
+*BEGIN RELATION cortical 310 320
+point_number 56
+size 0.000
+*END
+
+*BEGIN RELATION cortical 310 350
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 310 400
+point_number 35
+size 0.000
+*END
+
+*BEGIN RELATION cortical 320 350
+point_number 45
+size 455.000
+*END
+
+*BEGIN RELATION cortical 320 370
+point_number 32
+size 389.000
+*END
+
+*BEGIN RELATION cortical 320 400
+point_number 5
+size 360.000
+*END
+
+*BEGIN RELATION cortical 320 420
+point_number 63
+size 0.000
+*END
+
+*BEGIN RELATION cortical 320 480
+point_number 56
+size 0.000
+*END
+
+*BEGIN RELATION cortical 320 510
+point_number 19
+size 250.000
+*END
+
+*BEGIN RELATION cortical 320 560
+point_number 36
+size 283.000
+*END
+
+*BEGIN RELATION cortical 320 570
+point_number 44
+size 158.000
+*END
+
+*BEGIN RELATION cortical 330 340
+point_number 50
+size 221.000
+*END
+
+*BEGIN RELATION cortical 330 350
+point_number 51
+size 465.000
+*END
+
+*BEGIN RELATION cortical 330 390
+point_number 14
+size 196.000
+*END
+
+*BEGIN RELATION cortical 340 350
+point_number 39
+size 174.000
+*END
+
+*BEGIN RELATION cortical 340 360
+point_number 51
+size 392.000
+*END
+
+*BEGIN RELATION cortical 340 390
+point_number 64
+size 381.000
+*END
+
+*BEGIN RELATION cortical 340 410
+point_number 50
+size 0.000
+*END
+
+*BEGIN RELATION cortical 340 500
+point_number 26
+size 0.000
+*END
+
+*BEGIN RELATION cortical 340 540
+point_number 54
+size 292.000
+*END
+
+*BEGIN RELATION cortical 340 600
+point_number 72
+size 388.000
+*END
+
+*BEGIN RELATION cortical 340 610
+point_number 20
+size 0.000
+*END
+
+*BEGIN RELATION cortical 350 360
+point_number 66
+size 182.000
+*END
+
+*BEGIN RELATION cortical 350 370
+point_number 55
+size 404.000
+*END
+
+*BEGIN RELATION cortical 350 380
+point_number 65
+size 0.000
+*END
+
+*BEGIN RELATION cortical 350 400
+point_number 53
+size 486.000
+*END
+
+*BEGIN RELATION cortical 350 440
+point_number 23
+size 0.000
+*END
+
+*BEGIN RELATION cortical 350 450
+point_number 18
+size 57.000
+*END
+
+*BEGIN RELATION cortical 350 490
+point_number 13
+size 49.000
+*END
+
+*BEGIN RELATION cortical 350 510
+point_number 81
+size 783.000
+*END
+
+*BEGIN RELATION cortical 350 590
+point_number 44
+size 737.000
+*END
+
+*BEGIN RELATION cortical 350 680
+point_number 5
+size 0.000
+*END
+
+*BEGIN RELATION cortical 350 800
+point_number 34
+size 0.000
+*END
+
+*BEGIN RELATION cortical 350 890
+point_number 61
+size 0.000
+*END
+
+*BEGIN RELATION cortical 350 1160
+point_number 16
+size 211.000
+*END
+
+*BEGIN RELATION cortical 350 1240
+point_number 21
+size 89.000
+*END
+
+*BEGIN RELATION cortical 350 1300
+point_number 2
+size 168.000
+*END
+
+*BEGIN RELATION cortical 350 1350
+point_number 4
+size 6.000
+*END
+
+*BEGIN RELATION cortical 360 410
+point_number 59
+size 0.000
+*END
+
+*BEGIN RELATION cortical 360 430
+point_number 82
+size 404.000
+*END
+
+*BEGIN RELATION cortical 360 450
+point_number 40
+size 157.000
+*END
+
+*BEGIN RELATION cortical 360 540
+point_number 40
+size 243.000
+*END
+
+*BEGIN RELATION cortical 360 690
+point_number 35
+size 0.000
+*END
+
+*BEGIN RELATION cortical 360 720
+point_number 7
+size 139.000
+*END
+
+*BEGIN RELATION cortical 370 420
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 370 440
+point_number 41
+size 0.000
+*END
+
+*BEGIN RELATION cortical 370 470
+point_number 85
+size 539.000
+*END
+
+*BEGIN RELATION cortical 370 490
+point_number 31
+size 123.000
+*END
+
+*BEGIN RELATION cortical 370 570
+point_number 47
+size 216.000
+*END
+
+*BEGIN RELATION cortical 370 670
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 370 880
+point_number 8
+size 529.000
+*END
+
+*BEGIN RELATION cortical 370 950
+point_number 40
+size 0.000
+*END
+
+*BEGIN RELATION cortical 370 1080
+point_number 61
+size 0.000
+*END
+
+*BEGIN RELATION cortical 370 1090
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 370 1140
+point_number 34
+size 249.000
+*END
+
+*BEGIN RELATION cortical 370 1620
+point_number 26
+size 0.000
+*END
+
+*BEGIN RELATION cortical 370 1800
+point_number 46
+size 476.000
+*END
+
+*BEGIN RELATION cortical 380 390
+point_number 38
+size 0.000
+*END
+
+*BEGIN RELATION cortical 380 460
+point_number 34
+size 0.000
+*END
+
+*BEGIN RELATION cortical 380 590
+point_number 21
+size 0.000
+*END
+
+*BEGIN RELATION cortical 390 460
+point_number 57
+size 521.000
+*END
+
+*BEGIN RELATION cortical 400 420
+point_number 31
+size 0.000
+*END
+
+*BEGIN RELATION cortical 400 440
+point_number 15
+size 0.000
+*END
+
+*BEGIN RELATION cortical 410 540
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 420 440
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 430 450
+point_number 23
+size 90.000
+*END
+
+*BEGIN RELATION cortical 430 550
+point_number 50
+size 132.000
+*END
+
+*BEGIN RELATION cortical 430 690
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 430 720
+point_number 21
+size 204.000
+*END
+
+*BEGIN RELATION cortical 450 550
+point_number 36
+size 198.000
+*END
+
+*BEGIN RELATION cortical 450 680
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 450 730
+point_number 9
+size 58.000
+*END
+
+*BEGIN RELATION cortical 450 740
+point_number 29
+size 163.000
+*END
+
+*BEGIN RELATION cortical 450 870
+point_number 1
+size 2.000
+*END
+
+*BEGIN RELATION cortical 460 500
+point_number 46
+size 0.000
+*END
+
+*BEGIN RELATION cortical 460 590
+point_number 15
+size 192.000
+*END
+
+*BEGIN RELATION cortical 460 600
+point_number 25
+size 232.000
+*END
+
+*BEGIN RELATION cortical 460 650
+point_number 19
+size 57.000
+*END
+
+*BEGIN RELATION cortical 460 660
+point_number 18
+size 49.000
+*END
+
+*BEGIN RELATION cortical 470 490
+point_number 11
+size 43.000
+*END
+
+*BEGIN RELATION cortical 470 580
+point_number 40
+size 122.000
+*END
+
+*BEGIN RELATION cortical 470 670
+point_number 30
+size 0.000
+*END
+
+*BEGIN RELATION cortical 470 880
+point_number 27
+size 218.000
+*END
+
+*BEGIN RELATION cortical 480 510
+point_number 55
+size 0.000
+*END
+
+*BEGIN RELATION cortical 480 560
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 490 580
+point_number 54
+size 218.000
+*END
+
+*BEGIN RELATION cortical 490 680
+point_number 5
+size 0.000
+*END
+
+*BEGIN RELATION cortical 490 730
+point_number 11
+size 22.000
+*END
+
+*BEGIN RELATION cortical 500 600
+point_number 5
+size 0.000
+*END
+
+*BEGIN RELATION cortical 500 610
+point_number 29
+size 0.000
+*END
+
+*BEGIN RELATION cortical 510 560
+point_number 26
+size 246.000
+*END
+
+*BEGIN RELATION cortical 510 640
+point_number 50
+size 0.000
+*END
+
+*BEGIN RELATION cortical 510 760
+point_number 73
+size 542.000
+*END
+
+*BEGIN RELATION cortical 510 820
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 510 890
+point_number 40
+size 0.000
+*END
+
+*BEGIN RELATION cortical 540 600
+point_number 60
+size 201.000
+*END
+
+*BEGIN RELATION cortical 540 720
+point_number 55
+size 268.000
+*END
+
+*BEGIN RELATION cortical 540 1130
+point_number 43
+size 150.000
+*END
+
+*BEGIN RELATION cortical 540 1270
+point_number 72
+size 219.000
+*END
+
+*BEGIN RELATION cortical 540 1480
+point_number 36
+size 124.000
+*END
+
+*BEGIN RELATION cortical 550 720
+point_number 62
+size 273.000
+*END
+
+*BEGIN RELATION cortical 550 740
+point_number 35
+size 156.000
+*END
+
+*BEGIN RELATION cortical 560 570
+point_number 38
+size 207.000
+*END
+
+*BEGIN RELATION cortical 560 760
+point_number 41
+size 120.000
+*END
+
+*BEGIN RELATION cortical 560 1080
+point_number 20
+size 0.000
+*END
+
+*BEGIN RELATION cortical 560 1140
+point_number 14
+size 106.000
+*END
+
+*BEGIN RELATION cortical 570 1080
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 580 750
+point_number 50
+size 0.000
+*END
+
+*BEGIN RELATION cortical 580 870
+point_number 2
+size 8.000
+*END
+
+*BEGIN RELATION cortical 580 880
+point_number 24
+size 297.000
+*END
+
+*BEGIN RELATION cortical 580 910
+point_number 10
+size 129.000
+*END
+
+*BEGIN RELATION cortical 590 650
+point_number 10
+size 147.000
+*END
+
+*BEGIN RELATION cortical 590 700
+point_number 53
+size 0.000
+*END
+
+*BEGIN RELATION cortical 590 800
+point_number 51
+size 0.000
+*END
+
+*BEGIN RELATION cortical 590 810
+point_number 26
+size 141.000
+*END
+
+*BEGIN RELATION cortical 590 1150
+point_number 33
+size 265.000
+*END
+
+*BEGIN RELATION cortical 600 610
+point_number 36
+size 0.000
+*END
+
+*BEGIN RELATION cortical 600 660
+point_number 32
+size 118.000
+*END
+
+*BEGIN RELATION cortical 600 1040
+point_number 41
+size 109.000
+*END
+
+*BEGIN RELATION cortical 600 1130
+point_number 43
+size 86.000
+*END
+
+*BEGIN RELATION cortical 640 760
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 640 820
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 650 660
+point_number 21
+size 114.000
+*END
+
+*BEGIN RELATION cortical 650 700
+point_number 11
+size 0.000
+*END
+
+*BEGIN RELATION cortical 650 810
+point_number 23
+size 205.000
+*END
+
+*BEGIN RELATION cortical 660 1030
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 660 1040
+point_number 9
+size 151.000
+*END
+
+*BEGIN RELATION cortical 670 880
+point_number 49
+size 0.000
+*END
+
+*BEGIN RELATION cortical 680 730
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 690 720
+point_number 59
+size 0.000
+*END
+
+*BEGIN RELATION cortical 700 810
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 720 740
+point_number 46
+size 152.000
+*END
+
+*BEGIN RELATION cortical 720 980
+point_number 59
+size 214.000
+*END
+
+*BEGIN RELATION cortical 720 1010
+point_number 41
+size 139.000
+*END
+
+*BEGIN RELATION cortical 720 1070
+point_number 57
+size 176.000
+*END
+
+*BEGIN RELATION cortical 720 1270
+point_number 56
+size 312.000
+*END
+
+*BEGIN RELATION cortical 720 1330
+point_number 20
+size 53.000
+*END
+
+*BEGIN RELATION cortical 720 1450
+point_number 44
+size 138.000
+*END
+
+*BEGIN RELATION cortical 720 1480
+point_number 32
+size 96.000
+*END
+
+*BEGIN RELATION cortical 720 1510
+point_number 9
+size 24.000
+*END
+
+*BEGIN RELATION cortical 720 1520
+point_number 37
+size 223.000
+*END
+
+*BEGIN RELATION cortical 720 1670
+point_number 12
+size 44.000
+*END
+
+*BEGIN RELATION cortical 720 1680
+point_number 23
+size 94.000
+*END
+
+*BEGIN RELATION cortical 730 870
+point_number 30
+size 60.000
+*END
+
+*BEGIN RELATION cortical 740 870
+point_number 1
+size 3.000
+*END
+
+*BEGIN RELATION cortical 740 910
+point_number 16
+size 49.000
+*END
+
+*BEGIN RELATION cortical 740 1070
+point_number 43
+size 136.000
+*END
+
+*BEGIN RELATION cortical 750 880
+point_number 64
+size 0.000
+*END
+
+*BEGIN RELATION cortical 750 910
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 750 1110
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 760 990
+point_number 39
+size 379.000
+*END
+
+*BEGIN RELATION cortical 760 1140
+point_number 43
+size 116.000
+*END
+
+*BEGIN RELATION cortical 760 1180
+point_number 55
+size 218.000
+*END
+
+*BEGIN RELATION cortical 800 1150
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 800 1160
+point_number 8
+size 0.000
+*END
+
+*BEGIN RELATION cortical 800 1220
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 810 1030
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 810 1120
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 810 1150
+point_number 12
+size 31.000
+*END
+
+*BEGIN RELATION cortical 810 1360
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 810 1420
+point_number 8
+size 106.000
+*END
+
+*BEGIN RELATION cortical 820 890
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 820 990
+point_number 48
+size 0.000
+*END
+
+*BEGIN RELATION cortical 820 1300
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 870 910
+point_number 35
+size 82.000
+*END
+
+*BEGIN RELATION cortical 880 950
+point_number 40
+size 0.000
+*END
+
+*BEGIN RELATION cortical 880 1090
+point_number 15
+size 0.000
+*END
+
+*BEGIN RELATION cortical 880 1100
+point_number 76
+size 581.000
+*END
+
+*BEGIN RELATION cortical 880 1110
+point_number 3
+size 155.000
+*END
+
+*BEGIN RELATION cortical 880 1210
+point_number 34
+size 0.000
+*END
+
+*BEGIN RELATION cortical 880 1410
+point_number 42
+size 144.000
+*END
+
+*BEGIN RELATION cortical 880 1490
+point_number 9
+size 140.000
+*END
+
+*BEGIN RELATION cortical 880 1530
+point_number 23
+size 173.000
+*END
+
+*BEGIN RELATION cortical 880 1570
+point_number 57
+size 0.000
+*END
+
+*BEGIN RELATION cortical 880 1620
+point_number 31
+size 0.000
+*END
+
+*BEGIN RELATION cortical 880 1800
+point_number 19
+size 805.000
+*END
+
+*BEGIN RELATION cortical 880 1870
+point_number 49
+size 159.000
+*END
+
+*BEGIN RELATION cortical 880 2050
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 880 2150
+point_number 31
+size 0.000
+*END
+
+*BEGIN RELATION cortical 880 2240
+point_number 9
+size 171.000
+*END
+
+*BEGIN RELATION cortical 890 1300
+point_number 27
+size 0.000
+*END
+
+*BEGIN RELATION cortical 910 1070
+point_number 29
+size 66.000
+*END
+
+*BEGIN RELATION cortical 910 1110
+point_number 14
+size 146.000
+*END
+
+*BEGIN RELATION cortical 910 1200
+point_number 5
+size 22.000
+*END
+
+*BEGIN RELATION cortical 950 1090
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 980 1010
+point_number 48
+size 141.000
+*END
+
+*BEGIN RELATION cortical 980 1510
+point_number 29
+size 119.000
+*END
+
+*BEGIN RELATION cortical 990 1250
+point_number 44
+size 0.000
+*END
+
+*BEGIN RELATION cortical 990 1300
+point_number 39
+size 457.000
+*END
+
+*BEGIN RELATION cortical 990 1540
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 990 1650
+point_number 16
+size 211.000
+*END
+
+*BEGIN RELATION cortical 990 1700
+point_number 33
+size 0.000
+*END
+
+*BEGIN RELATION cortical 990 1750
+point_number 2
+size 207.000
+*END
+
+*BEGIN RELATION cortical 990 1760
+point_number 23
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1010 1270
+point_number 25
+size 208.000
+*END
+
+*BEGIN RELATION cortical 1010 1510
+point_number 35
+size 179.000
+*END
+
+*BEGIN RELATION cortical 1010 1630
+point_number 30
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1030 1040
+point_number 40
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1030 1120
+point_number 19
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1040 1120
+point_number 22
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1040 1130
+point_number 2
+size 11.000
+*END
+
+*BEGIN RELATION cortical 1040 1420
+point_number 43
+size 306.000
+*END
+
+*BEGIN RELATION cortical 1040 1470
+point_number 45
+size 263.000
+*END
+
+*BEGIN RELATION cortical 1040 1950
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1070 1200
+point_number 5
+size 8.000
+*END
+
+*BEGIN RELATION cortical 1080 1140
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1090 1620
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1100 1210
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1100 1530
+point_number 34
+size 248.000
+*END
+
+*BEGIN RELATION cortical 1100 1800
+point_number 265
+size 984.000
+*END
+
+*BEGIN RELATION cortical 1100 2110
+point_number 50
+size 116.000
+*END
+
+*BEGIN RELATION cortical 1100 2420
+point_number 45
+size 372.000
+*END
+
+*BEGIN RELATION cortical 1100 2460
+point_number 64
+size 268.000
+*END
+
+*BEGIN RELATION cortical 1100 2780
+point_number 13
+size 45.000
+*END
+
+*BEGIN RELATION cortical 1100 2790
+point_number 29
+size 90.000
+*END
+
+*BEGIN RELATION cortical 1100 2860
+point_number 54
+size 588.000
+*END
+
+*BEGIN RELATION cortical 1100 2870
+point_number 11
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1100 3290
+point_number 38
+size 830.000
+*END
+
+*BEGIN RELATION cortical 1100 3360
+point_number 30
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1100 3450
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1110 1200
+point_number 6
+size 10.000
+*END
+
+*BEGIN RELATION cortical 1110 1330
+point_number 12
+size 16.000
+*END
+
+*BEGIN RELATION cortical 1110 1410
+point_number 46
+size 89.000
+*END
+
+*BEGIN RELATION cortical 1120 1420
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1130 1270
+point_number 33
+size 72.000
+*END
+
+*BEGIN RELATION cortical 1130 1470
+point_number 60
+size 137.000
+*END
+
+*BEGIN RELATION cortical 1140 1790
+point_number 45
+size 132.000
+*END
+
+*BEGIN RELATION cortical 1140 1800
+point_number 32
+size 126.000
+*END
+
+*BEGIN RELATION cortical 1140 2290
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1150 1220
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1150 1340
+point_number 46
+size 291.000
+*END
+
+*BEGIN RELATION cortical 1150 1360
+point_number 8
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1160 1220
+point_number 15
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1160 1350
+point_number 12
+size 119.000
+*END
+
+*BEGIN RELATION cortical 1180 1250
+point_number 31
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1180 1650
+point_number 28
+size 139.000
+*END
+
+*BEGIN RELATION cortical 1180 1790
+point_number 44
+size 249.000
+*END
+
+*BEGIN RELATION cortical 1180 1960
+point_number 24
+size 106.000
+*END
+
+*BEGIN RELATION cortical 1200 1330
+point_number 6
+size 9.000
+*END
+
+*BEGIN RELATION cortical 1210 1530
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1220 1240
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1220 1340
+point_number 44
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1220 1560
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1220 1600
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1240 1300
+point_number 20
+size 95.000
+*END
+
+*BEGIN RELATION cortical 1240 1340
+point_number 71
+size 1369.000
+*END
+
+*BEGIN RELATION cortical 1240 1350
+point_number 4
+size 12.000
+*END
+
+*BEGIN RELATION cortical 1240 1600
+point_number 22
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1240 1690
+point_number 32
+size 116.000
+*END
+
+*BEGIN RELATION cortical 1240 1750
+point_number 50
+size 873.000
+*END
+
+*BEGIN RELATION cortical 1240 2400
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1240 2510
+point_number 33
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1240 2550
+point_number 75
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1240 2600
+point_number 53
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1240 2640
+point_number 17
+size 779.000
+*END
+
+*BEGIN RELATION cortical 1250 1650
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1270 1470
+point_number 12
+size 19.000
+*END
+
+*BEGIN RELATION cortical 1270 1480
+point_number 78
+size 234.000
+*END
+
+*BEGIN RELATION cortical 1270 1510
+point_number 137
+size 733.000
+*END
+
+*BEGIN RELATION cortical 1270 1630
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1270 1910
+point_number 13
+size 33.000
+*END
+
+*BEGIN RELATION cortical 1270 1990
+point_number 32
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1300 1540
+point_number 33
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1300 1600
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1300 1690
+point_number 25
+size 142.000
+*END
+
+*BEGIN RELATION cortical 1330 1490
+point_number 4
+size 4.000
+*END
+
+*BEGIN RELATION cortical 1330 1640
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1340 1550
+point_number 66
+size 808.000
+*END
+
+*BEGIN RELATION cortical 1340 2380
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1350 1560
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1350 1600
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1360 1420
+point_number 19
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1360 1550
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1410 1490
+point_number 38
+size 78.000
+*END
+
+*BEGIN RELATION cortical 1420 1550
+point_number 59
+size 565.000
+*END
+
+*BEGIN RELATION cortical 1420 1950
+point_number 49
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1450 1520
+point_number 31
+size 137.000
+*END
+
+*BEGIN RELATION cortical 1450 1680
+point_number 11
+size 29.000
+*END
+
+*BEGIN RELATION cortical 1450 1740
+point_number 27
+size 68.000
+*END
+
+*BEGIN RELATION cortical 1450 2040
+point_number 29
+size 79.000
+*END
+
+*BEGIN RELATION cortical 1470 1820
+point_number 33
+size 148.000
+*END
+
+*BEGIN RELATION cortical 1490 1640
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1490 1730
+point_number 23
+size 91.000
+*END
+
+*BEGIN RELATION cortical 1490 2050
+point_number 8
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1510 1520
+point_number 73
+size 221.000
+*END
+
+*BEGIN RELATION cortical 1510 1630
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1510 1910
+point_number 80
+size 1037.000
+*END
+
+*BEGIN RELATION cortical 1510 1990
+point_number 43
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1510 2340
+point_number 56
+size 165.000
+*END
+
+*BEGIN RELATION cortical 1510 2630
+point_number 42
+size 176.000
+*END
+
+*BEGIN RELATION cortical 1510 2740
+point_number 157
+size 1080.000
+*END
+
+*BEGIN RELATION cortical 1510 3250
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1510 3440
+point_number 34
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1520 2040
+point_number 61
+size 192.000
+*END
+
+*BEGIN RELATION cortical 1520 2220
+point_number 20
+size 59.000
+*END
+
+*BEGIN RELATION cortical 1520 2340
+point_number 28
+size 62.000
+*END
+
+*BEGIN RELATION cortical 1520 2580
+point_number 17
+size 37.000
+*END
+
+*BEGIN RELATION cortical 1530 1870
+point_number 44
+size 158.000
+*END
+
+*BEGIN RELATION cortical 1530 2110
+point_number 35
+size 87.000
+*END
+
+*BEGIN RELATION cortical 1540 1690
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1540 1750
+point_number 27
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1550 2380
+point_number 23
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1550 2390
+point_number 32
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1560 1600
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1570 1800
+point_number 61
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1600 1690
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1620 1800
+point_number 56
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1640 1670
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1650 1700
+point_number 36
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1650 1760
+point_number 14
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1650 1960
+point_number 49
+size 656.000
+*END
+
+*BEGIN RELATION cortical 1650 2410
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1670 1680
+point_number 17
+size 67.000
+*END
+
+*BEGIN RELATION cortical 1670 1730
+point_number 13
+size 20.000
+*END
+
+*BEGIN RELATION cortical 1680 1730
+point_number 27
+size 65.000
+*END
+
+*BEGIN RELATION cortical 1680 1740
+point_number 35
+size 98.000
+*END
+
+*BEGIN RELATION cortical 1680 2160
+point_number 19
+size 76.000
+*END
+
+*BEGIN RELATION cortical 1680 2270
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1690 1750
+point_number 24
+size 141.000
+*END
+
+*BEGIN RELATION cortical 1700 1760
+point_number 14
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1710 2170
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1710 2190
+point_number 17
+size 228.000
+*END
+
+*BEGIN RELATION cortical 1710 2640
+point_number 31
+size 240.000
+*END
+
+*BEGIN RELATION cortical 1710 2700
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1730 2000
+point_number 27
+size 249.000
+*END
+
+*BEGIN RELATION cortical 1730 2050
+point_number 11
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1730 2270
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1730 2470
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1730 2830
+point_number 4
+size 31.000
+*END
+
+*BEGIN RELATION cortical 1730 2990
+point_number 9
+size 32.000
+*END
+
+*BEGIN RELATION cortical 1740 2040
+point_number 10
+size 25.000
+*END
+
+*BEGIN RELATION cortical 1740 2160
+point_number 35
+size 79.000
+*END
+
+*BEGIN RELATION cortical 1750 1760
+point_number 49
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1750 2400
+point_number 15
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1760 2400
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1760 2410
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1790 1800
+point_number 18
+size 37.000
+*END
+
+*BEGIN RELATION cortical 1790 1960
+point_number 34
+size 90.000
+*END
+
+*BEGIN RELATION cortical 1790 2290
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1800 2290
+point_number 20
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1800 2420
+point_number 19
+size 33.000
+*END
+
+*BEGIN RELATION cortical 1820 1910
+point_number 19
+size 211.000
+*END
+
+*BEGIN RELATION cortical 1820 1950
+point_number 22
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1870 2110
+point_number 2
+size 7.000
+*END
+
+*BEGIN RELATION cortical 1870 2240
+point_number 17
+size 38.000
+*END
+
+*BEGIN RELATION cortical 1870 2250
+point_number 14
+size 28.000
+*END
+
+*BEGIN RELATION cortical 1910 1950
+point_number 26
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1910 2130
+point_number 21
+size 699.000
+*END
+
+*BEGIN RELATION cortical 1910 2380
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1910 2390
+point_number 51
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1910 2520
+point_number 9
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1910 2550
+point_number 40
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1910 2610
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1910 3440
+point_number 41
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1910 3490
+point_number 20
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1950 2390
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1960 2410
+point_number 44
+size 0.000
+*END
+
+*BEGIN RELATION cortical 1960 2420
+point_number 35
+size 391.000
+*END
+
+*BEGIN RELATION cortical 2000 2050
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2000 2470
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2040 2160
+point_number 36
+size 67.000
+*END
+
+*BEGIN RELATION cortical 2040 2220
+point_number 43
+size 89.000
+*END
+
+*BEGIN RELATION cortical 2040 2320
+point_number 30
+size 64.000
+*END
+
+*BEGIN RELATION cortical 2050 2150
+point_number 27
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2050 2240
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2110 2250
+point_number 50
+size 112.000
+*END
+
+*BEGIN RELATION cortical 2110 2460
+point_number 22
+size 51.000
+*END
+
+*BEGIN RELATION cortical 2130 2160
+point_number 3
+size 202.000
+*END
+
+*BEGIN RELATION cortical 2130 2190
+point_number 36
+size 651.000
+*END
+
+*BEGIN RELATION cortical 2130 2470
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 2520
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 2560
+point_number 30
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 2610
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 2650
+point_number 37
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 2700
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 2750
+point_number 20
+size 264.000
+*END
+
+*BEGIN RELATION cortical 2130 2920
+point_number 20
+size 61.000
+*END
+
+*BEGIN RELATION cortical 2130 2950
+point_number 99
+size 591.000
+*END
+
+*BEGIN RELATION cortical 2130 2990
+point_number 19
+size 54.000
+*END
+
+*BEGIN RELATION cortical 2130 3010
+point_number 47
+size 623.000
+*END
+
+*BEGIN RELATION cortical 2130 3040
+point_number 11
+size 20.000
+*END
+
+*BEGIN RELATION cortical 2130 3350
+point_number 11
+size 40.000
+*END
+
+*BEGIN RELATION cortical 2130 3410
+point_number 1
+size 1.000
+*END
+
+*BEGIN RELATION cortical 2130 3490
+point_number 83
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 3550
+point_number 20
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 3560
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 3580
+point_number 8
+size 301.000
+*END
+
+*BEGIN RELATION cortical 2130 3610
+point_number 49
+size 122.000
+*END
+
+*BEGIN RELATION cortical 2130 3680
+point_number 9
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 3820
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 3850
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 3900
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2130 3990
+point_number 25
+size 390.000
+*END
+
+*BEGIN RELATION cortical 2130 4110
+point_number 9
+size 40.000
+*END
+
+*BEGIN RELATION cortical 2150 2240
+point_number 42
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2160 2270
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2160 2320
+point_number 17
+size 238.000
+*END
+
+*BEGIN RELATION cortical 2160 2470
+point_number 17
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2160 2560
+point_number 45
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2160 2720
+point_number 29
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2170 2300
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2170 2510
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2180 2300
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2180 2620
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 2420
+point_number 22
+size 984.000
+*END
+
+*BEGIN RELATION cortical 2190 2500
+point_number 2
+size 12.000
+*END
+
+*BEGIN RELATION cortical 2190 2640
+point_number 12
+size 79.000
+*END
+
+*BEGIN RELATION cortical 2190 2680
+point_number 47
+size 240.000
+*END
+
+*BEGIN RELATION cortical 2190 2700
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 2820
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 2830
+point_number 31
+size 98.000
+*END
+
+*BEGIN RELATION cortical 2190 2900
+point_number 44
+size 405.000
+*END
+
+*BEGIN RELATION cortical 2190 3070
+point_number 37
+size 166.000
+*END
+
+*BEGIN RELATION cortical 2190 3160
+point_number 65
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3190
+point_number 26
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3260
+point_number 40
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3280
+point_number 39
+size 95.000
+*END
+
+*BEGIN RELATION cortical 2190 3380
+point_number 5
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3460
+point_number 62
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3530
+point_number 33
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3590
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3670
+point_number 35
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3690
+point_number 3
+size 407.000
+*END
+
+*BEGIN RELATION cortical 2190 3700
+point_number 45
+size 147.000
+*END
+
+*BEGIN RELATION cortical 2190 3730
+point_number 12
+size 396.000
+*END
+
+*BEGIN RELATION cortical 2190 3780
+point_number 23
+size 572.000
+*END
+
+*BEGIN RELATION cortical 2190 3790
+point_number 4
+size 77.000
+*END
+
+*BEGIN RELATION cortical 2190 3800
+point_number 5
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3810
+point_number 8
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3860
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 3930
+point_number 73
+size 339.000
+*END
+
+*BEGIN RELATION cortical 2190 3960
+point_number 11
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 4000
+point_number 22
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 4060
+point_number 37
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2190 4110
+point_number 19
+size 222.000
+*END
+
+*BEGIN RELATION cortical 2220 2320
+point_number 4
+size 13.000
+*END
+
+*BEGIN RELATION cortical 2220 2580
+point_number 20
+size 63.000
+*END
+
+*BEGIN RELATION cortical 2220 2750
+point_number 22
+size 77.000
+*END
+
+*BEGIN RELATION cortical 2220 2920
+point_number 14
+size 40.000
+*END
+
+*BEGIN RELATION cortical 2240 2250
+point_number 4
+size 4.000
+*END
+
+*BEGIN RELATION cortical 2240 2470
+point_number 29
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2240 2540
+point_number 30
+size 165.000
+*END
+
+*BEGIN RELATION cortical 2240 2830
+point_number 46
+size 395.000
+*END
+
+*BEGIN RELATION cortical 2240 3000
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2250 2460
+point_number 20
+size 57.000
+*END
+
+*BEGIN RELATION cortical 2250 2540
+point_number 25
+size 108.000
+*END
+
+*BEGIN RELATION cortical 2250 2680
+point_number 12
+size 134.000
+*END
+
+*BEGIN RELATION cortical 2250 2820
+point_number 21
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2270 2470
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2300 2510
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2300 2520
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2300 2620
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2320 2720
+point_number 21
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2320 2750
+point_number 49
+size 241.000
+*END
+
+*BEGIN RELATION cortical 2340 2580
+point_number 24
+size 88.000
+*END
+
+*BEGIN RELATION cortical 2340 2630
+point_number 33
+size 134.000
+*END
+
+*BEGIN RELATION cortical 2380 2390
+point_number 26
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2380 2550
+point_number 58
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2400 2410
+point_number 46
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2400 2420
+point_number 38
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2400 2600
+point_number 39
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2410 2420
+point_number 37
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2420 2600
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2420 2640
+point_number 4
+size 468.000
+*END
+
+*BEGIN RELATION cortical 2420 2770
+point_number 30
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2420 3160
+point_number 14
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2420 3450
+point_number 96
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2420 3530
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2460 2680
+point_number 26
+size 47.000
+*END
+
+*BEGIN RELATION cortical 2460 2790
+point_number 53
+size 146.000
+*END
+
+*BEGIN RELATION cortical 2460 2900
+point_number 31
+size 114.000
+*END
+
+*BEGIN RELATION cortical 2470 2830
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2500 2830
+point_number 8
+size 10.000
+*END
+
+*BEGIN RELATION cortical 2500 2990
+point_number 10
+size 37.000
+*END
+
+*BEGIN RELATION cortical 2500 3060
+point_number 16
+size 30.000
+*END
+
+*BEGIN RELATION cortical 2500 3240
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2510 2520
+point_number 26
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2510 2550
+point_number 34
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2510 2640
+point_number 14
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2520 2550
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2520 2610
+point_number 14
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2520 2620
+point_number 9
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2520 2650
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2540 2820
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2540 3000
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2540 3070
+point_number 28
+size 233.000
+*END
+
+*BEGIN RELATION cortical 2560 2720
+point_number 22
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2560 2750
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2580 2630
+point_number 12
+size 35.000
+*END
+
+*BEGIN RELATION cortical 2580 2920
+point_number 13
+size 42.000
+*END
+
+*BEGIN RELATION cortical 2580 2950
+point_number 55
+size 196.000
+*END
+
+*BEGIN RELATION cortical 2600 2640
+point_number 27
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2620 2650
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2620 2700
+point_number 23
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2630 2740
+point_number 59
+size 213.000
+*END
+
+*BEGIN RELATION cortical 2640 2770
+point_number 22
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2650 2700
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2680 2820
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2680 2900
+point_number 26
+size 73.000
+*END
+
+*BEGIN RELATION cortical 2700 3260
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2720 2750
+point_number 44
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2740 2950
+point_number 39
+size 297.000
+*END
+
+*BEGIN RELATION cortical 2740 3010
+point_number 56
+size 895.000
+*END
+
+*BEGIN RELATION cortical 2740 3250
+point_number 60
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2740 3600
+point_number 33
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2750 2920
+point_number 79
+size 259.000
+*END
+
+*BEGIN RELATION cortical 2750 3350
+point_number 47
+size 159.000
+*END
+
+*BEGIN RELATION cortical 2780 2790
+point_number 34
+size 176.000
+*END
+
+*BEGIN RELATION cortical 2780 2860
+point_number 24
+size 492.000
+*END
+
+*BEGIN RELATION cortical 2780 2870
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2780 3380
+point_number 33
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2790 2900
+point_number 21
+size 76.000
+*END
+
+*BEGIN RELATION cortical 2790 3690
+point_number 39
+size 251.000
+*END
+
+*BEGIN RELATION cortical 2820 3070
+point_number 33
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2830 2990
+point_number 37
+size 86.000
+*END
+
+*BEGIN RELATION cortical 2830 3000
+point_number 27
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2830 3070
+point_number 66
+size 259.000
+*END
+
+*BEGIN RELATION cortical 2860 2870
+point_number 11
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2860 3190
+point_number 22
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2860 3360
+point_number 32
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2860 3380
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2900 3380
+point_number 9
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2900 3690
+point_number 17
+size 138.000
+*END
+
+*BEGIN RELATION cortical 2920 2950
+point_number 8
+size 25.000
+*END
+
+*BEGIN RELATION cortical 2920 3040
+point_number 27
+size 52.000
+*END
+
+*BEGIN RELATION cortical 2920 3350
+point_number 15
+size 48.000
+*END
+
+*BEGIN RELATION cortical 2920 3410
+point_number 10
+size 21.000
+*END
+
+*BEGIN RELATION cortical 2920 3620
+point_number 15
+size 43.000
+*END
+
+*BEGIN RELATION cortical 2950 3010
+point_number 28
+size 151.000
+*END
+
+*BEGIN RELATION cortical 2950 3600
+point_number 35
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2990 3240
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 2990 3350
+point_number 1
+size 22.000
+*END
+
+*BEGIN RELATION cortical 3000 3070
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3010 3250
+point_number 38
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3010 3540
+point_number 45
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3040 3410
+point_number 13
+size 23.000
+*END
+
+*BEGIN RELATION cortical 3060 3240
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3060 3590
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3060 3620
+point_number 20
+size 52.000
+*END
+
+*BEGIN RELATION cortical 3070 3280
+point_number 36
+size 97.000
+*END
+
+*BEGIN RELATION cortical 3160 3260
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3160 3530
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3190 3380
+point_number 60
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3190 3460
+point_number 11
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3190 3530
+point_number 41
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3240 3350
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3240 3620
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3250 3440
+point_number 40
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3250 3540
+point_number 15
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3290 3360
+point_number 45
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3290 3450
+point_number 56
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3290 3530
+point_number 53
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3350 3620
+point_number 43
+size 157.000
+*END
+
+*BEGIN RELATION cortical 3360 3530
+point_number 14
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3380 3690
+point_number 27
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3410 3610
+point_number 24
+size 115.000
+*END
+
+*BEGIN RELATION cortical 3410 3620
+point_number 6
+size 19.000
+*END
+
+*BEGIN RELATION cortical 3440 3490
+point_number 34
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3440 3540
+point_number 26
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3450 3530
+point_number 21
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3460 3530
+point_number 9
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3490 3540
+point_number 67
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3550 3560
+point_number 5
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3550 3900
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3560 3580
+point_number 5
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3560 3900
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3560 3940
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3580 3680
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3580 3940
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3580 3950
+point_number 8
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3600 3820
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3600 3850
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3600 3910
+point_number 23
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3610 3620
+point_number 28
+size 224.000
+*END
+
+*BEGIN RELATION cortical 3610 3850
+point_number 23
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3610 3920
+point_number 80
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3610 4030
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3610 4120
+point_number 26
+size 846.000
+*END
+
+*BEGIN RELATION cortical 3620 3800
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3620 3880
+point_number 49
+size 445.000
+*END
+
+*BEGIN RELATION cortical 3620 3890
+point_number 2
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3620 3920
+point_number 7
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3670 3780
+point_number 26
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3680 3820
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3680 3950
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3690 3830
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3690 3860
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3690 3970
+point_number 35
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3700 3790
+point_number 23
+size 178.000
+*END
+
+*BEGIN RELATION cortical 3700 3930
+point_number 14
+size 127.000
+*END
+
+*BEGIN RELATION cortical 3700 3960
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3730 3860
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3730 4010
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3780 3810
+point_number 31
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3780 4060
+point_number 23
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3780 4070
+point_number 28
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3780 4110
+point_number 54
+size 1347.000
+*END
+
+*BEGIN RELATION cortical 3790 3870
+point_number 16
+size 407.000
+*END
+
+*BEGIN RELATION cortical 3790 3890
+point_number 15
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3790 3930
+point_number 31
+size 927.000
+*END
+
+*BEGIN RELATION cortical 3790 3960
+point_number 37
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3790 4050
+point_number 61
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3800 3890
+point_number 15
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3810 3830
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3810 4070
+point_number 23
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3820 3910
+point_number 38
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3820 3950
+point_number 15
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3820 3980
+point_number 14
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3820 4030
+point_number 34
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3830 3970
+point_number 6
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3850 3910
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3850 4030
+point_number 20
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3860 4010
+point_number 22
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3870 3880
+point_number 28
+size 307.000
+*END
+
+*BEGIN RELATION cortical 3870 3890
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3870 4050
+point_number 45
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3880 3890
+point_number 16
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3880 4050
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3900 3940
+point_number 4
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3900 3980
+point_number 17
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3900 3990
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3900 4020
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3910 4030
+point_number 3
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3920 4050
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3920 4120
+point_number 45
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3930 4000
+point_number 86
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3930 4050
+point_number 1
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3940 3950
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3940 3980
+point_number 8
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3950 3980
+point_number 10
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3970 4070
+point_number 37
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3980 3990
+point_number 18
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3980 4020
+point_number 25
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3980 4120
+point_number 33
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3990 4020
+point_number 44
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3990 4040
+point_number 57
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3990 4090
+point_number 54
+size 0.000
+*END
+
+*BEGIN RELATION cortical 3990 4100
+point_number 129
+size 775.000
+*END
+
+*BEGIN RELATION cortical 3990 4110
+point_number 3
+size 257.000
+*END
+
+*BEGIN RELATION cortical 3990 4120
+point_number 56
+size 1336.000
+*END
+
+*BEGIN RELATION cortical 4000 4010
+point_number 83
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4000 4110
+point_number 5
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4010 4070
+point_number 67
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4010 4110
+point_number 19
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4030 4120
+point_number 51
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4040 4050
+point_number 79
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4040 4090
+point_number 24
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4040 4120
+point_number 12
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4050 4090
+point_number 13
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4050 4120
+point_number 50
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4060 4110
+point_number 58
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4070 4110
+point_number 32
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4090 4110
+point_number 106
+size 0.000
+*END
+
+*BEGIN RELATION cortical 4100 4110
+point_number 69
+size 557.000
+*END
+
+*END

@@ -1,0 +1,18 @@
+*BEGIN SYNTAX siMorpho
+
+modelFile           string  !
+graphFiles          string  !
+labelsMapFile       string
+filter_attributes   string
+filter_pattern      string
+output_prefix       string
+verbose             int
+name_descriptors    int
+label_attribute     string
+descriptor_aliases  string
+print_labels        int
+subjects            string
+subject_regex       string
+selection           string
+
+*END

@@ -1,0 +1,39 @@
+#-----------------------------------------------------------------------------
+class SigraphComponent( GenericMakerComponent ):
+  _name = 'sigraph'
+
+  optionsDescription = GenericMakerComponent.optionsDescription.copy()
+  optionsDescription.update( {
+    'sisvm': ( None, 'include SVM plugin (default: autodetect)' ),
+  } )
+
+  def __init__( self, options ):
+    GenericMakerComponent.__init__( self, options )
+    # Default options values
+    self.setDefaultOption( 'sisvm', 1 )
+
+  def dependencies( self ):
+    deps = [ 'neuron', 'aimsalgo' ]
+    return deps
+
+  def weakDependencies( self ):
+    result = []
+    if self.getOption( 'sisvm' ) \
+      and weakDependency( SiSvmComponent, self ):
+      result.append( SiSvmComponent )
+    return result
+
+#-----------------------------------------------------------------------------
+class SiSvmComponent( GenericMakerModuleComponent ):
+	_name = 'sisvm'
+
+	def sourceName(self):
+		return 'sigraph'
+
+	def dependencies(self):
+		datamind = getInstance('datamind')
+		return [SigraphComponent, DatamindLibsvmComponent]
+
+	def _libraries( self ):
+		return ['sigraphsvm']
+

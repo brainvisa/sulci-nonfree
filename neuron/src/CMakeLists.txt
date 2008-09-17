@@ -1,0 +1,5 @@
+
+ADD_SUBDIRECTORY(lib)
+ADD_SUBDIRECTORY(neurlearn)
+ADD_SUBDIRECTORY(neurmakenet)
+ADD_SUBDIRECTORY(neurpatimport)

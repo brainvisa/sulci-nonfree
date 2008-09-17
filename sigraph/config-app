@@ -1,0 +1,40 @@
+TEMPLATE	= app
+
+#!include config
+
+LIBS	= \
+	-L../../lib -lsigraph
+
+release-solaris:LIBS	= \
+        -L../../lib/solaris -lsigraph 
+
+debug-solaris:LIBS	= \
+        -L../../lib/solaris -lsigraph-debug
+
+release-linux:LIBS	= \
+        -L../../lib/linux -lsigraph
+
+debug-linux:LIBS	= \
+        -L../../lib/linux -lsigraph-debug
+
+linux:LIBS	+= -L/home/appli/aimsalgo-main/lib/linux
+solaris:LIBS	+= -L/home/appli/aimsalgo-main/lib/solaris
+irix:LIBS	+= \
+	-L/data/sendai/sendai1/temp/mangin/perforce/aimsdata-irix/lib -laimsdata \
+	-L/data/sendai/sendai1/temp/mangin/perforce/graph-irix/lib -lgraph \
+	-L/data/sendai/sendai1/temp/mangin/perforce/shfj-irix/lib -lshfj \
+	-L/data/sendai/sendai1/temp/mangin/perforce/neuron-irix/lib -lneuron \
+	-L/data/sendai/sendai1/temp/mangin/perforce/aimsalgo-irix/lib
+
+darwin:LIBS	+= \
+	-L/Users/shfj/perforce/aimsalgo-darwin/lib -laimsalgopub \
+	-L/Users/shfj/perforce/aimsdata-darwin/lib -laimsdata \
+	-L/Users/shfj/perforce/graph-darwin/lib -lgraph \
+	-L/Users/shfj/perforce/shfj-darwin/lib -lshfj \
+	-L/Users/shfj/perforce/neuron-darwin/lib -lneuron \
+	-L/Users/shfj/perforce/vidaIO-darwin/lib -lvidaIO \
+	-L/Users/shfj/perforce/ecat+-darwin/lib -lecat+ \
+	-L/Users/shfj/perforce/ecat-darwin/lib -lecat \
+	-L/Users/shfj/perforce/aimsalgo-darwin/lib
+
+#!include config-app-local

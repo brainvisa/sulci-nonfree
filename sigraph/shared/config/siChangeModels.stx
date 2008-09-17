@@ -1,0 +1,9 @@
+
+*BEGIN SYNTAX siChangeModels
+
+mgraph		string	!
+attribute	string
+pattern		string	!
+model		string	!
+
+*END

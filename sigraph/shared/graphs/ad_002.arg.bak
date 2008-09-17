@@ -1,0 +1,26 @@
+*BEGIN TREE 1.0 ad_leaf
+
+work	mlp_work1
+eval	mlp_eval1
+
+*BEGIN NODE sub_ad_mlp
+name		mlp_work1
+usedinputs	1 2 3 5
+net		/home/riviere/sigraph-0.1/dependencies/graphs/res001.net
+sigma		0.2 0.5 0.9 0.8
+mean		0.5 0.6 0.4 0.7
+eta		0.15
+*END
+
+*BEGIN NODE sub_ad_mlp
+name		mlp_eval1
+usedinputs	1 2 3 5
+net		/home/riviere/sigraph-0.1/dependencies/graphs/res001.net
+sigma		0.2 0.5 0.9 0.8
+mean		0.5 0.6 0.4 0.7
+eta		0.15
+*END
+
+
+*END
+

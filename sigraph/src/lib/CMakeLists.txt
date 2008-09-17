@@ -1,0 +1,17 @@
+
+getFromPro(sigraph.pro HEADERS SOURCES)
+
+SHFJ_COPY_HEADERS(include/si ${HEADERS})
+
+ADD_LIBRARY(sigraph SHARED
+${SOURCES}
+)
+
+TARGET_LINK_LIBRARIES(sigraph
+aimsalgo
+neuron
+)
+
+SET_TARGET_PROPERTIES(sigraph PROPERTIES ${BrainVISA_LIBRARY_PROPERTIES})
+
+INSTALL(TARGETS sigraph DESTINATION lib/)

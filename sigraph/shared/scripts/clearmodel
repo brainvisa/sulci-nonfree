@@ -1,0 +1,5 @@
+rm -f model/adap/*
+rm -f model/adap/nnets/*
+rm -f model/domain/*
+rm -f model/edges/*
+rm -f model/edges/nnets/*

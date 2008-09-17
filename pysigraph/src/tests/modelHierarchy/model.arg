@@ -1,0 +1,29 @@
+# graph 1.0
+
+*BEGIN GRAPH model_graph
+model_file   fakerel.mod
+model_finder fold_finder
+nbase_graphs 21
+
+*BEGIN NODE model_node 1
+domain_file     plop1.dom
+label           plop1
+model_file      plop1.mod
+occurence_count 1
+*END
+
+*BEGIN NODE model_node 2
+domain_file     plop2.dom
+label           plop2
+model_file      plop2.mod
+occurence_count 1
+*END
+
+*BEGIN UEDGE model_edge 1 2
+label1          plop1
+label2          plop2
+model_file      plop1-plop2.mod
+occurence_count 1
+*END
+
+*END

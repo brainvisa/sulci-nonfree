@@ -1,0 +1,223 @@
+#Fichier .roi_name_templates
+# Les definitions sont user dependantes.
+# Les Tetes de menus sont precedes de $ et les sous menus de %
+# Disponible : 16 menus principaux
+#			16 items par menu principal
+#			(La longueur d'un item est < 32 cars.)
+$CENTRAL
+%S.C.
+%S.C.sup.		S.C.
+%S.C.inf.		S.C.
+%S.C.sup.r.GPoC.	S.C.
+%S.C.sup.r.GPeC.	S.C.
+%S.C.inf.r.GPoC.	S.C.
+%S.C.inf.r.GPeC.	S.C.
+$F.C.L.
+%F.C.L.a.
+%F.C.L.r.ant.
+%F.C.L.r.asc.
+%F.C.L.p.
+%F.C.L.r.diag.
+%F.C.L.r.sc.ant.
+%F.C.L.r.sc.post.
+%F.C.L.r.retroC.tr.
+%F.C.L.r.temp.t.	F.C.L.p.
+%F.C.L.r.temp.t.post.   F.C.L.p.
+%F.C.L.r.temp.t.int.	F.C.L.p.
+%F.C.L.r.temp.t.ant.	unknown
+%F.C.L.r.ter.asc.	F.C.L.p.
+%F.C.L.r.ter.desc.	F.C.L.p.
+$PRECENTRAL
+%S.Pe.C.
+%S.Pe.C.median.
+%S.Pe.C.marginal.
+%S.Pe.C.sup.
+%S.Pe.C.sup.r.GPeC.	S.Pe.C.sup.
+%S.Pe.C.inter.
+%S.Pe.C.inter.r.GPeC.	S.Pe.C.inter.
+%S.Pe.C.inf.
+%S.Pe.C.inf.r.GPeC.	S.Pe.C.inf.
+$PREFRONTAL
+%S.F.x.			unknown
+%S.F.median.
+%S.F.median.1.		S.F.median.
+%S.F.median.2.		S.F.median.
+%S.F.median.3.		S.F.median.
+%S.F.median.4.		S.F.median.
+%S.F.sup.
+%S.F.sup.ant.		S.F.sup.
+%S.F.sup.ant.r.asc.	S.F.sup.	
+%S.F.sup.ant.r.desc.	S.F.sup.
+%S.F.sup.moy.		S.F.sup.
+%S.F.sup.moy.r.asc.	S.F.sup.
+%S.F.sup.moy.r.desc.	S.F.sup.
+%S.F.sup.post.		S.F.sup.
+%S.F.sup.post.r.asc.	S.F.sup.
+%S.F.sup.post.r.desc.	S.F.sup.
+%S.F.sup.r.asc.		S.F.sup.
+%S.F.sup.r.desc.	S.F.sup.
+%S.F.inter.
+%S.F.inter.ant.		S.F.inter.
+%S.F.inter.ant.r.asc.	S.F.inter.
+%S.F.inter.ant.r.desc.	S.F.inter.
+%S.F.inter.moy.		S.F.inter.
+%S.F.inter.moy.r.asc.	S.F.inter.
+%S.F.inter.moy.r.desc.	S.F.inter.
+%S.F.inter.post.	S.F.inter.
+%S.F.inter.post.r.asc.	S.F.inter.
+%S.F.inter.post.r.desc.	S.F.inter.
+%S.F.inter.r.asc.	S.F.inter.
+%S.F.inter.r.desc.	S.F.inter.
+%S.F.inf.
+%S.F.inf.ant.		S.F.inf.
+%S.F.inf.ant.r.asc.	S.F.inf.
+%S.F.inf.ant.r.desc.	S.F.inf.
+%S.F.inf.moy.		S.F.inf.
+%S.F.inf.moy.r.asc.	S.F.inf.
+%S.F.inf.moy.r.desc.	S.F.inf.
+%S.F.inf.post.		S.F.inf.
+%S.F.inf.post.r.asc.	S.F.inf.
+%S.F.inf.post.r.desc.	S.F.inf.
+%S.F.inf.r.asc.		S.F.inf.
+%S.F.inf.r.desc.	S.F.inf.
+%S.F.inf.r.tr.		S.F.inf.
+%S.F.polaire.tr.
+%S.F.polaire.tr.sup.	S.F.polaire.tr.
+%S.F.polaire.tr.moy.	S.F.polaire.tr.
+%S.F.polaire.tr.inf.	S.F.polaire.tr.
+%S.F.marginal.
+%S.F.orbitaire.
+%S.Olf.
+%S.Or.
+%S.Or.l.
+$FACEINTERNE.F
+%S.p.Olf.ant.		unknown
+%S.F.int.pol.		S.F.int.
+%S.F.int.sup		S.F.int.
+%S.F.int.AMS		S.F.int.
+# celui-la pour retraduction interne
+%S.F.int.
+%S.R.sup.
+%S.R.inf.
+%F.C.M.			unknown
+%F.C.M.inf.		F.C.M.ant.
+%F.C.M.asc.		F.C.M.ant.
+%F.C.M.sup.r.asc.ant.	F.C.M.ant.
+%F.C.M.sup.		F.C.M.ant.
+%F.C.M.AMS.		F.C.M.post.
+%F.C.M.r.AMS.ant.
+%S.p.C.
+%F.C.M.para.		F.C.M.post.
+%F.C.M.r.asc.		F.C.M.post.
+# ces deux-la pour 'backwards compatibility'...
+%F.C.M.para.AMS.r.asc.	F.C.M.post.
+%F.C.M.sup.asc.inf.	F.C.M.ant.
+# ces deux-la pour retraduction interne
+%F.C.M.ant.
+%F.C.M.post.
+%S.intraCing.		unknown
+%S.Call.
+%S.C.LPC.
+$FACEINTERNE.PO
+%S.s.P.
+%S.Pa.int.
+%S.Pa.int.ant.		S.Pa.int.
+%S.Pa.int.post.		S.Pa.int.
+%F.P.O.
+%F.P.O.sup.		F.P.O.
+%F.P.O.inf.		F.P.O.
+%S.Cu.sag.inf.		S.Cu.
+%S.Cu.sag.sup.		S.Cu.
+%S.Cu.vert.		S.Cu.
+# celui-la pour retraduction interne
+%S.Cu.
+%S.Li.
+$PARIETAL
+%S.Par.x.		unknown
+%S.Pa.sup.
+%S.Pa.t.
+%S.Po.C.		unknown
+%S.Po.C.sup.
+%S.Po.C.br.LPS		unknown
+%S.Po.C.br.LPI		unknown
+%S.Po.C.br.GPOC		unknown
+%S.GSM.			unknown
+%F.I.P.
+%F.I.P.Po.C.		unknown
+%F.I.P.Po.C.sup.	F.I.P.
+%F.I.P.Po.C.inf.	
+%F.I.P.r.trans.		F.I.P.
+%F.I.P.Horiz.		F.I.P.
+%F.I.P.ParO.		F.I.P.
+%F.I.P.ParO.sup.	F.I.P.
+%F.I.P.ParO.inf.	F.I.P.
+%F.I.P.r.desc.		unknown
+%F.I.P.r.asc.		unknown
+%F.I.P.r.int.1
+%F.I.P.r.int.2
+$OCCIPITAL
+%OCCIPITAL
+%S.O.x.			OCCIPITAL
+%S.O.t.			OCCIPITAL
+%S.Oc.Te.lat.		OCCIPITAL
+%S.I.O.			OCCIPITAL
+%S.O.L.			OCCIPITAL
+%S.O.L.ant.		OCCIPITAL
+%S.O.L.post.		OCCIPITAL
+%S.Lu.			OCCIPITAL
+%S.r.Lu.		OCCIPITAL
+%S.O.i.			OCCIPITAL
+%S.O.a.			OCCIPITAL
+%I.Pr.O.		OCCIPITAL
+$C.CALCARIN
+%F.Cal.ant.		F.Cal.ant.-Sc.Cal.
+%Sc.Cal.		F.Cal.ant.-Sc.Cal.
+%S.r.Cal.		F.Cal.ant.-Sc.Cal.
+%S.Cal.externe.		F.Cal.ant.-Sc.Cal.
+# celui-la pour retraduction interne
+%F.Cal.ant.-Sc.Cal.
+%S.O.p.
+$TEMPORAL-EXT
+%S.T.x.			unknown
+%S.T.pol.
+%S.T.pol.sup.		S.T.pol.
+%S.T.pol.inf.		S.T.pol.
+%S.T.s.
+%S.T.s.ant.		S.T.s.
+%S.T.s.moy.		S.T.s.
+%S.ac.                  unknown
+%S.T.s.post.		S.T.s.
+%S.T.s.ter.asc.ant.
+%S.T.s.horiz.		unknown
+%S.T.s.ter.asc.post.
+%S.T.post.              unknown
+%S.T.i.                 unknown
+%S.T.i.ant.
+%S.T.i.ant.R.ant.	S.T.i.ant.
+%S.T.i.ant.R.moy.	S.T.i.ant.
+%S.T.i.post.
+%S.T.i.post.R.post.	S.T.i.post.
+%S.T.i.post.R.desc.	S.T.i.post.
+%S.O.T.marg.		unknown
+$TEMPORAL-BASAL
+%S.O.T.lat.		unknown
+%S.O.T.lat.ant.		
+%S.O.T.lat.post.
+%S.O.T.lat.med.		unknown
+%F.Coll.
+%F.Coll.R.tr.ant.	F.Coll.
+%F.Coll.R.PH.		F.Coll.
+%F.Coll.r.ter.		F.Coll.
+%F.Coll.r.IL.		F.Coll.
+%S.U.			unknown
+%S.Rh.
+%S.h.			unknown
+$INSULA
+%INSULA
+%S.I.Cir.		INSULA
+%S.I.C.			INSULA
+%S.I.Ct.		INSULA
+%S.I.Ct.ant.		INSULA
+%S.I.Ct.post.		INSULA
+%S.I.Lg.		INSULA
+%S.I.Falc.		INSULA

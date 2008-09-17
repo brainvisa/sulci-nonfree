@@ -1,0 +1,77 @@
+*BEGIN TREE 1.0 ad_tree
+mix_method mean_mixer
+
+*BEGIN NODE ad_leaf
+eval mlp_eval1
+work mlp_work1
+
+*BEGIN NODE sub_ad_mlp
+eta        0.15
+mean       0.500000 0.600000 0.400000 0.700000 
+name       mlp_work1
+net        /home/riviere/sigraph-0.1/dependencies/graphs/res001.net
+sigma      0.200000 0.500000 0.900000 0.800000 
+usedinputs 1 2 3 5 
+*END
+
+*BEGIN NODE sub_ad_mlp
+eta        0.15
+mean       0.500000 0.600000 0.400000 0.700000 
+name       mlp_eval1
+net        /home/riviere/sigraph-0.1/dependencies/graphs/res001.net
+sigma      0.200000 0.500000 0.900000 0.800000 
+usedinputs 1 2 3 5 
+*END
+*END
+
+*BEGIN NODE ad_tree
+mix_method mean_mixer
+
+*BEGIN NODE ad_leaf
+eval mlp_eval2
+work mlp_work2
+
+*BEGIN NODE sub_ad_mlp
+eta        0.12
+mean       0.600000 0.400000 0.700000 
+name       mlp_work2
+net        /home/riviere/sigraph-0.1/dependencies/graphs/res002.net
+sigma      0.200000 0.400000 0.800000 
+usedinputs 1 4 6 
+*END
+
+*BEGIN NODE sub_ad_mlp
+eta        0.12
+mean       0.600000 0.400000 0.700000 
+name       mlp_eval2
+net        /home/riviere/sigraph-0.1/dependencies/graphs/res002.net
+sigma      0.200000 0.400000 0.800000 
+usedinputs 1 4 6 
+*END
+*END
+
+*BEGIN NODE ad_leaf
+eval mlp_eval3
+work mlp_work3
+
+*BEGIN NODE sub_ad_mlp
+eta        0.12
+mean       0.600000 0.400000 0.700000 
+name       mlp_work3
+net        /home/riviere/sigraph-0.1/dependencies/graphs/res002.net
+sigma      0.200000 0.400000 0.800000 
+usedinputs 1 4 6 
+*END
+
+*BEGIN NODE sub_ad_mlp
+eta        0.12
+mean       0.600000 0.400000 0.700000 
+name       mlp_eval3
+net        /home/riviere/sigraph-0.1/dependencies/graphs/res002.net
+sigma      0.200000 0.400000 0.800000 
+usedinputs 1 4 6 
+*END
+*END
+*END
+
+*END

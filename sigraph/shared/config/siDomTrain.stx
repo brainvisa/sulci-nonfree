@@ -1,0 +1,12 @@
+*BEGIN SYNTAX domTrain
+
+modelFile	string	!
+trainschemeFile	string	!
+graphFiles	string	!
+uninitflg	int
+labelsMapFile	string
+nosave		int
+clear		int
+load_buckets	int
+
+*END

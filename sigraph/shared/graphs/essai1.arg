@@ -1,0 +1,65 @@
+*BEGIN BINARYGRAPH 1.0 graphe_sillon
+
+
+volume /home/poupon/base/irm/ares.vimg
+
+*BEGIN NODE hull 290
+name brain_hull
+# external hull of the brain used to compute some Voronoi diagrams
+# this object is implied in hull_junctions
+*END
+
+*BEGIN NODE fold 300
+squelette_label 300
+name S.F.median. right
+size 19.000
+#gravity_center 115.875 118.500 19.500
+profondeur 5.880
+point_number 19
+ss_point_number 8
+edge_point_number 11
+*END
+
+*BEGIN NODE fold 310
+squelette_label 310
+name S.F.median. left
+size 22.000
+#gravity_center 148.077 127.154 20.200
+profondeur 6.780
+point_number 22
+ss_point_number 13
+edge_point_number 9
+*END
+
+*BEGIN NODE fold 320
+squelette_label 320
+name S.F.sup. left
+size 349.000
+#normal 0.905 -0.420 0.073
+#gravity_center 161.043 132.788 29.619
+profondeur 16.280
+point_number 349
+ss_point_number 278
+edge_point_number 71
+bucket toto.bck
+triangulation toto.tri
+*END
+
+
+*BEGIN UBEDGE hull_junction 290 300
+point_number 14
+size 18.200
+*END
+
+*BEGIN UBEDGE hull_junction 290 310
+point_number 26
+size 33.800
+*END
+
+*BEGIN UBEDGE hull_junction 290 320
+point_number 126
+size 163.800
+bucket yoyo.bck
+*END
+
+*END

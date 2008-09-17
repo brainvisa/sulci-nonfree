@@ -1,0 +1,10 @@
+*BEGIN TREE 1.0 domain_box
+ndata 13
+xmax  10
+xmin  1
+ymax  20
+ymin  2
+zmax  20
+zmin  2
+
+*END

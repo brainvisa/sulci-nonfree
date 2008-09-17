@@ -1,0 +1,39 @@
+
+
+getFromPro(sipsvm.pro SIP_HDRS SIP_SRCS)
+
+SHFJ_COPY_HEADERS(include/pysigraph ${SIP_HDRS})
+
+FILE(GLOB globbedTpl           ${CMAKE_CURRENT_SOURCE_DIR}/*.tpl)
+FILE(GLOB relativeTpl RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.tpl)
+FILE(GLOB globbedSip           ${CMAKE_CURRENT_SOURCE_DIR}/*.sip)
+FILE(GLOB relativeSip RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.sip)
+
+# Copy sip & tpl files for further compilation
+COPY_FILES(${CMAKE_BINARY_DIR}/sip ${globbedSip})
+COPY_FILES(${CMAKE_BINARY_DIR}/tpl ${globbedTpl})
+
+
+SET(SIP_INCLUDES 
+${PYAIMS_SIP_DIR}
+${CMAKE_BINARY_DIR}/sip 
+${PYQT_SIP_DIR}
+)
+SET(SIP_CONCAT_PARTS 1)
+SET(SIP_TAGS ALL WS_X11 Qt_3_3_0)
+SET(SIP_DISABLE_FEATURES 
+VendorID 
+Qt_STYLE_WINDOWSXP 
+Qt_STYLE_INTERLACE
+Qt_STYLE_WINDOWSXP
+)
+SET(SIP_EXTRA_OPTIONS -e)
+SET(SIP_EXTRA_DEPENDENCIES ${globbedSip})
+SET(SIP_MAIN_FILE          ${CMAKE_BINARY_DIR}/sip/sigraphsvm.sip)
+
+ADD_SIP_PYTHON_MODULE(sigraphsvmsip ${SIP_MAIN_FILE}
+pysigraph
+)
+
+
+INSTALL(TARGETS sigraphsvmsip DESTINATION python/sigraph)

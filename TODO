@@ -1,0 +1,80 @@
+07/09/03
+
+Trucs datant de discussion avec Jeff il y a qq mois. Thème: pourquoi 
+l'apprentissage avec RBF mache moins bien que les anciens apprentissages. Re 
+re-note ce qu'on avait écrit sur un papier avant de le perdre, mais à vrai dire 
+il y a des points que je ne comprends plus...
+
+- base ICBM: les cerveaux sont normalisés différemment ? Les tailles de voxels
+  sont différentes aussi (1x1x1)
+- généralisation à outrance (??)
+- modèle du ventricule (??)
+- base pas étiquetée (entropie) (??)
+- comparer RBF / boîte en apprentissage
+- essayer SVM
+- ratio contre-exemples à ajuster pour RBF
+- bug sur unknown ds liste de noms
+- seuil sur les gaussiennes
+- taille de triangulation -> devrait améliorer ICBM
+- traduction des noms
+- test domaines: tester le centre de gravité et les extrêmités
+
+
+29/08/02
+
+* (brainvisa?) initialiser les stats quand on crée un modèle a la volée pour 
+  la morphométrie (vecteurs moyens etc.)
+
+* Retravailler les domaines (RBFs ?)
+
+* Adaptations internes à faire pour suivre les modernisations d'Aims (module 
+  d'IO sur les graphes spécialisés etc.)
+
+* Transformations de coordonnées en entrée et/ou en sortie de la morphométrie: 
+  désactivation de Talairach ou utilisation d'une matrice de transformation 
+  externe (normalisation SPM...)
+
+* Faire un modèle et des descripteurs pour les graphes d'activations (position 
+  moyenne, étendue, ...) (Stan et Christophe s'en serviraient)
+
+
+Trucs datant de Marseille-03/02:
+
+* params manquants sur les descripteurs:
+  - profondeur des plis de passage
+  - surface des sillons
+  - ouverture du sillon -> volume de LCR / taille du sillon ?
+  - epaisseur de gris (comment ?) -> carte de distance entre interface 
+    gris/blanc et gris/LCR. Delimitation du gris des sillons ? -> dilatation 
+    du squelette ?
+  - profondeur moyenne
+  - indice d'operculisation: ratio entre cortex "enfoui" (à + d'un certain 
+    seuil de profondeur) et cortex "externe"
+  - changer la version de graphe qd on ajoute ces nouveaux attributs
+  - moments
+
+* sortir les stats des experts, taux de confiance etc
+
+* infos sur sexe, age, lateralite des sujets (on pourrait les mettre dans les 
+  graphes)
+
+* distances moyennes (relations)
+
+* indice d'operculisation par rapport a la base: normale moy + direction moy 
+  -> direction (ou difference) par rapport a l'enveloppe ext
+
+
+11/10/01
+
+* siMorpho: permettre de créer un modèle à la volée coorespondant au nom qu'on 
+  lui donne en entrée, pour avoir une description au niveau de détail qu'on 
+  veut
+  ===== fait ~20/10/01 =====
+
+07/09/01
+
+* Utiliser des hierarchies a la place des fichiers de traduction
+  ===== fait 11/10/01 =====
+
+* siMorpho: l'empecher de tenir compte des boites englobantes
+  ===== fait 11/10/01 =====

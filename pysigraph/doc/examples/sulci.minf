@@ -1,0 +1,15 @@
+attributes = {
+    'format' : 'database_1.0',
+    'labels' : [ 'valid', 'volumeS1', 'connectedComponentsS1', 'connectedComponentsS1Rel', 'volumeS2', 'connectedComponentsS2', 'connectedComponentsS2Rel', 'corticalSize', 'distanceMin', 'direction_x', 'direction_y', 'direction_z', 'distanceToExtremity1', 'distanceToExtremity2', 'gravityCenter_x', 'gravityCenter_y', 'gravityCenter_z', 'corticalDotProduct', 'junctions', 'junctionDepthMin', 'junctionsSize', 'plisDePassage', 'plisDePassageDepthMax', 'Potential', 'Class', 'cycle' ],
+    'types' : [ 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'string' ],
+    'X' : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 ],
+    'Y' : [ 23, 24 ],
+    'INF' : [ 25 ],
+    'size' : 10,
+    'dims' : 26,
+    'data' : 'sulci.data',
+    'sigraph' : {
+        'split' : 5,
+        'cycles' : 1
+      }
+  }

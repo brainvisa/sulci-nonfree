@@ -1,0 +1,21 @@
+*BEGIN GRAPH 1.0 graphe_sillon
+Talairach_rotation    1 0 0 0 1 0 0 0 1
+Talairach_scale       0.011628 0.007634 0.013263
+Talairach_translation -130 -111 -88.4
+filename_base         fold1.data
+type.bck              none
+type.tri              none
+voxel_size            0.781 0.781 1.2
+
+*BEGIN NODE fold 1
+bottom_filename     bottom/bucket2.bck
+bottom_point_number 1
+depth               3
+gravity_center      0 0 0
+name                sillon1
+point_number        1
+size                10
+skeleton_label      1
+ss_filename         ss/bucket1.bck
+ss_point_number     10
+*END

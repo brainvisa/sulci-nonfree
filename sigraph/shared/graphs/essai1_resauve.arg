@@ -1,0 +1,40 @@
+*BEGIN BINARYGRAPH 1.0 graphe_sillon
+Talairach_rotation    1 0 0 0 1 0 0 0 1
+Talairach_scale       0.011628 0.007634 0.013263
+Talairach_translation -130 -111 -88.4
+filename_base         zeus.data
+voxel_size            0.781 0.781 1.2
+
+*BEGIN NODE fold 1
+bottom_filename     bucket2.bck
+bottom_point_number 1
+depth               3
+gravity_center      0 0 0
+name                sillon1
+point_number        1
+size                10
+skeleton_label      0
+ss_filename         bucket1.bck
+ss_point_number     10
+*END
+
+*BEGIN NODE fold 2
+bottom_filename     bucket2.bck
+bottom_point_number 3
+depth               4
+gravity_center      0 0 0
+name                sillon2
+point_number        2
+size                12
+skeleton_label      0
+ss_filename         bucket1.bck
+ss_point_number     12
+*END
+
+*BEGIN UEDGE hull_junction 1 2
+junction_filename bucket3.bck
+point_number      14
+size              18.2
+*END
+
+*END

@@ -1,0 +1,9 @@
+
+ADD_SUBDIRECTORY(lib)
+
+IF( SVM_FOUND )
+  ADD_SUBDIRECTORY(libsigraphsvm)
+  IF(APPLE)
+    ADD_SUBDIRECTORY(bundle_sisvm)
+  ENDIF(APPLE)
+ENDIF( SVM_FOUND )

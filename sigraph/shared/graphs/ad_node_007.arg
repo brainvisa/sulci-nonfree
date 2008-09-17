@@ -1,0 +1,19 @@
+*BEGIN TREE 1.0 graphe_sillon
+
+*BEGIN NODE hull 001
+name brain_hull
+volume /home/poupon/base/irm/ares.vimg
+*END
+
+
+*BEGIN NODE adaptive_node 002
+adaptive_file	ad_002.arg
+*END
+
+*BEGIN NODE adaptive_node 003
+adaptive_file	ad_003.arg
+*END
+
+
+*END
+

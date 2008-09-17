@@ -1,0 +1,56 @@
+*BEGIN SYNTAX copier
+*END
+
+*BEGIN SYNTAX clique_memorizer
+*END
+
+*BEGIN SYNTAX terminal_learner
+*END
+
+*BEGIN SYNTAX bad_learner
+*END
+
+*BEGIN SYNTAX stats_learner
+*END
+
+*BEGIN SYNTAX const_learner
+*END
+
+*BEGIN SYNTAX domain_learner
+*END
+
+*BEGIN SYNTAX labels_changer
+*END
+
+*BEGIN SYNTAX fold_labels_changer
+*END
+
+*BEGIN SYNTAX fold_reduced_labels_changer
+*END
+
+*BEGIN SYNTAX fold_far_labels_changer
+*END
+
+*BEGIN SYNTAX selective_learner
+filter_attribute	string
+pattern			string !
+*END
+
+*BEGIN SYNTAX writer_learner
+filename	string
+*END
+
+*BEGIN SYNTAX fold_noiser
+*END
+
+*BEGIN SYNTAX empty_avoid_learner
+mandatory_empty_output	float
+empty_penalty_threshold	float
+*END
+
+*BEGIN SYNTAX fold_copier
+*END
+
+*BEGIN SYNTAX one_label_trier
+*END
+

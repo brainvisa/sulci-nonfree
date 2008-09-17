@@ -1,0 +1,23 @@
+*BEGIN UBGRAPH 1.0 model_graph
+
+
+*BEGIN NODE model_node 1
+label		S.F.median. left
+model_file	/home/riviere/sigraph-0.1/dependencies/graphs/ad_003.arg
+domain_file	/home/riviere/sigraph-0.1/dependencies/graphs/dom_box_01.arg
+*END
+
+*BEGIN NODE model_node 2
+label		S.F.sup. left
+model_file	/home/riviere/sigraph-0.1/dependencies/graphs/ad_002.arg
+domain_file	/home/riviere/sigraph-0.1/dependencies/graphs/dom_box_02.arg
+*END
+
+
+*BEGIN UBEDGE model_edge 1 2
+label		S.Pe.C.sup. right
+model_file	/home/riviere/sigraph-0.1/dependencies/graphs/ad_002.arg
+*END
+
+
+*END

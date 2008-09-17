@@ -1,0 +1,5 @@
+# on linux / gcc 3.2.2 -O3 produces an optimizer error. It works with gcc 3.3.3
+# on SGI using -O2 or -O3 with gcc 3.0.4 produces assembler errors
+release-irix:CXXFLAGS	= -O1
+
+#!include config-local

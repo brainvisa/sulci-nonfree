@@ -1,0 +1,22 @@
+#-----------------------------------------------------------------------------
+class SigraphComponent( GenericMakerModuleComponent ):
+  _name = 'sigraph'
+
+  def dependencies( self ):
+    return [ 'sigraphlib' ]
+
+  def weakDependencies( self ):
+    deps = []
+    for component in [ 'pysigraph' ]:
+      if weakDependency( component ):
+        deps.append( component )
+    return deps
+
+currentComponentDirectory = os.path.dirname( currentComponentFile )
+for component in [ 'sigraphlib', 'pysigraph' ]:
+  c = options.setdefault( component, {} )
+  c[ 'source' ] = os.path.join( currentComponentDirectory, component )
+  c[ 'version' ] = '4.0'
+# exception:
+options[ 'sigraphlib' ][ 'source' ] = os.path.join( currentComponentDirectory, 'sigraph' )
+

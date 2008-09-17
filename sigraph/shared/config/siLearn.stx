@@ -1,0 +1,25 @@
+*BEGIN SYNTAX siLearn
+
+modelFile		string	!
+trainschemeFile		string	!
+graphFiles		string	!
+dimreduction_mode	string
+dimreduction_optim	string
+selected_dim		int
+predict_train		int
+gaussian_mode		string
+testGraphFiles		string
+labelsMapFile		string
+label_attribute		string
+uninitflg		int
+nosave			int
+mode			string !
+cycles			int
+cycles_tst		int
+filter_attributes	string
+filter_pattern		string
+stop_delay		int
+max_app_error		float
+close_learning		int
+
+*END

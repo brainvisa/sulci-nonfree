@@ -1,0 +1,11 @@
+*BEGIN SYNTAX siErrorStatsParams
+
+baseGraphFiles	string	!
+testGraphFiles	string
+genGraphFiles	string
+resultFile	string	!
+translation	string
+modelGraph	string
+set_weights	float
+
+*END

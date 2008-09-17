@@ -1,0 +1,8 @@
+class NeuronComponent( GenericMakerComponent ):
+  _name = 'neuron'
+
+  def dependencies( self ):
+    return []
+                                                                                
+  def weakDependencies( self ):
+    return []

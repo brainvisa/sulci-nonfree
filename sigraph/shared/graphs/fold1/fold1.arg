@@ -1,0 +1,51 @@
+*BEGIN GRAPH 1.0 graphe_sillon
+
+Talairach_rotation 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000
+Talairach_translation -130.000000 -111.000000 -88.399994
+Talairach_scale 0.011628 0.007634 0.013263
+#bounding_box_min 44 35 10
+#bounding_box_max 207 242 123
+voxel_size 0.781000 0.781000 1.200000
+#anterior_commissure 130 111 68
+filename_base fold1.data
+
+type.bck	none
+type.tri	none
+
+
+*BEGIN NODE fold 1
+point_number		1
+size			10
+name			sillon1
+skeleton_label		1
+gravity_center		0 0 0
+depth			3
+ss_point_number		10
+bottom_point_number	1
+ss_filename		ss/bucket1.bck
+bottom_filename		bottom/bucket2.bck
+label			sillon_toto
+
+*END
+
+*BEGIN NODE fold 2
+point_number		2
+size			12
+name			sillon2
+skeleton_label		2
+gravity_center		0 0 0
+depth			4
+ss_point_number		12
+bottom_point_number	3
+ss_filename		ss/bucket1.bck
+bottom_filename		bottom/bucket2.bck
+label			sillon_tutu
+*END
+
+*BEGIN UBEDGE hull_junction 1 2
+point_number		14
+size			18.200
+junction_filename	junction/bucket3.bck
+*END
+
+*END
