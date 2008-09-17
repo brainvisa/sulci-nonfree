@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
-class SigraphComponent( GenericMakerComponent ):
-  _name = 'sigraph'
+class SigraphlibComponent( GenericMakerComponent ):
+  _name = 'sigraphlib'
 
   optionsDescription = GenericMakerComponent.optionsDescription.copy()
   optionsDescription.update( {
@@ -13,7 +13,7 @@ class SigraphComponent( GenericMakerComponent ):
     self.setDefaultOption( 'sisvm', 1 )
 
   def dependencies( self ):
-    deps = [ 'neuron', 'aimsalgo' ]
+    deps = [ 'neuron', 'aimsalgo(aims)' ]
     return deps
 
   def weakDependencies( self ):
@@ -22,6 +22,9 @@ class SigraphComponent( GenericMakerComponent ):
       and weakDependency( SiSvmComponent, self ):
       result.append( SiSvmComponent )
     return result
+
+  def _libraries( self ):
+    return [ 'sigraph' ]
 
 #-----------------------------------------------------------------------------
 class SiSvmComponent( GenericMakerModuleComponent ):
@@ -32,7 +35,7 @@ class SiSvmComponent( GenericMakerModuleComponent ):
 
 	def dependencies(self):
 		datamind = getInstance('datamind')
-		return [SigraphComponent, DatamindLibsvmComponent]
+		return [SigraphlibComponent, DatamindLibsvmComponent]
 
 	def _libraries( self ):
 		return ['sigraphsvm']

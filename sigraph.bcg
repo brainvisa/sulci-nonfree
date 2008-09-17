@@ -12,8 +12,11 @@ class SigraphComponent( GenericMakerModuleComponent ):
         deps.append( component )
     return deps
 
+  def libraries( self ):
+    return []
+
 currentComponentDirectory = os.path.dirname( currentComponentFile )
-for component in [ 'sigraphlib', 'pysigraph' ]:
+for component in [ 'sigraphlib', 'pysigraph', 'neuron' ]:
   c = options.setdefault( component, {} )
   c[ 'source' ] = os.path.join( currentComponentDirectory, component )
   c[ 'version' ] = '4.0'
