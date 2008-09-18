@@ -5,17 +5,18 @@ class PySigraphComponent( GenericMakerComponent ):
   def postInit( self ):
     if not self._initialized:
       GenericMakerComponent.postInit( self )
-      source = os.path.join( self.sourceDir(), 'src', 'sip' )
-      build = os.path.join( self.componentBuildDir(), 'src', 'sip' )
-      self._data[ 'sipinclude' ] = [ '-I', build, '-I', source ]
-      self._data[ 'sipinclude' ] = SipComponent.sipinclude( self )
+      if self._found and int(self._data['enabled']):
+        source = os.path.join( self.sourceDir(), 'src', 'sip' )
+        build = os.path.join( self.componentBuildDir(), 'src', 'sip' )
+        self._data[ 'sipinclude' ] = [ '-I', build, '-I', source ]
+        self._data[ 'sipinclude' ] = SipComponent.sipinclude( self )
 
   def dependencies( self ):
     return [ SigraphlibComponent, 'pyaims(aims)', 'datamind' ]
 
   def weakDependencies( self ):
     result = []
-    if weakDependency( 'sisvm', getInstance( SigraphComponent ) ):
+    if weakDependency( 'sisvm', getInstance( SigraphlibComponent ) ):
       result.append( 'sisvm' )
     return result
 

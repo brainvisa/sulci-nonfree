@@ -5,12 +5,26 @@ class SigraphComponent( GenericMakerModuleComponent ):
   def dependencies( self ):
     return [ 'sigraphlib' ]
 
-  def weakDependencies( self ):
-    deps = []
-    for component in [ 'pysigraph' ]:
-      if weakDependency( component ):
-        deps.append( component )
-    return deps
+  def postInit( self ):
+    if not self._initialized:
+      GenericMakerModuleComponent.postInit( self )
+      global componentsToBuild
+      try:
+        pa = getInstance( 'pysigraph' )
+        if pa:
+          pa.postInit()
+          if weakDependency( 'pysigraph' ):
+            componentsToBuild.append( 'pysigraph' )
+      except Exception, e:
+        print e
+
+  #def weakDependencies( self ):
+    #deps = []
+    #for component in [ 'pysigraph' ]:
+      #if weakDependency( component ):
+        #print 'sigraph weakdep pysigraph OK'
+        #deps.append( component )
+    #return deps
 
   def libraries( self ):
     return []

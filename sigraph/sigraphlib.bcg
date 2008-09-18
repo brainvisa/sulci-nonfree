@@ -34,8 +34,7 @@ class SiSvmComponent( GenericMakerModuleComponent ):
 		return 'sigraph'
 
 	def dependencies(self):
-		datamind = getInstance('datamind')
-		return [SigraphlibComponent, DatamindLibsvmComponent]
+		return [SigraphlibComponent, 'datamind_libsvm(datamind)']
 
 	def _libraries( self ):
 		return ['sigraphsvm']
