@@ -11,7 +11,7 @@ class PySigraphComponent( GenericMakerComponent ):
       self._data[ 'sipinclude' ] = SipComponent.sipinclude( self )
 
   def dependencies( self ):
-    return [ 'sigraph', 'pyaims', 'datamind' ]
+    return [ SigraphlibComponent, 'pyaims(aims)', 'datamind' ]
 
   def weakDependencies( self ):
     result = []
