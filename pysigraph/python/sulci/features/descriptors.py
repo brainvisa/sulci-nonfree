@@ -136,6 +136,12 @@ class RelationDescriptor(Descriptor):
 	def __init__(self):
 		Descriptor.__init__(self)
 
+	def selected_labels(self, selected_sulci, name1, name2):
+		if selected_sulci != None and \
+			((name1 not in selected_sulci) or \
+			(name2 not in selected_sulci)): return False
+		return True
+
 	def edges_from_graph(self, graph, selected_sulci=None):
 		edges = {}
 		for e in graph.edges():
@@ -145,10 +151,8 @@ class RelationDescriptor(Descriptor):
 				v2.getSyntax() != 'fold':
 				continue
 			name1, name2 = v1['name'], v2['name']
-			if selected_sulci != None and \
-				(name1 not in selected_sulci) and \
-				(name2 not in selected_sulci):
-				continue
+			if not self.selected_labels(selected_sulci,
+					name1, name2): continue
 			r1, r2 = v1['index'], v2['index']
 			if r1 > r2:
 				v1, v2 = v2, v1
@@ -161,16 +165,19 @@ class RelationDescriptor(Descriptor):
 		return edges
 
 
-	def potential_matrix(self, distribs, edge_infos,
+	def potential_matrix(self, motion, distribs, edge_infos,
 				avalaible_labels, potential=True):
 		'''
     potential : True store -log(likelihood(data(edge))) for each label pair.
                 False strore    likelihood(data(edge))       "     "
 		'''
 		(r1, r2), ((v1, v2), edges) = edge_infos
-		data = self.data_edges(edges)
+		data = self.data_edges(motion, edges)
 		labels_1, labels_2 = avalaible_labels[r1], avalaible_labels[r2]
 		P = numpy.zeros((len(labels_1), len(labels_2)), numpy.float96)
+		if data is None:
+			if not potential: P += numpy.inf
+			return P, (r1, r2)
 		for s1, l_1 in enumerate(labels_1):
 			for s2, l_2 in enumerate(labels_2):
 				if l_1 > l_2:
@@ -187,6 +194,26 @@ class RelationDescriptor(Descriptor):
 				else:	P[s1, s2] = li
 		return P, (r1, r2)
 
+	def data_from_graphs(self, graphs, selected_sulci=None):
+		data = {}
+		for g in graphs:
+			motion = aims.GraphManip.talairach(g)
+			graph_edges = self.edges_from_graph(g, selected_sulci)
+			for (r1, r2), ((v1, v2), edges) in graph_edges.items():
+				name1, name2 = v1['name'], v2['name']
+				d = self.data_edges(motion, edges)
+				if d is None: continue
+				d = numpy.array(d)
+				# order names
+				if name1 > name2: name1, name2 = name2, name1
+				key = (name1, name2)
+				if data.has_key(key):
+					data[key].append(d)
+				else:	data[key] = [d]
+		for relation, D in data.items():
+			data[relation] = numpy.vstack(D)
+		return data
+
 
 ################################################################################
 class MinDistanceRelationDescriptor(RelationDescriptor):
@@ -194,7 +221,7 @@ class MinDistanceRelationDescriptor(RelationDescriptor):
 		RelationDescriptor.__init__(self)
 		self._name = 'min_distance'
 
-	def data_edges(self, edges):
+	def data_edges(self, motion, edges):
 		if edges.has_key('plidepassage') or edges.has_key('junction'):
 			pi = numpy.array([0, 0, 0])
 			pj = numpy.array([0, 0, 0])
@@ -206,22 +233,170 @@ class MinDistanceRelationDescriptor(RelationDescriptor):
 			return None
 		return numpy.sqrt(((pi - pj) ** 2).sum()) #distance
 
+
+class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
+	'''
+    For each label pair (l1, l2), For each subject k :
+    For each segment si1 with label l1
+        dk_l1->l2 = min dist(si1, sj2) for sj2 in segments with label l2
+    For each segment sj2 with label l2
+        dk_l2->l1 = min dist(si1, sj2) for si1 in segments with label l1
+    get the min of this distance for given (subject, labels pair).
+
+    if l1 == l2 : only related (through relations edges) segments are considered
+	'''
+	def __init__(self):
+		MinDistanceRelationDescriptor.__init__(self)
+		self._name = 'all_min_distance'
+
+	def group_segments_per_labels(self, g):
+		group = {}
+		for v in g.vertices():
+			if v.getSyntax() != 'fold': continue
+			label = v['name']
+			if group.has_key(label):
+				group[label].append(v)
+			else:	group[label] = [v]
+		return group
+
+	def data_vertices(self, motion, v1, v2):
+		map1 = v1['aims_ss'].get()
+		s1 = numpy.array([map1.sizeX(), map1.sizeY(), map1.sizeZ()])
+		X1 = numpy.array([motion.transform(aims.Point3df(p * s1)) \
+					for p in map1[0].keys()])
+		map2 = v2['aims_ss'].get()
+		s2 = numpy.array([map2.sizeX(), map2.sizeY(), map2.sizeZ()])
+		X2 = numpy.array([motion.transform(aims.Point3df(p * s2)) \
+					for p in map2[0].keys()])
+		d = numpy.min([numpy.min(((X2 - x)** 2).sum(axis=1)) \
+							for x in X1])
+		return numpy.sqrt(d)
+
+	def update_data(self, data, motion, g1, g2):
+		(name1, segments1), (name2, segments2) = g1, g2
+		dist = []
+		if name1 == name2 :
+			for s1 in segments1:
+				r1 = s1['index']
+				edges = s1.edges()
+				h = {}
+				for e in edges:
+					si, sj = e.vertices()
+					ri = si['index']
+					rj = sj['index']
+					if ri != r1:
+						rj, ri = ri, rj
+						sj, si = si, sj
+					if ri > rj: continue
+					if sj.getSyntax() != 'fold': continue
+					if sj['name'] != name1: continue
+					h[rj] = sj
+				for r2, s2 in h.items():
+					d = self.data_vertices(motion, s1, s2)
+					dist.append(d)
+		else:
+			for s1 in segments1:
+				dmin = numpy.inf
+				for s2 in segments2:
+					d = self.data_vertices(motion, s1, s2)
+					if d < dmin: dmin = d
+				dist.append(dmin)
+		key = (name1, name2)
+		if name1 != name2 : dist = [numpy.min(dist)]
+		if data.has_key(key):
+			data[key] += dist
+		else:	data[key] = dist
+
 	def data_from_graphs(self, graphs, selected_sulci=None):
 		data = {}
 		for g in graphs:
-			graph_edges = self.edges_from_graph(g, selected_sulci)
-			for (r1, r2), ((v1, v2), edges) in graph_edges.items():
-				name1, name2 = v1['name'], v2['name']
-				d = numpy.array(self.data_edges(edges))
-				# order names
-				if name1 > name2: name1, name2 = name2, name1
-				key = (name1, name2)
-				if data.has_key(key):
-					data[key].append(d)
-				else:	data[key] = [d]
+			motion = aims.GraphManip.talairach(g)
+			group = self.group_segments_per_labels(g)
+			for g1 in group.items():
+				for g2 in group.items():
+					(name1, segments1) = g1
+					(name2, segments2) = g2
+					if not self.selected_labels(\
+						selected_sulci, name1, name2):
+						continue
+					if name1 > name2: continue
+					self.update_data(data, motion, g1, g2)
 		for relation, D in data.items():
-			data[relation] = numpy.vstack(D)
+			if len(D):
+				data[relation] = numpy.vstack(D)
+			else:	del data[relation]
 		return data
+
+
+################################################################################
+class ConnexionLengthRelationDescriptor(RelationDescriptor):
+	def __init__(self):
+		RelationDescriptor.__init__(self)
+		self._name = 'connexion_length'
+
+	def data_edges(self, motion, edges):
+		if edges.has_key('junction'):
+			return edges['junction']['reflength']
+		else:	return None
+
+
+################################################################################
+class AllDirectionsPairRelationDescriptor(RelationDescriptor):
+	def __init__(self):
+		RelationDescriptor.__init__(self)
+		self._name = 'all_directions_pair'
+
+	def data_edges(self, motion, edges):
+		e = edges.values()[0]
+		v1, v2 = e.vertices()
+
+		map1 = v1['aims_ss'].get()
+		s1 = numpy.array([map1.sizeX(), map1.sizeY(), map1.sizeZ()])
+		vox1 = [motion.transform(aims.Point3df(p * s1)) \
+					for p in map1[0].keys()]
+		map2 = v1['aims_ss'].get()
+		s2 = numpy.array([map2.sizeX(), map2.sizeY(), map2.sizeZ()])
+		vox2 = [motion.transform(aims.Point3df(p * s2)) \
+					for p in map2[0].keys()]
+
+		name1, name2 = v1['name'], v2['name']
+		X = []
+		for v1 in vox1:
+			for v2 in vox2:
+				dir = (v1 - v2).arraydata()
+				if name1 > name2: dir *= 1.
+				X.append(dir)
+		if len(X):
+			return numpy.vstack(X)
+		else:	return None
+
+################################################################################
+class AllDistancesPairRelationDescriptor(RelationDescriptor):
+	def __init__(self):
+		RelationDescriptor.__init__(self)
+		self._name = 'all_distances_pair'
+
+	def data_edges(self, motion, edges):
+		e = edges.values()[0]
+		v1, v2 = e.vertices()
+
+		map1 = v1['aims_ss'].get()
+		s1 = numpy.array([map1.sizeX(), map1.sizeY(), map1.sizeZ()])
+		vox1 = [motion.transform(aims.Point3df(p * s1)) \
+					for p in map1[0].keys()]
+		map2 = v1['aims_ss'].get()
+		s2 = numpy.array([map2.sizeX(), map2.sizeY(), map2.sizeZ()])
+		vox2 = [motion.transform(aims.Point3df(p * s2)) \
+					for p in map2[0].keys()]
+		X = []
+		for v1 in vox1:
+			for v2 in vox2:
+				dir = (v1 - v2).arraydata()
+				d = numpy.sqrt((dir ** 2).sum())
+				X.append(d)
+		if len(X):
+			return numpy.vstack(X)
+		else:	return None
 
 ################################################################################
 # Prior descriptors
@@ -247,7 +422,7 @@ class GlobalFrequencyDescriptor(PriorDescriptor):
 		self._data[label2] +=  s # new
 
 	def likelihood(self, distrib, label):
-		self.full_likelihood(self, distrib, None)
+		return self.full_likelihood(distrib, None)
 
 	def full_likelihood(self, distrib, taglabels):
 		logli, li = distrib.likelihood(self._data)
@@ -337,12 +512,19 @@ class LocalFrequencyDescriptor(PriorDescriptor):
 # Descriptor map/factory
 ################################################################################
 descriptor_map = { \
+	# segments
 	'voxels_aims_ss' : SurfaceSimpleSegmentDescriptor,
 	'voxels_bottom' : BottomSegmentDescriptor,
 	'refgravity_center' : GravityCenterSegmentDescriptor,
 	'refhull_normal' : OrientationSegmentDescriptor,
 	'coordinate_system' : CoordinateSystemSegmentDescriptor,
+	# relations
 	'min_distance' : MinDistanceRelationDescriptor,
+	'all_min_distance' : AllMinDistanceRelationDescriptor,
+	'connexion_length' : ConnexionLengthRelationDescriptor,
+	'all_directions_pair' : AllDirectionsPairRelationDescriptor,
+	'all_distances_pair' : AllDistancesPairRelationDescriptor,
+	# priors
 	'size_global_frequency' : SizeGlobalFrequencyDescriptor,
 	'label_global_frequency' : LabelGlobalFrequencyDescriptor,
 	'local_frequency' : LocalFrequencyDescriptor,

@@ -12,6 +12,7 @@ from sulci.features.descriptors import descriptorFactory
 from soma.gui.api import chooseMatplotlibBackend
 chooseMatplotlibBackend()
 
+################################################################################
 def save_fig(relation, distr, X, filename):
 	n = len(X) / 5
 	if n < 5: n = 5
@@ -29,68 +30,12 @@ def save_fig(relation, distr, X, filename):
 	pylab.savefig(filename, dpi=150)
 	f.clear()
 
-from sulci.features.descriptors import RelationDescriptor
-
-class ConnexionStrengthRelationDescriptor(RelationDescriptor):
-	def __init__(self):
-		RelationDescriptor.__init__(self)
-		self._name = 'connexion_strength'
-
-	def data_edge(self, motion, edge):
-		v1, v2 = edge.vertices()
-		if edge.getSyntax() == 'junction':
-			return edge['reflength']
-		else:	return None
-
-	def edges_from_graph(self, graph, selected_sulci=None):
-		edges = {}
-		# store in priority junction/plidepassage
-		# and else cortical
-		for e in graph.edges():
-			v1, v2 = e.vertices()
-			# skip hull junctions
-			if v1.getSyntax() != 'fold' or \
-				v2.getSyntax() != 'fold':
-				continue
-			name1, name2 = v1['name'], v2['name']
-			if selected_sulci != None and \
-				(name1 not in selected_sulci) and \
-				(name2 not in selected_sulci):
-				continue
-			r1, r2 = v1['index'], v2['index']
-			if r1 > r2:
-				v1, v2 = v2, v1
-				r1, r2 = r2, r1
-			if e.getSyntax() == 'junction':
-				edges[(r1, r2)] = e, v1, v2
-		return edges
-
-	def data_from_graphs(self, graphs, selected_sulci=None):
-		data = {}
-		for g in graphs:
-			motion = aims.GraphManip.talairach(g)
-			edges = self.edges_from_graph(g, selected_sulci)
-			for (r1, r2), (e, v1, v2) in edges.items():
-				name1, name2 = v1['name'], v2['name']
-				d = numpy.array(self.data_edge(motion, e))
-				if d is None: continue
-				# order names
-				if name1 > name2: name1, name2 = name2, name1
-				key = (name1, name2)
-				if data.has_key(key):
-					data[key].append(d)
-				else:	data[key] = [d]
-		for relation, D in data.items():
-			data[relation] = numpy.vstack(D)
-		return data
 
 ################################################################################
 def compute_relations(graphs, distribdir, selected_sulci, options):
-	min_db_size = 100
+	min_db_size = options.size_threshold
 	sulci_set = {}
-	if options.data_type == 'connexion_strength': #FIXME
-		descriptor = ConnexionStrengthRelationDescriptor()
-	else: descriptor = descriptorFactory(options.data_type)
+	descriptor = descriptorFactory(options.data_type)
 	data = descriptor.data_from_graphs(graphs, selected_sulci)
 
 	# create output directory
@@ -122,8 +67,8 @@ def compute_relations(graphs, distribdir, selected_sulci, options):
 			if sulcus1 == sulcus2:
 				Xd_intra.append(X)
 			else:	Xd_inter.append(X)
-	data['default_intra'] = numpy.vstack(Xd_intra)
-	data['default_inter'] = numpy.vstack(Xd_inter)
+	if Xd_intra: data['default_intra'] = numpy.vstack(Xd_intra)
+	if Xd_inter: data['default_inter'] = numpy.vstack(Xd_inter)
 
 	for relation, X in data.items():
 		if isinstance(relation, list):
@@ -135,7 +80,7 @@ def compute_relations(graphs, distribdir, selected_sulci, options):
 		print "*** %s ***" % str(relation)
 		print repr(X.T)
 		d = Distrib()
-		d.fit(X)
+		d.fit(X) #FIXME
 		filename = io.node2densityname(prefix,
 				options.model_type, relation)
 		if options.savefig: save_fig(relation, d, X, filename + '.png')
@@ -164,17 +109,18 @@ def parseOpts(argv):
 	parser.add_option('-s', '--sulci', dest='sulci',
 		metavar='LIST', action='store', default=None,
 		help='compute models only for specified sulci. ex: ' + \
-		'"S.C._right,S.C._right;S.Pe.C._right,S.F.inf._right;' + \
-		'S.F.sup._right,*" : it specifies 3 relations, 1st : intra ' + \
-		'S.C._right, 2nd : between S.Pe.C._right and S.F.inf._right '+ \
-		'and 3rd : between S.F.sup._right and any sulcus')
+		'"S.C._right,S.C._right,S.Pe.C._right,S.F.inf._right" : ' + \
+		'only pairs of sulci with its 2 labels in this list is ' + \
+		'considered')
 	parser.add_option('--data-type', dest='data_type',
 		metavar='TYPE', action='store', default='min_distance',
-		type='choice', choices=('min_distance', 'connexion_strength'),
+		type='choice', choices=('min_distance', 'connexion_length',
+		'all_directions_pair', 'all_distances_pair',
+		'all_min_distance'),
 		help="data type : kind of relation to be learned. " + \
 		"'min_distance' : distance between the 2 " + \
 		"nearest extremities (near from the minimal distance), " + \
-		"'connection_strength' : 0 if disconnected segments, from " + \
+		"'connexion_length' : 0 if disconnected segments, from " + \
 		"0 to 1 for connected components (default : %default)")
 	parser.add_option('--model-type', dest='model_type',
 		metavar='TYPE', action='store', default='gamma', type='choice',
@@ -192,6 +138,10 @@ def parseOpts(argv):
 	parser.add_option('--save-fig', dest='savefig',
 		action='store_true', default=False,
 		help="save histograms of learned values")
+	parser.add_option('--size-threshold', dest='size_threshold',
+		metavar='INT', action='store', default=100, type='int',
+		help="under this threshold the relations models are learned " +\
+		" grouped in 2 big classes (inter-labels) and (intra-labels)")
 
 	return parser, parser.parse_args(argv)
 

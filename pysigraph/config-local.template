@@ -25,6 +25,7 @@ SIP_PLATFORM = @sip:platform@
 SIGRAPH_LIBS = @sigraph:libLine@
 PYTHON_LIBS = @sip:libLine@
 SIP_LIBS = @libBuildLine@
+SIP_OPTIONS = @sip:sip_options@
 
 defmodule(pysisvm) = @sisvm:enabled@
 module(pysisvm):INCLUDEPATH += @libsvm:includes@

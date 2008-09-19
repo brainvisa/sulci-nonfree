@@ -102,8 +102,14 @@ public:
   AnnealConfigurator();
   virtual ~AnnealConfigurator();
 
+%If (SIP_THROW_BUG)
   virtual bool loadConfig( const std::string & filename )
-    throw ( /* std::exception, carto::io_error */ );
+    throw ( );
+%End
+%If (!SIP_THROW_BUG)
+  virtual bool loadConfig( const std::string & filename )
+    throw ( std::exception, carto::io_error );
+%End
   virtual void saveConfig( const std::string & filename );
   virtual void init();
   virtual bool processParams();

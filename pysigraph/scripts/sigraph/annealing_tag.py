@@ -295,8 +295,8 @@ class Tagger(object):
 			self._neighbours[r1].add(r2)
 			self._neighbours[r2].add(r1)
 			# relation potential
-			P12, indices = reldescr.potential_matrix(reldistr,
-					edge_infos, self._availablelabels)
+			P12, indices = reldescr.potential_matrix(self._motion,
+				reldistr, edge_infos, self._availablelabels)
 			# segment potential
 			self._rel_potentials[indices] = P12
 			if weighting_mode == 'sizes':
@@ -536,7 +536,7 @@ class Tagger(object):
 			else:	P12 = self._rel_potentials[id1, id2]
 			en += P12[:,l2].T # FIXME : add weight
 		priors = self.eval_priors(id1)
-		en += self._seg_potentials[id1] + priors
+		en += self._seg_potentials[id1] + priors #FIXME * self._seg_weights[id1]
 		delta_e = en[l1] - en
 		l2 = numpy.argmin(en) # new label
 		chgmt = (l2 != l1)

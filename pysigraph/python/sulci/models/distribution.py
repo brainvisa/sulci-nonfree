@@ -1801,6 +1801,14 @@ class GammaExponentialMixtureModel(MixtureModel):
 				scale = g._compute_scale(X.ravel(), wg)
 				g.setScale(scale)
 				g.update()
+			# to avoid gamma parameters ranges given nan value
+			# for likelihood
+			if g.shape() >= 100:
+				g.setShape(100.)
+				scale = g._compute_scale(X.ravel(), wg)
+				if scale < 0.01: scale = 0.01
+				g.setScale(scale)
+				g.update()
 
 			# E step
 			pe = e.likelihoods(X)[1].ravel() * prior_e
