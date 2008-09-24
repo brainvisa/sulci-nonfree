@@ -729,6 +729,16 @@ class Bingham(Distribution):
 			self._lognormalization = None
 			self._A = None
 
+	def setUniform(self, dim):
+		self._A = numpy.asmatrix(numpy.identity(dim))
+		self._M = self._A.copy()
+		self._Z = numpy.array([1., 1., 1.])
+		self.update()
+
+	def GetMeanDirection(self):
+		ind = numpy.argmax(self._Z)
+		return numpy.array(self._M[:,ind]).ravel()
+
 	def M(self): return self._M
 
 	def Z(self): return self._Z

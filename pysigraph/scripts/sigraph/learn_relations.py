@@ -45,7 +45,15 @@ def compute_relations(graphs, distribdir, selected_sulci, options):
 		print e
 		sys.exit(1)
 
-	Distrib = distribution.distributionFactory(options.model_type)
+	if options.model_type == 'direction':
+		mtype_inter = 'kent'
+		mtype_intra = 'bingham'
+		Distrib_inter = distribution.distributionFactory(mtype_inter)
+		Distrib_intra = distribution.distributionFactory(mtype_intra)
+	else:
+		Distrib = distribution.distributionFactory(options.model_type)
+		Distrib_inter = Distrib_intra = Distrib
+		mtype_inter = mtype_intra = options.model_type
 
 	# learn and write spams
 	h = {'level' : 'relations', 'data_type' : options.data_type,
@@ -63,31 +71,43 @@ def compute_relations(graphs, distribdir, selected_sulci, options):
 	Xd_inter = []
 	for relation, X in data.items():
 		sulcus1, sulcus2 = relation
+		if sulcus1 == sulcus2:
+			dim_intra = X.shape[0]
+		else:	dim_inter = X.shape[0]
 		if len(X) < min_db_size:
 			if sulcus1 == sulcus2:
 				Xd_intra.append(X)
 			else:	Xd_inter.append(X)
 	if Xd_intra: data['default_intra'] = numpy.vstack(Xd_intra)
+	else:	data['default_intra'] = None
 	if Xd_inter: data['default_inter'] = numpy.vstack(Xd_inter)
+	else:	data['default_inter'] = None
 
 	for relation, X in data.items():
-		if isinstance(relation, list):
+		if isinstance(relation, tuple):
 			sulcus1, sulcus2 = relation
 			if selected_sulci != None and \
 				(sulcus1 not in selected_sulci) \
 				and (sulcus2 not in selected_sulci): continue
-		if len(X) < min_db_size: continue
-		print "*** %s ***" % str(relation)
-		print repr(X.T)
-		d = Distrib()
-		d.fit(X) #FIXME
-		filename = io.node2densityname(prefix,
-				options.model_type, relation)
+		if X is not None and (len(X) < min_db_size): continue
+		if relation == 'default_intra' or (sulcus1 == sulcus2):
+			d = Distrib_intra()
+			mtype = mtype_intra
+		elif relation == 'default_inter' or (sulcus1 != sulcus2):
+			d = Distrib_inter()
+			mtype = mtype_inter
+		if X is None:
+			if relation == 'default_intra':
+				d.setUniform(dim_intra)
+			elif relation == 'default_inter':
+				d.setUniform(dim_inter)
+		else:	d.fit(X)
+		filename = io.node2densityname(prefix, mtype, relation)
 		if options.savefig: save_fig(relation, d, X, filename + '.png')
 		d.write(filename)
 		relfilename = re.sub('^%s%s' % (os.path.dirname(prefix), \
 						os.path.sep), '', filename)
-		h['files'][relation] = (options.model_type, relfilename)
+		h['files'][relation] = (mtype, relfilename)
 
 	# write distribution summary file
 	summary_file = distribdir + '.dat'
@@ -116,7 +136,8 @@ def parseOpts(argv):
 		metavar='TYPE', action='store', default='min_distance',
 		type='choice', choices=('min_distance', 'connexion_length',
 		'all_directions_pair', 'all_distances_pair',
-		'all_min_distance'),
+		'all_connected_distance', 'all_connected_mean_distance',
+		'all_min_distance', 'gravity_centers_directions'),
 		help="data type : kind of relation to be learned. " + \
 		"'min_distance' : distance between the 2 " + \
 		"nearest extremities (near from the minimal distance), " + \
@@ -124,8 +145,10 @@ def parseOpts(argv):
 		"0 to 1 for connected components (default : %default)")
 	parser.add_option('--model-type', dest='model_type',
 		metavar='TYPE', action='store', default='gamma', type='choice',
-		choices=('gamma', 'beta', 'gamma_exponential_mixture'),
-		help="distributions : gamma, beta, gamma_exponential_mixture")
+		choices=('gamma', 'beta', 'gamma_exponential_mixture',
+		'direction'),
+		help="distributions : gamma, beta, gamma_exponential_mixture,"+\
+		" directions")
 	parser.add_option('--mode', dest='mode', metavar = 'FILE',
 		action='store', default='normal', type='choice',
 		choices=('normal', 'loo'),

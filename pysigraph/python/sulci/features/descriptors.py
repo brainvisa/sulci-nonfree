@@ -75,6 +75,27 @@ class BottomSegmentDescriptor(VoxelsSegmentDescriptor):
 		self._name = 'voxels_bottom'
 		self._data_type = 'aims_bottom'
 
+################################################################################
+class HullJunctionDescriptor(Descriptor):
+	def __init__(self):
+		Descriptor.__init__(self)
+
+	def hull_junction(self, vertex):
+		edges = vertex.edges()
+		edges = [e for e in edges if e.getSyntax() == 'hull_junction']
+		if len(edges) == 0: return None
+		return edges[0]
+
+	def data(self, motion, vertex):
+		e = self.hull_junction(vertex)
+		if e is None: return None
+		map = e["aims_junction"].get()
+		s = numpy.array([map.sizeX(), map.sizeY(), map.sizeZ()])
+		vox = [motion.transform(aims.Point3df(p * s)) \
+					for p in map[0].keys()]
+		if len(vox):
+			return numpy.vstack(vox)
+		else:	return None
 
 ################################################################################
 class GravityCenterSegmentDescriptor(SegmentDescriptor):
@@ -164,6 +185,12 @@ class RelationDescriptor(Descriptor):
 			else:	edges[key] = (v1, v2), {syntax : e}
 		return edges
 
+	def local_energy(self, distrib, data):
+		logli, li = distrib.likelihoods(data)
+		return -logli
+
+	def data_labels(self, data, inverse):
+		return data # default : symmetric
 
 	def potential_matrix(self, motion, distribs, edge_infos,
 				avalaible_labels, potential=True):
@@ -181,17 +208,18 @@ class RelationDescriptor(Descriptor):
 		for s1, l_1 in enumerate(labels_1):
 			for s2, l_2 in enumerate(labels_2):
 				if l_1 > l_2:
-					relation = l_2, l_1
-				else:	relation = l_1, l_2
+					relation, inverse = (l_2, l_1), True
+				else:	relation, inverse = (l_1, l_2), False
 				if not distribs.has_key(relation):
 					if l_1 == l_2:
 						relation = 'default_intra'
 					else:	relation = 'default_inter'
 				distrib = distribs[relation]
-				logli, li = distrib.likelihoods(data)
+				data2 = self.data_labels(data, inverse)
+				en = self.local_energy(distrib, data2)
 				if potential:
-					P[s1, s2] = -logli
-				else:	P[s1, s2] = li
+					P[s1, s2] = en
+				else:	P[s1, s2] = numpy.exp(-en)
 		return P, (r1, r2)
 
 	def data_from_graphs(self, graphs, selected_sulci=None):
@@ -203,13 +231,14 @@ class RelationDescriptor(Descriptor):
 				name1, name2 = v1['name'], v2['name']
 				d = self.data_edges(motion, edges)
 				if d is None: continue
-				d = numpy.array(d)
+				inverse = (name1 > name2)
+				d2 = self.data_labels(d, inverse)
 				# order names
 				if name1 > name2: name1, name2 = name2, name1
 				key = (name1, name2)
 				if data.has_key(key):
-					data[key].append(d)
-				else:	data[key] = [d]
+					data[key].append(d2)
+				else:	data[key] = [d2]
 		for relation, D in data.items():
 			data[relation] = numpy.vstack(D)
 		return data
@@ -272,7 +301,7 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 							for x in X1])
 		return numpy.sqrt(d)
 
-	def update_data(self, data, motion, g1, g2):
+	def compute(self, motion, g1, g2):
 		(name1, segments1), (name2, segments2) = g1, g2
 		dist = []
 		if name1 == name2 :
@@ -301,11 +330,8 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 					d = self.data_vertices(motion, s1, s2)
 					if d < dmin: dmin = d
 				dist.append(dmin)
-		key = (name1, name2)
-		if name1 != name2 : dist = [numpy.min(dist)]
-		if data.has_key(key):
-			data[key] += dist
-		else:	data[key] = dist
+		if name1 != name2 : return [numpy.min(dist)]
+		return dist
 
 	def data_from_graphs(self, graphs, selected_sulci=None):
 		data = {}
@@ -320,12 +346,167 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 						selected_sulci, name1, name2):
 						continue
 					if name1 > name2: continue
-					self.update_data(data, motion, g1, g2)
+					D = self.compute(motion, g1, g2)
+					if D is None: continue
+					key = (name1, name2)
+					if data.has_key(key):
+						data[key] += D
+					else:	data[key] = D
 		for relation, D in data.items():
 			if len(D):
 				data[relation] = numpy.vstack(D)
 			else:	del data[relation]
 		return data
+
+
+class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
+	'''
+    For each pair of sulci (s1 and s2), connect with the Hungarian algorithm
+    a set of n voxels of s1 with a set of n voxels of s2.
+	'''
+	def __init__(self):
+		AllMinDistanceRelationDescriptor.__init__(self)
+		self._name = 'all_connected_distance'
+		self._synth = aims.set_STRING(["junction", "plidepassage"])
+
+	def data_edges(self, motion, edges):
+		if edges.has_key('cortical'):
+			edge = edges['cortical']
+			return edge['refmean_connected_dist']
+		else:	return None
+
+	def connected_cc(self, ci, cj):
+		ri = [vi['index'] for vi in ci]
+		for vj in cj:
+			rj = vj['index']
+			for e in vj.edges():
+				v1, v2 = e.vertices()
+				r1, r2 = v1['index'], v2['index']
+				if v1 != vj:
+					if r1 in ri: return True
+				else:
+					if r2 in ri: return True
+		x = [vj['index'] for vj in cj]
+		return False
+
+	def euclidian_distance(self, X, Y=None): #from fff2
+		if Y == None: Y = X
+		if X.shape[1]!=Y.shape[1]:
+			raise ValueError, "incompatible dimension " + \
+						"for X and Y matrices"
+		s1 = X.shape[0]
+		s2 = Y.shape[0]
+		NX = numpy.reshape(numpy.sum(X*X,1),(s1,1))
+		NY = numpy.reshape(numpy.sum(Y*Y,1),(1,s2))
+		ED = numpy.repeat(NX,s2,1)
+		ED = ED + numpy.repeat(NY,s1,0)
+		ED = ED-2*numpy.dot(X,numpy.transpose(Y))
+		ED = numpy.maximum(ED,0)
+		ED = numpy.sqrt(ED)
+		return ED
+
+	def data_cc(self, motion, (ci, cj)):
+		hull_junction_mode = True
+		descr1 = HullJunctionDescriptor()
+		descr2 = SurfaceSimpleSegmentDescriptor()
+		for vi in ci:
+			if descr1.hull_junction(vi) is None:
+				hull_junction_mode = False
+		for vj in cj:
+			if descr1.hull_junction(vj) is None:
+				hull_junction_mode = False
+		if hull_junction_mode:
+			descr = descr1
+		else:	descr = descr2
+		X = []
+		for vi in ci: X.append(descr.data(motion, vi))
+		X = numpy.vstack(X)
+		Y = []
+		for vj in cj: Y.append(descr.data(motion, vj))
+		Y = numpy.vstack(Y)
+		sX = X.shape[0]
+		sY = Y.shape[0]
+		mi = min(sX, sY)
+		ma = max(sX, sY)
+		th_min = 30
+		th_max = 100
+		n = (ma * th_min) / mi
+		if n > th_max:
+			n = th_max
+			th_min = (mi * n) / ma
+		if mi > th_min:
+			if sX < sY:
+				nX, nY = th_min, n
+			else:	nY, nX = th_min, n
+		else:
+			nX = sX
+			ny = sY
+		indX = range(sX)
+		indY = range(sY)
+		numpy.random.shuffle(indX)
+		numpy.random.shuffle(indY)
+		X = X[indX[:nX]]
+		Y = Y[indY[:nY]]
+		C = self.euclidian_distance(X, Y)
+		if nX != nY:
+			c_inf = numpy.max(C) * 10000
+			if nX < nY:
+				P = numpy.zeros((nY-nX, nY)) + c_inf
+				C = numpy.vstack((C, P))
+			else:
+				P = numpy.zeros((nX, nX-nY)) + c_inf
+				C = numpy.hstack((C, P))
+		import munkres
+		m = munkres.Munkres()
+		indexes = m.compute(C.copy())
+		dist = []
+		for (i,j) in indexes:
+			if i >= nX or j >= nY: continue
+			dist.append(C[i, j])
+		return dist
+
+	def compute(self, motion, g1, g2):
+		(name1, segments1), (name2, segments2) = g1, g2
+		dist = []
+		if name1 == name2 :
+			import sigraph
+			from soma import aims
+			s = aims.set_VertexPtr()
+			for seg in segments1: s.add(seg)
+			cc = sigraph.VertexClique.connectivity(s, self._synth)
+			n = len(cc)
+			# find pairs of related components
+			pairs = []
+			for i in range(n):
+				ci = cc[i]
+				for j in range(i + 1, n):
+					cj = cc[j]
+					if self.connected_cc(ci, cj):
+						pairs.append((ci, cj))
+			for p in pairs:
+				dist += self.data_cc(motion, p)
+		else:
+			p = segments1, segments2
+			dist += self.data_cc(motion, p)
+		return dist
+
+
+class AllConnectedMeanDistanceRelationDescriptor(\
+		AllConnectedDistanceRelationDescriptor):
+	'''
+    For each pair of sulci (s1 and s2), connect with the Hungarian algorithm
+    a set of n voxels of s1 with a set of n voxels of s2.
+	'''
+	def __init__(self):
+		AllConnectedDistanceRelationDescriptor.__init__(self)
+		self._name = 'all_connected_mean_distance'
+		self._synth = aims.set_STRING(["junction", "plidepassage"])
+
+	def compute(self, motion, g1, g2):
+		D = AllConnectedDistanceRelationDescriptor.compute(self,
+							motion, g1, g2)
+		if D is None: return None
+		return [numpy.mean(D)]
 
 
 ################################################################################
@@ -346,29 +527,79 @@ class AllDirectionsPairRelationDescriptor(RelationDescriptor):
 		RelationDescriptor.__init__(self)
 		self._name = 'all_directions_pair'
 
+	def data_labels(self, data, inverse):
+		# antisymetric data
+		if inverse:
+			s = -1.
+		else:	s = 1.
+		return s * data
+
 	def data_edges(self, motion, edges):
 		e = edges.values()[0]
 		v1, v2 = e.vertices()
 
+		# get voxels
 		map1 = v1['aims_ss'].get()
 		s1 = numpy.array([map1.sizeX(), map1.sizeY(), map1.sizeZ()])
-		vox1 = [motion.transform(aims.Point3df(p * s1)) \
-					for p in map1[0].keys()]
-		map2 = v1['aims_ss'].get()
+		X = numpy.array([motion.transform(aims.Point3df(p * s1)) \
+					for p in map1[0].keys()])
+		map2 = v2['aims_ss'].get()
 		s2 = numpy.array([map2.sizeX(), map2.sizeY(), map2.sizeZ()])
-		vox2 = [motion.transform(aims.Point3df(p * s2)) \
-					for p in map2[0].keys()]
+		Y = numpy.array([motion.transform(aims.Point3df(p * s2)) \
+					for p in map2[0].keys()])
 
-		name1, name2 = v1['name'], v2['name']
-		X = []
-		for v1 in vox1:
-			for v2 in vox2:
-				dir = (v1 - v2).arraydata()
-				if name1 > name2: dir *= 1.
-				X.append(dir)
-		if len(X):
-			return numpy.vstack(X)
+		# kmeans to reduce the number of considered voxels
+		sX, sY = len(X), len(Y)
+		nX, nY = sX / 30, sY / 30
+		if nX <= 10: nX = 10
+		if nY <= 10: nY = 10
+
+		import scipy.cluster as C
+		X, lX = C.vq.kmeans(X, nX)
+		Y, lY = C.vq.kmeans(Y, nY)
+		#indX, indY = range(sX), range(sY)
+		#numpy.random.shuffle(indX)
+		#numpy.random.shuffle(indY)
+		#X = X[indX[:nX]]
+		#Y = Y[indY[:nY]]
+		data = []
+		for v1 in X:
+			for v2 in Y:
+				dir = (v1 - v2)
+				n = numpy.linalg.norm(dir)
+				if not n: continue
+				dir = dir / n
+				data.append(dir)
+
+		if len(data):
+			return numpy.vstack(data)
 		else:	return None
+
+
+
+
+class GravityCentersDirections(RelationDescriptor):
+	def __init__(self):
+		RelationDescriptor.__init__(self)
+		self._name = 'gravity_centers_directions'
+
+	def data_labels(self, data, inverse):
+		# antisymetric data
+		if inverse:
+			s = -1.
+		else:	s = 1.
+		return s * data
+
+	def data_edges(self, motion, edges):
+		e = edges.values()[0]
+		v1, v2 = e.vertices()
+		name1, name2 = v1['name'], v2['name']
+		g1 = v1['refgravity_center'].arraydata()
+		g2 = v2['refgravity_center'].arraydata()
+		dir = g1 - g2
+		n /= numpy.linalg.norm(dir)
+		if n: return dir / n
+		return None
 
 ################################################################################
 class AllDistancesPairRelationDescriptor(RelationDescriptor):
@@ -382,20 +613,31 @@ class AllDistancesPairRelationDescriptor(RelationDescriptor):
 
 		map1 = v1['aims_ss'].get()
 		s1 = numpy.array([map1.sizeX(), map1.sizeY(), map1.sizeZ()])
-		vox1 = [motion.transform(aims.Point3df(p * s1)) \
-					for p in map1[0].keys()]
-		map2 = v1['aims_ss'].get()
+		X = numpy.array([motion.transform(aims.Point3df(p * s1)) \
+					for p in map1[0].keys()])
+		map2 = v2['aims_ss'].get()
 		s2 = numpy.array([map2.sizeX(), map2.sizeY(), map2.sizeZ()])
-		vox2 = [motion.transform(aims.Point3df(p * s2)) \
-					for p in map2[0].keys()]
-		X = []
-		for v1 in vox1:
-			for v2 in vox2:
+		Y = numpy.array([motion.transform(aims.Point3df(p * s2)) \
+					for p in map2[0].keys()])
+
+		sX, sY = len(X), len(Y)
+		nX = sX / 50
+		nY = sY / 50
+		if nX <= 3: nX = 3
+		if nY <= 3: nY = 3
+		indX, indY = range(sX), range(sY)
+		numpy.random.shuffle(indX)
+		numpy.random.shuffle(indY)
+		X = X[indX[:nX]]
+		Y = Y[indY[:nY]]
+		data = []
+		for v1 in X:
+			for v2 in Y:
 				dir = (v1 - v2).arraydata()
 				d = numpy.sqrt((dir ** 2).sum())
-				X.append(d)
-		if len(X):
-			return numpy.vstack(X)
+				data.append(d)
+		if len(data):
+			return numpy.vstack(data)
 		else:	return None
 
 ################################################################################
@@ -411,6 +653,7 @@ class PriorDescriptor(Descriptor):
 class GlobalFrequencyDescriptor(PriorDescriptor):
 	def __init__(self):
 		PriorDescriptor.__init__(self)
+		self._w = None
 
 	def get_data(self): return self._data
 
@@ -434,7 +677,6 @@ class LabelGlobalFrequencyDescriptor(GlobalFrequencyDescriptor):
 		GlobalFrequencyDescriptor.__init__(self)
 		self._name = 'label_global_frequency'
 		self._data = None
-		self._w = None
 
 	def update_data(self, segment, label1, label2):
 		self._data[label1] -=  1 # old
@@ -462,7 +704,6 @@ class SizeGlobalFrequencyDescriptor(GlobalFrequencyDescriptor):
 		self._name = 'size_global_frequency'
 		self._data = None
 		self._sizes = None
-		self._w = None
 
 	def compute_data(self, graph, taglabels, availablelabels,
 						segments, labels):
@@ -521,9 +762,13 @@ descriptor_map = { \
 	# relations
 	'min_distance' : MinDistanceRelationDescriptor,
 	'all_min_distance' : AllMinDistanceRelationDescriptor,
+	'all_connected_distance' : AllConnectedDistanceRelationDescriptor,
+	'all_connected_mean_distance' : \
+				AllConnectedMeanDistanceRelationDescriptor,
+	'all_distances_pair' : AllDistancesPairRelationDescriptor,
 	'connexion_length' : ConnexionLengthRelationDescriptor,
 	'all_directions_pair' : AllDirectionsPairRelationDescriptor,
-	'all_distances_pair' : AllDistancesPairRelationDescriptor,
+	'gravity_centers_directions' : GravityCentersDirections,
 	# priors
 	'size_global_frequency' : SizeGlobalFrequencyDescriptor,
 	'label_global_frequency' : LabelGlobalFrequencyDescriptor,

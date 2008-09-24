@@ -70,7 +70,18 @@ public:
 		sipRes = 0;
 	}
 %End
+	static SIP_PYLIST connectivity2( const set_VertexPtr & vx,
+		const set_STRING & syntTypes) /PyName=connectivity/;
+%MethodCode
+	std::set<sigraph::CComponent *>	s;
+	std::set<sigraph::CComponent *>::const_iterator i, e;
+	unsigned int n = sigraph::VertexClique::connectivity(*a0, &s, *a1);
+	unsigned int ind = 0;
+	sipRes = PyList_New(n);
+	for (i = s.begin(), e = s.end(); i != e; ++i, ++ind)
+		PyList_SetItem(sipRes, ind, sipConvertFromInstance(*i,
+				sipClass_set_VertexPtr, Py_None));
+%End
 };
 
 };
-

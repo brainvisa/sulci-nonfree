@@ -322,6 +322,8 @@ class Tagger(object):
 			for ind, p in self._seg_potentials.items():
 				self._seg_potentials[ind] *= \
 					self._seg_weights[ind]
+		else:	self._normalize_weights = False
+
 		if picklename:
 			fd = open(picklename, 'w')
 			obj = (self._availablelabels, self._labelsind,
@@ -399,7 +401,7 @@ class Tagger(object):
 		self._best_taglabels = copy.copy(self._taglabels)
 		t = 0
 		while 1:
-			#numpy.random.shuffle(self._seg_indices) #FIXME
+			numpy.random.shuffle(self._seg_indices)
 			chgmt = 0.
 			for id in self._seg_indices:
 				c, d = self.gibbs(id)
@@ -504,7 +506,7 @@ class Tagger(object):
 			if id1 > id2:
 				P12 = self._rel_potentials[id2, id1].T
 			else:	P12 = self._rel_potentials[id1, id2]
-			en += P12[:,l2].T
+			en += P12[:,l2].T * 2
 		P1 = self._seg_potentials[id1]
 		priors = self.eval_priors(id1)
 		en += P1[:] + priors
@@ -534,9 +536,9 @@ class Tagger(object):
 			if id1 > id2:
 				P12 = self._rel_potentials[id2, id1].T
 			else:	P12 = self._rel_potentials[id1, id2]
-			en += P12[:,l2].T # FIXME : add weight
+			en += P12[:,l2].T * 2 # FIXME : add weight
 		priors = self.eval_priors(id1)
-		en += self._seg_potentials[id1] + priors #FIXME * self._seg_weights[id1]
+		en += self._seg_potentials[id1] + priors
 		delta_e = en[l1] - en
 		l2 = numpy.argmin(en) # new label
 		chgmt = (l2 != l1)
@@ -561,6 +563,7 @@ class Tagger(object):
 				en[i] = -logli
 				old_l2 = l2
 			self._prior_descriptor.update_data(id, old_l2, l1)
+			en *= self._seg_weights[id] # new behaviour
 		return en
 
 	def eval_prior(self):

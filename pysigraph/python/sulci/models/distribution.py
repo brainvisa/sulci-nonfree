@@ -184,7 +184,10 @@ class Gaussian(Distribution):
 
 	def _compute_norm(self):
 		ndim = len(self._mean)
-		det = numpy.linalg.det(self._cov)
+		if self._cov.shape == (1,1):
+			det = self._cov[0, 0]
+		else:
+			det = numpy.linalg.det(self._cov)
 		self._norm = numpy.sqrt(numpy.fabs(det)* (2 * numpy.pi) ** ndim)
 		self._metric = self._cov.I
 		self._det = det
@@ -244,10 +247,11 @@ class Gaussian(Distribution):
 		X = numpy.asmatrix(X)
 		Xm = X.mean(axis=0)
 		Xc = X - Xm
-		if weights:
-			Xcw = numpy.multiply(weights, weights)
-		else:	Xcw = Xc
-		cov = Xc.T * Xcw / (n - 1)
+		if weights is not None:
+			weights = weights * n / weights.sum()
+			cov = numpy.multiply(Xc.T, weights) * Xc / (n - 1)
+		else:	
+			cov = Xc.T * Xc / (n - 1)
 		self._mean = Xm
 		self._cov = cov
 		self.update()
@@ -1212,6 +1216,16 @@ class Kent(Distribution):
 			self._update()
 		else: self._normalization = None
 
+	def setUniform(self, dim=3):
+		if dim != 3: raise ValueError, "dim must be 3"
+		self._gamma = numpy.asmatrix(numpy.identity(3))
+		self._kappa = 1.
+		self._beta = 0.
+		self.update()
+
+	def GetMeanDirection(self):
+		return numpy.array(self._gamma[0]).ravel()
+
 	def update(self):
 		'''update internal parameters'''
 		k, b = self._kappa, self._beta
@@ -1753,6 +1767,13 @@ class GammaExponentialMixtureModel(MixtureModel):
 		self._name = 'gamma_exponential_mixture'
 
 	def em(self, X, maxiter=1000, eps=10e-5):
+		# shift
+		xmin = X.min()
+		if xmin <= 1.:
+			self._shift = xmin
+			X -= self._shift
+		else:	self._shift = 0.
+
 		# models
 		e = GeneralizedExponential()
 		g = Gamma()
@@ -1793,19 +1814,19 @@ class GammaExponentialMixtureModel(MixtureModel):
 			prior_sum = prior_e + prior_g
 			prior_e /= prior_sum
 			prior_g /= prior_sum
-			e.fit(X, we)
-			g.fit(X, wg)
+			if we.sum(): e.fit(X, we)
+			if wg.sum(): g.fit(X, wg)
 			# force gaussian-like shape rather than exponential one
 			if g.shape() < 1.: # gamma(x=0) = 0
 				g.setShape(1.)
-				scale = g._compute_scale(X.ravel(), wg)
+				scale = g._compute_scale(X.ravel(), wg/wg.sum())
 				g.setScale(scale)
 				g.update()
 			# to avoid gamma parameters ranges given nan value
 			# for likelihood
 			if g.shape() >= 100:
 				g.setShape(100.)
-				scale = g._compute_scale(X.ravel(), wg)
+				scale = g._compute_scale(X.ravel(), wg/wg.sum())
 				if scale < 0.01: scale = 0.01
 				g.setScale(scale)
 				g.update()
@@ -1813,14 +1834,112 @@ class GammaExponentialMixtureModel(MixtureModel):
 			# E step
 			pe = e.likelihoods(X)[1].ravel() * prior_e
 			pg = g.likelihoods(X)[1].ravel() * prior_g
-			ze = (we != 0)
-			zg = (wg != 0)
+			ze = (we >= 10e-10)
+			zg = (wg >= 10e-10)
 			en = -(we[ze] * numpy.log(pe[ze])).sum() + \
 				(wg[zg] * numpy.log(pg[zg])).sum()
 			en -= 2 * size * (gamma - 1) * (numpy.log(prior_e) + \
 							numpy.log(prior_g))
 			en /= size
+			pe[ze == 0] = 0.
+			pg[zg == 0] = 0.
 			s = pe + pg
+			s[s == 0] = 0.5
+			we = pe / s
+			wg = pg / s
+			# avoid NaN and 0 values for gamma distribution
+			z = (numpy.isnan(we) + numpy.isnan(wg)) != 0
+			we[z] = 0.5
+			wg[z] = 0.5
+			we[zind] = 1.
+			wg[zind] = 0.
+
+			n += 1
+			if (n > 2 and old_en - en < eps) or n >= maxiter: break
+			old_en = en
+		
+		models = [e, g]
+		priors = [prior_e, prior_g]
+		return models, priors, en
+
+	def fit(self, X, maxiter=1000, eps=10e-5):
+		best_en = numpy.inf
+		best_data = None
+		n = 0
+		while (best_data is None) or (n < 5):
+			models, priors, en = self.em(X, maxiter, eps)
+			if en < best_en:
+				best_en = en
+				best_data = models, priors
+			if models: n += 1
+		self._models = best_data[0]
+		self._priors = best_data[1]
+
+	def likelihoods(self, X):
+		X = X - self._shift
+		logli0, li0 = self._models[0].likelihoods(X)
+		logli1, li1 = self._models[1].likelihoods(X)
+		li = li0 * self._priors[0] + li1 * self._priors[1]
+		return numpy.log(li), li
+
+	def toTuple(self):
+		t = MixtureModel.toTuple(self)
+		return (t, self._shift)
+
+	def fromTuple(self, tuple):
+		if len(tuple) == 2:
+			t, self._shift = tuple
+		else:	t, self._shift = tuple, 0.
+		MixtureModel.fromTuple(self, t)
+
+
+class TwoGaussiansMixtureModel(MixtureModel):
+	def __init__(self, models=None, priors=None):
+		MixtureModel.__init__(self, models, priors)
+		self._name = 'two_gaussians_mixture'
+
+	def em(self, X, maxiter=1000, eps=10e-5):
+		# models
+		e = Gaussian()
+		g = Gaussian()
+
+		# init of EM
+		size = len(X)
+		zind = (X == 0).ravel()
+		priors = [0.5, 0.5]
+		we = (X <= X.mean()).ravel() + 0.
+		wg = 1. - we
+
+		n = 0
+		# EM optimization
+		old_en = numpy.inf
+		gamma = 1.001
+		while 1:
+			# M step
+			# priors P(z=c|pi) = pi_c with P(pi|gamma) = dir(gamma)
+			d = 2 * size * (gamma - 1.)
+			prior_e = we.sum() + d
+			prior_g = wg.sum() + d
+			prior_sum = prior_e + prior_g
+			prior_e /= prior_sum
+			prior_g /= prior_sum
+			if we.sum(): e.fit(X, we)
+			if wg.sum(): g.fit(X, wg)
+
+			# E step
+			pe = e.likelihoods(X)[1].ravel() * prior_e
+			pg = g.likelihoods(X)[1].ravel() * prior_g
+			ze = (we >= 10e-10)
+			zg = (wg >= 10e-10)
+			en = -(we[ze] * numpy.log(pe[ze])).sum() + \
+				(wg[zg] * numpy.log(pg[zg])).sum()
+			en -= 2 * size * (gamma - 1) * (numpy.log(prior_e) + \
+							numpy.log(prior_g))
+			en /= size
+			pe[ze == 0] = 0.
+			pg[zg == 0] = 0.
+			s = pe + pg
+			s[s == 0] = 0.5
 			we = pe / s
 			wg = pg / s
 			# avoid NaN and 0 values for gamma distribution
@@ -1858,6 +1977,8 @@ class GammaExponentialMixtureModel(MixtureModel):
 		return numpy.log(li), li
 
 
+
+
 ################################################################################
 distribution_map = { \
 	'full_gaussian' : Gaussian,
@@ -1886,6 +2007,7 @@ distribution_map = { \
 	'shifted_generalized_dirichlet' : ShiftedGeneralizedDirichlet,
 	'gaussian_mixture' : GaussianMixtureModel,
 	'gamma_exponential_mixture' : GammaExponentialMixtureModel,
+	'two_gaussians_mixture' : TwoGaussiansMixtureModel,
 }
 
 
