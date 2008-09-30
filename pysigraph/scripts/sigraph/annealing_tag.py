@@ -506,7 +506,7 @@ class Tagger(object):
 			if id1 > id2:
 				P12 = self._rel_potentials[id2, id1].T
 			else:	P12 = self._rel_potentials[id1, id2]
-			en += P12[:,l2].T * 2
+			en += P12[:,l2].T
 		P1 = self._seg_potentials[id1]
 		priors = self.eval_priors(id1)
 		en += P1[:] + priors
@@ -536,7 +536,7 @@ class Tagger(object):
 			if id1 > id2:
 				P12 = self._rel_potentials[id2, id1].T
 			else:	P12 = self._rel_potentials[id1, id2]
-			en += P12[:,l2].T * 2 # FIXME : add weight
+			en += P12[:,l2].T
 		priors = self.eval_priors(id1)
 		en += self._seg_potentials[id1] + priors
 		delta_e = en[l1] - en

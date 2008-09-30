@@ -71,9 +71,7 @@ def compute_relations(graphs, distribdir, selected_sulci, options):
 	Xd_inter = []
 	for relation, X in data.items():
 		sulcus1, sulcus2 = relation
-		if sulcus1 == sulcus2:
-			dim_intra = X.shape[0]
-		else:	dim_inter = X.shape[0]
+		dim = X.shape[1]
 		if len(X) < min_db_size:
 			if sulcus1 == sulcus2:
 				Xd_intra.append(X)
@@ -97,10 +95,7 @@ def compute_relations(graphs, distribdir, selected_sulci, options):
 			d = Distrib_inter()
 			mtype = mtype_inter
 		if X is None:
-			if relation == 'default_intra':
-				d.setUniform(dim_intra)
-			elif relation == 'default_inter':
-				d.setUniform(dim_inter)
+			d.setUniform(dim)
 		else:	d.fit(X)
 		filename = io.node2densityname(prefix, mtype, relation)
 		if options.savefig: save_fig(relation, d, X, filename + '.png')

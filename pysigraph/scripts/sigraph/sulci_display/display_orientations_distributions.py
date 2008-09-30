@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 import os, sys, numpy
 from optparse import OptionParser
+from datamind.tools import *
 from sulci.common import io
 from sulci.models import check_same_distribution, distribution, \
 				distribution_aims, distribution_fff
 from sulci.registration import procrust
 from soma import aims
 
-unit_sphere = aims.SurfaceGenerator.sphere([0, 0, 0], 1, 4096)
 
 ################################################################################
 class GlobalModelDisplay(object):
@@ -50,13 +50,16 @@ class SegmentsDisplay(GlobalModelDisplay):
 		GlobalModelDisplay.__init__(self, *args, **kwargs)
 
 	def display(self):
-		for sulcus in self._sulci:
+		print "compute meshes..."
+		bar = ProgressionBarPct(len(self._sulci), '#', color = 'blue')
+		for i, sulcus in enumerate(self._sulci):
 			if self._selected_sulci is not None and \
 				sulcus not in self._selected_sulci: continue
 			try: gd = self._gaussians_distrib['vertices'][sulcus]
 			except KeyError: continue
 			try: od = self._orientations_distrib['vertices'][sulcus]
 			except KeyError: continue
+			bar.display(i)
 			self.display_one(sulcus, gd, od)
 
 
@@ -65,7 +68,10 @@ class RelationsDisplay(GlobalModelDisplay):
 		GlobalModelDisplay.__init__(self, *args, **kwargs)
 
 	def display(self):
-		for relation in self._orientations_distrib['edges'].keys():
+		print "compute meshes..."
+		relations = self._orientations_distrib['edges'].keys()
+		bar = ProgressionBarPct(len(relations), '#', color = 'blue')
+		for i, relation in enumerate(relations):
 			# skip : intra/inter global models
 			if not isinstance(relation, tuple): continue
 			label1, label2 = relation
@@ -78,6 +84,7 @@ class RelationsDisplay(GlobalModelDisplay):
 			except KeyError: continue
 			try: od = self._orientations_distrib['edges'][relation]
 			except KeyError: continue
+			bar.display(i)
 			if label1 != label2:
 				self.display_one(relation, gd1, gd2, od)
 			else:	GlobalModelDisplay.display_one(self, label1,
@@ -90,8 +97,8 @@ class RelationsDisplay(GlobalModelDisplay):
 		# split the mesh in 2 parts along a plane directed by
 		# the mean direction
 		dir = numpy.hstack((od.GetMeanDirection(), 0))
-		plane1 = tuple(dir)
-		plane2 = tuple(-dir)
+		plane1 = tuple(-dir)
+		plane2 = tuple(dir)
 		mesh1 = aims.AimsSurfaceTriangle()
 		mesh2 = aims.AimsSurfaceTriangle()
 		borderline1 = aims.AimsTimeSurface_2()
@@ -128,13 +135,15 @@ class RelationsDisplay(GlobalModelDisplay):
 class LocalModelMesher(object):
 	def __init__(self, od):
 		self._od = od
+		self._unit_sphere = aims.SurfaceGenerator.sphere([0, 0, 0],
+								1, 4096)
 
 class OrientationMesher(LocalModelMesher):
 	def __init__(self, *args, **kwargs):
 		LocalModelMesher.__init__(self, *args, **kwargs)
 
 	def mesh(self, scale, size, s):
-		mesh = aims.AimsTimeSurface_3(unit_sphere)
+		mesh = aims.AimsTimeSurface_3(self._unit_sphere)
 		for v in mesh.vertex():
 			logli, li = self._od.likelihood(v * s)
 			v += li * v / scale
@@ -149,7 +158,7 @@ class MatrixBinghamMesher(LocalModelMesher):
 
 	def create_marginal_mesh(self, i):
 		n = 100
-		mesh = aims.AimsTimeSurface_3(unit_sphere)
+		mesh = aims.AimsTimeSurface_3(self._unit_sphere)
 		for v in mesh.vertex():
 			lis = 0.
 			vx = v.arraydata()

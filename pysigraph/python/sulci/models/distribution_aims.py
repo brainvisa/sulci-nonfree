@@ -730,10 +730,9 @@ class Bingham(Distribution):
 			self._A = None
 
 	def setUniform(self, dim):
-		self._A = numpy.asmatrix(numpy.identity(dim))
-		self._M = self._A.copy()
-		self._Z = numpy.array([1., 1., 1.])
-		self.update()
+		self._M = numpy.asmatrix(numpy.identity(dim))
+		self._Z = numpy.ones(dim)
+		self.update() # A + normalization
 
 	def GetMeanDirection(self):
 		ind = numpy.argmax(self._Z)
@@ -746,8 +745,11 @@ class Bingham(Distribution):
 	def update(self):
 		'''update internal parameters'''
 		p = self._M.shape[0]
-		self._lognormalisation = numpy.log(aimsalgo.hyp1f1(0.5,
-					p/ 2., self._Z, 1000))
+		# warning : huge value for nb_iter is good for precision
+		# but can gives NaN results if Z compoents value are too big.
+		nb_iter = 100
+		self._lognormalization = numpy.log(aimsalgo.hyp1f1(0.5, p/ 2.,
+							self._Z, nb_iter))
 		self._A = numpy.dot(self._M,
 			numpy.dot(numpy.diag(self._Z), self._M.T))
 
@@ -755,10 +757,10 @@ class Bingham(Distribution):
 		def func(z, X, weights):
 			self._Z = numpy.asarray(z).ravel()
 			self.update()
-			energy = 0.
-			for x in X:
-				logli, li = self.likelihood(x)
-				energy -= logli
+			logli, li = self.likelihoods(X)
+			if numpy.isnan(self._lognormalization):
+				energy = numpy.inf
+			else:	energy = -logli.sum()
 			if weights is None: energy /= len(X)
 			return energy
 
@@ -786,10 +788,20 @@ class Bingham(Distribution):
 		self._Z = self.compute_Z(X, weights)
 		self.update()
 
+	def likelihoods(self, X):
+		X = numpy.asarray(X).reshape(-1, X.shape[-1])
+		AX = numpy.dot(numpy.asarray(self._A), X.T).T
+		XTAX = (X * AX).sum(axis=1)
+		logli = XTAX - self._lognormalization
+		li = numpy.exp(logli)
+		return logli, li
+
 	def likelihood(self, x):
 		x = numpy.asarray(x)
-		d = numpy.dot(x, numpy.dot(x.T, self._A.T).T)[0, 0]
-		logli = d - self._lognormalisation
+		x = x.reshape(-1, x.shape[-1])
+		AX = numpy.dot(numpy.asarray(self._A), x.T).T
+		XTAX = (x * AX).sum(axis=1)[0]
+		logli = XTAX - self._lognormalization
 		li = numpy.exp(logli)
 		return logli, li
 
@@ -836,8 +848,9 @@ class MatrixVonMisesFisher(Distribution):
 	def update(self):
 		'''update internal parameters'''
 		dim = self._G.shape[1]
-		self._lognormalisation = aimsalgo.loghyp0f1(dim / 2.,
-					(self._P ** 2) / 4., 1000)
+		nb_iter = 100
+		self._lognormalization = aimsalgo.loghyp0f1(dim / 2.,
+					(self._P ** 2) / 4., nb_iter)
 		S = numpy.zeros((self._D.shape[1], self._G.shape[0]))
 		for i, p in enumerate(self._P): S[i, i] = p
 		self._F = numpy.dot(self._D, numpy.dot(S, self._G))
@@ -882,7 +895,7 @@ class MatrixVonMisesFisher(Distribution):
 		'''
 		X = numpy.asarray(X)
 		d = numpy.trace(numpy.dot(self._F, X.T))
-		logli = d - self._lognormalisation
+		logli = d - self._lognormalization
 		li = numpy.exp(logli)
 		return logli, li
 
@@ -936,12 +949,10 @@ class MatrixBingham(Distribution):
 		'''update internal parameters'''
 		n, p = self._shape
 		# copy else strange memory error (shape of D might be modified)
+		nb_iter = 100
 		L = numpy.log(aimsalgo.hyp1f1(n / 2., p / 2.,
-					self._D.copy(), 1000))
-		if numpy.isnan(L):
-			L = aimsalgo.loghyp1f1(n / 2., p / 2.,
-					self._D.copy(), 50)
-		self._lognormalisation = L
+					self._D.copy(), nb_iter))
+		self._lognormalization = L
 		self._A = numpy.dot(self._M,
 			numpy.dot(numpy.diag(self._D), self._M.T))
 
@@ -996,7 +1007,7 @@ class MatrixBingham(Distribution):
 		X = numpy.asarray(X)
 		Y = numpy.dot(X.T, X)
 		d = numpy.trace(numpy.dot(self._A, Y))
-		logli = d - self._lognormalisation
+		logli = d - self._lognormalization
 		li = numpy.exp(logli)
 		return logli, li
 

@@ -163,6 +163,22 @@ class RelationDescriptor(Descriptor):
 			(name2 not in selected_sulci)): return False
 		return True
 
+	def euclidian_distance(self, X, Y=None): #from fff2
+		if Y == None: Y = X
+		if X.shape[1]!=Y.shape[1]:
+			raise ValueError, "incompatible dimension " + \
+						"for X and Y matrices"
+		s1 = X.shape[0]
+		s2 = Y.shape[0]
+		NX = numpy.reshape(numpy.sum(X*X,1),(s1,1))
+		NY = numpy.reshape(numpy.sum(Y*Y,1),(1,s2))
+		ED = numpy.repeat(NX,s2,1)
+		ED = ED + numpy.repeat(NY,s1,0)
+		ED = ED-2*numpy.dot(X,numpy.transpose(Y))
+		ED = numpy.maximum(ED,0)
+		ED = numpy.sqrt(ED)
+		return ED
+
 	def edges_from_graph(self, graph, selected_sulci=None):
 		edges = {}
 		for e in graph.edges():
@@ -186,11 +202,14 @@ class RelationDescriptor(Descriptor):
 		return edges
 
 	def local_energy(self, distrib, data):
-		logli, li = distrib.likelihoods(data)
+		logli, li = distrib.likelihood(data)
 		return -logli
 
 	def data_labels(self, data, inverse):
 		return data # default : symmetric
+
+	def data_potential_edges(self, motion, edges):
+		return self.data_edges(motion, edges)
 
 	def potential_matrix(self, motion, distribs, edge_infos,
 				avalaible_labels, potential=True):
@@ -199,7 +218,7 @@ class RelationDescriptor(Descriptor):
                 False strore    likelihood(data(edge))       "     "
 		'''
 		(r1, r2), ((v1, v2), edges) = edge_infos
-		data = self.data_edges(motion, edges)
+		data = self.data_potential_edges(motion, edges)
 		labels_1, labels_2 = avalaible_labels[r1], avalaible_labels[r2]
 		P = numpy.zeros((len(labels_1), len(labels_2)), numpy.float96)
 		if data is None:
@@ -289,17 +308,39 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 		return group
 
 	def data_vertices(self, motion, v1, v2):
+		import time
+		print "getdata"
+		print time.asctime()
 		map1 = v1['aims_ss'].get()
 		s1 = numpy.array([map1.sizeX(), map1.sizeY(), map1.sizeZ()])
-		X1 = numpy.array([motion.transform(aims.Point3df(p * s1)) \
+		X = numpy.array([motion.transform(aims.Point3df(p * s1)) \
 					for p in map1[0].keys()])
 		map2 = v2['aims_ss'].get()
 		s2 = numpy.array([map2.sizeX(), map2.sizeY(), map2.sizeZ()])
-		X2 = numpy.array([motion.transform(aims.Point3df(p * s2)) \
+		Y = numpy.array([motion.transform(aims.Point3df(p * s2)) \
 					for p in map2[0].keys()])
-		d = numpy.min([numpy.min(((X2 - x)** 2).sum(axis=1)) \
-							for x in X1])
-		return numpy.sqrt(d)
+		print time.asctime()
+		print
+
+		sX, sY = len(X), len(Y)
+		nX, nY = sX / 30, sY / 30
+		if nX <= 10: nX = 10
+		if nY <= 10: nY = 10
+
+		print "kmeans"
+		print time.asctime()
+		import scipy.cluster as C
+		X, lX = C.vq.kmeans(X, nX)
+		Y, lY = C.vq.kmeans(Y, nY)
+		print time.asctime()
+		print
+
+		print "dist"
+		print time.asctime()
+		C = self.euclidian_distance(X, Y)
+		print time.asctime()
+		print
+		return numpy.sqrt(numpy.min(C))
 
 	def compute(self, motion, g1, g2):
 		(name1, segments1), (name2, segments2) = g1, g2
@@ -333,19 +374,54 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 		if name1 != name2 : return [numpy.min(dist)]
 		return dist
 
+	def label_gravity_center(self, segments):
+		w = 0.
+		g = numpy.zeros(3)
+		for v in segments:
+			s = v['refsize']
+			w += s
+			g += v['refgravity_center'].arraydata() * s
+		g /= w
+		return g
+
+	def connected_cc(self, ci, cj):
+		ri = [vi['index'] for vi in ci]
+		for vj in cj:
+			rj = vj['index']
+			for e in vj.edges():
+				v1, v2 = e.vertices()
+				r1, r2 = v1['index'], v2['index']
+				if v1 != vj:
+					if r1 in ri: return True
+				else:
+					if r2 in ri: return True
+		x = [vj['index'] for vj in cj]
+		return False
+
 	def data_from_graphs(self, graphs, selected_sulci=None):
 		data = {}
+		# If the squared distance between the gravity centers of
+		# sulci is over this threshold the model is not computed
+		dist2_th = 1000
 		for g in graphs:
 			motion = aims.GraphManip.talairach(g)
 			group = self.group_segments_per_labels(g)
 			for g1 in group.items():
+				(name1, segments1) = g1
+				c1 = self.label_gravity_center(segments1)
 				for g2 in group.items():
-					(name1, segments1) = g1
 					(name2, segments2) = g2
 					if not self.selected_labels(\
 						selected_sulci, name1, name2):
 						continue
 					if name1 > name2: continue
+					c2 = self.label_gravity_center(\
+							segments2)
+					dist = ((c1 - c2) ** 2).sum()
+					if not self.connected_cc(segments1,
+						segments2) and dist > dist2_th:
+						continue
+					print name1, name2
 					D = self.compute(motion, g1, g2)
 					if D is None: continue
 					key = (name1, name2)
@@ -368,6 +444,8 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 		AllMinDistanceRelationDescriptor.__init__(self)
 		self._name = 'all_connected_distance'
 		self._synth = aims.set_STRING(["junction", "plidepassage"])
+		self._descr_hull = HullJunctionDescriptor()
+		self._descr_ss = SurfaceSimpleSegmentDescriptor()
 
 	def data_edges(self, motion, edges):
 		if edges.has_key('cortical'):
@@ -375,78 +453,43 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 			return edge['refmean_connected_dist']
 		else:	return None
 
-	def connected_cc(self, ci, cj):
-		ri = [vi['index'] for vi in ci]
-		for vj in cj:
-			rj = vj['index']
-			for e in vj.edges():
-				v1, v2 = e.vertices()
-				r1, r2 = v1['index'], v2['index']
-				if v1 != vj:
-					if r1 in ri: return True
-				else:
-					if r2 in ri: return True
-		x = [vj['index'] for vj in cj]
-		return False
-
-	def euclidian_distance(self, X, Y=None): #from fff2
-		if Y == None: Y = X
-		if X.shape[1]!=Y.shape[1]:
-			raise ValueError, "incompatible dimension " + \
-						"for X and Y matrices"
-		s1 = X.shape[0]
-		s2 = Y.shape[0]
-		NX = numpy.reshape(numpy.sum(X*X,1),(s1,1))
-		NY = numpy.reshape(numpy.sum(Y*Y,1),(1,s2))
-		ED = numpy.repeat(NX,s2,1)
-		ED = ED + numpy.repeat(NY,s1,0)
-		ED = ED-2*numpy.dot(X,numpy.transpose(Y))
-		ED = numpy.maximum(ED,0)
-		ED = numpy.sqrt(ED)
-		return ED
-
 	def data_cc(self, motion, (ci, cj)):
 		hull_junction_mode = True
-		descr1 = HullJunctionDescriptor()
-		descr2 = SurfaceSimpleSegmentDescriptor()
 		for vi in ci:
-			if descr1.hull_junction(vi) is None:
+			if self._descr_hull.hull_junction(vi) is None:
 				hull_junction_mode = False
 		for vj in cj:
-			if descr1.hull_junction(vj) is None:
+			if self._descr_hull.hull_junction(vj) is None:
 				hull_junction_mode = False
 		if hull_junction_mode:
-			descr = descr1
-		else:	descr = descr2
+			descr = self._descr_hull
+		else:	descr = self._descr_ss
 		X = []
 		for vi in ci: X.append(descr.data(motion, vi))
 		X = numpy.vstack(X)
 		Y = []
 		for vj in cj: Y.append(descr.data(motion, vj))
 		Y = numpy.vstack(Y)
-		sX = X.shape[0]
-		sY = Y.shape[0]
+		sX, sY = len(X), len(Y)
 		mi = min(sX, sY)
 		ma = max(sX, sY)
-		th_min = 30
-		th_max = 100
+		th_min = 10
+		th_max = 40
 		n = (ma * th_min) / mi
 		if n > th_max:
 			n = th_max
 			th_min = (mi * n) / ma
+			if th_min <= 5: th_min = 5
 		if mi > th_min:
 			if sX < sY:
 				nX, nY = th_min, n
 			else:	nY, nX = th_min, n
 		else:
-			nX = sX
-			ny = sY
-		indX = range(sX)
-		indY = range(sY)
-		numpy.random.shuffle(indX)
-		numpy.random.shuffle(indY)
-		X = X[indX[:nX]]
-		Y = Y[indY[:nY]]
+			nX, nY = sX, sY
+		import scipy.cluster as C
+		X, lX = C.vq.kmeans(X, nX)
+		Y, lY = C.vq.kmeans(Y, nY)
+		nX, nY = len(X), len(Y)
 		C = self.euclidian_distance(X, Y)
 		if nX != nY:
 			c_inf = numpy.max(C) * 10000
@@ -534,6 +577,34 @@ class AllDirectionsPairRelationDescriptor(RelationDescriptor):
 		else:	s = 1.
 		return s * data
 
+	def euclidian_directions(self, X, Y):
+		'''
+    return {(y - x) for x in X for y in Y}
+		'''
+		sX, sY = X.shape[0], Y.shape[0]
+		dim = X.shape[1]
+		if sX < sY:
+			D = numpy.repeat(Y[None], sX, 0).transpose(1, 0, 2) - X
+		else:	D = numpy.repeat(-X[None], sY, 0).transpose(1, 0, 2) + Y
+		D = D.reshape(sX * sY, dim)
+		N = numpy.sqrt((D ** 2).sum(axis=1)) # norm
+		nz = (N != 0)
+		D, N = D[nz].T, N[nz]
+		D /= N
+		return D.T
+
+	def data_potential_edges(self, motion, edges):
+		e = edges.values()[0]
+		v1, v2 = e.vertices()
+		name1, name2 = v1['name'], v2['name']
+		g1 = v1['refgravity_center'].arraydata()
+		g2 = v2['refgravity_center'].arraydata()
+		dir = g2 - g1
+
+		n = numpy.sqrt((dir ** 2).sum()) # norm
+		if n: return dir / n
+		return None
+
 	def data_edges(self, motion, edges):
 		e = edges.values()[0]
 		v1, v2 = e.vertices()
@@ -557,24 +628,11 @@ class AllDirectionsPairRelationDescriptor(RelationDescriptor):
 		import scipy.cluster as C
 		X, lX = C.vq.kmeans(X, nX)
 		Y, lY = C.vq.kmeans(Y, nY)
-		#indX, indY = range(sX), range(sY)
-		#numpy.random.shuffle(indX)
-		#numpy.random.shuffle(indY)
-		#X = X[indX[:nX]]
-		#Y = Y[indY[:nY]]
-		data = []
-		for v1 in X:
-			for v2 in Y:
-				dir = (v1 - v2)
-				n = numpy.linalg.norm(dir)
-				if not n: continue
-				dir = dir / n
-				data.append(dir)
+		data = self.euclidian_directions(X, Y)
 
-		if len(data):
-			return numpy.vstack(data)
+		if data.shape[0]:
+			return data
 		else:	return None
-
 
 
 
@@ -596,8 +654,9 @@ class GravityCentersDirections(RelationDescriptor):
 		name1, name2 = v1['name'], v2['name']
 		g1 = v1['refgravity_center'].arraydata()
 		g2 = v2['refgravity_center'].arraydata()
-		dir = g1 - g2
-		n /= numpy.linalg.norm(dir)
+		dir = g2 - g1
+
+		n = numpy.sqrt((dir ** 2).sum()) # norm
 		if n: return dir / n
 		return None
 
@@ -621,23 +680,17 @@ class AllDistancesPairRelationDescriptor(RelationDescriptor):
 					for p in map2[0].keys()])
 
 		sX, sY = len(X), len(Y)
-		nX = sX / 50
-		nY = sY / 50
-		if nX <= 3: nX = 3
-		if nY <= 3: nY = 3
-		indX, indY = range(sX), range(sY)
-		numpy.random.shuffle(indX)
-		numpy.random.shuffle(indY)
-		X = X[indX[:nX]]
-		Y = Y[indY[:nY]]
-		data = []
-		for v1 in X:
-			for v2 in Y:
-				dir = (v1 - v2).arraydata()
-				d = numpy.sqrt((dir ** 2).sum())
-				data.append(d)
-		if len(data):
-			return numpy.vstack(data)
+		nX, nY = sX / 30, sY / 30
+		if nX <= 10: nX = 10
+		if nY <= 10: nY = 10
+
+		import scipy.cluster as C
+		X, lX = C.vq.kmeans(X, nX)
+		Y, lY = C.vq.kmeans(Y, nY)
+
+		C = self.euclidian_distance(X, Y).reshape(-1, 1)
+		if len(C):
+			return C
 		else:	return None
 
 ################################################################################

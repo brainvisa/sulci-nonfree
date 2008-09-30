@@ -8,6 +8,8 @@ from sulci.registration.transformation import RigidTransformation, \
 
 
 ################################################################################
+PI_div_2 = 1.5707963267948966
+
 def antisymetric_matrix_from_vector(v):
 	vx, vy, vz = v
 	return numpy.matrix([[0, -vz, vy], [vz, 0, -vx], [-vy, vx, 0]])
@@ -73,6 +75,240 @@ J_i = [antisymetric_matrix_from_vector([1, 0, 0]),
 	antisymetric_matrix_from_vector([0, 1, 0]),
 	antisymetric_matrix_from_vector([0, 0, 1]),
 ]
+
+
+class SphericalKmeans(object):
+	'''
+    X : unitary data
+    k : number of clusters
+	'''
+	def __init__(self, X, k):
+		self._u = numpy.array([1., 0, 0]) # ref vector
+		n, dim = X.shape
+		if dim == 2:
+			Z = numpy.zeros((n, 1))
+			X = numpy.hstack((X, Z))
+		elif dim != 3:
+			raise ValueError("handle only dimension : 2 or 3")
+		self._X = numpy.asarray(X)
+		self._k = k
+
+	def init_centers(self, verbose=False):
+		indices = range(len(self._X))
+		numpy.random.shuffle(indices)
+		indices = indices[:self._k]
+		C = numpy.array([self._X[ind] for ind in indices])
+		return C
+
+	def algo_euclidian(self, C, eps=0.001, max_iter=10000, verbose=False):
+		if verbose: print "* euclidian optimization"
+		return self.algo(self.euclidian_cluster,
+			self.euclidian_mean, C, eps, max_iter, verbose)
+
+	def algo_riemannian(self, C, eps=0.001, max_iter=10000, verbose=False):
+		if verbose: print "* riemannian optimization"
+		return self.algo(self.euclidian_cluster,
+			self.riemannian_mean, C, eps, max_iter, verbose)
+
+	def compute(self, eps=0.001, max_iter=10000, verbose=False):
+		# centers : random init from data
+		C = self.init_centers(verbose)
+		C, clusters = self.algo_euclidian(C, 0.1, 10, verbose)
+		return self.algo_riemannian(C, eps, max_iter, verbose)
+
+	def algo(self, cluster, mean, C,
+		eps=0.01, max_iter=10000, verbose=False):
+
+		# algo
+		n = 0
+		old_en = 2 * numpy.pi
+		while 1:
+			clusters, dist = cluster(C, self._X)
+			en = dist.mean()
+			if verbose: print "n = %3d, en = %f" % (n, en)
+			for i in range(self._k):
+				C[i] = mean(C[i], self._X[clusters == i])
+			n += 1
+			if n > max_iter: break
+			if (old_en - en) < eps: break
+			old_en = en
+
+		return C, clusters
+
+
+class DirectionalKmeans(SphericalKmeans):
+	def __init__(self, *args, **kwargs):
+		SphericalKmeans.__init__(self, *args, **kwargs)
+
+	def riemannian_mean(self, C, X, eps=0.01):
+		'''
+    compute intrinsic riemmanian mean of rotations
+
+    C : initialization of mean
+		'''
+		theta_mean = eps + 1.
+		n = X.shape[0]
+		while theta_mean > eps:
+			W = numpy.cross(X, -C)
+			cos_theta = numpy.dot(X, C)
+			cos_theta[cos_theta > 1] = 1.
+			cos_theta[cos_theta < -1] = -1.
+			sin_theta = numpy.sqrt((W ** 2).sum(axis=1)) # norm
+			theta = numpy.arccos(cos_theta)
+			theta *= (1 -(sin_theta < 0) * 2)
+			z = (sin_theta == 0)
+			W[z] = 0
+			sin_theta[z] = 1.
+			W = (W.T * theta / sin_theta).T
+			w = W.mean(axis=0)
+			theta_mean = numpy.sqrt((w ** 2).sum()) # norm
+			C = numpy.dot(numpy.asarray(rotation_from_vector(w)), C)
+		return C
+
+	def argmin_riemannian_dist2(self, C, x):
+		X = antisymetric_matrix_from_vector(x)
+		W = -numpy.asarray((X * C.T).T)
+		cos_theta = numpy.dot(C, x)
+		cos_theta[cos_theta > 1] = 1.
+		cos_theta[cos_theta < -1] = -1.
+		sin_theta = numpy.sqrt((W ** 2).sum(axis=1)) # norm
+		theta = numpy.arccos(cos_theta)
+		theta *= (1 -(sin_theta < 0) * 2)
+		ind = numpy.argmin(theta)
+		return ind, theta[ind]
+
+	def riemannian_cluster(self, C, X):
+		S = [antisymetric_matrix_from_vector(c) for c in C]
+		S = numpy.asarray(numpy.vstack(S))
+		S.shape = (self._k, 3, 3)
+		# cross product between all C and X
+		W = numpy.tensordot(S, X.T, axes=(2, 0))
+		cos_theta = numpy.dot(C, X.T)
+		cos_theta[cos_theta > 1] = 1.
+		cos_theta[cos_theta < -1] = -1.
+		sin_theta = numpy.sqrt((W ** 2).sum(axis=1)) # norm
+		theta = numpy.arccos(cos_theta)
+		theta *= (1 -(sin_theta < 0) * 2)
+		clusters = numpy.argmin(theta, axis=0)
+		dist = numpy.min(theta, axis=0)
+		return clusters, dist
+
+	def argmin_euclidian_dist2(self, C, x):
+		d = ((C - x) ** 2).sum(axis=1)
+		ind = numpy.argmin(d)
+		return ind, d[ind]
+
+	def euclidian_mean(self, C, X):
+		Xm = X.mean(axis=0)
+		n = numpy.sqrt((Xm ** 2).sum()) # norm
+		return Xm / n
+
+	def euclidian_cluster(self, C, X):
+		s1 = X.shape[0]
+		s2 = C.shape[0]
+		NX = numpy.reshape(numpy.sum(X * X, 1), (s1, 1))
+		NC = numpy.reshape(numpy.sum(C * C, 1), (1, s2))
+		D = numpy.repeat(NX, s2, 1)
+		D = D + numpy.repeat(NC, s1, 0)
+		D = D - 2 * numpy.dot(X, numpy.transpose(C))
+		D = numpy.maximum(D, 0)
+		clusters = D.argmin(axis=1)
+		dist = D.min(axis=1)
+		return clusters, dist
+
+
+class AxialKmeans(SphericalKmeans):
+	def __init__(self, *args, **kwargs):
+		SphericalKmeans.__init__(self, *args, **kwargs)
+
+	def compute(self, eps=0.001, max_iter=10000, verbose=False):
+		# centers : random init from data
+		C = self.init_centers(verbose)
+		return self.algo_riemannian(C, eps, max_iter, verbose)
+
+	def riemannian_mean(self, C, X, eps=0.01):
+		'''
+    compute intrinsic riemmanian mean of rotations
+
+    C : initialization of mean
+		'''
+		theta_mean = eps + 1.
+		n = X.shape[0]
+		while theta_mean > eps:
+			W = numpy.cross(X, -C)
+			cos_theta = numpy.dot(X, C)
+			cos_theta[cos_theta > 1] = 1.
+			cos_theta[cos_theta < -1] = -1.
+			sin_theta = numpy.sqrt((W ** 2).sum(axis=1)) # norm
+			theta = numpy.arccos(cos_theta)
+			theta *= (1 -(sin_theta < 0) * 2)
+			big = (theta > PI_div_2)
+			theta[big] = numpy.pi - theta[big]
+			z = (sin_theta == 0)
+			W[z] = 0
+			sin_theta[z] = 1.
+			W = (W.T * theta / sin_theta).T
+			w = W.mean(axis=0)
+			theta_mean = numpy.sqrt((w ** 2).sum()) # norm
+			C = numpy.dot(numpy.asarray(rotation_from_vector(w)), C)
+		return C
+
+	def argmin_riemannian_dist2(self, C, x): #FIXME
+		X = antisymetric_matrix_from_vector(x)
+		W = -numpy.asarray((X * C.T).T)
+		cos_theta = numpy.dot(C, x)
+		cos_theta[cos_theta > 1] = 1.
+		cos_theta[cos_theta < -1] = -1.
+		sin_theta = numpy.sqrt((W ** 2).sum(axis=1)) # norm
+		theta = numpy.arccos(cos_theta)
+		theta *= (1 -(sin_theta < 0) * 2)
+		big = (theta > PI_div_2)
+		theta[big] = numpy.pi - theta[big]
+		ind = numpy.argmin(theta)
+		return ind, theta[ind]
+
+	def riemannian_cluster(self, C, X): #FIXME
+		S = [antisymetric_matrix_from_vector(c) for c in C]
+		S = numpy.asarray(numpy.vstack(S))
+		S.shape = (self._k, 3, 3)
+		# cross product between all C and X
+		W = numpy.tensordot(S, X.T, axes=(2, 0))
+		cos_theta = numpy.dot(C, X.T)
+		cos_theta[cos_theta > 1] = 1.
+		cos_theta[cos_theta < -1] = -1.
+		sin_theta = numpy.sqrt((W ** 2).sum(axis=1)) # norm
+		theta = numpy.arccos(cos_theta)
+		theta *= (1 -(sin_theta < 0) * 2)
+		big = (theta > PI_div_2)
+		theta[big] = numpy.pi - theta[big]
+		clusters = numpy.argmin(theta, axis=0)
+		dist = numpy.min(theta, axis=0)
+		return clusters, dist
+
+	def argmin_euclidian_dist2(self, C, x): #FIXME
+		d1 = ((C - x) ** 2).sum(axis=1)
+		d2 = ((C + x) ** 2).sum(axis=1)
+		d = numpy.min([d1, d2], axis=0)
+		ind = numpy.argmin(d)
+		return ind, d[ind]
+
+	def euclidian_cluster(self, C, X): #FIXME
+		s1 = X.shape[0]
+		s2 = C.shape[0]
+		NX = numpy.reshape(numpy.sum(X * X, 1), (s1, 1))
+		NC = numpy.reshape(numpy.sum(C * C, 1), (1, s2))
+		D = numpy.repeat(NX, s2, 1)
+		D = D + numpy.repeat(NC, s1, 0)
+		D = D - 2 * numpy.dot(X, numpy.transpose(C))
+		D2 = D + 2 * numpy.dot(X, numpy.transpose(C))
+		D = numpy.maximum(D, 0)
+		D2 = numpy.maximum(D2, 0)
+		D = numpy.min([D, D2], axis=0)
+		clusters = D.argmin(axis=1)
+		dist = D.min(axis=1)
+		return clusters, dist
+
+
 
 
 ################################################################################
