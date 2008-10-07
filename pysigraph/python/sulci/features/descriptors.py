@@ -179,6 +179,22 @@ class RelationDescriptor(Descriptor):
 		ED = numpy.sqrt(ED)
 		return ED
 
+	def euclidian_directions(self, X, Y):
+		'''
+    return {(y - x) for x in X for y in Y}
+		'''
+		sX, sY = X.shape[0], Y.shape[0]
+		dim = X.shape[1]
+		if sX < sY:
+			D = numpy.repeat(Y[None], sX, 0).transpose(1, 0, 2) - X
+		else:	D = numpy.repeat(-X[None], sY, 0).transpose(1, 0, 2) + Y
+		D = D.reshape(sX * sY, dim)
+		N = numpy.sqrt((D ** 2).sum(axis=1)) # norm
+		nz = (N != 0)
+		D, N = D[nz].T, N[nz]
+		D /= N
+		return D.T
+
 	def edges_from_graph(self, graph, selected_sulci=None):
 		edges = {}
 		for e in graph.edges():
@@ -243,6 +259,7 @@ class RelationDescriptor(Descriptor):
 
 	def data_from_graphs(self, graphs, selected_sulci=None):
 		data = {}
+		count = {}
 		for g in graphs:
 			motion = aims.GraphManip.talairach(g)
 			graph_edges = self.edges_from_graph(g, selected_sulci)
@@ -257,9 +274,14 @@ class RelationDescriptor(Descriptor):
 				key = (name1, name2)
 				if data.has_key(key):
 					data[key].append(d2)
-				else:	data[key] = [d2]
-		for relation, D in data.items():
-			data[relation] = numpy.vstack(D)
+					count[key] += 1
+				else:
+					data[key] = [d2]
+					count[key] = 1
+		for rel, D in data.items():
+			if len(D):
+				data[rel] = numpy.vstack(D), count[rel]
+			else:	del data[rel]
 		return data
 
 
@@ -308,9 +330,6 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 		return group
 
 	def data_vertices(self, motion, v1, v2):
-		import time
-		print "getdata"
-		print time.asctime()
 		map1 = v1['aims_ss'].get()
 		s1 = numpy.array([map1.sizeX(), map1.sizeY(), map1.sizeZ()])
 		X = numpy.array([motion.transform(aims.Point3df(p * s1)) \
@@ -319,27 +338,17 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 		s2 = numpy.array([map2.sizeX(), map2.sizeY(), map2.sizeZ()])
 		Y = numpy.array([motion.transform(aims.Point3df(p * s2)) \
 					for p in map2[0].keys()])
-		print time.asctime()
-		print
 
 		sX, sY = len(X), len(Y)
 		nX, nY = sX / 30, sY / 30
 		if nX <= 10: nX = 10
 		if nY <= 10: nY = 10
 
-		print "kmeans"
-		print time.asctime()
 		import scipy.cluster as C
 		X, lX = C.vq.kmeans(X, nX)
 		Y, lY = C.vq.kmeans(Y, nY)
-		print time.asctime()
-		print
 
-		print "dist"
-		print time.asctime()
 		C = self.euclidian_distance(X, Y)
-		print time.asctime()
-		print
 		return numpy.sqrt(numpy.min(C))
 
 	def compute(self, motion, g1, g2):
@@ -400,6 +409,7 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 
 	def data_from_graphs(self, graphs, selected_sulci=None):
 		data = {}
+		count = {}
 		# If the squared distance between the gravity centers of
 		# sulci is over this threshold the model is not computed
 		dist2_th = 1000
@@ -427,11 +437,16 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 					key = (name1, name2)
 					if data.has_key(key):
 						data[key] += D
-					else:	data[key] = D
-		for relation, D in data.items():
+						count[key] += 1
+					else:
+						data[key] = D
+						count[key] = 1
+
+		print "-- end data from graphs --"
+		for rel, D in data.items():
 			if len(D):
-				data[relation] = numpy.vstack(D)
-			else:	del data[relation]
+				data[rel] = numpy.vstack(D), count[rel]
+			else:	del data[rel]
 		return data
 
 
@@ -453,42 +468,57 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 			return edge['refmean_connected_dist']
 		else:	return None
 
+	def cc_size(self, has_hull, cc):
+		s = 0.
+		if has_hull:
+			for v in cc: s += self._descr_hull.hull_junction(v)['refsize']
+		else:
+			for v in cc: s += v['refsurface_area']
+		return s
+
+	def cc_has_hull_junction(self, cc):
+		b = True
+		for v in cc:
+			if self._descr_hull.hull_junction(v) is None:
+				b = False
+		return b
+
+	def cc_to_X(self, motion, descr, cc):
+		X = []
+		for v in cc: X.append(descr.data(motion, v))
+		return numpy.vstack(X)
+
 	def data_cc(self, motion, (ci, cj)):
-		hull_junction_mode = True
-		for vi in ci:
-			if self._descr_hull.hull_junction(vi) is None:
-				hull_junction_mode = False
-		for vj in cj:
-			if self._descr_hull.hull_junction(vj) is None:
-				hull_junction_mode = False
+		hull_junction_mode = self.cc_has_hull_junction(ci) and \
+					self.cc_has_hull_junction(cj)
 		if hull_junction_mode:
 			descr = self._descr_hull
 		else:	descr = self._descr_ss
-		X = []
-		for vi in ci: X.append(descr.data(motion, vi))
-		X = numpy.vstack(X)
-		Y = []
-		for vj in cj: Y.append(descr.data(motion, vj))
-		Y = numpy.vstack(Y)
+		X = self.cc_to_X(motion, descr, ci)
+		Y = self.cc_to_X(motion, descr, cj)
 		sX, sY = len(X), len(Y)
 		mi = min(sX, sY)
 		ma = max(sX, sY)
 		th_min = 10
 		th_max = 40
-		n = (ma * th_min) / mi
-		if n > th_max:
-			n = th_max
-			th_min = (mi * n) / ma
-			if th_min <= 5: th_min = 5
-		if mi > th_min:
-			if sX < sY:
-				nX, nY = th_min, n
-			else:	nY, nX = th_min, n
-		else:
-			nX, nY = sX, sY
+		ma2 = (ma * th_min) / mi
+		if ma2 > th_max:
+			ma2 = th_max
+			mi2 = (mi * ma2) / ma
+			if mi2 <= th_min: mi2 = th_min
+		else:	mi2 = th_min
+		if sX < sY:
+			nX, nY = mi2, ma2
+		else:	nY, nX = ma2, mi2
 		import scipy.cluster as C
 		X, lX = C.vq.kmeans(X, nX)
 		Y, lY = C.vq.kmeans(Y, nY)
+		return self.data_cc_specific(X, Y)
+
+	def data_intra(self, X, Y):
+		return numpy.sqrt(((X - Y) ** 2).sum())
+
+	def data_cc_specific(self, X, Y):
 		nX, nY = len(X), len(Y)
 		C = self.euclidian_distance(X, Y)
 		if nX != nY:
@@ -506,31 +536,39 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 		for (i,j) in indexes:
 			if i >= nX or j >= nY: continue
 			dist.append(C[i, j])
-		return dist
+		if len(dist):
+			return numpy.vstack(dist)
+		else:	return None
 
 	def compute(self, motion, g1, g2):
+		import scipy.cluster as C
+		import fff2.graph.graph as G
 		(name1, segments1), (name2, segments2) = g1, g2
 		dist = []
+		n = 0.02 # density of centroids
 		if name1 == name2 :
 			import sigraph
 			from soma import aims
 			s = aims.set_VertexPtr()
 			for seg in segments1: s.add(seg)
 			cc = sigraph.VertexClique.connectivity(s, self._synth)
-			n = len(cc)
-			# find pairs of related components
-			pairs = []
-			for i in range(n):
-				ci = cc[i]
-				for j in range(i + 1, n):
-					cj = cc[j]
-					if self.connected_cc(ci, cj):
-						pairs.append((ci, cj))
-			for p in pairs:
-				dist += self.data_cc(motion, p)
-		else:
+			for ci in cc:
+				X = self.cc_to_X(motion, self._descr_ss, ci)
+				size = self.cc_size(False, ci)
+				nX = int(n * size)
+				if nX < 2: continue
+				X, lX = C.vq.kmeans(X, nX)
+				nX = len(X)
+				if nX < 2: continue
+				g = G.WeightedGraph(nX)
+				e = g.mst(X)
+				for (id1, id2) in g.get_edges():
+					d = self.data_intra(X[id1], X[id2])
+					dist.append(d)
+		else: 
+			return [] #FIXME
 			p = segments1, segments2
-			dist += self.data_cc(motion, p)
+			dist.append(self.data_cc(motion, p))
 		return dist
 
 
@@ -563,6 +601,25 @@ class ConnexionLengthRelationDescriptor(RelationDescriptor):
 			return edges['junction']['reflength']
 		else:	return None
 
+	def edges_from_graph(self, graph, selected_sulci=None):
+		edges = {}
+		for e in graph.edges():
+			v1, v2 = e.vertices()
+			# get only junction edges
+			if e.getSyntax() != 'junction': continue
+			name1, name2 = v1['name'], v2['name']
+			if not self.selected_labels(selected_sulci,
+					name1, name2): continue
+			r1, r2 = v1['index'], v2['index']
+			if r1 > r2:
+				v1, v2 = v2, v1
+				r1, r2 = r2, r1
+			key = (r1, r2)
+			syntax = e.getSyntax()
+			if edges.has_key(key):
+				edges[key][1][syntax] = e
+			else:	edges[key] = (v1, v2), {syntax : e}
+		return edges
 
 ################################################################################
 class AllDirectionsPairRelationDescriptor(RelationDescriptor):
@@ -576,22 +633,6 @@ class AllDirectionsPairRelationDescriptor(RelationDescriptor):
 			s = -1.
 		else:	s = 1.
 		return s * data
-
-	def euclidian_directions(self, X, Y):
-		'''
-    return {(y - x) for x in X for y in Y}
-		'''
-		sX, sY = X.shape[0], Y.shape[0]
-		dim = X.shape[1]
-		if sX < sY:
-			D = numpy.repeat(Y[None], sX, 0).transpose(1, 0, 2) - X
-		else:	D = numpy.repeat(-X[None], sY, 0).transpose(1, 0, 2) + Y
-		D = D.reshape(sX * sY, dim)
-		N = numpy.sqrt((D ** 2).sum(axis=1)) # norm
-		nz = (N != 0)
-		D, N = D[nz].T, N[nz]
-		D /= N
-		return D.T
 
 	def data_potential_edges(self, motion, edges):
 		e = edges.values()[0]
@@ -659,6 +700,48 @@ class GravityCentersDirections(RelationDescriptor):
 		n = numpy.sqrt((dir ** 2).sum()) # norm
 		if n: return dir / n
 		return None
+
+
+class AllConnectedDirectionRelationDescriptor(AllConnectedDistanceRelationDescriptor):
+	'''
+    For each pair of sulci (s1 and s2), connect with the Hungarian algorithm
+    a set of n voxels of s1 with a set of n voxels of s2.
+	'''
+	def __init__(self):
+		AllConnectedDistanceRelationDescriptor.__init__(self)
+		self._name = 'all_connected_direction'
+
+	def data_labels(self, data, inverse):
+		# antisymetric data
+		if inverse:
+			s = -1.
+		else:	s = 1.
+		return s * data
+
+	def data_potential_edges(self, motion, edges):
+		e = edges.values()[0]
+		v1, v2 = e.vertices()
+		name1, name2 = v1['name'], v2['name']
+		g1 = v1['refgravity_center'].arraydata()
+		g2 = v2['refgravity_center'].arraydata()
+		dir = g2 - g1
+
+		n = numpy.sqrt((dir ** 2).sum()) # norm
+		if n: return dir / n
+		return None
+
+	def data_cc_specific(self, X, Y):
+		data = self.euclidian_directions(X, Y)
+		if data.shape[0]:
+			return data
+		else:	return None
+
+	def data_intra(self, X, Y):
+		dir = Y - X
+		n = numpy.sqrt((dir ** 2).sum())
+		if n: return dir / n
+		return None
+
 
 ################################################################################
 class AllDistancesPairRelationDescriptor(RelationDescriptor):
@@ -820,8 +903,9 @@ descriptor_map = { \
 				AllConnectedMeanDistanceRelationDescriptor,
 	'all_distances_pair' : AllDistancesPairRelationDescriptor,
 	'connexion_length' : ConnexionLengthRelationDescriptor,
-	'all_directions_pair' : AllDirectionsPairRelationDescriptor,
 	'gravity_centers_directions' : GravityCentersDirections,
+	'all_directions_pair' : AllDirectionsPairRelationDescriptor,
+	'all_connected_direction' : AllConnectedDirectionRelationDescriptor,
 	# priors
 	'size_global_frequency' : SizeGlobalFrequencyDescriptor,
 	'label_global_frequency' : LabelGlobalFrequencyDescriptor,

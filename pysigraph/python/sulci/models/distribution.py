@@ -1882,6 +1882,9 @@ class GammaExponentialMixtureModel(MixtureModel):
 		li = li0 * self._priors[0] + li1 * self._priors[1]
 		return numpy.log(li), li
 
+	def likelihood(self, x):
+		return self.likelihoods(x)
+
 	def toTuple(self):
 		t = MixtureModel.toTuple(self)
 		return (t, self._shift)

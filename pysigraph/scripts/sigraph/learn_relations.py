@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, sys, numpy, pprint, re, glob
+import os, sys, numpy, pprint, re, glob, pickle
 from optparse import OptionParser
 import matplotlib
 matplotlib.use('QtAgg')
@@ -34,6 +34,7 @@ def save_fig(relation, distr, X, filename):
 ################################################################################
 def compute_relations(graphs, distribdir, selected_sulci, options):
 	min_db_size = options.size_threshold
+	graph_th = len(graphs) / 2
 	sulci_set = {}
 	descriptor = descriptorFactory(options.data_type)
 	data = descriptor.data_from_graphs(graphs, selected_sulci)
@@ -69,35 +70,44 @@ def compute_relations(graphs, distribdir, selected_sulci, options):
 			f.clear()
 	Xd_intra = []
 	Xd_inter = []
-	for relation, X in data.items():
+	for relation, (X, count) in data.items():
 		sulcus1, sulcus2 = relation
 		dim = X.shape[1]
-		if len(X) < min_db_size:
+		if len(X) < min_db_size or count < graph_th:
 			if sulcus1 == sulcus2:
 				Xd_intra.append(X)
 			else:	Xd_inter.append(X)
-	if Xd_intra: data['default_intra'] = numpy.vstack(Xd_intra)
-	else:	data['default_intra'] = None
-	if Xd_inter: data['default_inter'] = numpy.vstack(Xd_inter)
-	else:	data['default_inter'] = None
+			del data[relation]
+	if len(Xd_intra):
+		data['default_intra'] = numpy.vstack(Xd_intra), graph_th * 2
+	else:	data['default_intra'] = None, None
+	if len(Xd_inter):
+		data['default_inter'] = numpy.vstack(Xd_inter), graph_th * 2
+	else:	data['default_inter'] = None, None
 
-	for relation, X in data.items():
+	for relation, (X, count) in data.items():
 		if isinstance(relation, tuple):
 			sulcus1, sulcus2 = relation
 			if selected_sulci != None and \
 				(sulcus1 not in selected_sulci) \
 				and (sulcus2 not in selected_sulci): continue
-		if X is not None and (len(X) < min_db_size): continue
-		if relation == 'default_intra' or (sulcus1 == sulcus2):
+		else:   sulcus1, sulcus2 = None, None
+		if relation == 'default_intra' or \
+			(sulcus1 is not None and (sulcus1 == sulcus2)):
 			d = Distrib_intra()
 			mtype = mtype_intra
-		elif relation == 'default_inter' or (sulcus1 != sulcus2):
+		elif relation == 'default_inter' or \
+			(sulcus1 is not None and (sulcus1 != sulcus2)):
 			d = Distrib_inter()
 			mtype = mtype_inter
+		filename = io.node2densityname(prefix, mtype, relation)
 		if X is None:
 			d.setUniform(dim)
-		else:	d.fit(X)
-		filename = io.node2densityname(prefix, mtype, relation)
+		else:
+			d.fit(X)
+			fd = open(filename + '.X', 'w')
+			pickle.dump(X, fd)
+			fd.close()
 		if options.savefig: save_fig(relation, d, X, filename + '.png')
 		d.write(filename)
 		relfilename = re.sub('^%s%s' % (os.path.dirname(prefix), \
@@ -132,7 +142,8 @@ def parseOpts(argv):
 		type='choice', choices=('min_distance', 'connexion_length',
 		'all_directions_pair', 'all_distances_pair',
 		'all_connected_distance', 'all_connected_mean_distance',
-		'all_min_distance', 'gravity_centers_directions'),
+		'all_min_distance', 'gravity_centers_directions',
+		'all_connected_direction'),
 		help="data type : kind of relation to be learned. " + \
 		"'min_distance' : distance between the 2 " + \
 		"nearest extremities (near from the minimal distance), " + \

@@ -12,17 +12,14 @@ from sulci.features.descriptors import descriptorFactory
 class Observer(object):
 	def update(self, tagger):
 		state = tagger.getState()
-		if state == 'init':
-			self.init(tagger)
-			return
-		elif state == 'label_changed':
-			self.label_changed(tagger)
-		elif state == 'after_pass':
-			self.after_pass(tagger)
+		self.__getattribute__(state)(tagger)
 
+	def label_choosen(self, tagger): pass
+	def init(self, tagger): pass
 	def label_changed(self, tagger): pass
-	
 	def after_pass(self, tagger): pass
+	def unchanged(self, tagger): pass
+
 
 class GuiObserver(Observer):
 	def __init__(self):
@@ -150,6 +147,55 @@ class GuiChangesObserver(GuiObserver):
 		self._n += 1
 
 
+class SegmentObserver(Observer):
+	def __init__(self, indices):
+		Observer.__init__(self)
+		self._indices = indices
+
+	def label_changed(self, tagger):
+		def proba(en):
+			P = numpy.exp(-en)
+			P /= P.sum()
+			return P
+		def s(a):
+			return "[" + ', '.join(("%2.3f" % x) for x in a) + "]"
+			
+		id1 = tagger.getCurrenSegmentID()
+		if id1 not in self._indices: return
+		print " -- label has changed on segment n.%d --" % id1
+		print " - relations : "
+		availablelabels = tagger.getAvailableLabels(id1)
+		availablelabels_n = len(availablelabels)
+		if availablelabels_n == 1: return 0, 0
+		relcum = numpy.zeros(availablelabels_n, dtype=numpy.float96)
+		w = tagger.getSegWeights(id1)
+		if not w: w = 1.
+		neighbours_n = len(tagger.getNeighbours(id1))
+		for id2 in tagger.getNeighbours(id1):
+			l2 = tagger.tagLabel(id2)
+			P12 = tagger.relPotential(id1, id2)
+			P12_id2 = P12[:,l2].T
+			relcum += P12_id2
+			label = tagger.getSegmentLabel(id2)
+			print "    n.%3d : %s %s (%s) " % (id2, s(P12_id2 / w),
+				 s(proba(neighbours_n * P12_id2 / w)), label)
+		relcum /= w
+		print "  =        ", s(relcum), s(proba(relcum))
+		priors = tagger.eval_priors(id1) / w
+		print " - priors :", s(priors), s(proba(priors))
+		seg_pot = tagger.segPotential(id1) / w
+		print " - seg :   ", s(seg_pot), s(proba(seg_pot))
+		en = relcum + priors + seg_pot
+		print " - En :    ", s(en), s(proba(en))
+		print " - Labels :", availablelabels
+		
+	def label_choosen(self, tagger):
+		print " -- choosen labels --"
+		for id in self._indices:
+			label = tagger.getSegmentLabel(id)
+			print "n.%d : %s" % (id, label)
+
+
 ################################################################################
 class Tagger(object):
 	def __init__(self, sulcimodel, init_prior_distr, graph, motion, nrjname,
@@ -181,8 +227,7 @@ class Tagger(object):
 		self._nrj_fd.write("Iteration\tTemperature\tEnergy\tChanges\n")
 		self._csvname = csvname
 		self._normalize_weights = normalize_weights
-
-	def graph(self): return self._graph
+		self._current_seg_id = None
 
 	def addObserver(self, observer):
 		self._observers.append(observer)
@@ -192,6 +237,34 @@ class Tagger(object):
 	def notifyObservers(self):
 		for o in self._observers:
 			o.update(self)
+
+	def getCurrenSegmentID(self): return self._current_seg_id
+
+	def getSegmentLabel(self, id):
+		return self._availablelabels[id][self._taglabels[id]]
+
+	def getAvailableLabels(self, id):
+		return self._availablelabels[id]
+
+	def graph(self): return self._graph
+
+	def getNeighbours(self, id):
+		return self._neighbours[id]
+
+	def tagLabel(self, id):
+		return self._taglabels[id]
+
+	def relPotential(self, id1, id2):
+		if id1 > id2:
+			P12 = self._rel_potentials[id2, id1].T
+		else:	P12 = self._rel_potentials[id1, id2]
+		return P12
+
+	def segPotential(self, id1):
+		return self._seg_potentials[id1]
+
+	def getSegWeights(self, id1):
+		return self._seg_weights[id1]
 
 	def initialize_prior(self):
 		if not self._labels_prior: return
@@ -260,6 +333,9 @@ class Tagger(object):
 			p = li / li.sum()
 			if select_mode == 'threshold': sel = p >= 0.01
 			elif select_mode == 'all': sel = (p == p)
+			elif select_mode != 'store_labels': 
+				sel = [(t == s['label']) \
+					for i, t in enumerate(self._states)]
 			self._seg_potentials[node_index] = -logli[sel]
 			labels=[t for i, t in enumerate(self._states) if sel[i]]
 			self._availablelabels[node_index] = labels
@@ -268,7 +344,7 @@ class Tagger(object):
 			if init_mode == 'store_labels':
 				init_label = s['label']
 			elif init_mode == 'segments_potentials':
-				init_label = self._states[numpy.argmax(logli)]
+				init_label = self._states[numpy.argmax(p)]
 			elif init_mode == 'random':
 				r = numpy.random.randint(0, len(labels))
 				init_label = labels[r]
@@ -314,7 +390,7 @@ class Tagger(object):
 					w = edges['junction']['reflength']
 				else: # note : strange rare relations
 					w = 0.
-			elif weighting_mode in ['number', 'none']: w = 1
+			elif weighting_mode in ['number', 'none']: w = 1.
 			self._rel_potentials[indices] *= w
 			self._seg_weights[r1] += w
 			self._seg_weights[r2] += w
@@ -358,6 +434,9 @@ class Tagger(object):
 	def tag(self, mode='icm', init_mode='store_labels',
 		weighting_mode='none', select_mode='threshold',
 		precomputing='from_data', picklename=None):
+		if mode in ['energy', 'error']:
+			select_mode = 'store_labels'
+			init_mode = 'store_labels'
 		self._segments = []
 		for xi in self._graph.vertices():
 			if xi.getSyntax() != 'fold': continue
@@ -381,16 +460,21 @@ class Tagger(object):
 			id = s['index']
 			tag_label = self._taglabels[id]
 			s['label'] = self._availablelabels[id][tag_label]
+		self._state = 'label_choosen'
+		self.notifyObservers()
 		self.write_csv()
 
 	def algo(self, mode='icm'):
 		self.notifyObservers()
 		self._changes = {}
 		for id in self._seg_indices: self._changes[id] = 0.
-		if mode == 'icm': return self.algo_icm()
-		if mode == 'mpm': return self.algo_mpm()
+		if mode == 'init': return
+		elif mode == 'icm': return self.algo_icm()
+		elif mode == 'mpm': return self.algo_mpm()
 		elif mode == 'sa': return self.algo_simulated_annealing()
-		elif mode == 'init': return
+		elif mode == 'energy': print "energy = ", self.energy()
+		elif mode == 'error':
+			pass #FIXME
 
 	def algo_simulated_annealing(self):
 		print "start simulated annealing..."
@@ -399,11 +483,13 @@ class Tagger(object):
 		en = self.energy()
 		self._best_en = numpy.inf
 		self._best_taglabels = copy.copy(self._taglabels)
+		self._current_seg_id = None
 		t = 0
 		while 1:
 			numpy.random.shuffle(self._seg_indices)
 			chgmt = 0.
 			for id in self._seg_indices:
+				self._current_seg_id = id
 				c, d = self.gibbs(id)
 				self._changes[id] += c
 				chgmt += c
@@ -432,11 +518,13 @@ class Tagger(object):
 		en = self.energy()
 		best_en = numpy.inf
 		best_taglabels = copy.copy(self._taglabels)
+		self._current_seg_id = None
 		t = 0
 		while 1:
 			numpy.random.shuffle(self._seg_indices)
 			chgmt = 0.
 			for id in self._seg_indices:
+				self._current_seg_id = id
 				c, d = self.icm(id)
 				self._changes[id] += c
 				chgmt += c
@@ -461,6 +549,7 @@ class Tagger(object):
 			size = len(self._availablelabels[id1])
 			self._freq[id] = numpy.zeros(size, dtype=numpy.float96)
 		self._temp, rate, stopRate, tmax = self._anneal_opt
+		self._current_seg_id = None
 		t = 0
 		print "burning period..."
 		self._state = 'running'
@@ -470,6 +559,7 @@ class Tagger(object):
 				if t == 100:
 					print "start computing frequencies..."
 				for id in self._seg_indices:
+					self._current_seg_id = id
 					self.gibbs(id)
 					self._freq[id][self._taglabels[id]] += 1
 					self.notifyObservers()
@@ -496,20 +586,22 @@ class Tagger(object):
 		en_rel /= 2.
 		return en_rel + en_seg + self.eval_prior()
 
-	def gibbs(self, id1):
-		l1 = self._taglabels[id1]
-		availablelabels_n = len(self._availablelabels[id1])
-		if availablelabels_n == 1: return 0, 0
-		en = numpy.zeros(availablelabels_n, dtype=numpy.float96)
+	def local_energy(self, id1):
+		en = numpy.float96(0.)
 		for id2 in self._neighbours[id1]:
 			l2 = self._taglabels[id2]
 			if id1 > id2:
 				P12 = self._rel_potentials[id2, id1].T
 			else:	P12 = self._rel_potentials[id1, id2]
 			en += P12[:,l2].T
-		P1 = self._seg_potentials[id1]
 		priors = self.eval_priors(id1)
-		en += P1[:] + priors
+		en += self._seg_potentials[id1] + priors
+		return en
+
+	def gibbs(self, id1):
+		if len(self._availablelabels[id1]) == 1: return 0, 0
+		l1 = self._taglabels[id1]
+		en = self.local_energy(id1)
 		delta_e = en[l1] - en
 		if self._normalize_weights:
 			w = self._seg_weights[id1]
@@ -527,18 +619,9 @@ class Tagger(object):
 		return chgmt, delta_e[l2]
 			
 	def icm(self, id1):
+		if len(self._availablelabels[id1]) == 1: return 0, 0
 		l1 = self._taglabels[id1]
-		availablelabels_n = len(self._availablelabels[id1])
-		if availablelabels_n == 1: return 0, 0
-		en = numpy.zeros(availablelabels_n, dtype=numpy.float96)
-		for id2 in self._neighbours[id1]:
-			l2 = self._taglabels[id2]
-			if id1 > id2:
-				P12 = self._rel_potentials[id2, id1].T
-			else:	P12 = self._rel_potentials[id1, id2]
-			en += P12[:,l2].T
-		priors = self.eval_priors(id1)
-		en += self._seg_potentials[id1] + priors
+		en = self.local_energy(id1)
 		delta_e = en[l1] - en
 		l2 = numpy.argmin(en) # new label
 		chgmt = (l2 != l1)
@@ -605,8 +688,9 @@ class Tagger(object):
 					P12 = self._rel_potentials[id2, id1].T
 				else:	P12 = self._rel_potentials[id1, id2]
 				en += P12[:,l2].T
-			# the prior may be global, without any local component
-			en += self._seg_potentials[id1] # no prior
+			priors = self.eval_priors(id1)
+			en += self._seg_potentials[id1] + priors
+			en /= self._seg_weights[id1]
 			P[:] = 0.
 			for i, ind in enumerate(self._labelsind[id1]):
 				P[ind] = numpy.exp(-en[i])
@@ -693,7 +777,12 @@ def parseOpts(argv):
 		help="'init' : only initialisation with segments potential " + \
 		"is done, 'icm' : init + Iterated Conditional Mode, 'mpm' : "+ \
 		"init + Marginal Posterior Mode, 'sa' : init + Simulated " + \
-		"Annealing)", choices=('icm', 'sa', 'mpm', 'init'))
+		"Annealing), 'energy' : compute energy of labels store in " + \
+		"'label' attribute, 'error' : compute the mean posterior " + \
+		"error of labels stored in the input graph attribute 'label' "+\
+		"according to true labels store in the input graph attribute "+\
+		"'name'", choices=('icm', 'sa', 'mpm', 'init',
+		'energy', 'error'))
 	algo_group.add_option('--init-mode', dest='init_mode',
 		metavar = 'MODE', action='store', default='store_labels',
 		type='choice', help="initialization of labels. " + \
@@ -706,8 +795,9 @@ def parseOpts(argv):
 		type='choice', help="select available labels on each " + \
 		"segment. 'threshold' : select labels with posterior of " + \
 		"local segment potential over the threshold, 'all' : keep " + \
-		"all labels defined in graph_model", choices=('threshold',
-		'all'))
+		"all labels defined in graph_model, 'store_labels' : select " +\
+		"only the labels stored in 'label' attribute of the " + \
+		"input graph", choices=('threshold', 'all', 'store_labels'))
 	algo_group.add_option('--init-temperature', dest='init_temp',
 		metavar = 'FLOAT', action='store', default='50', type='float',
 		help='initial temperature for simulated annealing ' + \
@@ -736,6 +826,11 @@ def parseOpts(argv):
 		metavar = 'INDEX', action='store', default=None, type='str',
 		help='init label on all segments, then start algo ' + \
 		'only on specified segments (according to their indices)')
+	misc_group.add_option('--look-at-segments', dest='lookat_seg_id',
+		metavar = 'LIST', action='store', default=None,
+		help='monitor information on the specified segments ' + \
+		'(according to their indices) : local energies, current ' + \
+		'label, local probabilities.')
 	misc_group.add_option('--precomputing-mode', dest='precomputing',
 		metavar = 'MODE', action='store', default='from_data',
 		type='choice', choices=('from_data', 'from_pickle'),
@@ -808,6 +903,9 @@ def main():
 		if options.gui_mode == 'labels': obs = GuiLabelsObserver()
 		elif options.gui_mode == 'changes': obs = GuiChangesObserver()
 		tagger.addObserver(obs)
+	if options.lookat_seg_id:
+		indices = [int(id) for id in options.lookat_seg_id.split(',')]
+		tagger.addObserver(SegmentObserver(indices))
 	print "tag..."
 	tagger.tag(options.mode, options.init_mode, options.weighting_mode,
 		options.select_mode, options.precomputing, options.picklename)
