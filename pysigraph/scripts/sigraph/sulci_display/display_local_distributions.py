@@ -11,38 +11,39 @@ from soma import aims
 
 ################################################################################
 class GlobalModelDisplay(object):
-	def __init__(self, gaussians_distrib, orientations_distrib,
-		hie, s,	scale, size, output, selected_sulci=None):
+	def __init__(self, gaussians_distrib, local_distrib,
+		hie, options, output, selected_sulci=None):
 		self._gaussians_distrib = gaussians_distrib
-		self._orientations_distrib = orientations_distrib
+		self._local_distrib = local_distrib
 		self._hie = hie
-		self._s = s
-		self._scale = scale
-		self._size = size
+		self._options = options
 		self._output = output
 		self._selected_sulci = selected_sulci
 		self._sulci = set()
 		self._sulci.update(gaussians_distrib['vertices'].keys())
 
-	def display_one(self, sulcus, gd, od):
-		mesher = OrientationMesher(od)
-		if od.name() == 'bingham':
-			mesh = mesher.mesh(self._scale, self._size/5., self._s)
-		else:	mesh = mesher.mesh(self._scale, self._size, self._s)
-		
-		# add color
+	def display_one(self, sulcus, gd, ld):
 		color = self._hie.find_color(sulcus)
-		go =  {'diffuse' : color}
-		mesh.header()['material'] = go
 
+		# mesher
+		Mesher, mesher_opt = mesherFactory(ld.name(), self._options)
+		mesher = Mesher(ld)
+		mesher.setColor(color)
+		meshes = mesher.mesh(*mesher_opt)
+		
 		# translate
 		pos = numpy.asarray(gd.mean()).ravel()
 		motion = aims.Motion()
 		motion.setTranslation(pos)
-		aims.SurfaceManip.meshTransform(mesh, motion)
+		for m in meshes: aims.SurfaceManip.meshTransform(m, motion)
 
 		# write
-		aims.Writer().write(mesh, '%s_%s.mesh' % (self._output, sulcus))
+		for i, m in enumerate(meshes):
+			if len(meshes) != 1 :
+				id = '_%d' % i
+			else:	id = ''
+			aims.Writer().write(m, '%s_%s%s.mesh' % \
+					(self._output, sulcus, id))
 
 
 class SegmentsDisplay(GlobalModelDisplay):
@@ -57,10 +58,10 @@ class SegmentsDisplay(GlobalModelDisplay):
 				sulcus not in self._selected_sulci: continue
 			try: gd = self._gaussians_distrib['vertices'][sulcus]
 			except KeyError: continue
-			try: od = self._orientations_distrib['vertices'][sulcus]
+			try: ld = self._local_distrib['vertices'][sulcus]
 			except KeyError: continue
 			bar.display(i)
-			self.display_one(sulcus, gd, od)
+			self.display_one(sulcus, gd, ld)
 
 
 class RelationsDisplay(GlobalModelDisplay):
@@ -69,7 +70,7 @@ class RelationsDisplay(GlobalModelDisplay):
 
 	def display(self):
 		print "compute meshes..."
-		relations = self._orientations_distrib['edges'].keys()
+		relations = self._local_distrib['edges'].keys()
 		bar = ProgressionBarPct(len(relations), '#', color = 'blue')
 		for i, relation in enumerate(relations):
 			# skip : intra/inter global models
@@ -82,29 +83,37 @@ class RelationsDisplay(GlobalModelDisplay):
 			except KeyError: continue
 			try: gd2 = self._gaussians_distrib['vertices'][label2]
 			except KeyError: continue
-			try: od = self._orientations_distrib['edges'][relation]
+			try: ld = self._local_distrib['edges'][relation]
 			except KeyError: continue
 			bar.display(i)
 			if label1 != label2:
-				self.display_one(relation, gd1, gd2, od)
+				self.display_one(relation, gd1, gd2, ld)
 			else:	GlobalModelDisplay.display_one(self, label1,
-								gd1, od)
+								gd1, ld)
 
-	def display_one(self, relation, gd1, gd2, od):
-		mesher = OrientationMesher(od)
-		mesh = mesher.mesh(self._scale, self._size, self._s)
-
+	def display_one(self, relation, gd1, gd2, ld):
+		#FIXME : ne marche que pour certaines fonctions d'orientation
+		# mesher
+		Mesher, mesher_opt = mesherFactory(ld.name(), self._options)
+		mesher = Mesher(ld)
+		mesher.setColor(color)
+		meshes = mesher.mesh(*mesher_opt)
+	
 		# split the mesh in 2 parts along a plane directed by
 		# the mean direction
-		dir = numpy.hstack((od.GetMeanDirection(), 0))
+		dir = numpy.hstack((ld.GetMeanDirection(), 0))
 		plane1 = tuple(-dir)
 		plane2 = tuple(dir)
-		mesh1 = aims.AimsSurfaceTriangle()
-		mesh2 = aims.AimsSurfaceTriangle()
 		borderline1 = aims.AimsTimeSurface_2()
 		borderline2 = aims.AimsTimeSurface_2()
-		aims.SurfaceManip.cutMesh(mesh, plane1, mesh1, borderline1)
-		aims.SurfaceManip.cutMesh(mesh, plane2, mesh2, borderline2)
+		meshes1, meshes2 = [], []
+		for m in meshes:
+			m1 = aims.AimsSurfaceTriangle()
+			m2 = aims.AimsSurfaceTriangle()
+			aims.SurfaceManip.cutMesh(m, plane1, m1, borderline1)
+			aims.SurfaceManip.cutMesh(m, plane2, m2, borderline2)
+			meshes1.append(m1)
+			meshes2.append(m2)
 
 		# add color
 		label1, label2 = relation
@@ -125,31 +134,64 @@ class RelationsDisplay(GlobalModelDisplay):
 		aims.SurfaceManip.meshTransform(mesh2, motion)
 
 		# write
-		aims.Writer().write(mesh1, '%s_%s,%s_1.mesh' % \
-				(self._output, label1, label2))
-		aims.Writer().write(mesh2, '%s_%s,%s_2.mesh' % \
-				(self._output, label1, label2))
+		for i, m in enumerate(meshes):
+			if len(meshes) != 1 :
+				id = '_%d' % i
+			else:	id = ''
+			aims.Writer().write(mesh, '%s_%s%s.mesh' % \
+					(self._output, sulcus, id))
+			aims.Writer().write(mesh1, '%s_%s,%s_1%s.mesh' % \
+					(self._output, label1, label2, id))
+			aims.Writer().write(mesh2, '%s_%s,%s_2%s.mesh' % \
+					(self._output, label1, label2, id))
+
+
+
 
 
 ################################################################################
 class LocalModelMesher(object):
-	def __init__(self, od):
-		self._od = od
+	'''
+    ld : local distribution
+	'''
+	def __init__(self, ld):
+		self._color = None
+		self._ld = ld
 		self._unit_sphere = aims.SurfaceGenerator.sphere([0, 0, 0],
 								1, 4096)
+	def setColor(self, color): self._color = color
+
+	def _color_mesh(self, mesh):
+		go =  {'diffuse' : self._color}
+		mesh.header()['material'] = go
 
 class OrientationMesher(LocalModelMesher):
+	'''
+    ld : orientation distribution
+	'''
 	def __init__(self, *args, **kwargs):
 		LocalModelMesher.__init__(self, *args, **kwargs)
 
 	def mesh(self, scale, size, s):
 		mesh = aims.AimsTimeSurface_3(self._unit_sphere)
 		for v in mesh.vertex():
-			logli, li = self._od.likelihood(v * s)
+			logli, li = self._ld.likelihood(v * s)
 			v += li * v / scale
 			v *= size
 		mesh.updateNormals()
-		return mesh
+		if self._color is not None: self._color_mesh(mesh)
+		return [mesh]
+
+class BinghamOrientationMesher(OrientationMesher):
+	'''
+    ld : bingham distribution
+	'''
+	def __init__(self, *args, **kwargs):
+		OrientationMesher.__init__(self, *args, **kwargs)
+
+	def mesh(self, scale, size, s):
+		return OrientationMesher.mesh(self, scale, size / 5, s)
+
 
 # FIXME : old test, not already integrated in new API
 class MatrixBinghamMesher(LocalModelMesher):
@@ -181,7 +223,7 @@ class MatrixBinghamMesher(LocalModelMesher):
 					vz = numpy.cross(vx, vy)
 					vz /= numpy.linalg.norm(vz)
 					X = numpy.vstack([vz, vx])
-				logli, li = self._od.likelihood(X)
+				logli, li = self._ld.likelihood(X)
 				lis += li
 			lis *= numpy.pi / n
 			v += 2 * lis * v / self._scale
@@ -212,7 +254,7 @@ class MatrixBinghamMesher(LocalModelMesher):
 		c += aims.SurfaceGenerator.cylinder([0, 0, -e], [0, 0, e],
 						0.2, 0.2, 6, False, True)
 		m = numpy.identity(4)
-		m[:3, :3] = self._od.M().T
+		m[:3, :3] = self._ld.M().T
 		motion2 = aims.Motion(m.flatten())
 		aims.SurfaceManip.meshTransform(c, motion * motion2)
 
@@ -221,6 +263,65 @@ class MatrixBinghamMesher(LocalModelMesher):
 				(self._p._output, self._sulcus))
 
 
+class GaussianMesher(LocalModelMesher):
+	def __init__(self, *args, **kwargs):
+		LocalModelMesher.__init__(self, *args, **kwargs)
+		self._ratio = [0.5, 1, 2]
+		self._alpha = [1, 0.6, 0.2]
+
+	def mesh(self):
+		gaussian = self._ld
+		meshes = []
+		if gaussian.type() == 'fake_gaussian': return
+		#mean = gaussian.mean()
+		#mean3df = aims.Point3df(numpy.asarray(mean).flatten())
+		cov = gaussian.covariance()
+		eigval, eigvect = numpy.linalg.eig(cov)
+		d = numpy.diag(numpy.sqrt(eigval))
+		for i in range(3):
+			color2 = list(self._color) + [self._alpha[i]]
+			cov = eigvect * (d * self._ratio[i]) * eigvect.I
+			mesh = aims.AimsTimeSurface_3(self._unit_sphere)
+			transformation = numpy.identity(4)
+			transformation[:3, :3] = cov
+			flattrans = numpy.asarray(transformation).flatten()
+			motion = aims.Motion(flattrans)
+			#motion.setTranslation(mean3df)
+			aims.SurfaceManip.meshTransform(mesh, motion)
+			go =  {'diffuse' : color2}
+			mesh.header()['material'] = go
+			meshes.append(mesh)
+
+		return meshes
+
+
+class FakeMesher(LocalModelMesher):
+	def __init__(self, *args, **kwargs):
+		LocalModelMesher.__init__(self, *args, **kwargs)
+
+	def mesh(self):
+		return []
+
+################################################################################
+mesher_map = {
+	'orientation' : OrientationMesher,
+	'bingham' : BinghamOrientationMesher,
+	'full_gaussian' : GaussianMesher,
+}
+
+def mesherFactory(name, options):
+	if name in ['kent', 'von_mises_fisher']: name = 'orientation'
+	if name in ['orientation', 'bingham']:
+		if options.inverse:
+			s = -1
+		else:	s = 1
+		mesher_opt = float(options.scale), float(options.size), s
+	else:	mesher_opt = []
+	try:
+		mesher = mesher_map[name]
+	except KeyError:
+		mesher = FakeMesher
+	return mesher, mesher_opt
 
 ################################################################################
 def parseOpts(argv):
@@ -230,8 +331,8 @@ def parseOpts(argv):
 	parser.add_option('--distrib-gaussians', dest='distrib_gaussians_name',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')
-	parser.add_option('--distrib-orientations',
-		dest='distrib_orientations_name', metavar = 'FILE',
+	parser.add_option('--distrib-local',
+		dest='distrib_local_name', metavar = 'FILE',
 		action='store', default = None, help='distribution models')
 	parser.add_option('-s', '--sulci', dest='sulci',
 		metavar = 'LIST', action='store', default = None,
@@ -256,13 +357,14 @@ def parseOpts(argv):
 	parser.add_option('--scale', dest='scale', metavar = 'FLOAT',
 		action='store', default = 0.2, help='scaling of likelihoods')
 	parser.add_option('--inverse', dest='inverse', action='store_true',
-		default = False, help='inverse orientations')
+		default = False,
+		help='inverse orientations for orientations distribution')
 	return parser, parser.parse_args(argv)
 
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.distrib_gaussians_name,
-		options.distrib_orientations_name, options.output]:
+		options.distrib_local_name, options.output]:
 		print "error : missing option(s)"
 		parser.print_help()
 		sys.exit(1)
@@ -272,21 +374,18 @@ def main():
 	gaussians_distrib = io.read_segments_distrib(\
 		options.distrib_gaussians_name, selected_sulci)
 	if options.level == 'segments':
-		orientations_distrib = io.read_segments_distrib(\
-			options.distrib_orientations_name, selected_sulci)
+		local_distrib = io.read_segments_distrib(\
+			options.distrib_local_name, selected_sulci)
 	elif options.level == 'relations':
-		orientations_distrib = io.read_relations_distrib(\
-			options.distrib_orientations_name, selected_sulci)
+		local_distrib = io.read_relations_distrib(\
+			options.distrib_local_name, selected_sulci)
 	hie = aims.Reader().read(options.hie)
 
-	if options.inverse:
-		s = -1
-	else:	s = 1
 	scale = float(options.scale)
 	size = float(options.size)
 
-	opt = [gaussians_distrib, orientations_distrib,
-		hie, s, scale, size, options.output, selected_sulci]
+	opt = [gaussians_distrib, local_distrib,
+		hie, options, options.output, selected_sulci]
 	if options.level == 'segments':
 		displayer = SegmentsDisplay(*opt)
 	elif options.level == 'relations':

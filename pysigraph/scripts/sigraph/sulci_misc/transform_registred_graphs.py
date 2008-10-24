@@ -59,7 +59,7 @@ def main():
 	graph = io.load_graph(options.transfile, options.input_graphname)
 	if options.no_talairach:
 		motion_tal = aims.Motion()
-		motion_tal = setToIdentity()
+		motion_tal.setToIdentity()
 	else:	motion_tal = aims.GraphManip.talairach(graph)
 	if options.global_motion_name:
 		motion_global = aims.Reader().read(option.global_motion_name)

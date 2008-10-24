@@ -61,7 +61,9 @@ def vector_from_rotation(R):
 			theta = numpy.arccos(cost)
 			if numpy.sign(m[ind]) < 0: theta = 2 * numpy.pi - theta
 		g = (1 - cost) / (theta ** 2)
-		w[:] = numpy.asmatrix(numpy.sqrt((numpy.diag(R) - cost) / g)).T
+		S = (numpy.diag(R) - cost) / g
+		S[S < 0] = 0. # prevent numerical issues
+		w[:] = numpy.asmatrix(numpy.sqrt(S)).T
 		ind = numpy.argmax(w)
 		z = {}
 		z[0, 1] = z[1, 0] = (R[1, 0] + R[0, 1]) / g
@@ -871,11 +873,19 @@ class MixtureLocalRegistration(Registration):
                  likelihoods computation.
 	'''
 	_algo_map = {}
-	def __init__(self, X, mixture, groups=None, available_labels=None,
-			verbose=0):
+	def __init__(self, X, gravity_centers, mixture, translation_prior=None,
+		direction_prior=None, angle_prior=None,
+		groups=None, available_labels=None, verbose=0):
 		Registration.__init__(self, verbose)
 		self._X = numpy.asmatrix(X)
+		self._gravity_centers = gravity_centers
 		self._mixture = mixture
+		if translation_prior is None and \
+			direction_prior is None and\
+			angle_prior is None:
+			self._rotation_priors = None
+		else:	self._rotation_priors = translation_prior, \
+					direction_prior, angle_prior
 		self._groups = groups
 		self._available_labels = available_labels
 		n, self._size = self._X.shape[1], len(self._mixture)
@@ -919,23 +929,30 @@ class MixtureLocalRegistration(Registration):
 				if L is not None:
 					L_i = L[:, i]
 				else:	L_i = None
+				g = self._gravity_centers[i]
 				Algo = self.get_registration_algo()
 				if self._groups is not None:
-					algo = Algo(spam, X, posteriors[i],
+					algo = Algo(spam, g, X, posteriors[i],
 						self._groups,
 						verbose=self._verbose - 2)
-				else:	algo = Algo(spam, X, posteriors[i],
+				else:	algo = Algo(spam, g, X, posteriors[i],
 						verbose=self._verbose - 2)
+				if self._rotation_priors:
+					t_prior = self._rotation_priors[0][i]
+					d_prior = self._rotation_priors[1][i]
+					a_prior = self._rotation_priors[2][i]
+					algo.setPriors(t_prior, \
+						d_prior, a_prior)
 				R, t = self._trans[i]
 				algo.set_initialization(R, t)
 				R, t = algo.optimize(eps,
-						user_func, user_data, mode)
+					user_func, user_data, mode)
 				local_en = algo.getCurrentEnergy()
 				new_energy += local_en
 				if self._verbose > 1:
 					print "local en = ", local_en
 				self._trans[i] = R, t
-				Xi = R * X + t
+				Xi = R * (X - g) + (t + g)
 				logli, li = spam.likelihoods_groups(Xi.T,
 							self._groups, L_i)
 				loglikelihoods.append(logli)
@@ -951,5 +968,10 @@ class MixtureLocalRegistration(Registration):
 			n += 1
 			if old_energy - new_energy < eps: break
 			else:	old_energy = new_energy
-		trans = LocalRigidTransformations(self._trans)
+		trans2 = []
+		for i, (R, t) in enumerate(self._trans):
+			g = self._gravity_centers[i]
+			t2 = t + g - R * g
+			trans2.append((R, t2))
+		trans = LocalRigidTransformations(trans2)
 		return trans, posteriors, loglikelihoods.T, likelihoods.T

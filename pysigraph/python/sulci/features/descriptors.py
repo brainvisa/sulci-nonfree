@@ -285,6 +285,24 @@ class RelationDescriptor(Descriptor):
 		return data
 
 
+class ComboRelationsDescriptor(RelationDescriptor):
+	def __init__(self, descriptors):
+		RelationDescriptor.__init__(self)
+		self._descriptors = {}
+		for descr in descriptors:
+			self._descriptors[descr.name()] = descr
+
+	def potential_matrix(self, motion, distribs, edge_infos,
+				avalaible_labels, potential=True):
+		P = numpy.float96(0.)
+		for datatype in self._descriptors.keys():
+			subdistribs = distribs[datatype]
+			Pi, ind = self._descriptors[datatype].potential_matrix(\
+					motion, subdistribs, edge_infos,
+						avalaible_labels, potential)
+			P += Pi
+		return P, ind
+
 ################################################################################
 class MinDistanceRelationDescriptor(RelationDescriptor):
 	def __init__(self):
@@ -318,6 +336,8 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 	def __init__(self):
 		MinDistanceRelationDescriptor.__init__(self)
 		self._name = 'all_min_distance'
+		self._descr_hull = HullJunctionDescriptor()
+		self._descr_ss = SurfaceSimpleSegmentDescriptor()
 
 	def group_segments_per_labels(self, g):
 		group = {}
@@ -329,36 +349,33 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 			else:	group[label] = [v]
 		return group
 
-	def data_vertices(self, motion, v1, v2):
-		map1 = v1['aims_ss'].get()
-		s1 = numpy.array([map1.sizeX(), map1.sizeY(), map1.sizeZ()])
-		X = numpy.array([motion.transform(aims.Point3df(p * s1)) \
-					for p in map1[0].keys()])
-		map2 = v2['aims_ss'].get()
-		s2 = numpy.array([map2.sizeX(), map2.sizeY(), map2.sizeZ()])
-		Y = numpy.array([motion.transform(aims.Point3df(p * s2)) \
-					for p in map2[0].keys()])
+	def cc_has_hull_junction(self, cc):
+		b = True
+		for v in cc:
+			if self._descr_hull.hull_junction(v) is None:
+				b = False
+		return b
 
-		sX, sY = len(X), len(Y)
-		nX, nY = sX / 30, sY / 30
-		if nX <= 10: nX = 10
-		if nY <= 10: nY = 10
+	def data_vertices(self, descr, motion, v1, v2):
+		import time
 
-		import scipy.cluster as C
-		X, lX = C.vq.kmeans(X, nX)
-		Y, lY = C.vq.kmeans(Y, nY)
-
+		X = descr.data(motion, v1)
+		Y = descr.data(motion, v2)
 		C = self.euclidian_distance(X, Y)
 		return numpy.sqrt(numpy.min(C))
 
-	def compute(self, motion, g1, g2):
+	def compute(self, motion, g1, g2, connected):
 		(name1, segments1), (name2, segments2) = g1, g2
+		if not connected and self.cc_has_hull_junction(segments1) and\
+			self.cc_has_hull_junction(segments2):
+			descr = self._descr_hull
+		else:	descr = self._descr_ss
 		dist = []
 		if name1 == name2 :
+			pairs = []
 			for s1 in segments1:
 				r1 = s1['index']
 				edges = s1.edges()
-				h = {}
 				for e in edges:
 					si, sj = e.vertices()
 					ri = si['index']
@@ -369,17 +386,27 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 					if ri > rj: continue
 					if sj.getSyntax() != 'fold': continue
 					if sj['name'] != name1: continue
-					h[rj] = sj
-				for r2, s2 in h.items():
-					d = self.data_vertices(motion, s1, s2)
-					dist.append(d)
+					if ri < rj:
+						pairs.append((si, sj))
+					else:	pairs.append((sj, si))
+			pairs = set(pairs)
+			for (s1, s2) in pairs:
+				d = self.data_vertices(descr, motion, s1, s2)
+				dist.append(d)
 		else:
-			for s1 in segments1:
+			size1, size2 = len(segments1), len(segments2)
+			C = numpy.zeros((size1, size2))
+			for i, s1 in enumerate(segments1):
 				dmin = numpy.inf
-				for s2 in segments2:
-					d = self.data_vertices(motion, s1, s2)
-					if d < dmin: dmin = d
-				dist.append(dmin)
+				for j, s2 in enumerate(segments2):
+					d = self.data_vertices(descr,
+							motion, s1, s2)
+					C[i, j] = d
+			# take min according to each sulci
+			l = zip(numpy.arange(size1), C.argmin(axis=1))
+			l += zip(C.argmin(axis=0), numpy.arange(size2))
+			s = set(l)
+			for ind in s: dist.append(C[ind])
 		if name1 != name2 : return [numpy.min(dist)]
 		return dist
 
@@ -428,11 +455,13 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 					c2 = self.label_gravity_center(\
 							segments2)
 					dist = ((c1 - c2) ** 2).sum()
-					if not self.connected_cc(segments1,
-						segments2) and dist > dist2_th:
+					connected = self.connected_cc(segments1,
+								segments2)
+					if not connected and dist > dist2_th:
 						continue
 					print name1, name2
-					D = self.compute(motion, g1, g2)
+					D = self.compute(motion, g1, g2,
+								connected)
 					if D is None: continue
 					key = (name1, name2)
 					if data.has_key(key):
@@ -459,8 +488,6 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 		AllMinDistanceRelationDescriptor.__init__(self)
 		self._name = 'all_connected_distance'
 		self._synth = aims.set_STRING(["junction", "plidepassage"])
-		self._descr_hull = HullJunctionDescriptor()
-		self._descr_ss = SurfaceSimpleSegmentDescriptor()
 
 	def data_edges(self, motion, edges):
 		if edges.has_key('cortical'):
@@ -475,13 +502,6 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 		else:
 			for v in cc: s += v['refsurface_area']
 		return s
-
-	def cc_has_hull_junction(self, cc):
-		b = True
-		for v in cc:
-			if self._descr_hull.hull_junction(v) is None:
-				b = False
-		return b
 
 	def cc_to_X(self, motion, descr, cc):
 		X = []
@@ -540,7 +560,7 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 			return numpy.vstack(dist)
 		else:	return None
 
-	def compute(self, motion, g1, g2):
+	def compute(self, motion, g1, g2, connected):
 		import scipy.cluster as C
 		import fff2.graph.graph as G
 		(name1, segments1), (name2, segments2) = g1, g2
@@ -566,7 +586,6 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 					d = self.data_intra(X[id1], X[id2])
 					dist.append(d)
 		else: 
-			return [] #FIXME
 			p = segments1, segments2
 			dist.append(self.data_cc(motion, p))
 		return dist
@@ -583,9 +602,9 @@ class AllConnectedMeanDistanceRelationDescriptor(\
 		self._name = 'all_connected_mean_distance'
 		self._synth = aims.set_STRING(["junction", "plidepassage"])
 
-	def compute(self, motion, g1, g2):
+	def compute(self, motion, g1, g2, connected):
 		D = AllConnectedDistanceRelationDescriptor.compute(self,
-							motion, g1, g2)
+						motion, g1, g2, connected)
 		if D is None: return None
 		return [numpy.mean(D)]
 
@@ -776,6 +795,7 @@ class AllDistancesPairRelationDescriptor(RelationDescriptor):
 			return C
 		else:	return None
 
+
 ################################################################################
 # Prior descriptors
 ################################################################################
@@ -886,6 +906,57 @@ class LocalFrequencyDescriptor(PriorDescriptor):
 
 
 ################################################################################
+# Prior descriptors
+################################################################################
+class SulciDescriptor(Descriptor):
+	def __init__(self):
+		Descriptor.__init__(self)
+
+
+class RegistredSulciDescriptor(SulciDescriptor):
+	def __init__(self):
+		SulciDescriptor.__init__(self)
+		self._name = 'registred_spam_ss'
+		self._distribs = {}
+		self._cache = {}
+		self._descr = SurfaceSimpleSegmentDescriptor()
+		self._data = {}
+
+	def init(self, motion, distrib, labels, segments):
+		# init cache
+		for s in segments:
+			id = s['index']
+			X = self._descr.data(motion, s)
+			n = len(X) / 50.
+			if n < 2: n = 2
+			self._data[id] = X
+		for i, label in enumerate(labels):
+			self._cache[i] = {}
+			self._distribs[i] = distrib['vertices'][label]
+
+	def likelihood(self, distrib, label, segments):
+		if len(segments) == 0: return 40. #FIXME
+		from sulci.registration.spam import SpamRegistration
+
+		# in cache ?
+		cache_key = tuple(sorted(segments.keys()))
+		cache_label = self._cache[label]
+		if cache_label.has_key(cache_key):
+			return cache_label[cache_key]
+		# not in cache
+		X = []
+		for id, s in segments.items(): X.append(self._data[id])
+		X = numpy.vstack(X)
+		g = X.mean(axis=0)
+		spam = self._distribs[label]
+		#FIXME : replace None by values
+		spamreg = SpamRegistration(spam, X.T, g[None].T,None,None, None)
+		R, t = spamreg.optimize_powell(eps=0.1)
+		en = spamreg._energy
+		cache_label[cache_key] = en # insert in cache
+		return en
+
+################################################################################
 # Descriptor map/factory
 ################################################################################
 descriptor_map = { \
@@ -906,15 +977,20 @@ descriptor_map = { \
 	'gravity_centers_directions' : GravityCentersDirections,
 	'all_directions_pair' : AllDirectionsPairRelationDescriptor,
 	'all_connected_direction' : AllConnectedDirectionRelationDescriptor,
+	# sulci
+	'registred_spam_ss' : RegistredSulciDescriptor,
 	# priors
 	'size_global_frequency' : SizeGlobalFrequencyDescriptor,
 	'label_global_frequency' : LabelGlobalFrequencyDescriptor,
 	'local_frequency' : LocalFrequencyDescriptor,
 }
 
-def descriptorFactory(datatypes):
+def descriptorFactory(datatypes, level='segments'):
 	if isinstance(datatypes, tuple) and len(datatypes) != 1:
 		descriptors = [descriptor_map[datatype]() \
 					for datatype in datatypes]
-		return ComboSegmentDescriptor(descriptors)
+		if level == 'segments':
+			return ComboSegmentDescriptor(descriptors)
+		elif level == 'relations':
+			return ComboRelationsDescriptor(descriptors)
 	else:	return descriptor_map[datatypes]()

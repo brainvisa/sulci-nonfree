@@ -6,12 +6,12 @@ import numpy, sys
 import sigraph
 from soma import aims
 
-import bayesian_sulci.distribution_aims
-from bayesian_sulci.distribution_aims import Spam
-import sulci_registration.spam
-import sulci_registration.procrust
-from sulci_registration.common import save_transformation
-from sulci_registration.spam import SpamRegistration
+import sulci.models.distribution_aims
+from sulci.models.distribution_aims import Spam
+import sulci.registration.spam
+import sulci.registration.procrust
+from sulci.registration.common import save_transformation
+from sulci.registration.spam import SpamRegistration
 
 def main():
 	spamname = sys.argv[3]

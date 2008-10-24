@@ -1041,7 +1041,9 @@ class VonMises(Distribution):
 		return kappa
 
 	def fit(self, db):
-		X = db.getX()
+		try:	X = db.getX()
+		except AttributeError:
+			X = db
 		if not self._check(X): return
 		self._mu = self.compute_mu(X)
 		self._kappa = self.compute_kappa(X, self._mu)
@@ -1080,7 +1082,7 @@ class VonMisesFisher(Distribution):
 		self._kappa = kappa
 		self._dim = p
 		if not None in [mu, kappa, p]:
-			self._update()
+			self.update()
 		else: self._normalization = None
 
 	def _check(self, X):

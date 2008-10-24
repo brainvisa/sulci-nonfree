@@ -724,7 +724,7 @@ class Bingham(Distribution):
 		self._name = 'bingham'
 		self._M = M
 		self._Z = Z
-		if not None in [M, Z]: self._update()
+		if not None in [M, Z]: self.update()
 		else:
 			self._lognormalization = None
 			self._A = None
@@ -746,7 +746,7 @@ class Bingham(Distribution):
 		'''update internal parameters'''
 		p = self._M.shape[0]
 		# warning : huge value for nb_iter is good for precision
-		# but can gives NaN results if Z compoents value are too big.
+		# but can gives NaN results if Z components value are too big.
 		nb_iter = 100
 		self._lognormalization = numpy.log(aimsalgo.hyp1f1(0.5, p/ 2.,
 							self._Z, nb_iter))

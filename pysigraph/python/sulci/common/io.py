@@ -154,16 +154,45 @@ def create_relations_distrib_one_datatype(prefix, distrib, selected_sulci=None):
 	return distrib
 
 
-def create_segments_distrib_several_datatypes(prefix, distrib,
+def create_relations_distrib_several_datatypes(prefix, distrib,
 					selected_sulci=None):
-	print "FIXME : not implemented"
-	sys.exit(1)
+	datatypes = distrib['data_type']
+	subdistribs = {}
+	relations = set()
+	for datatype in datatypes:
+		distribname = os.path.join(prefix, distrib['files'][datatype])
+		subdistrib = read_distribution_models(distribname)
+		subdistribs[datatype] = subdistrib
+		relations.update(subdistrib['files'].keys())
+	for datatype in datatypes: distrib['edges'][datatype] = {}
+	for rel in relations:
+		if isinstance(rel, tuple):
+			sulcus1, sulcus2 = rel
+			if selected_sulci is not None and \
+				(sulcus1 not in selected_sulci) and \
+				(sulcus2 not in selected_sulci): continue
+		for datatype, subdistrib in subdistribs.items():
+			if not subdistrib['files'].has_key(rel): continue
+			(model_type, distribfile) = subdistrib['files'][rel]
+			Distribution = distribution.distributionFactory(\
+							model_type)
+			density = Distribution()
+			density.read(os.path.join(prefix,
+				os.path.dirname(distrib['files'][datatype]) ,
+				distribfile))
+			distrib['edges'][datatype][rel] = density
+	del distrib['files']
+	return distrib
 
+
+
+def read_sulci_distrib(distribname, selected_sulci=None):
+	return read_segments_distrib(distribname, selected_sulci)
 
 def read_full_model(graphmodelname, 
-	segmentsdistribname=None, reldistribname=None, labelspriorname=None,
-	globalrotationpriorname=None, localrotationspriorname=None,
-	selected_sulci=None):
+	segmentsdistribname=None, reldistribname=None, sulcidistribname=None,
+	labelspriorname=None, globalrotationpriorname=None,
+	localrotationspriorname=None, selected_sulci=None):
 	graphmodel = read_graphmodel(graphmodelname, selected_sulci)
 	if segmentsdistribname:
 		segments_distrib = read_segments_distrib(segmentsdistribname,
@@ -173,6 +202,10 @@ def read_full_model(graphmodelname,
 		relations_distrib = read_relations_distrib(reldistribname,
 							selected_sulci)
 	else:	relations_distrib = None
+	if sulcidistribname:
+		sulci_distrib = read_sulci_distrib(sulcidistribname,
+							selected_sulci)
+	else:	sulci_distrib = None
 	if labelspriorname:
 		labels_prior = read_labels_prior_model(labelspriorname)
 	else:	labels_prior = None
@@ -184,7 +217,8 @@ def read_full_model(graphmodelname,
 		local_rotations_prior = None #FIXME
 	else:	local_rotations_prior = None
 	return sulci.SulciModel(graphmodel, segments_distrib, relations_distrib,
-		labels_prior, global_rotations_prior, local_rotations_prior)
+			sulci_distrib, labels_prior, global_rotations_prior,
+			local_rotations_prior)
 	
 	
 def read_distribution_models(filename):

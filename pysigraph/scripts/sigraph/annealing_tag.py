@@ -121,6 +121,18 @@ class GuiLabelsObserver(GuiObserver):
 		time.sleep(0.001)
 		self._n += 1
 
+class GuiLabelsChangedObserver(GuiLabelsObserver):
+	def __init__(self):
+		GuiLabelsObserver.__init__(self)
+
+	def init(self, tagger):
+		GuiLabelsObserver.init(self, tagger)
+
+	def after_pass(self, tagger): pass
+
+	def label_changed(self, tagger):
+		GuiLabelsObserver.after_pass(self, tagger)
+
 
 class GuiChangesObserver(GuiObserver):
 	def __init__(self):
@@ -198,19 +210,30 @@ class SegmentObserver(Observer):
 
 ################################################################################
 class Tagger(object):
-	def __init__(self, sulcimodel, init_prior_distr, graph, motion, nrjname,
-			csvname, selected_sulci, node_indices,
-			anneal_opt, normalize_weights):
+	def __init__(self, sulcimodel, init_with_segments, init_prior_distr,
+			graph, motion, nrjname, csvname, selected_sulci,
+			node_indices, anneal_opt, normalize_weights):
 		self._sulcimodel = sulcimodel
+		self._init_with_segments = init_with_segments
 		self._init_prior_distr = init_prior_distr
 		self._segments_distrib = sulcimodel.segments_distrib()
-		segments_data_type = self._segments_distrib['data_type']
-		self._segments_descriptor = \
-			descriptorFactory(segments_data_type)
+		if self._segments_distrib:
+			segments_data_type = self._segments_distrib['data_type']
+			self._segments_descriptor = \
+			descriptorFactory(segments_data_type, 'segments')
+		else:	self._segments_descriptor = None
 		self._relations_distrib = sulcimodel.relations_distrib()
-		relations_data_type = self._relations_distrib['data_type']
-		self._relations_descriptor = \
-			descriptorFactory(relations_data_type)
+		if self._relations_distrib:
+			relations_data_type=self._relations_distrib['data_type']
+			self._relations_descriptor = \
+			descriptorFactory(relations_data_type, 'relations')
+		else:	self._relations_descriptor = None
+		self._sulci_distrib = sulcimodel.sulci_distrib()
+		if self._sulci_distrib:
+			sulci_data_type = self._sulci_distrib['data_type']
+			self._sulci_descriptor = descriptorFactory(\
+						sulci_data_type, 'sulci')
+		else:	self._sulci_descriptor = None
 		self._labels_prior = sulcimodel.labels_prior()
 		self._states = sulcimodel.labels()
 		self._states_n = len(self._states)
@@ -308,8 +331,12 @@ class Tagger(object):
 				select_mode, picklename=None):
 		segdescr = self._segments_descriptor
 		reldescr = self._relations_descriptor
-		segdistr = self._segments_distrib['vertices']
-		reldistr = self._relations_distrib['edges']
+		if self._segments_distrib:
+			segdistr = self._segments_distrib['vertices']
+		else:	segdistr = None
+		if self._relations_distrib:
+			reldistr = self._relations_distrib['edges']
+		else:	reldistr = None
 
 		print "compute initialization..."
 		self._availablelabels = {}
@@ -325,18 +352,23 @@ class Tagger(object):
 			self._neighbours[node_index] = set()
 			logli = numpy.zeros(self._states_n, dtype=numpy.float96)
 			li = numpy.zeros(self._states_n, dtype=numpy.float96)
-			for i, label in enumerate(self._states):
-				distrib = segdistr[label]
-				logli[i], li[i] = segdescr.likelihood(\
-						distrib, self._motion, s)
-			if self._init_prior_distr: li *= self._init_priors
-			p = li / li.sum()
+			if segdistr:
+				for i, label in enumerate(self._states):
+					distrib = segdistr[label]
+					logli[i], li[i] = segdescr.likelihood(\
+							distrib, self._motion,s)
+				if self._init_prior_distr:
+					li *= self._init_priors
+				p = li / li.sum()
+			else:	p = li
 			if select_mode == 'threshold': sel = p >= 0.01
 			elif select_mode == 'all': sel = (p == p)
 			elif select_mode != 'store_labels': 
 				sel = [(t == s['label']) \
 					for i, t in enumerate(self._states)]
-			self._seg_potentials[node_index] = -logli[sel]
+			if not self._init_with_segments:
+				self._seg_potentials[node_index] = -logli[sel]
+			else:	self._seg_potentials[node_index] = li[sel] * 0.
 			labels=[t for i, t in enumerate(self._states) if sel[i]]
 			self._availablelabels[node_index] = labels
 			self._labelsind[node_index] = [i for i, t in \
@@ -359,46 +391,48 @@ class Tagger(object):
 
 
 		print "compute potentials and neighbourhood..."
-		graph_edges = reldescr.edges_from_graph(self._graph)
-		if weighting_mode == 'number':
+		if reldescr:
+			graph_edges = reldescr.edges_from_graph(self._graph)
+			if weighting_mode == 'number':
+				for edge_infos in graph_edges.items():
+					(r1, r2), ((v1, v2), edges) = edge_infos
+					seg_edges[r1].append(edges)
+					seg_edges[r2].append(edges)
+			self._rel_potentials = {}
 			for edge_infos in graph_edges.items():
 				(r1, r2), ((v1, v2), edges) = edge_infos
-				seg_edges[r1].append(edges)
-				seg_edges[r2].append(edges)
-		self._rel_potentials = {}
-		for edge_infos in graph_edges.items():
-			(r1, r2), ((v1, v2), edges) = edge_infos
-			self._neighbours[r1].add(r2)
-			self._neighbours[r2].add(r1)
-			# relation potential
-			P12, indices = reldescr.potential_matrix(self._motion,
-				reldistr, edge_infos, self._availablelabels)
-			# segment potential
-			self._rel_potentials[indices] = P12
-			if weighting_mode == 'sizes':
-				w = v1['refsize'] * v2['refsize']
-			elif weighting_mode == 'contact_area':
-				if edges.has_key('cortical'):
-					w = edges['cortical']['reflength']
-				elif edges.has_key('junction'):
-				# note : some buried segments may have cortical
-				# relation missing because the voronoi used to
-				# define the relation is only define in surface.
-				# In this case, I choose to use the length of
-				# the contact area between the 2 segments rather
-				# than those between the 2 voronoi ROIs.
-					w = edges['junction']['reflength']
-				else: # note : strange rare relations
-					w = 0.
-			elif weighting_mode in ['number', 'none']: w = 1.
-			self._rel_potentials[indices] *= w
-			self._seg_weights[r1] += w
-			self._seg_weights[r2] += w
-		if weighting_mode != 'none':
-			for ind, p in self._seg_potentials.items():
-				self._seg_potentials[ind] *= \
-					self._seg_weights[ind]
-		else:	self._normalize_weights = False
+				self._neighbours[r1].add(r2)
+				self._neighbours[r2].add(r1)
+				# relation potential
+				P12, indices = reldescr.potential_matrix(self._motion,
+					reldistr, edge_infos, self._availablelabels)
+				# segment potential
+				self._rel_potentials[indices] = P12
+				if weighting_mode == 'sizes':
+					w = v1['refsize'] * v2['refsize']
+				elif weighting_mode == 'contact_area':
+					if edges.has_key('cortical'):
+						w = edges['cortical']['reflength']
+					elif edges.has_key('junction'):
+					# note : some buried segments may have cortical
+					# relation missing because the voronoi used to
+					# define the relation is only define in surface.
+					# In this case, I choose to use the length of
+					# the contact area between the 2 segments rather
+					# than those between the 2 voronoi ROIs.
+						w = edges['junction']['reflength']
+					else: # note : strange rare relations
+						w = 0.
+				elif weighting_mode in ['number', 'none']: w = 1.
+				self._rel_potentials[indices] *= w
+				self._seg_weights[r1] += w
+				self._seg_weights[r2] += w
+			if weighting_mode != 'none':
+				for ind, p in self._seg_potentials.items():
+					self._seg_potentials[ind] *= \
+						self._seg_weights[ind]
+			else:	self._normalize_weights = False
+		else:	self._rel_potentials = None
 
 		if picklename:
 			fd = open(picklename, 'w')
@@ -451,6 +485,7 @@ class Tagger(object):
 		elif precomputing == 'from_pickle':
 			self.precompute_from_pickle(picklename)
 		self.initialize_prior()
+		self.init_sulci_potentials()
 
 		# infered labels
 		self.algo(mode)
@@ -584,7 +619,10 @@ class Tagger(object):
 			P1 = self._seg_potentials[id1]
 			en_seg += P1[l1]
 		en_rel /= 2.
-		return en_rel + en_seg + self.eval_prior()
+		if self._sulci_descriptor: en_sulci = self._sulci_en.sum()
+		else:	en_sulci = 0.
+		print en_rel, en_seg, self.eval_prior(), en_sulci
+		return en_rel + en_seg + self.eval_prior() + en_sulci
 
 	def local_energy(self, id1):
 		en = numpy.float96(0.)
@@ -596,6 +634,7 @@ class Tagger(object):
 			en += P12[:,l2].T
 		priors = self.eval_priors(id1)
 		en += self._seg_potentials[id1] + priors
+		en += self.eval_sulci_potentials(id1)
 		return en
 
 	def gibbs(self, id1):
@@ -614,7 +653,7 @@ class Tagger(object):
 		l2 = (p < r).sum() # new label
 		chgmt = (l2 != l1)
 		self._taglabels[id1]= l2
-		self.update_prior(id1, l1, l2)
+		self.update(id1, l1, l2)
 
 		return chgmt, delta_e[l2]
 			
@@ -626,8 +665,56 @@ class Tagger(object):
 		l2 = numpy.argmin(en) # new label
 		chgmt = (l2 != l1)
 		self._taglabels[id1] = l2
-		self.update_prior(id1, l1, l2)
+		self.update(id1, l1, l2)
 		return chgmt, delta_e[l2]
+
+	def init_sulci_potentials(self):
+		if not self._sulci_descriptor: return
+		print "init sulci potentials"
+		self._sulci_local_en = {}
+		label_segments = {}
+		for label in range(self._states_n): label_segments[label] = {}
+		for s in self._segments:
+			id = s['index']
+			label = self._labelsind[id][self._taglabels[id]]
+			label_segments[label][id] = s
+		self._label_segments = label_segments
+		self._sulci_descriptor.init(self._motion, self._sulci_distrib,
+						self._states, self._segments)
+
+		# init energy
+		self._sulci_en = numpy.zeros(self._states_n,dtype=numpy.float96)
+		d = self._sulci_descriptor
+		for i in range(self._states_n):
+			self._sulci_en[i] = d.likelihood(self._sulci_distrib,
+						i, self._label_segments[i])
+
+	def eval_sulci_potentials(self, id):
+		if not self._sulci_descriptor: return 0.
+		l1 = self._taglabels[id]
+		tl1 = self._labelsind[id][l1]
+		en = numpy.zeros(len(self._labelsind[id]), dtype=numpy.float96)
+		en2 = numpy.array(self._sulci_en)
+		en2[tl1] = 0.
+
+		segments_tl1 = copy.copy(self._label_segments[tl1])
+		seg = segments_tl1[id]
+		del segments_tl1[id]
+	
+		en_tl1 = self._sulci_descriptor.likelihood(self._sulci_distrib,
+							tl1, segments_tl1)
+		for i, tl2 in enumerate(self._labelsind[id]):
+			segments_tl2 = copy.copy(self._label_segments[tl2])
+			segments_tl2[id] = seg
+			en_tl2 = self._sulci_descriptor.likelihood(\
+				self._sulci_distrib, tl2, segments_tl2)
+			self._sulci_local_en[tl2] = en_tl2
+			en3 = numpy.array(en2)
+			en3[tl2] = 0.
+			if tl1 != tl2:
+				en[i] = en3.sum() + en_tl1 + en_tl2
+			else:	en[i] = en3.sum() + en_tl2
+		return en
 
 	def eval_priors(self, id):
 		'''
@@ -660,16 +747,25 @@ class Tagger(object):
 
 		
 
-	def update_prior(self, id, l1, l2):
+	def update(self, id, l1, l2):
 		'''
     id : segment id
     l1 : local label id (old)
     l2 : local label id (new)
 		'''
-		if not self._labels_prior: return
+		if not self._labels_prior and not self._sulci_descriptor:
+			return
+		# true labels indices
 		l1 = self._labelsind[id][l1]
 		l2 = self._labelsind[id][l2]
-		self._prior_descriptor.update_data(id, l1, l2)
+		if self._labels_prior:
+			self._prior_descriptor.update_data(id, l1, l2)
+		if self._sulci_descriptor:
+			s = self._label_segments[l1][id]
+			del self._label_segments[l1][id]
+			self._label_segments[l2][id] = s
+			self._sulci_en[l1] = self._sulci_local_en[l1]
+			self._sulci_en[l2] = self._sulci_local_en[l2]
 
 	def write_csv(self):
 		fd = open(self._csvname, 'w')
@@ -710,12 +806,14 @@ class OptionParser2(OptionParser):
 	        if getattr(self.values, option.dest) is None:
         		self.error("%s option not supplied" % option)
 	def check(self):
-		option1 = self.get_option('-d')
-		option2 = self.get_option('--distrib_nodes')
+		option1 = self.get_option('--distrib_segments')
+		option2 = self.get_option('--distrib_relations')
+		option3 = self.get_option('--distrib_sulci')
 		if (getattr(self.values, option1.dest) is None) and \
-			(getattr(self.values, option2.dest) is None):
-			self.error("need at least one model among nodes " +
-				"and relations ones")
+			(getattr(self.values, option2.dest) is None) and \
+			(getattr(self.values, option3.dest) is None):
+			self.error("need at least one model among segments " +
+				", relations and sulci.")
 
 
 def parseOpts(argv):
@@ -744,6 +842,10 @@ def parseOpts(argv):
 		dest='distribsegmentsname', metavar = 'FILE', action='store',
 		default = None, help='distribution models for segments ' + \
 		'(default : no model)')
+	models_group.add_option('--distrib_sulci',
+		dest='distribsulciname', metavar = 'FILE', action='store',
+		default = None, help='distribution models for sulci ' + \
+		'(default : no model)')
 	models_group.add_option('--distrib_relations', dest='distribrelname',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models for relations (default : no model)')
@@ -753,7 +855,12 @@ def parseOpts(argv):
 	models_group.add_option('--init-prior', dest='init_priorname',
 		metavar = 'FILE', action='store', default=None,
 		help='prior model for label initialization ' + \
-		'(default : no prior)') #FIXME : ajouter
+		'(default : no prior)')
+	models_group.add_option('--init-with-segments',
+		dest='init_with_segments', action='store_true', default=False,
+		help='use distribution models for segments only to ' + \
+		'initialize labels and select which labels are available ' + \
+		'on each segment')
 	parser.add_option_group(models_group)
 
 	# outputs
@@ -845,8 +952,10 @@ def parseOpts(argv):
 		default=False, help="display and save images of labels " + \
 		"with anatomist during labeling process")
 	misc_group.add_option('--gui-mode', dest='gui_mode', action='store',
-		type='choice', choices=('labels', 'changes'), default='labels',
-		 help="'labels' : display labels, 'changes' : display " + \
+		type='choice', choices=('labels', 'labels_changed', 'changes'),
+		default='labels', help="'labels' : display labels (refresh " + \
+		" after each pass), 'labels_changed' : display labels " + \
+		"(refresh after each change), 'changes' : display " + \
 		"number of changes")
 	misc_group.add_option('--weighting-mode', dest='weighting_mode',
 		metavar = 'MODE', action='store', default='none', type='choice',
@@ -888,6 +997,7 @@ def main():
 	sulcimodel = io.read_full_model(options.graphmodelname,
 		segmentsdistribname=options.distribsegmentsname,
 		reldistribname=options.distribrelname,
+		sulcidistribname=options.distribsulciname,
 		labelspriorname=options.priorname,
 		selected_sulci=selected_sulci)
 	if options.init_priorname:
@@ -896,11 +1006,14 @@ def main():
 	else:	init_prior_distr = None
 
 	# sulci tag
-	tagger = Tagger(sulcimodel, init_prior_distr, graph, motion,
-		options.nrj, options.csvname, selected_sulci, node_indices,
-		anneal_opt, options.normalize_weights)
+	tagger = Tagger(sulcimodel, options.init_with_segments,
+		init_prior_distr, graph, motion, options.nrj, options.csvname,
+		selected_sulci, node_indices, anneal_opt,
+		options.normalize_weights)
 	if options.gui:
 		if options.gui_mode == 'labels': obs = GuiLabelsObserver()
+		elif options.gui_mode == 'labels_changed':
+			obs = GuiLabelsChangedObserver()
 		elif options.gui_mode == 'changes': obs = GuiChangesObserver()
 		tagger.addObserver(obs)
 	if options.lookat_seg_id:

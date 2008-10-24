@@ -13,9 +13,10 @@ from sulci.registration.transformation import RigidTransformation, \
 
 ################################################################################
 class SpamLearner(object):
-	def __init__(self, graphs, ss, selected_sulci,
+	def __init__(self, graphs, input_motions, ss, selected_sulci,
 			sigmas, sigma_value, fromlog):
 		self._graphs = graphs
+		self._input_motions = input_motions
 		self._ss = ss
 		self._selected_sulci = selected_sulci
 		self._sigmas = sigmas
@@ -38,6 +39,8 @@ class SpamLearner(object):
 
 		for i, g in enumerate(self._graphs):
 			motion = aims.GraphManip.talairach(g)
+			if self._input_motions:
+				motion = self._input_motions[i] * motion
 			motions.append(motion)
 			data = {}
 			for v in g.vertices():
@@ -88,10 +91,10 @@ class SpamLearner(object):
 
 
 class GlobalSpamLearner(SpamLearner):
-	def __init__(self, graphs, ss, selected_sulci,
+	def __init__(self, graphs, input_motions, ss, selected_sulci,
 			sigmas, sigma_value, fromlog):
-		SpamLearner.__init__(self, graphs, ss, selected_sulci,
-					sigmas, sigma_value, fromlog)
+		SpamLearner.__init__(self, graphs, input_motions, ss,
+			selected_sulci, sigmas, sigma_value, fromlog)
 
 	def _init_data(self):
 		SpamLearner._init_data(self)
@@ -214,10 +217,10 @@ class GlobalSpamLearner(SpamLearner):
 
 
 class GlobalSpamLearnerLoo(GlobalSpamLearner):
-	def __init__(self, graphs, ss, selected_sulci,
+	def __init__(self, graphs, input_motions, ss, selected_sulci,
 			sigmas, sigma_value, fromlog):
-		GlobalSpamLearner.__init__(self, graphs, ss, selected_sulci,
-					sigmas, sigma_value, fromlog)
+		GlobalSpamLearner.__init__(self, graphs, input_motions, ss,
+			selected_sulci, sigmas, sigma_value, fromlog)
 
 	def learn_spams_loo(self, i, motions):
 		sulci_set = copy.copy(self._sulci_set)
@@ -249,10 +252,10 @@ class GlobalSpamLearnerLoo(GlobalSpamLearner):
 
 
 class LocalSpamLearner(SpamLearner):
-	def __init__(self, graphs, ss, selected_sulci,
+	def __init__(self, graphs, input_motions, ss, selected_sulci,
 			sigmas, sigma_value, fromlog, dir_priors):
-		SpamLearner.__init__(self, graphs, ss, selected_sulci,
-					sigmas, sigma_value, fromlog)
+		SpamLearner.__init__(self, graphs, input_motions, ss,
+				selected_sulci, sigmas, sigma_value, fromlog)
 		self._dir_priors = dir_priors
 
 	def _init_data(self):
@@ -277,10 +280,7 @@ class LocalSpamLearner(SpamLearner):
 		if dir_prior:
 			kappa, mu = dir_prior.kappa(), dir_prior.mu()
 			dir_var = 10. / kappa
-			#dir_var = 10000.
-			#angle_var = numpy.pi / 4.
 			angle_var = (numpy.pi / 4.) ** 2
-			#angle_var = (2 * numpy.pi) ** 2
 			t_var = 100.
 		else:	dir_var = mu = angle_var = t_var = None
 		g = self._gravity_centers[sulcus][None].T
@@ -292,12 +292,14 @@ class LocalSpamLearner(SpamLearner):
 		R, t = reg.optimize(eps=eps, mode='powell')
 		self._old_params[i] = R, t
 		energy = reg.energy()
-		# local transformation (centred at gravity center of sulcus)
-		# to global transformation :
+		# local expression of local sulcus transformation
+		# (centred at gravity center of sulcus
+		local_trans = RigidTransformation(R, t)
+		# global expression of local sulcus transformation 
 		# R.(X - g) + t + g = R.X + (t + g - R.g)
 		t2 = t + g - R * g
-		trans = RigidTransformation(R, t2)
-		return trans, energy
+		global_trans = RigidTransformation(R, t2)
+		return local_trans, global_trans, energy
 
 	def learn_spam(self, sulcus, motions, sulci_set):
 		infos = sulci_set[sulcus]
@@ -320,14 +322,15 @@ class LocalSpamLearner(SpamLearner):
 				print "graph %d/%d" % (i + 1, len(self._graphs))
 			X = X_subjects[i]
 			if X is None:
-				transformations.append(None)
+				transformations.append((None, None))
 				if verbose > 1: print "(skip graph)"
 				continue
-			trans, energy = self.register(sulcus, i, X, spam,
+			local_trans, global_trans, energy = \
+					self.register(sulcus, i, X, spam,
 					dir_prior, verbose - 1)
 			if verbose > 1: print "graph energy :", energy
 			total_energy += energy
-			transformations.append(trans)
+			transformations.append((local_trans, global_trans))
 		total_energy /= len(self._graphs)
 		return transformations, total_energy
 
@@ -343,7 +346,7 @@ class LocalSpamLearner(SpamLearner):
 			R, t = id.copy(), z.copy()
 			trans = RigidTransformation(R, t)
 			self._old_params.append((R, t))
-			transformations.append(trans)
+			transformations.append((trans, trans)) # local / global
 		old_energy = numpy.inf
 		n = 0
 		while 1:
@@ -362,9 +365,10 @@ class LocalSpamLearner(SpamLearner):
 			# compute transformation from subject space
 			cur_motions = []
 			for i in range(len(self._graphs)):
-				trans = transformations[i]
+				local_trans, global_trans = transformations[i]
 				m = self._motions[i]
-				if trans: m = trans.to_motion() * m
+				if global_trans:
+					m = global_trans.to_motion() * m
 				cur_motions.append(m)
 			if n >= maxiter: break
 		spam = self.learn_spam(sulcus, cur_motions, self._sulci_set)
@@ -372,7 +376,8 @@ class LocalSpamLearner(SpamLearner):
 
 	def learn(self, miniter=0., maxiter=numpy.inf, verbose=0):
 		d = dict(zip(self._labels, [None] * len(self._labels)))
-		graph_trans = [copy.copy(d) for i in self._graphs]
+		local_graph_trans = [copy.copy(d) for i in self._graphs]
+		global_graph_trans = [copy.copy(d) for i in self._graphs]
 		spams = []
 		for j, sulcus in enumerate(self._labels):
 			if self._selected_sulci != None and \
@@ -382,18 +387,25 @@ class LocalSpamLearner(SpamLearner):
 			transformations, spam = self.learn_sulcus(sulcus,
 						miniter, maxiter, verbose - 1)
 			spams.append(spam)
-			for i, trans in enumerate(transformations):
-				graph_trans[i][sulcus] = trans
-		trans = [SulcusWiseRigidTransformations(t) for t in graph_trans]
+			for i, (local_trans, global_trans) \
+				in enumerate(transformations):
+				local_graph_trans[i][sulcus] = local_trans
+				global_graph_trans[i][sulcus] = global_trans
+
+		local_trans = [SulcusWiseRigidTransformations(t) \
+					for t in local_graph_trans]
+		global_trans = [SulcusWiseRigidTransformations(t) \
+					for t in global_graph_trans]
 		mixture = distribution_aims.SpamMixtureModel(spams, None)
-		return trans, mixture
+		return zip(local_trans, global_trans), mixture
 
 
 class LocalSpamLearnerLoo(LocalSpamLearner):
-	def __init__(self, graphs, ss, selected_sulci,
+	def __init__(self, graphs, input_motions, ss, selected_sulci,
 			sigmas, sigma_value, fromlog, dir_priors):
-		LocalSpamLearner.__init__(self, graphs, ss, selected_sulci,
-				sigmas, sigma_value, fromlog, dir_priors)
+		LocalSpamLearner.__init__(self, graphs, input_motions, ss,
+					selected_sulci, sigmas, sigma_value,
+					fromlog, dir_priors)
 
 	def learn_spam_loo(self, sulcus, i, motions):
 		sulci_set = copy.copy(self._sulci_set)
@@ -421,11 +433,12 @@ class LocalSpamLearnerLoo(LocalSpamLearner):
 			spam = self.learn_spam_loo(sulcus, i, motions)
 			X = X_subjects[i]
 			if X is None: continue
-			trans, energy = self.register(i, X, spam,
+			local_trans, global_trans, energy = \
+					self.register(i, X, spam,
 					dir_prior, verbose - 1)
 			if verbose > 1: print "graph energy :", energy
 			total_energy += energy
-			transformations.append(trans)
+			transformations.append((local_trans, global_trans))
 		total_energy /= len(self._graphs)
 		return transformations, total_energy
 
@@ -433,7 +446,9 @@ class LocalSpamLearnerLoo(LocalSpamLearner):
 ################################################################################
 def parseOpts(argv):
 	description = 'Compute Spam from a list of graphs.\n' \
-	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg...'
+	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg...\n' \
+	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... -- ' \
+	'motion1.trm motion2.trm...'
 	parser = OptionParser(description)
 	add_translation_option_to_parser(parser)
 	parser.add_option('-d', '--distribdir', dest='distribdir',
@@ -450,7 +465,7 @@ def parseOpts(argv):
 		help='tag only specified manually tagged sulci.')
 	parser.add_option('--data-type', dest='data_type',
 		metavar = 'TYPE', action='store', default = 'simple_surface',
-		help="data type on which spam are learned. Choose one of " \
+		help="data type on which spam are learned. Choose one among " \
 		"'simple_surface', 'bottom' (default : %default)")
 	parser.add_option('--sigma-value', dest='sigma_value',
 		metavar = 'FILE', action='store', default = 2.,
@@ -485,17 +500,30 @@ def parseOpts(argv):
 
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
-	graphnames = args[1:]
-	if len(graphnames) == 0:
+
+	# read inputs
+	inputs = args[1:]
+	if len(inputs) == 0:
 		parser.print_help()
 		sys.exit(1)
+	ind = [i for i, input in enumerate(inputs) if input == '==']
+	if len(ind) == 0:
+		graphnames = inputs
+		input_motions_names = None
+	else:
+		ind = ind[0]
+		graphnames = inputs[:ind]
+		input_motions_names = inputs[ind + 1:]
+	graphs = io.load_graphs(options.transfile, graphnames)
+	if input_motions_names:
+		reader = aims.Reader()
+		input_motions = [reader.read(f) for f in input_motions_names]
+	else:	input_motions = None
+
+	# options
 	if options.sulci is None:
 		selected_sulci = None
 	else:	selected_sulci = options.sulci.split(',')
-	
-	graphs = io.load_graphs(options.transfile, graphnames)
-
-	# options
 	if options.data_type == 'simple_surface':
 		ss = True
 		data_type = 'voxels_aims_ss'
@@ -520,7 +548,7 @@ def main():
 
 	# learn
 	if options.mode == 'global':
-		opt = [graphs, ss, selected_sulci, sigmas,
+		opt = [graphs, input_motions, ss, selected_sulci, sigmas,
 				sigma_value, options.fromlog]
 		if options.loo:
 			Learner = GlobalSpamLearnerLoo
@@ -531,8 +559,8 @@ def main():
 					options.dir_priorsname,
 					selected_sulci=selected_sulci)
 		else:	dir_priors = None
-		opt = [graphs, ss, selected_sulci, sigmas, sigma_value,
-					options.fromlog, dir_priors]
+		opt = [graphs, input_motions, ss, selected_sulci, sigmas,
+				sigma_value, options.fromlog, dir_priors]
 		if options.loo:
 			Learner = LocalSpamLearnerLoo
 		else:	Learner = LocalSpamLearner
@@ -552,9 +580,10 @@ def main():
 			filename = os.path.join(prefix, base + '.trm')
 			transformation.write(filename)
 		elif options.mode == 'local':
+			local_trans, global_trans = transformation
 			dir = os.path.join(base)
-			filename = dir + '.dat'
-			transformation.write(dir, filename)
+			local_trans.write(dir + '_local', dir + '_local.dat')
+			global_trans.write(dir + '_global', dir + '_global.dat')
 
 	# write distributions
 	h = {'model' : 'spam', 'data_type' : data_type, 'files' : {}}

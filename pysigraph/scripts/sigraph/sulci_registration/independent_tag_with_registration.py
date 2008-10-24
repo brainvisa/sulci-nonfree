@@ -16,9 +16,9 @@ from sulci.registration.transformation import SulcusWiseRigidTransformations
 import sulci.registration.spam
 
 class Tagger(object):
-	def __init__(self, sulcimodel, descriptor, graph_data,
-		available_labels, csvname, selected_sulci, node_index,
-		verbose=0):
+	def __init__(self, sulcimodel, gaussians_distrib, descriptor,
+		graph_data, input_motion, available_labels, csvname,
+		selected_sulci, node_index, verbose=0):
 		self._sulcimodel = sulcimodel
 		self._distrib = sulcimodel.segments_distrib()
 		self._descriptor = descriptor
@@ -28,6 +28,7 @@ class Tagger(object):
 			for i, label in enumerate(self._states))
 		self._graph_data = graph_data
 		self._motion = aims.GraphManip.talairach(graph_data)
+		if input_motion: self._motion = input_motion * self._motion
 		self._selected_sulci = selected_sulci
 		self._node_index = node_index
 		self._verbose = verbose
@@ -44,10 +45,28 @@ class Tagger(object):
 		self._X, self._groups = self._create_data_matrix()
 
 		# mixture model
+		self._gravity_centers = []
+		translation_prior, direction_prior, angle_prior = [], [], []
 		models = []
-		for label in self._states:
+		rp = sulcimodel._local_rotations_prior
+		if rp[0]: t_rp = rp[0]['vertices']
+		else: t_rp = None
+		if rp[1]: d_rp = rp[1]['vertices']
+		else: d_rp = None
+		if rp[2]: a_rp = rp[2]['vertices']
+		else: a_rp = None
+		for i, label in enumerate(self._states):
 			distrib = self._distrib['vertices'][label]
 			models.append(distrib)
+			if gaussians_distrib:
+				gd = gaussians_distrib['vertices'][label]
+			g = numpy.asarray(gd.mean()).T
+			self._gravity_centers.append(g)
+			if t_rp: translation_prior.append(t_rp[label])
+			if d_rp: direction_prior.append(d_rp[label])
+			if a_rp: angle_prior.append(a_rp[label])
+		self._local_rotations_prior = translation_prior, \
+					direction_prior, angle_prior
 		Mixture = self._get_mixture_model()
 		self._mixture = Mixture(models, priors)
 
@@ -102,10 +121,17 @@ class Tagger(object):
 
 	def tag(self, mode='global', eps=1, user_func=(lambda self,x : None),
 							user_data=None):
-		opt = [self._X.T, self._mixture, self._groups,
-			self._available_labels, self._verbose]
-		if mode == 'global' : reg = MixtureGlobalRegistration(*opt)
-		elif mode == 'local' : reg = MixtureLocalRegistration(*opt)
+		if mode == 'global' :
+			opt = [self._X.T, self._mixture, self._groups,
+				self._available_labels, self._verbose]
+			reg = MixtureGlobalRegistration(*opt)
+		elif mode == 'local' :
+			rotations_prior = self._local_rotations_prior
+			opt = [self._X.T, self._gravity_centers, self._mixture,
+				rotations_prior[0], rotations_prior[1],
+				rotations_prior[2], self._groups,
+				self._available_labels, self._verbose]
+			reg = MixtureLocalRegistration(*opt)
 		trans, posteriors, loglikelihoods, likelihoods = \
 			reg.optimize(eps=eps, user_func=user_func,
                         user_data=user_data, mode=self._opt_mode)
@@ -234,10 +260,17 @@ def parseOpts(argv):
 		metavar = 'FILE', action='store',
 		default = 'bayesian_graphmodel.dat', help='bayesian model : ' \
 			'graphical model structure (default : %default)')
+	parser.add_option('--input-motion', dest='input_motion',
+		metavar = 'FILE', action='store', default = None,
+		help='motion file (.trm) from Talairach to the ' + \
+		'space of segments model')
 	parser.add_option('--motion', action='store', dest='motion',
                 metavar = 'FILE', default = None,
                 help='output .trm motion file to register data on model')
 	parser.add_option('-d', '--distrib', dest='distribname',
+		metavar = 'FILE', action='store', default = None,
+		help='distribution models')
+	parser.add_option('--distrib-gaussians', dest='distrib_gaussians_name',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')
 	parser.add_option('-c', '--csv', dest='csvname',
@@ -271,6 +304,15 @@ def parseOpts(argv):
 		action='store', default = 'global', help="registration " + \
 		"mode : 'global' (one rotation+translation)  or 'local' " + \
 		"(one rotation+translation by sulcus)")
+	parser.add_option('--translation-prior', dest='translation_prior',
+		metavar = 'FILE', action='store', default=None,
+		help="translation prior (see learn_transformation_prior.py)")
+	parser.add_option('--direction-prior', dest='direction_prior',
+		metavar = 'FILE', action='store', default=None,
+		help="direction prior (see learn_transformation_prior.py)")
+	parser.add_option('--angle-prior', dest='angle_prior',
+		metavar = 'FILE', action='store', default=None,
+		help="angle prior (see learn_transformation_prior.py)")
 
 	return parser, parser.parse_args(argv)
 
@@ -288,6 +330,10 @@ def main():
 	if None in [options.input_graphname, options.distribname]:
 		print "missing option(s)"
 		parser.print_help()
+		sys.exit(1)
+
+	if options.mode == 'local' and options.distrib_gaussians_name is None:
+		print "error : missing gaussian distrib"
 		sys.exit(1)
 
 	if options.node_index:
@@ -308,6 +354,27 @@ def main():
 		selected_sulci=selected_sulci)
 	graph = io.load_graph(options.transfile, options.input_graphname)
 
+	if options.distrib_gaussians_name:
+		gaussians_distrib = io.read_segments_distrib(\
+			options.distrib_gaussians_name, selected_sulci)
+	else:	gaussians_distrib = None
+
+	if options.translation_prior:
+		translation_prior = io.read_segments_distrib(\
+			options.translation_prior, selected_sulci)
+	else:	translation_prior = None
+	if options.direction_prior:
+		direction_prior = io.read_segments_distrib(\
+			options.direction_prior, selected_sulci)
+	else:	direction_prior = None
+	if options.angle_prior:
+		angle_prior = io.read_segments_distrib(\
+			options.angle_prior, selected_sulci)
+	else:	angle_prior = None
+	# hack...
+	sulcimodel._local_rotations_prior = (translation_prior, \
+				direction_prior, angle_prior)
+
 	# format options
 	data_type = sulcimodel.segments_distrib()['data_type']
 	descriptor = descriptorFactory(data_type)
@@ -327,9 +394,12 @@ def main():
 		print "error : unhandle model type '%s'" % model_type
 		sys.exit(1)
 
-	tagger_opt = [sulcimodel, descriptor, graph, availablelabels,
-		options.csvname, selected_sulci, node_index,
-		int(options.verbose)]
+	if options.input_motion:
+		input_motion = aims.Reader().read(options.input_motion)
+	else:	input_motion = None
+	tagger_opt = [sulcimodel, gaussians_distrib, descriptor, graph,
+		input_motion, availablelabels, options.csvname, selected_sulci, 
+		node_index, int(options.verbose)]
 	if model_type == 'gaussian' : d = GaussianTagger(*tagger_opt)
 	elif model_type == 'spam' : d = SpamTagger(*tagger_opt)
 	print "tag..."
@@ -349,7 +419,12 @@ def main():
 				trans.add_transformation(sulcus, t)
 			dir = options.motion
 			filename = options.motion + '.dat'
-			trans.write(dir, filename)
+			print dir, filename
+			try:
+				trans.write(dir, filename)
+			except OSError, e:
+				print e
+				sys.exit(1)
 
 	print_available_labels(options.output_labelsfile, available_labels)
 	graph['filename_base'] = '*'

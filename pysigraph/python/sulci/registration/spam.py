@@ -47,6 +47,11 @@ class SpamRegistration(Registration):
 			id = numpy.identity(3)
 			self._t_prior.setMeanCov(numpy.zeros(3), t_var * id)
 
+	def setPriors(self, translation_prior, direction_prior, angle_prior):
+		self._t_prior = translation_prior
+		self._dir_prior = direction_prior
+		self._angle_prior = angle_prior
+
 	def energy(self):
 		X2 = self._R * (self._X - self._g) + self._t + self._g
 		w_norm = numpy.linalg.norm(self._w)
@@ -59,6 +64,7 @@ class SpamRegistration(Registration):
 			a_logli, a_li = self._angle_prior.likelihood(theta)
 		else:	a_logli, a_li = 0., 1.
 		if self._dir_prior:
+			dir = numpy.asarray(dir).ravel()
 			d_logli, d_li = self._dir_prior.likelihood(dir)
 		else:	d_logli, d_li = 0., 1.
 		if self._t_prior:
@@ -80,8 +86,10 @@ class SpamGroupRegistration(SpamRegistration):
 		self._groups = groups
 
 	def _spam_energy(self, X):
-		return self._spam.weighted_prodlikelihoods_groups(X.T,
+		s_logli, s_li = self._spam.weighted_prodlikelihoods_groups(X.T,
 					self._weights, self._groups)
+		s_logli = s_logli / self._weights.sum()
+		return s_logli, numpy.exp(s_logli)
 
 class SpamMixtureRegistration(Registration):
 	def __init__(self, X, weights, spams_mixture, groups, verbose=0):
