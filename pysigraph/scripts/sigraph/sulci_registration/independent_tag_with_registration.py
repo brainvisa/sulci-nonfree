@@ -60,8 +60,8 @@ class Tagger(object):
 			models.append(distrib)
 			if gaussians_distrib:
 				gd = gaussians_distrib['vertices'][label]
-			g = numpy.asarray(gd.mean()).T
-			self._gravity_centers.append(g)
+				g = numpy.asarray(gd.mean()).T
+				self._gravity_centers.append(g)
 			if t_rp: translation_prior.append(t_rp[label])
 			if d_rp: direction_prior.append(d_rp[label])
 			if a_rp: angle_prior.append(a_rp[label])

@@ -102,9 +102,12 @@ def execution( self, context ):
     moddir = os.path.dirname( self.model_graph.fullPath() )
     # ---
     context.write( _t_( 'clearing any pre-existing model data...' ) )
+    dataname = self.model_graph.fullPaths()[1]
     if not os.path.isdir(moddir): os.makedirs(moddir)
-    for x in os.listdir( moddir ):
-        shelltools.rm( os.path.join( moddir, x ) )
+    if os.path.exists( self.model_graph.fullPath() ):
+      shelltools.rm( self.model_graph.fullPath() )
+    if os.path.exists( dataname ):
+      shelltools.rm( dataname )
 
     context.write( _t_( 'making model nodes...' ) )
     args = [ self.model_graph, self.labels_translation_map,

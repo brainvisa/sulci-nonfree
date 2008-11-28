@@ -33,7 +33,7 @@ def read_graph(graphname, sulci):
 			states.pop()
 			continue
 		if states[-1] == GRAPH_STATE:
-			m = re.match('filename_base[ \t]*(\*[\w\.]*)', line)
+			m = re.match('filename_base[ \t]*([\*\w\.]*)', line)
 			if m:
 				data_dir = m.groups()[0]
 				continue
@@ -78,7 +78,8 @@ def extract_sulci_from_graph(graphname, sulci):
 
 ################################################################################
 def parseOpts(argv):
-	description = 'Extract sulci mesh from several graphs'
+	description = 'Extract sulci mesh from several graphs\n' + \
+		'./extract_mesh.py -s SULCI graph1.arg graph2.arg...'
 	parser = OptionParser(description)
 	parser.add_option('-s', '--sulci', dest='sulci',
 		metavar = 'LIST', action='store', default = None,

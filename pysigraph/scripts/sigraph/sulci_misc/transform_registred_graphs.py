@@ -29,7 +29,8 @@ def parseOpts(argv):
 		help='sulcuswise registration motions')
 	parser.add_option('--label-type', dest='label_type',
 		metavar = 'TYPE', action='store', default = 'name',
-		help='name (real labels) or label (automatic labelling)')
+		help='name (real labels) or label (automatic labelling) ' + \
+		'(default : name)')
 	parser.add_option('--no-talairach', dest='no_talairach',
 		action='store_true', default = False,
 		help='if specified does not apply global transformation to ' + \
@@ -62,13 +63,15 @@ def main():
 		motion_tal.setToIdentity()
 	else:	motion_tal = aims.GraphManip.talairach(graph)
 	if options.global_motion_name:
-		motion_global = aims.Reader().read(option.global_motion_name)
+		motion_global = aims.Reader().read(options.global_motion_name)
 	else:	motion_global = None
 	if options.local_motions_name:
 		motions_local = io.read_from_exec(options.local_motions_name,
 							'transformations')
+		prefix = os.path.dirname(options.local_motions_name)
 		for sulcus, filename in motions_local.items():
-			motions_local[sulcus] = aims.Reader().read(filename)
+			f = os.path.join(prefix, filename)
+			motions_local[sulcus] = aims.Reader().read(f)
 	else:	motions_local = None
 
 	meshes = {}

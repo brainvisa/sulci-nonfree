@@ -16,15 +16,21 @@ def addInfoToCSV(csvfilename, subject, sulci_errors):
 	fd = open(csvfilename, 'a')
 	fcntl.flock(fd.fileno(), fcntl.LOCK_EX)
 	if fd.tell() == 0:
-		h = 'subjects\tsulci\tsize_errors\tbinary_errors\tnode_errors\tSI_error\n'
+		header = ['subjects', 'sulci', 'size_errors', 'binary_errors',
+			'node_errors', 'SI_error', 'false_positive',
+			'false_negative', 'true_positive']
+		h = '\t'.join(header) + '\n'
 		fd.write(h)
 	for sulcus, error_rate in sulci_errors.items():
 		se = error_rate.compute_size_error()
 		ne = error_rate.compute_nodes_error()
                 sie = error_rate.compute_SI_error()
+		fp = error_rate.false_positive()
+		fn = error_rate.false_negative()
+		tp = error_rate.true_positive()
 		be = (se != 0.)
-		fd.write('%s\t%s\t%f\t%f\t%f\t%f\n' % (subject, sulcus, \
-							se, be, ne, sie))
+		fd.write(('%s\t%s' + '\t%f' * 7 + '\n') % (subject, sulcus, \
+			se, be, ne, sie, fp, fn, tp))
 	fcntl.flock(fd.fileno(), fcntl.LOCK_UN)
 	fd.close()
 

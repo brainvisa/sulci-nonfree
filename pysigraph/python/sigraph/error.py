@@ -74,19 +74,19 @@ class SulciError(object):
 		self._sulci_size = 0
 		self._fp = self._fn = self._tp = 0
 
-	def update_positive(self, tp, fp):
-		self._sulci_size += float(tp) + float(fp)
+	def update_name(self, tp, fn):
+		self._sulci_size += float(tp) + float(fn)
 		self._tp += tp
-		self._fp += fp
-		self._error += float(fp)
-		self._sulci_size_for_error += float(tp) + float(fp)
-		if fp: self._bad_tagged_nodes += 1
+		self._fn += fn
+		self._error += float(fn)
+		self._sulci_size_for_error += float(tp) + float(fn)
+		if fn: self._bad_tagged_nodes += 1
 		self._total_nodes += 1
 
-	def update_negative(self, fn):
-		self._fn = fn
-		self._error += float(fn)
-		self._sulci_size_for_error += float(fn)
+	def update_label(self, fp):
+		self._fp = fp
+		self._error += float(fp)
+		self._sulci_size_for_error += float(fp)
 		self._bad_tagged_nodes += 1
 		self._total_nodes += 1
 
@@ -128,19 +128,17 @@ def computeLocalErrorRates(lg, bg, filtred_labels):
 		label = v[autolabel]
 		try: size = v['size']
 		except KeyError: size = 0
-		e = 0
 		if label != name:
 			print "%s -> %s (size : %f)" % (name, label, size)
-			e = size
-			tp, fp = 0, size
-		else:	tp, fp = size, 0
+			tp, fn = 0, size
+		else:	tp, fn = size, 0
 		if not sulci_errors.has_key(name):
 			sulci_errors[name] = SulciError()
-		sulci_errors[name].update_positive(tp, fp)
+		sulci_errors[name].update_name(tp, fn)
 		if label != name:
 			if not sulci_errors.has_key(label):
 				sulci_errors[label] = SulciError()
-			sulci_errors[label].update_negative(fp)
+			sulci_errors[label].update_label(fn)
 	# at the end : labels not in sulci_errors, does not appear
 	# in manual labelling or has been filtred
 	return sulci_errors
@@ -155,7 +153,7 @@ def computeGlobalErrorRates(local_errors):
 		be = (se != 0.)
 		errors.append([se, be, ne, sie])
 		sizes.append(error_rate.sulci_size())
-		fp.append(error_rate.false_positive())
+		fp.append(error_rate.false_negative())
 	errors = numpy.vstack(errors)
 	sizes = numpy.array(sizes)
 	total_size = sizes.sum()
@@ -176,7 +174,7 @@ def computeGlobalErrorRates(local_errors):
 			'Mean_Local_Binary_Error' : errors_weighted_mean[1],
 			'Mean_Local_Nodes_Error' : errors_weighted_mean[2],
 			'Mean_Local_SI_Error' : errors_weighted_mean[3],
-			'Global_Mass_Error' : mass_error}
+			'Global_Mass_Error' : mass_error} # sum F_N /total_size
 		}
 
 

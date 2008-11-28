@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sigraph
 import anatomist.direct.api as anatomist
+import anatomist.cpp as cpp
 from soma import aims
 import datamind.io.old_csvIO as io
 import os, sys, exceptions, numpy
@@ -69,12 +70,16 @@ def read_csv(csvfilename):
 		X2 = X[(sulci == s)]
 		X2m = X2.mean(axis=0)
 		X2s = X2.std(axis=0)
-		sulci_data[s] = X2m, X2s
+		X2sum = X2.sum(axis=0)
+		sulci_data[s] = X2m, X2s, X2sum
 	X3 = numpy.vstack([data[0] for data in sulci_data.values()])
+	X4 = numpy.vstack([data[2] for data in sulci_data.values()])
 	Xm = X3.mean(axis=0)
 	Xs = X3.std(axis=0)
+	Xsum = X4.sum(axis=0)
 	print "global mean over sulci :", Xm
 	print "global std over sulci : ", Xs
+	print "global sum over sulci :", Xsum
 	return labels, sulci_data, mode
 
 def write_summary_csv(csvfilename, labels, sulci_data, mode):
@@ -100,6 +105,9 @@ def parseOpts(argv):
 	parser.add_option('-g', '--graph', dest='graphname',
 		metavar = 'FILE', action='store', default = None,
 		help='data graph')
+	parser.add_option('-m', '--mesh', dest='meshname',
+		metavar = 'FILE', action='store', default = None,
+		help='grey/white mesh in the same space of the input graph')
 	parser.add_option('--csv', dest='csvfilename',
 		metavar = 'FILE', action='store', default = None,
 		help='csv file')
@@ -130,11 +138,18 @@ def main():
 	if options.summarycsvfilename:
 		write_summary_csv(options.summarycsvfilename,
 					labels, sulci_data, mode)
+
+	# graph
 	if not options.graphname: return
 	from soma import aims
 	r = aims.Reader(options = {'subobjectsfilter' : 1})
 	g = r.read(options.graphname)
 	ft.translate(g)
+
+	# mesh
+	if options.meshname:
+		m = aims.Reader().read(options.meshname)
+	else:	m = None
 
 	for v in g.vertices():
 		if v.getSyntax() != 'fold': continue
@@ -148,12 +163,27 @@ def main():
 			v['csv_mean_' + h] = data[0][i]
 			# add only no-null std
 			if data[1][i]: v['csv_std_' + h] = data[1][i]
+			v['csv_sum_' + h] = data[2][i]
 
 	a = anatomist.Anatomist()
 	ag = a.toAObject(g)
 	ag.setColorMode(ag.PropertyMap)
 	ag.setColorProperty('csv_mean_' + labels[0])
 	ag.notifyObservers()
+	aobjects = [ag]
+	if m:
+		am = a.toAObject(m)
+		aobjects.append(am)
+	win = a.createWindow(wintype='3D')
+	win.setHasCursor(0)
+	a.addObjects(aobjects, [win])
+	c = a.getControlWindow()
+	c.SelectWindow(win.internalRep)
+	cpp.ObjectActions.displayGraphChildrenMenuCallback().doit(\
+					[ag.internalRep])
+	c.UnselectAllWindows()
+
+	# qt loop
 	qt.qApp.exec_loop()
 
 if __name__ == '__main__' : main()

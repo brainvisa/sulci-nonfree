@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <minf expander="brainvisa-tree_2.0">
-<l length="2">
+<l length="3">
   <f type="ProcessTree">
     <s name="name">morphometry</s>
     <true name="editable"/>
@@ -80,6 +80,32 @@
         <true name="editable"/>
         <s name="id">BrainvisaShowTranslation</s>
         <none name="name"/>
+      </f>
+    </l>
+  </f>
+  <f type="ProcessTree">
+    <s name="name">t1mri</s>
+    <s name="id">t1mri</s>
+    <true name="editable"/>
+    <l length="1" name="content">
+      <f type="ProcessTree.Branch">
+        <s name="name">segmentationpipeline</s>
+        <s name="id">t1mri/segmentationpipeline</s>
+        <true name="editable"/>
+        <l length="1" name="content">
+          <f type="ProcessTree.Branch">
+            <s name="name">components</s>
+            <s name="id">t1mri/segmentationpipeline/components</s>
+            <true name="editable"/>
+            <l length="1" name="content">
+              <f type="ProcessTree.Leaf">
+                <s name="id">recognition</s>
+                <none name="name"/>
+                <true name="editable"/>
+              </f>
+            </l>
+          </f>
+        </l>
       </f>
     </l>
   </f>

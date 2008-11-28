@@ -63,12 +63,17 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
       v->getProperty( SIA_LABEL, labelV );
       if( label == labelV )
       {
-        v->getProperty("LCR_volume",LCR_volume_vertex);
-        LCR_volume_clique += LCR_volume_vertex;
-        v->getProperty("mid_interface_voxels",mid_inter_voxels_vertex);
-        mid_inter_voxels_clique += mid_inter_voxels_vertex;
-        v->getProperty("thickness_mean",thickness_vertex);
-        thickness += thickness_vertex * mid_inter_voxels_vertex;
+        if( v->getProperty("LCR_volume",LCR_volume_vertex) )
+          LCR_volume_clique += LCR_volume_vertex;
+        // else cout << "no LCR_volume in node\n";
+        if( v->getProperty("mid_interface_voxels",mid_inter_voxels_vertex) )
+        {
+          mid_inter_voxels_clique += mid_inter_voxels_vertex;
+          if( v->getProperty("thickness_mean",thickness_vertex) )
+            thickness += thickness_vertex * mid_inter_voxels_vertex;
+          // else cout << "no thickness_mean in node\n";
+        }
+        // else cout << "no mid_interface_voxels in node\n";
       }
     }
     if(surface_area != 0)
