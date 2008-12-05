@@ -43,8 +43,8 @@ userLevel = 1
 
 signature = Signature(
     'graphs', ListOf( ReadDiskItem( 'Cortical folds graph', 'Graph' ) ),
-    'mri', ReadDiskItem( '3D Volume', 'GIS image' ),
-    'SPAM', WriteDiskItem( '3D Volume', 'GIS image' ),
+    'mri', ReadDiskItem( '3D Volume', 'Aims readable volume formats' ),
+    'SPAM', WriteDiskItem( '3D Volume', 'Aims writable volume formats' ),
     'smoothing', Choice('Yes','No'),
     'smoothing_parameter', Float(),
     'bucket',Choice( 'custom', 'Sulci', 'Simple Surfaces','Bottoms',
@@ -141,17 +141,17 @@ def execution( self, context ):
                     cmd += [ '-b', i ]
                context.system( *cmd )
           else:
-               if self.bucket in ('Sulci'):
+               if self.bucket in ('Sulci',):
                     cmd += [ '-o', temp, '-b', 'aims_ss', '-b', 'aims_bottom', '-b', 'aims_other' ]
                     context.system( *cmd )
-               if self.bucket in ('Bottoms'):               
+               if self.bucket in ('Bottoms',):
                     cmd += [ '-o', temp, '-b', 'aims_bottom' ]
                     context.system( *cmd )
-               if self.bucket in ('Junctions with brain hull'):
+               if self.bucket in ('Junctions with brain hull',):
                     cmd += [ '-o', temp, '-b',
                              'aims_junction', '-s', 'hull_junction' ]
                     context.system( *cmd )
-               if self.bucket in ('Simple Surfaces'):
+               if self.bucket in ('Simple Surfaces',):
                     cmd += [ '-o',temp, '-b', 'aims_ss' ]
                     context.system( *cmd )
           context.system('AimsThreshold', '-i',temp,'-m', 'gt', '-t', '0', '-b','-o', temp  )

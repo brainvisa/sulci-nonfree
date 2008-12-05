@@ -64,6 +64,7 @@ public:
   virtual ~AdapDescr();
 
   virtual sigraph::SiDBLearnable & getSiDBLearnable() = 0;
+  virtual void clearDB();
 
 protected:
   AdapDescr();

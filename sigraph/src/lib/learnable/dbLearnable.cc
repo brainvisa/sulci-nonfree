@@ -14,11 +14,31 @@ DBLearnable::DBLearnable(double *X, double *Y, char *INF,
 	_cols_numbers[2] = dims[2];
 }
 
+DBLearnable::~DBLearnable()
+{
+  clear();
+}
+
 DBVectorLearnable *DBLearnable::operator[](unsigned int ind) const
 {
 	DBVectorLearnable *v = new DBVectorLearnable(this, ind);
 	return v;
 };
+
+void DBLearnable::clear()
+{
+  if( _owned_data )
+  {
+    delete _X;
+    delete _Y;
+    delete _INF;
+  }
+  _X = 0;
+  _Y = 0;
+  _INF = 0;
+  _cols_numbers.clear();
+  _labels_to_indices.clear();
+}
 
 SiVectorLearnable *SiDBLearnable::operator[](unsigned int ind) const
 {

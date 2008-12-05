@@ -31,7 +31,7 @@ class DBLearnable : public Learnable
 	DBLearnable(double *X, double *Y, char *INF, std::vector<int> &dims,
 		bool owned_data);
 
-	virtual ~DBLearnable() {};
+	virtual ~DBLearnable();
 
 	inline DBLearnable(const DBLearnable & db)
 		: Learnable(db)
@@ -85,6 +85,8 @@ class DBLearnable : public Learnable
 	// New allocated VectorLearnable from database slice
 	DBVectorLearnable *operator[](unsigned int ind) const;
 	//@}
+
+        void clear();
 	
 	public:
 	void	setLabels(std::vector<std::string> &labels) {

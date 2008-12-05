@@ -16,6 +16,7 @@ AdapDescr::AdapDescr() : CliqueDescr(), _learnable(NULL)
 
 AdapDescr::~AdapDescr()
 {
+  delete _learnable;
 }
 
 void		AdapDescr::addGeneratedVector(const LearnConstParam *lp)
@@ -81,5 +82,12 @@ void	AdapDescr::updateSiDBLearnable(void)
 SiDBLearnable	&AdapDescr::getSiDBLearnable()
 {
 	return *_learnable;
+}
+
+
+void AdapDescr::clearDB()
+{
+  delete _learnable;
+  _learnable = 0;
 }
 

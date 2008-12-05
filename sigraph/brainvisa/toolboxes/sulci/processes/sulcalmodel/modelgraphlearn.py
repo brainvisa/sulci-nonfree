@@ -80,9 +80,10 @@ def cleanSignature(self):
   self.changeSignature(self.signature)
 
 def parallel_config_directory_callback(self, *args, **kwargs):
-	if self.model_graph is None : return
-	self.parallel_config_directory = os.path.join(os.path.dirname(
-		self.model_graph.fullPath()), 'tasks', self.learning_mode)
+  if self.model_graph is None : return
+  if self.signature.has_key( 'parallel_config_directory' ):
+    self.parallel_config_directory = os.path.join(os.path.dirname(
+      self.model_graph.fullPath()), 'tasks', self.learning_mode)
 
 def updateSignature(self):
   self.changeSignature(self.signature)
@@ -131,6 +132,7 @@ def initialization( self ):
   self.cycles_tst = 400
   self.stopDelay = 950
   self.time = '00:30'
+  self.parallel_config_directory = None
 
   try:
     import pwd
@@ -148,8 +150,9 @@ def execution( self, context ):
       raise RuntimeError( 'learningbase_data_graphs must not be empty' )
     #if len( self.testbase_data_graphs ) == 0:
     #    raise RuntimeError( 'testbase_data_graphs must not be empty' )
-  if self.parallel_config_directory is None \
-         and self.parallelism_mode != 'local':
+  if self.parallelism_mode != 'local' and \
+    ( hasattr( self, 'parallel_config_directory' ) or \
+    self.parallel_config_directory is None ):
     raise RuntimeError( 'parallel_config_directory must be specified in '
                         'parallel execution mode' )
 
@@ -191,7 +194,7 @@ def execution( self, context ):
   context.log( 'siLearn config file', html=f.read() )
   f.close()
 
-  if self.package == 'default':
+  if not hasattr( self, 'package' ) or self.package == 'default':
     silcmd = distutils.spawn.find_executable( 'siLearn.py' )
   else:
     silcmd = os.path.join(package_dir, self.package, 'bin', 'siLearn.py')

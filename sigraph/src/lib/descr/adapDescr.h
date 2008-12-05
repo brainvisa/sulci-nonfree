@@ -71,6 +71,7 @@ namespace sigraph
 			      double outp = 0 );
     ///	Reset (set to zero) all internal stats
     virtual void reset() {}
+    virtual void clearDB();
 
   protected:
     AdapDescr();

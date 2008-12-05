@@ -98,11 +98,13 @@ def execution(self, context):
 		self.parent['tasks'].append(cmd)
 	else:
 		import sigraph.error as sierror
+                # reload( sierror )
 		import sigraph.nrj as sinrj
-		error_rate = str(sierror.computeErrorRate(
+		error_rate = str(sierror.computeErrorRates(
+                                self.base_graph.fullPath(),
 				self.labeled_graph.fullPath(),
-				self.labels_translation.fullPath(),
-				self.base_graph.fullPath()))
+				self.labels_translation.fullPath()
+				))
 		nrj = str(sinrj.computeNrj(self.model.fullPath(),
 				self.labeled_graph.fullPath(),
 				self.labels_translation.fullPath()))
@@ -110,4 +112,3 @@ def execution(self, context):
 		self.parent['nrj'] = nrj
 		context.write('Error rate = ' + error_rate + '%')
 		context.write('Energy = ' + nrj)
-		fd.close()

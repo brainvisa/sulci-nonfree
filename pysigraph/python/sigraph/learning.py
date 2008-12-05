@@ -65,7 +65,19 @@ def trainer_trainOne( self, it, obj):
 	mgraph = self.getGraphModel()
 	modelfilename = mgraph['aims_reader_filename']
 	prefix = os.path.dirname(modelfilename)
+        try:
+          fnamebase = mgraph['filename_base']
+        except:
+          fnamebase = '*'
+        if fnamebase == '*':
+          fnamebase = os.path.basename(modelfilename)
+          p = fnamebase.rfind( '.' )
+          if p >= 0:
+            fnamebase = fnamebase[:p]
+          fnamebase += '.data'
 	if prefix == '' : prefix = '.'
+        prefix = os.path.join( prefix, fnamebase )
+        # print 'prefix:', prefix
 	m = self.mode()
 	opt = {}
 	opt['dimreduction'] = par.dimreduction_mode
@@ -128,6 +140,8 @@ def write_database_from_c_plus_plus(ad, prefix):
 	w = io.WriterCsv()
 	csv_filename = ad.getDataBaseName(prefix) + '.data'
 	minf_filename = ad.getDataBaseName(prefix) + '.minf'
+        # print 'csv_filename:', csv_filename
+        # print 'minf_filename:', minf_filename
 	sigraph_dic = {
 		'split' : learnable.getSplit(),
 		'cycles' : learnable.getCycles(),
@@ -139,6 +153,7 @@ def write_database_from_c_plus_plus(ad, prefix):
 		'user' : ('sigraph', sigraph_dic)
 		}
 	w.write(csv_filename, db, header, minf_filename)
+        descr.clearDB()
 
 def trainer_readAndTrain(self, it, prefix, opt):
 	return it.adaptive().train(prefix, opt)

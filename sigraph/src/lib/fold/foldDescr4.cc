@@ -80,7 +80,7 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
     {
       fold_opening = LCR_volume_clique/surface_area;
     }
-      
+
     else
     {
       fold_opening = 10000;
@@ -89,12 +89,16 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
       thickness = thickness/mid_inter_voxels_clique;
     else
       thickness = 0;
-    
-    
+
     vec.push_back(thickness);
     vec.push_back(fold_opening);
-    
-  
+
+  }
+  else
+  {
+    // invalid vector
+    vec.push_back( 0. );
+    vec.push_back( 0. );
   }
 
   return vec_valid;

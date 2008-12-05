@@ -113,6 +113,13 @@ class SulciError(object):
 	def false_negative(self): return self._fn
 	def true_positive(self): return self._tp
 
+        def __repr__( self ):
+          return 'sulci_size: ' + str( self.sulci_size() ) \
+            + '\nfalse_positive: ' + str( self.false_positive() ) \
+            + '\nfalse_negative: ' + str( self.false_negative() ) \
+            + '\ntrue_positive: ' + str( self.true_positive() ) \
+            + '\nSI_error: ' + str( self.compute_SI_error() )
+
 
 def computeLocalErrorRates(lg, bg, filtred_labels):
 	corresp = {}
