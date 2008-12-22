@@ -12,6 +12,36 @@ from sulci.registration.transformation import RigidTransformation, \
 
 
 ################################################################################
+def compute_gravity_centers(sulci_set, input_motions=None,
+				local_transformations=None):
+	'''
+    Compute sulcuswise gravity centers.
+    sulci_set :     sulcuswise/subjectwise info (local gravity centers
+                    in Talairach space)
+    input_motions : subjectwise global motion (applied first)
+    local_transformations : sulcuswise/subjectwise transformations (applied
+                            in a second time)
+	'''
+	gravity_centers = {}
+	for sulcus, data in sulci_set.items():
+		db = []
+		for i, h in data.items():
+			g = h['gravity_center']
+			if input_motions:
+				motion = input_motions[i]
+			else:
+				motion = aims.Motion()
+				motion.setToIdentity()
+			if transformations:
+				local_trans = local_transformations[i][sulcus]
+				local_motion = local_trans.to_motion()
+				motion = local_motion * motion
+			db.append(motion.transform(g))
+		distr = distribution.Gaussian()
+		gravity_centers[sulcus] = distr.fit(db)
+	return gravity_centers
+
+################################################################################
 class SpamLearner(object):
 	def __init__(self, graphs, input_motions, ss, selected_sulci,
 			sigmas, sigma_value, fromlog):
@@ -39,6 +69,7 @@ class SpamLearner(object):
 
 		for i, g in enumerate(self._graphs):
 			motion = aims.GraphManip.talairach(g)
+			filename = g['aims_reader_filename']
 			if self._input_motions:
 				motion = self._input_motions[i] * motion
 			motions.append(motion)
@@ -50,20 +81,27 @@ class SpamLearner(object):
 					name not in self._selected_sulci:
 					continue
 				labels.add(name)
-				filename = g['aims_reader_filename']
+				c = v['refgravity_center']
+				w = v['refsize']
 				if sulci_set.has_key(name):
 					h = sulci_set[name]
 					if h.has_key(i):
 						h[i]['vertices'] += [v]
+						h[i]['gravity_center'][0].append(c)
+						h[i]['gravity_center'][1].append(w)
 					else:
 						h[i] = {
 							'vertices' : [v],
-							'name' : filename
+							'name' : filename,
+							'gravity_center' : \
+								[[c], [w]]
 						}
 				else:
 					sulci_set[name] = {
 						i : {'vertices' : [v],
-						     'name' : filename}
+						     'name' : filename,
+						     'gravity_center' : \
+								[[c], [w]] }
 						}
 				ss_map = v[bucket_name].get()
 				size_in = numpy.array([ss_map.sizeX(),
@@ -76,18 +114,19 @@ class SpamLearner(object):
 				if data.has_key(name):
 					data[name].append(X)
 				else:	data[name] = [X]
-				c = v['refgravity_center']
-				if gravity_centers.has_key(name):
-					gravity_centers[name].append(c)
-				else:	gravity_centers[name] = [c]
+			for sulcus, data in sulci_set.items():
+				d = data[i]
+				C = d['gravity_center'][0]
+				W = d['gravity_center'][1]
+				d['gravity_center'] = numpy.dot(W, C)
+
 			subjects_data.append(data)
-		for sulcus, C in gravity_centers.items():
-			gravity_centers[sulcus] = numpy.mean(C, axis=0)
+		self._gravity_centers = compute_gravity_centers(sulci_set,
+							self._input_motions)
 		self._subjects_data = subjects_data
 		self._sulci_set = sulci_set
 		self._labels = labels
 		self._motions = motions
-		self._gravity_centers = gravity_centers
 
 
 class GlobalSpamLearner(SpamLearner):
@@ -283,7 +322,8 @@ class LocalSpamLearner(SpamLearner):
 			angle_var = (numpy.pi / 4.) ** 2
 			t_var = 100.
 		else:	dir_var = mu = angle_var = t_var = None
-		g = self._gravity_centers[sulcus][None].T
+		g = numpy.asarray(self._gravity_centers[sulcus].mean()).T
+
 		reg = SpamRegistration(spam, g, X.T,
 			R_angle_var=angle_var, R_dir_var=dir_var,
 			R_dir_mean=mu, t_var=t_var, verbose=verbose-1)
@@ -292,14 +332,13 @@ class LocalSpamLearner(SpamLearner):
 		R, t = reg.optimize(eps=eps, mode='powell')
 		self._old_params[i] = R, t
 		energy = reg.energy()
-		# local expression of local sulcus transformation
-		# (centred at gravity center of sulcus
-		local_trans = RigidTransformation(R, t)
 		# global expression of local sulcus transformation 
-		# R.(X - g) + t + g = R.X + (t + g - R.g)
-		t2 = t + g - R * g
-		global_trans = RigidTransformation(R, t2)
-		return local_trans, global_trans, energy
+		# from t_g : local translation expressed in g referential
+		# R.(X - g) + t_g + g = R.X + (t_g + g - R.g)
+		# t0 : translation expressed in global referential : (g = 0)
+		t0 = t + g - R * g
+		global_trans = RigidTransformation(R, t0)
+		return global_trans, energy
 
 	def learn_spam(self, sulcus, motions, sulci_set):
 		infos = sulci_set[sulcus]
@@ -325,12 +364,11 @@ class LocalSpamLearner(SpamLearner):
 				transformations.append((None, None))
 				if verbose > 1: print "(skip graph)"
 				continue
-			local_trans, global_trans, energy = \
-					self.register(sulcus, i, X, spam,
+			global_trans, energy = self.register(sulcus, i, X, spam,
 					dir_prior, verbose - 1)
 			if verbose > 1: print "graph energy :", energy
 			total_energy += energy
-			transformations.append((local_trans, global_trans))
+			transformations.append(global_trans)
 		total_energy /= len(self._graphs)
 		return transformations, total_energy
 
@@ -346,7 +384,7 @@ class LocalSpamLearner(SpamLearner):
 			R, t = id.copy(), z.copy()
 			trans = RigidTransformation(R, t)
 			self._old_params.append((R, t))
-			transformations.append((trans, trans)) # local / global
+			transformations.append(trans) # global transformation
 		old_energy = numpy.inf
 		n = 0
 		while 1:
@@ -365,7 +403,7 @@ class LocalSpamLearner(SpamLearner):
 			# compute transformation from subject space
 			cur_motions = []
 			for i in range(len(self._graphs)):
-				local_trans, global_trans = transformations[i]
+				global_trans = transformations[i]
 				m = self._motions[i]
 				if global_trans:
 					m = global_trans.to_motion() * m
@@ -379,7 +417,7 @@ class LocalSpamLearner(SpamLearner):
 		local_graph_trans = [copy.copy(d) for i in self._graphs]
 		global_graph_trans = [copy.copy(d) for i in self._graphs]
 		spams = []
-		for j, sulcus in enumerate(self._labels):
+		for sulcus in self._labels:
 			if self._selected_sulci != None and \
 				sulcus not in self._selected_sulci:
 				continue
@@ -387,10 +425,20 @@ class LocalSpamLearner(SpamLearner):
 			transformations, spam = self.learn_sulcus(sulcus,
 						miniter, maxiter, verbose - 1)
 			spams.append(spam)
-			for i, (local_trans, global_trans) \
-				in enumerate(transformations):
+			for i, global_trans in enumerate(transformations):
+				global_graph_trans[i][sulcus] = transformations
+
+		# gravity_centers in optimized referential space
+		self._new_gravity_centers = compute_gravity_centers(sulci_set,
+				self._input_motions, global_graph_trans)
+		for sulcus in self._labels:
+			for i, g in enumerate(self._graphs):
+				trans = global_graph_trans[i][sulcus]
+				R, t0 = trans._R, trans._t
+				g = self._new_gravity_centers[sulcus]
+				tg = t0 + R * g - g
+				local_trans = RigidTransformation(R, tg)
 				local_graph_trans[i][sulcus] = local_trans
-				global_graph_trans[i][sulcus] = global_trans
 
 		local_trans = [SulcusWiseRigidTransformations(t) \
 					for t in local_graph_trans]
@@ -433,12 +481,11 @@ class LocalSpamLearnerLoo(LocalSpamLearner):
 			spam = self.learn_spam_loo(sulcus, i, motions)
 			X = X_subjects[i]
 			if X is None: continue
-			local_trans, global_trans, energy = \
-					self.register(i, X, spam,
+			global_trans, energy = self.register(i, X, spam,
 					dir_prior, verbose - 1)
 			if verbose > 1: print "graph energy :", energy
 			total_energy += energy
-			transformations.append((local_trans, global_trans))
+			transformations.append(global_trans)
 		total_energy /= len(self._graphs)
 		return transformations, total_energy
 
@@ -457,6 +504,9 @@ def parseOpts(argv):
 		help='output distribution directory (default : %default).' \
 			'A file named FILE.dat is created to store ' \
 			'labels/databases links.')
+	parser.add_option('--distrib-gaussians', dest='distrib_gaussians',
+		metavar = 'DIR', action='store', default = None,
+		help='output distrib model of gravity centers')
 	parser.add_option('--dir-priors', dest='dir_priorsname',
 		metavar = 'FILE', action='store', default = None,
 		help='von mises Fisher prior on sulcuswise rotation directions')
@@ -584,6 +634,25 @@ def main():
 			dir = os.path.join(base)
 			local_trans.write(dir + '_local', dir + '_local.dat')
 			global_trans.write(dir + '_global', dir + '_global.dat')
+	if options.mode == 'local':
+		gravity_centers = learner._new_gravity_centers
+		prefix = options.distrib_gaussians
+		try:    os.mkdir(prefix)
+		except OSError, e:
+			print e
+			sys.exit(1)
+		h = {'data_type' : 'refgravity_center', 'files' : {},
+			'level' : 'segments'}
+		for sulcus, distr in gravity_centers.items():
+			filename = io.node2densityname(prefix,'gaussian',sulcus)
+			distr.write(filename)
+			h['files'][sulcus] = (distr.name(), filename)
+		summary_file = options.distrib_gaussians + '.dat'
+		fd = open(summary_file, 'w')
+		fd.write('distributions = \\\n')
+		p = pprint.PrettyPrinter(indent=4, width=1000, stream=fd)
+		p.pprint(h)
+		fd.close()
 
 	# write distributions
 	h = {'model' : 'spam', 'data_type' : data_type, 'files' : {}}

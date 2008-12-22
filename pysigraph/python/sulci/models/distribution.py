@@ -1985,6 +1985,132 @@ class TwoGaussiansMixtureModel(MixtureModel):
 
 
 ################################################################################
+class Rbf(Distribution):
+	'''
+    Rbf to approximate a distribution.
+
+    mode : 'multiquadric', 'inverse multiquadric', 'gaussian',
+           'normalized_gaussian', 'cubic', 'quintic', 'thin-plate'.
+	   default : gaussian
+
+    std :  std of gaussian
+    W :    weights
+    C :    centers
+    normalize_kernel:  True: rowwise normalization of kernel.
+                       False: no normalization
+            ___
+    P(X) = \\   w_i * K(x, C_i)    with K(x, C_i) ~ Gaussian with std
+            /__
+	     i
+	'''
+	def __init__(self, mode='gaussian', std=2.,
+			normalize_kernel=False, W=None, C=None):
+		Distribution.__init__(self)
+		self._name = 'rbf'
+		self._mode = mode
+		self._std = std
+		self._normalize_kernel = normalize_kernel
+		self._W = W
+		self._C = C
+
+	def _call_kernel(self, X, Y, normalize=False):
+		X = X.T[..., :, numpy.newaxis]
+		Y = Y.T[..., numpy.newaxis, :]
+		R = ((X - Y)**2).sum(axis=0) # square norm
+		K = self._kernel(R)
+		if normalize:
+			return (K.T / K.sum(axis=1)).T
+		else:	return K
+	
+	def _kernel(self, r):
+		if self._mode == 'multiquadric':
+			return numpy.sqrt(1.0 / ((self._std ** 2) * r) + 1)
+		elif self._mode == 'inverse multiquadric':
+			1.0 / numpy.sqrt(1.0 / ((self._std ** 2) * r) + 1)
+		if self._mode == 'gaussian':
+			return numpy.exp(-r / (self._std ** 2))
+		elif self._mode == 'normalized_gaussian':
+			N = (numpy.sqrt(2 * numpy.pi) * self._std) ** 3
+			return numpy.exp(-r / (2. * self._std ** 2)) / N
+		elif self._mode == 'cubic':
+			return r ** 3
+		elif self._mode == 'quintic':
+			return r ** 5
+		elif self._mode == 'thin-plate':
+			res = numpy.array(r, copy=True)
+			res[r == 0] = 0
+			nz = r != 0
+			rnz = r[nz]
+			res[nz] = (rnz ** 2) * numpy.log(rnz)
+			return res
+
+	def fit_from_Spam(self, spam, n=100, pct=0.1, weighted=True,
+			interpolation=True, normalize_weights=False):
+		'''
+    Fit a Rbf on a 3D SPAM model.
+
+    spam :    Spam model
+    n :       number of Rbf
+    pct :     pct of random data taken to represent the spam before fitting
+    weighted: True:  use spam likelihoods to weight vector quantization
+              False: no weights (uniform weights), classic vector quantization
+    interpolation:  True:  interpolate data : KW = Y  =>  W = K.I Y
+                    False: approximate data (mean square error on selected
+                           data from spam with pct)
+                    E = ||KW - Y||^2  =>  W = (K.T K).I K.T Y
+    normalize_weights:  True:  add constraint: sum_i w_i = 1
+                               E = ||KW - Y||^2 + lambda (sum_i w_i -1)
+                         False: no constraint
+		'''
+		import my_vq
+		import scipy.cluster as C
+		# select uniformly data in spam bounding box
+		t = numpy.array(spam._bb_talairach_offset)
+		s = numpy.array(spam._bb_talairach_size)
+		n1 = numpy.prod(s) * pct
+		X = numpy.random.uniform(t, t + s, (n1, 3))
+
+		# select n data according to spam likelihoods
+		if weighted or not interpolation:
+			logli, Y = spam.likelihoods(X, shift=0.)
+		if weighted:
+			self._C, l = my_vq.kmeans(X, n, weights=Y)
+		else:	self._C, l = C.vq.kmeans(X, n)
+		logli, Y2 = spam.likelihoods(self._C, shift=0.)
+
+		# Rbf estimation
+		if interpolation:
+			K = self._call_kernel(self._C, self._C,
+					self._normalize_kernel)
+			self._W = scipy.linalg.solve(K, Y2)
+		else:
+			K = numpy.asmatrix(self._call_kernel(X, self._C,
+					self._normalize_kernel))
+			Y = numpy.asmatrix(Y).T
+			KTKI = (K.T*K).I
+			KTY = K.T * Y
+			W = KTKI * KTY
+			if normalize_weights:
+				half_lambda = (W.sum(axis=0) - 1.) / KTKI.sum()
+				W = KTKI * (KTY - half_lambda)
+			self._W = numpy.asarray(W).ravel()
+
+	def likelihoods(self, X):
+		K = self._call_kernel(X, self._C, self._normalize_kernel)
+		li = numpy.dot(K, self._W)
+		return numpy.log(li), li
+
+	def toTuple(self):
+		return (self._mode, self._std, self._normalize_kernel,
+			self._W, self._C)
+
+	def fromTuple(self, tuple):
+		self._mode, self._std, self._normalize_kernel, \
+			self._W, self._C = tuple
+
+
+
+################################################################################
 distribution_map = { \
 	'full_gaussian' : Gaussian,
 	'diagonal_gaussian' : DiagonalGaussian,
@@ -2010,6 +2136,7 @@ distribution_map = { \
 	'shifted_dirichlet' : ShiftedDirichlet,
 	'generalized_dirichlet' : GeneralizedDirichlet,
 	'shifted_generalized_dirichlet' : ShiftedGeneralizedDirichlet,
+	'rbf' : Rbf,
 	'gaussian_mixture' : GaussianMixtureModel,
 	'gamma_exponential_mixture' : GammaExponentialMixtureModel,
 	'two_gaussians_mixture' : TwoGaussiansMixtureModel,

@@ -501,8 +501,8 @@ class PySpam(Distribution):
 			pos = tuple([0] + p_out[::-1].tolist())
 			val = P[pos]
 			if val:
-				loglikelihood.append(numpy.log(P[pos]))
-			else:   loglikelihood.append(-50)
+				loglikelihoods.append(numpy.log(P[pos]))
+			else:   loglikelihoods.append(-50)
 		loglikelihoods = numpy.array(loglikelihoods)
 		likelihoods = numpy.exp(numpy.float96(loglikelihoods) + shift)
 		del P
