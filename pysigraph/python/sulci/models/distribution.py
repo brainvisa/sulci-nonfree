@@ -244,6 +244,7 @@ class Gaussian(Distribution):
 		except AttributeError:
 			X = db
 		n = X.shape[0]
+		if n <= 1: n = 2 # prevent NaN
 		X = numpy.asmatrix(X)
 		Xm = X.mean(axis=0)
 		Xc = X - Xm
@@ -375,10 +376,10 @@ class FixedSphericalGaussian(Gaussian):
 	'''
     Multivariate Spherical with fixed std
 	'''
-	def __init__(self):
+	def __init__(self, std=None):
 		Gaussian.__init__(self)
 		self._name = 'spherical_gaussian_fixed'
-		self._std = None
+		self._std = std
 
 	def _compute_norm(self):
 		ndim = len(self._mean)
@@ -398,7 +399,10 @@ class FixedSphericalGaussian(Gaussian):
 		if self._mean != None: self._compute_norm()
 
 	def fit(self, db):
-		X = numpy.asmatrix(db.getX())
+		try:	X = db.getX()
+		except AttributeError:
+			X = db
+		X = numpy.asmatrix(X)
 		Xm = X.mean(axis=0)
 		self._mean = Xm
 		self._cov = numpy.asmatrix(self._std * \
@@ -2109,6 +2113,265 @@ class Rbf(Distribution):
 			self._W, self._C = tuple
 
 
+class Gmm(Distribution):
+	'''
+    Gaussian Mixture Model
+
+    C : array of gaussian means
+    S : list of gaussian covariance matrices
+    pi : gaussian priors (weights)
+    
+    Ref with some details :
+    - "Summarising Contextual Activity and Detecting Unusual Inactivity
+       in a Supportive Home Environment", S.J. McKenna, H. Nait-Charif
+       * p.8 for GMM without any prior
+       * p.10 for GMM with priors
+	'''
+	def __init__(self, C=None, S=None, pi=None):
+		Distribution.__init__(self)
+		self._name = 'gmm'
+		self._C = C
+		self._S = S
+		self._pi = pi
+		if C is not None:
+			self._k = len(C)
+		else:	self._k = None
+
+	def update(self):
+		self._Sinv = []
+		self._det = []
+		for i in range(self._k):
+			S = self._S[i].astype('float')
+			Sinv = numpy.linalg.inv(S)
+			det = numpy.fabs(numpy.linalg.det(S))
+			self._Sinv.append(Sinv)
+			self._det.append(det)
+		self._det = numpy.array(self._det)
+
+	def fit(self, X, k, weights=None, M=0., tau=0.,
+		S0=0., theta=0., alpha=1., eps=10e-3,
+		itermin=100, itermax=1000, verbose=0):
+		'''
+    -- basic --
+    X:        data
+    k:        number of gaussians
+    weights:  weights attach to data, weights.sum() is used to specify
+              the real number of data.
+              If None, weights equal [1...1] for all data, so the real number of
+	      data is len(X).
+
+    -- Priors -- (default value: no prior)
+    M:        gaussian centers priors (same shape as C).
+              if M == 'auto': init of EM is used to set the prior.
+    tau:      scale parameter over M prior (one per gaussian)
+    S0:       Wishart mean prior(shape/scale parameter) over covariance matrices
+    theta:    Wishart freedom degree parameter (control the reliability of S0)
+    alpha:    Dirichlet prior over gaussian priors.
+
+    -- stop EM -- (energy : likelihood of the gmm)
+    eps:      EM stop when energy enhancement is less than eps. The energy is
+              normalized by (weights.sum()).
+    itermin:  min iteration before stopping EM.
+    itermax:  max iteration before stopping EM.
+
+    -- misc --
+    verbose:  verbosity level. 0: no message. >0: more and more messages.
+
+
+    Return Value : BIC
+		'''
+		import my_vq
+		import scipy.cluster as C
+
+		# init E-step with kmeans
+		W = weights
+		if W is not None:
+			C, labels = my_vq.kmeans2(X, k, weights=W)
+			n = W.sum()
+		else:
+			C, labels = C.vq.kmeans2(X, k)
+			n = len(X)
+		self._dim = C.shape[1]
+		# some clusters may be missing
+		ind = numpy.unique1d(labels)
+		C = C[ind]
+		self._k = len(ind)
+		P = [((labels == i) + 0.) for i in ind]
+		P = numpy.vstack(P)
+
+		# priors formatting
+		if M != 'auto':
+			if (len(M.shape) == 1 or M.shape[0] == 1):
+				M = numpy.repeat(M.reshape(1, -1), self._k, 0)
+		else:	M = C.copy()
+		if not isinstance(tau, numpy.ndarray):
+			tau = numpy.repeat(tau, self._k)
+		if not isinstance(S0, list):
+			S0 = [S0] * self._k
+		if not isinstance(theta, numpy.ndarray):
+			theta = numpy.repeat(theta, self._k)
+		if not isinstance(alpha, numpy.ndarray):
+			alpha = numpy.repeat(alpha, self._k)
+		for i in range(self._k): S0[i] = S0[i] * theta[i]
+		alpha1 = alpha - 1
+
+
+
+		# P : posteriors
+		# W : data weights
+		# S : Covariance matrix
+		# pi : priors
+		en = 0 
+		olden = eps + 1
+		t = 0
+		while 1:
+			# weights
+			if W is not None: P = P * W
+
+			# M-step
+			Psum = P.sum(axis=1)
+			self._C = numpy.dot(P, X) + (M.T * tau).T
+			self._C = (self._C.T / (Psum + tau)).T
+			self._S = []
+			for i in range(self._k):
+				X2 = X - C[i]
+				M2 = M[i] - C[i]
+				S = numpy.dot(X2.T, (X2.T * P[i]).T) + \
+					S0[i] + tau[i] * numpy.dot(M2.T, M2)
+				self._S.append(S / (Psum[i] + theta[i]))
+			self._pi = P.sum(axis=1) + n * alpha1
+			self._pi /= self._pi.sum()
+
+			# energy
+			self.update()
+			logL = self.modelwise_loglikelihoods(X)
+			logL[numpy.isnan(logL)] = -1000
+			L = (numpy.exp(logL).T * self._pi).T
+			tr = 0.
+			for i in range(self._k):
+				tr += numpy.trace(S0[i] * self._Sinv[i])
+			en = (P * logL).sum() + \
+				numpy.dot(alpha1, numpy.log(self._pi)) - \
+				0.5 * (numpy.dot(theta,numpy.log(self._det))+tr)
+			en /= n
+			if verbose >= 1: print "%d) en = %f" % (t, en)
+			if ((t > itermin) and (en <= olden) \
+				and (olden - en < eps)) or (t > itermax):
+				break
+			t += 1
+			olden = en
+
+			# E-step : posteriors
+			# log is too negative for all labels, the sum is null
+			# For the posteriors, the argmax label posterior is set
+			# to 1 and the others to 0.
+			Lsum = L.sum(axis=0)
+			Lsumz = (Lsum == 0)
+			Lsum[Lsumz] = 1.
+			P = L / Lsum
+			P[:, Lsumz] = 0.
+			m = numpy.argmax(P, axis=0)
+			id = numpy.argwhere(Lsum).ravel().tolist()
+			P[m[id], numpy.arange(P.shape[1])[id]] = 1.
+		if W is not None:
+			li = numpy.dot(numpy.log(L.sum(axis=0)), W)
+		else:	li = numpy.sum(numpy.log(L.sum(axis=0)))
+		free_deg = self._k * (self._dim + 1 + (self._dim ** 2) / 2.) - 1
+		bic = -2 * li + free_deg * numpy.log(n)
+		return bic
+
+	def modelwise_loglikelihoods(self, X):
+		'''
+    return P(X|L=l) P(L=l), one row for each label l
+		'''
+		L = []
+		halfdim = self._dim / 2.
+		for i in range(self._k):
+			X2 = X - self._C[i]
+			D = - 0.5 * (numpy.dot(X2,self._Sinv[i])*X2).sum(axis=1)
+			logZ = 0.5 * numpy.log(self._det[i]) + \
+				halfdim * numpy.log(2 * numpy.pi)
+			L.append(D - logZ)
+		return numpy.vstack(L)
+
+	def likelihoods(self, X):
+		logL = self.modelwise_loglikelihoods(X)
+		L = numpy.exp(logL)
+		li = numpy.dot(self._pi, L)
+		return numpy.log(li), li
+
+	def toTuple(self):
+		return self._C, self._S, self._pi, self._k
+
+	def fromTuple(self, tuple):
+		self._C, self._S, self._pi, self._k = tuple
+		self._dim = self._C.shape[1]
+
+
+class GmmFromSpam(Gmm):
+	def __init__(self, *args, **kwargs):
+		Gmm.__init__(self, *args, **kwargs)
+		self._name = 'gmm_from_spam'
+		# additional data from display purpose
+		self._bb_talairach_offset = None
+		self._bb_talairach_size = None
+
+	def bb_talairach(self):
+		return self._bb_talairach_offset, self._bb_talairach_size
+
+	def is_fromlog(self): return False
+
+	def fit(self, spam, n, k=10, freq=3, eps=1., itermin=100, itermax=1000, verbose=0):
+		'''
+    Fit a Gmm on a 3D SPAM model.
+
+    spam :    Spam model
+    n :       number of data (number of voxels used to estimate spam)
+    k :       number of gaussians
+    freq :    take 1 / freq on each dimension, so (1 / freq)^dim amon all data.
+              freq must be an integer.
+    eps :     EM stop when energy enhancement is less than eps.
+		'''
+		from numpy.lib import index_tricks
+		
+		# read weights
+		t, s = spam.bb_talairach()
+		t = numpy.array(t)
+		s = numpy.array(s)
+		self._bb_talairach_offset = t.copy()
+		self._bb_talairach_size = s.copy()
+		shape = tuple((s[::-1] - 1) / freq)
+		X = numpy.array([x for x in index_tricks.ndindex(shape)])
+		X *= freq
+		X += t
+		logli, W = spam.likelihoods(X, shift=0.)
+
+		# parameters
+		M = 'auto'
+		tau = 1. / 4 ** 2
+		theta = 20
+		S0_sigma = 5
+		S0 = numpy.identity(3) * (S0_sigma ** 2)
+		alpha = 1.05
+		Wz = W > 10e-10
+		W = W[Wz]
+		X = X[Wz]
+		W = (W * n) / W.sum()
+
+		# fit
+		return Gmm.fit(self, X, k, W, M, tau, S0, theta, alpha, eps,
+				itermin, itermax, verbose)
+
+
+	def toTuple(self):
+		return Gmm.toTuple(self), \
+			self._bb_talairach_offset, \
+			self._bb_talairach_size
+
+	def fromTuple(self, tuple):
+		t, self._bb_talairach_offset, self._bb_talairach_size = tuple
+		Gmm.fromTuple(self, t)
+
 
 ################################################################################
 distribution_map = { \
@@ -2137,6 +2400,8 @@ distribution_map = { \
 	'generalized_dirichlet' : GeneralizedDirichlet,
 	'shifted_generalized_dirichlet' : ShiftedGeneralizedDirichlet,
 	'rbf' : Rbf,
+	'gmm' : Gmm,
+	'gmm_from_spam' : GmmFromSpam,
 	'gaussian_mixture' : GaussianMixtureModel,
 	'gamma_exponential_mixture' : GammaExponentialMixtureModel,
 	'two_gaussians_mixture' : TwoGaussiansMixtureModel,

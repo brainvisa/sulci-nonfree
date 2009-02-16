@@ -27,6 +27,19 @@ def load_graphs(transfile, graphnames):
 def load_graph(transfile, graphname):
 	return load_graphs(transfile, [graphname])[0]
 
+################################################################################
+# read posterior segmentwise probabilities
+
+def read_segments_weights(input_segments_weights):
+	from datamind.io import ReaderCsv
+	r = ReaderCsv()
+	segments_weights = []
+	for file in input_segments_weights:
+		if file == 'None':
+			X = None
+		else:	X = r.read(file)
+		segments_weights.append(X)
+	return segments_weights
 
 ################################################################################
 # generic readers
@@ -189,11 +202,13 @@ def create_relations_distrib_several_datatypes(prefix, distrib,
 def read_sulci_distrib(distribname, selected_sulci=None):
 	return read_segments_distrib(distribname, selected_sulci)
 
-def read_full_model(graphmodelname, 
+def read_full_model(graphmodelname=None, 
 	segmentsdistribname=None, reldistribname=None, sulcidistribname=None,
 	labelspriorname=None, globalrotationpriorname=None,
 	localrotationspriorname=None, selected_sulci=None):
-	graphmodel = read_graphmodel(graphmodelname, selected_sulci)
+	if graphmodelname:
+		graphmodel = read_graphmodel(graphmodelname, selected_sulci)
+	else:	graphmodel = None
 	if segmentsdistribname:
 		segments_distrib = read_segments_distrib(segmentsdistribname,
 							selected_sulci)

@@ -105,6 +105,10 @@ def parseOpts(argv):
 	parser.add_option('-g', '--graph', dest='graphname',
 		metavar = 'FILE', action='store', default = None,
 		help='data graph')
+	parser.add_option('--label-attribute', dest='label_attribute',
+		metavar = 'STR', type='choice', choices=('name', 'label'),
+		action='store', default='name',
+		help="'name' or 'label' (default: %default)")
 	parser.add_option('-m', '--mesh', dest='meshname',
 		metavar = 'FILE', action='store', default = None,
 		help='grey/white mesh in the same space of the input graph')
@@ -120,6 +124,9 @@ def parseOpts(argv):
 	parser.add_option('-t', '--translation', dest='transfile',
 		metavar = 'FILE', action='store', default = transfile,
 		help='translation file (default : %default)')
+	parser.add_option('--log', dest='log',
+		metavar = 'FILE', action='store_true', default=False,
+		help='add log of mean values read in the input csv')
 	return parser, parser.parse_args(argv)
 
 
@@ -154,13 +161,15 @@ def main():
 	for v in g.vertices():
 		if v.getSyntax() != 'fold': continue
 		if mode == 'sulci':
-			try: data = sulci_data[v['name']]
+			try: data = sulci_data[v[options.label_attribute]]
 			except exceptions.KeyError: continue
 		elif mode == 'nodes':
 			try: data = sulci_data[str(int(v['index']))]
 			except exceptions.KeyError: continue
 		for i, h in enumerate(labels):
 			v['csv_mean_' + h] = data[0][i]
+			if options.log:
+				v['csv_log_mean_' + h] = numpy.log(data[0][i])
 			# add only no-null std
 			if data[1][i]: v['csv_std_' + h] = data[1][i]
 			v['csv_sum_' + h] = data[2][i]

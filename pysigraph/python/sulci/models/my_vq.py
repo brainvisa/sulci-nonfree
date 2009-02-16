@@ -445,7 +445,7 @@ def _missing_raise():
 
 _valid_miss_meth = {'warn': _missing_warn, 'raise': _missing_raise}
 
-def kmeans2(data, k, iter = 10, thresh = 1e-5, minit = 'random',
+def kmeans2(data, k, weights, iter = 10, thresh = 1e-5, minit = 'random',
         missing = 'warn'):
     """Classify a set of points into k clusters using kmean algorithm.
 
@@ -488,6 +488,7 @@ def kmeans2(data, k, iter = 10, thresh = 1e-5, minit = 'random',
             cluster[label[i]].
 
     """
+    weights = asarray(weights) / weights.sum()
     if missing not in _valid_miss_meth.keys():
         raise ValueError("Unkown missing method: %s" % str(missing))
     # If data is rank 1, then we have 1 dimension problem.
@@ -524,9 +525,9 @@ def kmeans2(data, k, iter = 10, thresh = 1e-5, minit = 'random',
         clusters = init(data, k)
 
     assert not iter == 0
-    return _kmeans2(data, clusters, iter, nc, _valid_miss_meth[missing])
+    return _kmeans2(data, clusters, weights, iter, nc, _valid_miss_meth[missing])
 
-def _kmeans2(data, code, niter, nc, missing):
+def _kmeans2(data, code, weights, niter, nc, missing):
     """ "raw" version of kmeans2. Do not use directly.
 
     Run kmeans with a given initial codebook.  """
@@ -538,7 +539,9 @@ def _kmeans2(data, code, niter, nc, missing):
         for j in range(nc):
             mbs = N.where(label==j)
             if mbs[0].size > 0:
-                code[j] = N.mean(data[mbs], axis=0)
+                weights_j = weights[mbs]
+		weights_j /= weights_j.sum()
+                code[j] = N.dot(weights_j, data[mbs])
             else:
                 missing()
 

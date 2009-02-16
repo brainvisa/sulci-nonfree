@@ -452,12 +452,17 @@ class Registration(object):
 		self._t = t
 
 	def optimize(self, eps=10e-5, user_func=(lambda self,x : None),
-				user_data=None, mode='riemannian'):
+			user_data=None, mode='riemannian', affine=False):
 		opt = [eps, user_func, user_data]
+		if affine == True and mode != 'powell':
+			raise ValueError("Affine registration works " + \
+					"only with powell optimization")
 		if mode == 'riemannian':
 			return self.optimize_riemannian(*opt)
 		elif mode == 'powell':
-			return self.optimize_powell(*opt)
+			if affine:
+				return self.optimize_affine_powell(*opt)
+			else:	return self.optimize_rigid_powell(*opt)
 		elif mode == 'rotation_vector':
 			return self.optimize_vector_rotation(*opt)
 		else:	raise ValueError("unknown mode '%s'" % mode)
@@ -557,7 +562,7 @@ class Registration(object):
 			else:	old_energy = new_energy
 		return self._R, self._t
 
-	def optimize_powell(self, eps=10e-5,
+	def optimize_rigid_powell(self, eps=10e-5,
 		user_func=(lambda self,x : None), user_data=None):
 		self._n = 0
 		def func(x, self, user_func, user_data):
@@ -585,7 +590,54 @@ class Registration(object):
 			args=(self, user_func, user_data), disp=0, ftol=eps)
 		func(res, self, user_func, user_data)
 		return self._R, self._t
+
+	def optimize_affine_powell(self, eps=10e-5,
+		user_func=(lambda self,x : None), user_data=None):
+		self._n = 0
+		def get_rot(w):
+			theta = numpy.sqrt(w.T * w)[0, 0]
+			if theta:
+				k = long(theta / (2 * numpy.pi))
+				if (theta - 2. * k * numpy.pi) > numpy.pi:
+					k += 1
+				w *= (1. - 2. * k * numpy.pi / theta)
+			return rotation_from_vector(w)
+
+
+		def func(x, self, user_func, user_data):
+			wu = numpy.asmatrix(x[:3]).T
+			D = x[3:6]
+			if numpy.any(D <= 0):
+				# hack to create a gradient
+				self._energy = -numpy.min(D) + 1000000.
+				return self._energy
+			D2 = numpy.asmatrix(numpy.diag(D))
+			wv = numpy.asmatrix(x[6:9]).T
+			self._t = numpy.asmatrix(x[9:12]).T
+			U = get_rot(wu)
+			V = get_rot(wv)
+			self._D = D
+			self._R = U * D2 * V
+			if not (self._n % 100):
+				user_func(self, user_data)
+			self._energy = self.energy()
+			if self._verbose > 0:
+				print "powell, en = %f " % (self._energy)
+			self._n += 1
+			return self._energy
+		U, D, V = numpy.linalg.svd(self._R) # R : affine matrix here
+		wu = numpy.asarray(vector_from_rotation(U)).ravel()
+		D = numpy.asarray(D).ravel()
+		wv = numpy.asarray(vector_from_rotation(V)).ravel()
+		x0 = numpy.hstack([wu, D.ravel(), wv,
+				numpy.asarray(self._t).ravel()])
+		import scipy.optimize
+		res = scipy.optimize.fmin_powell(func, x0,
+			args=(self, user_func, user_data), disp=0, ftol=eps)
+		func(res, self, user_func, user_data)
+		return self._R, self._t
 	
+
 
 
 ################################################################################
@@ -801,12 +853,13 @@ class MixtureGlobalRegistration(Registration):
 		distribution.GaussianMixtureModel : ProcrustMetricField,
 	}
 	def __init__(self, X, mixture, groups=None, available_labels=None,
-			verbose=0):
+		is_affine=False, verbose=0):
 		Registration.__init__(self, verbose)
 		self._X = numpy.asmatrix(X)
 		self._mixture = mixture
 		self._groups = groups
 		self._available_labels = available_labels
+		self._is_affine = is_affine
 		n, self._size = self._X.shape[1], len(self._mixture)
 		self._weights = numpy.ones((self._size, n))
 		self._R = numpy.asmatrix(numpy.identity(3))
@@ -828,8 +881,9 @@ class MixtureGlobalRegistration(Registration):
 		return weights.T, loglikelihoods.T, likelihoods.T
 
 
-	def optimize(self, eps=10e-5, user_func=(lambda self,x : None),
-					user_data=None, mode='riemannian'):
+	def optimize(self, eps=10e-5, maxiter=numpy.inf,
+			user_func=(lambda self,x : None),
+			user_data=None, mode='riemannian', affine=False):
 		'''
     mode : riemannian, powell, rotation_vector
 		'''
@@ -838,25 +892,27 @@ class MixtureGlobalRegistration(Registration):
 		X2 = X
 		n = 0
 		while 1:
+			if n >= maxiter: break
 			if self._verbose > 0: print "**** %d *****" % n
 			weights, loglikelihoods, likelihoods = \
 						self.posteriors(X2)
 			Algo = self.get_registration_algo()
 			if self._groups is not None:
 				algo = Algo(X, weights, self._mixture,
-					self._groups, verbose=self._verbose - 1)
+					self._groups, self._is_affine,
+					verbose=self._verbose - 1)
 			else:	algo = Algo(X, weights, self._mixture,
 					verbose=self._verbose - 1)
 			algo.set_initialization(self._R, self._t)
 			self._R, self._t = algo.optimize(eps,
-						user_func, user_data, mode)
+				user_func, user_data, mode, affine)
 			new_energy = algo.getCurrentEnergy()
 			if self._verbose > 0:
 				print "mixture registration : en = ", new_energy
-			X2 = self._R * X + self._t
 			n += 1
 			if old_energy - new_energy < eps: break
 			else:	old_energy = new_energy
+			X2 = self._R * X + self._t
 		weights, loglikelihoods, likelihoods = self.posteriors(X2)
 		trans = RigidTransformation(self._R, self._t)
 		return trans, weights, loglikelihoods, likelihoods
@@ -910,8 +966,9 @@ class MixtureLocalRegistration(Registration):
 		return posteriors.T, loglikelihoods.T, likelihoods.T
 
 
-	def optimize(self, eps=10e-5, user_func=(lambda self,x : None),
-					user_data=None, mode='riemannian'):
+	def optimize(self, eps=10e-5, maxiter=numpy.inf,
+			user_func=(lambda self,x : None),
+			user_data=None, mode='riemannian', affine=False):
 		'''
     mode : riemannian, powell, rotation_vector
 		'''
@@ -946,7 +1003,7 @@ class MixtureLocalRegistration(Registration):
 				R, t = self._trans[i]
 				algo.set_initialization(R, t)
 				R, t = algo.optimize(eps,
-					user_func, user_data, mode)
+					user_func, user_data, mode, affine)
 				local_en = algo.getCurrentEnergy()
 				new_energy += local_en
 				if self._verbose > 1:
@@ -966,6 +1023,7 @@ class MixtureLocalRegistration(Registration):
 			if self._verbose > 0:
 				print "local registrations : en = ", new_energy
 			n += 1
+			if n >= maxiter: break
 			if old_energy - new_energy < eps: break
 			else:	old_energy = new_energy
 		trans2 = []

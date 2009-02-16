@@ -11,7 +11,7 @@ from distribution import Distribution, MixtureModel, distribution_map
 inf = numpy.inf
 
 class PySpam(Distribution):
-	_converter = aims.Converter_BucketMap_VOID_AimsData_FLOAT()
+	_converter = aims.Converter_BucketMap_FLOAT_AimsData_FLOAT()
 	_resampler = aimsalgo.LinearResampler_FLOAT()
 	_neighbourhood = numpy.array([
 		[-1, -1, -1],
@@ -56,7 +56,7 @@ class PySpam(Distribution):
 
 	def is_fromlog(self): return self._fromlog
 
-	def _bucketmaps_to_bucketmap_bb(self, bucketmaps):
+	def _bucketmaps_to_bucketmap_bb(self, bucketmaps, weights=None):
 		'''
     Compute a bounding box from a list of bucketmaps and return translated
     coordinates of all buckets in this bounding box.
@@ -66,13 +66,16 @@ class PySpam(Distribution):
 		'''
 		xmin, ymin, zmin = inf, inf, inf
 		xmax, ymax, zmax = -inf, -inf, -inf
-		bucket_all = aims.BucketMap_VOID.Bucket()
-		bucket_out = aims.BucketMap_VOID.Bucket()
+		bucket_all = aims.BucketMap_FLOAT.Bucket()
+		bucket_out = aims.BucketMap_FLOAT.Bucket()
 
 		# For each bucketmap
-		for bm in bucketmaps:
+		for i, bm in enumerate(bucketmaps):
 			size = bm.sizeX(), bm.sizeY(), bm.sizeZ()
 			bucket_in = bm[0]
+			if weights:
+				w = weights[i]
+			else:	w = 1.
 			for p in bucket_in.keys():
 				xmax = max(xmax, p[0])
 				ymax = max(ymax, p[1])
@@ -80,7 +83,7 @@ class PySpam(Distribution):
 				xmin = min(xmin, p[0])
 				ymin = min(ymin, p[1])
 				zmin = min(zmin, p[2])
-				bucket_all[p] = 1
+				bucket_all[p] = w
 
 		# compute bounding box
 		xd, yd, zd = (xmax - xmin + 1), (ymax - ymin + 1), \
@@ -92,8 +95,8 @@ class PySpam(Distribution):
 
 		# compute bucketmap in bounding box axis
 		for b in bucket_all.keys():
-			bucket_out[b - bb_offset] = 1
-		bucketmap_out = aims.BucketMap_VOID()
+			bucket_out[b - bb_offset] = bucket_all[b]
+		bucketmap_out = aims.BucketMap_FLOAT()
 		bucketmap_out[0] = bucket_out
 		bucketmap_out.setSizeX(size[0])
 		bucketmap_out.setSizeY(size[1])
@@ -180,6 +183,7 @@ class PySpam(Distribution):
 		# For each subjects
 		for (id, graphinfo) in self._infos.items():
 			vertices = graphinfo['vertices']
+			weights = graphinfo['weights']
 			motion = self._motions[id]
 			
 			# compute subject bounding box
@@ -195,7 +199,8 @@ class PySpam(Distribution):
 				continue
 			self._voxels_n += n
 			bucket_min, bucket_max, bb_subject_size, bucketmap = \
-				self._bucketmaps_to_bucketmap_bb(bucketmaps_in)	
+				self._bucketmaps_to_bucketmap_bb(bucketmaps_in,
+								weights)	
 			bb_subject_offset = bucket_min
 			bucketmaps[id] = bucketmap
 			bb_subjects[id] = bb_subject_offset, bb_subject_size
@@ -496,7 +501,7 @@ class PySpam(Distribution):
 		loglikelihoods = []
 		for p_out in X:
 			if (p_out < 0).sum() or (p_out >= s).sum():
-				loglikelihood.append(-50)
+				loglikelihoods.append(-50)
 				continue
 			pos = tuple([0] + p_out[::-1].tolist())
 			val = P[pos]

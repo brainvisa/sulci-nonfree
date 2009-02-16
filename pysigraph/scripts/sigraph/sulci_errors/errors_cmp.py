@@ -106,9 +106,17 @@ def main():
 	if options.mode == 'wilcoxon': test = scipy.stats.wilcoxon
 	elif options.mode == 'ttest': test = scipy.stats.ttest_ind
 	if dims1[0] == 'subjects' and dims1[1] == 'sulci':
-		compute_local(X1, X2, test)
+		res = compute_local(X1, X2, test)
+		fd = open(options.output, 'w')
+		header = "sulci\t"
+		header += "\t".join(X1.colnames()[2:])
+		fd.write(header + '\n')
+		for sulcus, pvals in res.items():
+			line = sulcus + '\t'
+			line += "\t".join(("%e" % p) for p in pvals)
+			fd.write(line + '\n')
 	elif dims1[0] == 'Subject':
-		compute_global(X1, X2, test)
+		res = compute_global(X1, X2, test)
 	else:	print "error : unknown file format"
 
 

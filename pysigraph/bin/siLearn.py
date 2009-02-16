@@ -40,10 +40,12 @@ def saveModel(labels_filter, filter_mode):
 				'topadaptive_before' : save_adaptive_callback}
 			data = {'labels_filter' : labels_filter,
 				'filter_mode' : filter_mode,
-				'frgwriter' : w}
+				'frgwriter' : w,
+                                'graph' : rg }
 			if isinstance(tr, sigraph.SelectiveTrainer):
 				select_cover(tr, fundict, data)
-			else:	cover(rg, fundict, data,
+			else:
+                          	cover(rg, fundict, data,
 					labels_filter, filter_mode)
 	insave = 0
 
@@ -346,6 +348,7 @@ def main():
   if par.closeLearning:
     rg.closeLearning()
   saveModel(options.labels_filter, options.filter_mode)
+  os._exit(0)
 
 def main_safe():
 	try:	main()

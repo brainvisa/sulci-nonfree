@@ -43,6 +43,7 @@ Format( 'SVM classifier', 'f|*.svm' )
 #Format( 'SVM regressor', 'f|*.svm' )
 Format( 'MLP classifier', 'f|*.net' )
 Format( 'SNNS pattern', 'f|*.pat' )
+#Format( 'Bayesian Model', 'f|*.bmod' ),
 
 FileType( 'siRelax Fold Energy', 'Any Type', 'siRelax Fold Energy' )
 FileType( 'Left siRelax Fold Energy', 'siRelax Fold Energy' )
@@ -51,3 +52,7 @@ FileType( 'Sigraph Learner', 'Text file', 'Sigraph Learner' )
 FileType( 'Classifier', None, [ 'SVM classifier', # 'SVM regressor',
                                 'MLP classifier' ] )
 FileType( 'Elevation map', '2D image', shfjGlobals.aimsVolumeFormats )
+FileType( 'Bayesian Model', 'Any Type', 'Text Data Table' )
+FileType( 'Bayesian Recognition Posterior Probabilities', 'Any Type',
+  'CSV file' )
+FileType( 'Bayesian Recognition Priors', 'Any Type', 'Text Data Table' )

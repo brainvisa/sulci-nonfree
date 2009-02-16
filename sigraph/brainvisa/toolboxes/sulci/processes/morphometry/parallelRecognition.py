@@ -114,7 +114,7 @@ def execution( self, context ):
     mean = 0
     var = 0
     if self.stats_file:
-        stats = open( self.stats_file.fullPath(), 'w' )
+        statsfile = open( self.stats_file.fullPath(), 'w' )
     for x in xrange( self.number_of_trials ):
         mean += energies[x]
         var += energies[x] * energies[x]
@@ -127,15 +127,15 @@ def execution( self, context ):
         if M < energies[x]:
             M = energies[x]
         if self.stats_file:
-            stats.write( res[x] + '\t' + str( energies[x] ) + '\n' )
+            statsfile.write( res[x] + '\t' + str( energies[x] ) + '\n' )
     mean /= self.number_of_trials
     var = var / self.number_of_trials - mean * mean
     if self.stats_file:
-        stats.write( '\nmin:\t' + str( m ) + '\t(' + str( emin ) + ')\n' )
-        stats.write( 'max:\t' + str( M ) + '\n' )
-        stats.write( 'mean:\t' + str( mean ) + '\n' )
-        stats.write( 'stddev:\t' + str( math.sqrt( var ) ) + '\n' )
-        stats.close()
+        statsfile.write( '\nmin:\t' + str( m ) + '\t(' + str( emin ) + ')\n' )
+        statsfile.write( 'max:\t' + str( M ) + '\n' )
+        statsfile.write( 'mean:\t' + str( mean ) + '\n' )
+        statsfile.write( 'stddev:\t' + str( math.sqrt( var ) ) + '\n' )
+        statsfile.close()
     context.write( 'min: ', m, ' for trial ', emin, '\n' )
     context.system( 'AimsGraphConvert', '-i', res[emin], '-o',
                     self.output_graph )

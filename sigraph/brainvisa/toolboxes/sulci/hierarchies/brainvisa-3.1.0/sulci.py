@@ -45,6 +45,12 @@ insert( '{protocol}/{subject}/t1mri/{acquisition}/{analysis}/folds/{graph_versio
     
     "L<subject>_<sulci_recognition_session>_auto", SetType( 'siRelax Fold Energy' ),  SetWeakAttr( 'side', 'left'),
     "R<subject>_<sulci_recognition_session>_auto", SetType( 'siRelax Fold Energy' ), SetWeakAttr( 'side', 'right'),
+    'L<subject>_<sulci_recognition_session>_auto_proba',
+        SetType( 'Bayesian Recognition Posterior Probabilities' ),
+        SetWeakAttr( 'side', 'left' ),
+    'R<subject>_<sulci_recognition_session>_auto_proba',
+        SetType( 'Bayesian Recognition Posterior Probabilities' ),
+        SetWeakAttr( 'side', 'right' ),
 
     'segmentation', SetContent(
         "LSulci_<subject>_<sulci_recognition_session>_auto", SetType( 'Sulci Volume' ), SetWeakAttr( 'side', 'left'),
@@ -59,7 +65,7 @@ insert( '{protocol}/{subject}/t1mri/{acquisition}/{analysis}/folds/{graph_versio
     
     "*.data"
         ),
-  '{sulci_recognition_session}_manual', SetDefaultAttributeValue( 'sulci_recognition_session', default_session ), SetWeakAttr('labelled', 'Yes', 'manually_labelled', 'Yes', 'automatically_labelled', 'No'),
+  '{sulci_recognition_session}_manual', SetDefaultAttributeValue( 'sulci_recognition_session', default_session ), SetWeakAttr('labelled', 'Yes', 'manually_labelled', 'Yes', 'automatically_labelled', 'No', 'best', 'No' ),
     SetContent(
     # SULCI - labelled graphs, siRelax folds energy, segmentation
     "L<subject>_<sulci_recognition_session>_manual", SetType( 'Labelled Cortical folds graph' ), SetWeakAttr( 'side', 'left', 'parallel_recognition', 'No' ),

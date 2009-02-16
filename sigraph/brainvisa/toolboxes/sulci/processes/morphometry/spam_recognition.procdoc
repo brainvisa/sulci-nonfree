@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<minf expander="minf_2.0">
+<d>
+  <d name="fr">
+    <xhtml name="short">The SPAM sulci recognition is a newer alternative to the older <a href="bvprocess://recognition">recognition process</a>. It is much faster and produces different results. The current version is still a "basic" method: more accurate variants are under development.
+</xhtml>
+    <d name="parameters">
+      <xhtml name="labels_translation_map"/>
+      <xhtml name="priors">Priors are constraints that are taken into account during recognition, in addition to the SPAM model. Priors files are downloadable with bayesian models at <a href="http://brainvisa.info/downloadpage.html">the BrainVISA web site</a>.</xhtml>
+      <xhtml name="output_graph">Output graph (labelled)</xhtml>
+      <xhtml name="data_graph"><a HREF="AnaComputeCorticalFoldArg.html"><img SRC="../../images/III_sulci.jpg" ALT="" border="0"/></a><br/>
+Data to be labelled</xhtml>
+      <xhtml name="model">Bayesian recognition model. Due to their size, models are distributed as separate downloadable packages. You can get them at <a href="http://brainvisa.info/downloadpage.html">the BrainVISA web site</a>.</xhtml>
+      <xhtml name="posterior_probabilities">Posterior probabilities are written together with the output labelled graph to keep information about the recognition validity.</xhtml>
+    </d>
+    <xhtml name="long"><p>SPAM recognition is based on a probabilistic model which provides for any 3D position the probability of presence of every sulcus. Several variants and additions may also be taken into account (conjoint registration, additional prior contstraints, mix with the older neural network-based recognition, etc.) in a bayesian probabilistic framework.<br/>
+The current version is the first, most "basic", implementation. Other extensions will be made available in the future when they are stabilized, tested and published.
+</p>
+<p>For a more precise description of the method, see <a href="ftp://ftp.cea.fr/pub/dsv/anatomist/papers/Perrot-ISBI08.pdf">M. Perrot, D. Rivière, and J.-F. Mangin. Identifying cortical sulci from localizations, shape and local organization. In 5th Proc. IEEE ISBI, Paris, France, pages 420-423, May 2008.</a>.
+</p>
+<p>The process uses a learned SPAM model, which is a little too big to be distributed with the main BrainVISA package. It is distributed as a separate package which should be installed on the BrainVISA distribution. It can be downloaded from <a href="http://brainvisa.info/downloadpage.html">the BrainVISA web site</a>.
+</p>
+<p>Compared to the older <a href="bvprocess://recognition">recognition process</a>, results are a bit "different": the model has been trained on a much larger and cleaner database (62 manually labelled subjects), with a slightly updated nomenclature (use sulci_model_2008.trl as labels_translation_map rather than the classical sulci_model_noroots.trl), and produces results which are subject to different kind of errors.<br/>
+Globally results achieve better recognition rates (20% error rates instead of 25%), but some mistakes are more "human-visible" and allow inconsistancies in sulci which were mostly avoided in the former method. These problems will be solved in future variants of the models which will include additional constraints.<br/>
+Moreover the SPAM recognition is way faster than the former Markovian recognition (a few seconds instead of, typically, half an hour).
+</p></xhtml>
+  </d>
+  <d name="en">
+    <xhtml name="short">The SPAM sulci recognition is a newer alternative to the older <a href="recognition.html">recognition process</a>. It is much faster and produces different results. The current version is still a "basic" method: more accurate variants are under development.</xhtml>
+    <d name="parameters">
+      <xhtml name="labels_translation_map"/>
+      <xhtml name="priors"/>
+      <xhtml name="output_graph"/>
+      <xhtml name="data_graph"/>
+      <xhtml name="model"/>
+      <xhtml name="posterior_probabilities"/>
+    </d>
+    <xhtml name="long"><p>SPAM recognition is based on a probabilistic model which provides for any 3D position the probability of presence of every sulcus. Several variants and additions may also be taken into account (conjoint registration, additional prior contstraints, mix with the older neural network-based recognition, etc.) in a bayesian probabilistic framework.<br/>
+The current version is the first, most "basic", implementation. Other extensions will be made available in the future when they are stabilized, tested and published.
+</p>
+<p>For a more precise description of the method, see <a href="ftp://ftp.cea.fr/pub/dsv/anatomist/papers/Perrot-ISBI08.pdf">M. Perrot, D. Rivière, and J.-F. Mangin. Identifying cortical sulci from localizations, shape and local organization. In 5th Proc. IEEE ISBI, Paris, France, pages 420-423, May 2008.</a>.
+</p>
+<p>The process uses a learned SPAM model, which is a little too big to be distributed with the main BrainVISA package. It is distributed as a separate package which should be installed on the BrainVISA distribution. It can be downloaded from <a href="http://brainvisa.info/downloadpage.html">the BrainVISA web site</a>.
+</p></xhtml>
+  </d>
+</d>
+</minf>

@@ -49,7 +49,7 @@
       </f>
       <f type="ProcessTree.Leaf">
         <true name="editable"/>
-        <s name="id">recognition</s>
+        <s name="id">recognitionGeneral</s>
         <none name="name"/>
       </f>
       <f type="ProcessTree.Leaf">

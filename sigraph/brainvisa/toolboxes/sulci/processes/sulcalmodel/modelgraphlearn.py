@@ -151,7 +151,7 @@ def execution( self, context ):
     #if len( self.testbase_data_graphs ) == 0:
     #    raise RuntimeError( 'testbase_data_graphs must not be empty' )
   if self.parallelism_mode != 'local' and \
-    ( hasattr( self, 'parallel_config_directory' ) or \
+    ( not hasattr( self, 'parallel_config_directory' ) or \
     self.parallel_config_directory is None ):
     raise RuntimeError( 'parallel_config_directory must be specified in '
                         'parallel execution mode' )
@@ -239,7 +239,7 @@ def execution( self, context ):
     if distcmd is None:
        context.write("<font color=red>error</font> : can't find "
                      "grid.py program. It may be found in "
-                     "'//depot/soma-version/bin/grid.py")
+                     "'//depot/parallel-version/bin/grid.py")
        return
     fd = open(scriptout, 'w')
     print >> fd, "#!/bin/bash\n"

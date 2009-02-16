@@ -48,6 +48,22 @@ templ_model2 = apply( SetContent,
                         '*', SetType( 'Sigraph Learner' ), 
                         ) )
 
+bayesian_models = (
+  'priors',
+    SetContent(
+        '*_left', SetType( 'Bayesian Recognition Priors' ),
+            SetWeakAttr( 'side', 'left' ),
+        '*_right', SetType( 'Bayesian Recognition Priors' ),
+            SetWeakAttr( 'side', 'right' ),
+        ),
+  '{bayesian_model_type}', SetContent(
+      '{bayesian_model_name}_distribs_left', SetType( 'Bayesian Model' ),
+          SetWeakAttr( 'side', 'left' ),
+      '{bayesian_model_name}_distribs_right', SetType( 'Bayesian Model' ),
+          SetWeakAttr( 'side', 'right' ),
+              ),
+  )
+
 insertFirst( 'nomenclature/hierarchy',
   'sulcal_root_colors', SetPriorityOffset( +10 ), SetType( 'Nomenclature' ),
 )
@@ -59,6 +75,7 @@ insertLast('nomenclature/translation',
 insert( '',
   'models', SetContent( 
     "model_templates", templ_model2,
+    'bayesian_models', SetContent( *bayesian_models ),
     '{graph_version}', SetContent( 
       "L{model}", SetContent(
         "L{model}", SetType( 'Model graph' ), SetWeakAttr( 'side', 'left' ),

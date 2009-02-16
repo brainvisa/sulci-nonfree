@@ -114,6 +114,7 @@ public:
   MGWriter( const std::string &, const carto::PySyntaxSet & );
   virtual ~MGWriter();
   virtual void write( const Graph & );
+  virtual std::string dataDirectory( const Graph & ao ) const;
   virtual void parseModel(const GraphObject &,
 		const std::string & = "model_file",
 		const std::string & = "model");

@@ -6,9 +6,33 @@ from soma import aims
 from sulci.common import io, add_translation_option_to_parser
 from sulci.models import distribution, distribution_aims
 
+
 ################################################################################
-def compute_spams(graphs, distribdir, sigma_value, sigma_file, data_type,
-	bucket_name, ss, selected_sulcus, options):
+def update_sulci_set(sulci_set, i, filename, name, v, w=None):
+	if sulci_set.has_key(name):
+		h = sulci_set[name]
+		if h.has_key(i):
+			h[i]['vertices'].append(v)
+			if w: h[i]['weights'].append(w)
+		else:
+			h[i] = {
+				'vertices' : [v],
+				'name' : filename,
+				'weights' : None
+			}
+			if w: h[i]['weights'] = [w]
+	else:
+		sulci_set[name] = {
+			i : {'vertices' : [v],
+			'name' : filename,
+			'weights' : None
+			}
+		}
+		if w: sulci_set[name][i]['weights'] = [w]
+
+################################################################################
+def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
+	data_type, bucket_name, ss, selected_sulcus, options):
 	reader = aims.Reader()
 	if sigma_file is not None:
 		sigmas = io.read_from_exec(sigma_file, 'sigma')
@@ -24,6 +48,8 @@ def compute_spams(graphs, distribdir, sigma_value, sigma_file, data_type,
 	data_depth = []
 	# Create an hash table : sulci <-> [(vertices, motion) for each graph]
 	for i, g in enumerate(graphs):
+		if segments_weights:
+			segments_weights_g = segments_weights[i]
 		filename = g['aims_reader_filename']
 		subject = os.path.splitext(os.path.basename(filename))[0]
 		side = subject[0]
@@ -68,23 +94,43 @@ def compute_spams(graphs, distribdir, sigma_value, sigma_file, data_type,
 		motions.append(motion)
 		for v in g.vertices():
 			if v.getSyntax() != 'fold': continue
-			name = v['name']
-			if selected_sulcus is not None and \
-				name not in selected_sulcus: continue
-			if sulci_set.has_key(name):
-				h = sulci_set[name]
-				if h.has_key(i):
-					h[i]['vertices'] += [v]
-				else:
-					h[i] = {
-						'vertices' : [v],
-						'name' : filename
-					}
+			# select how to group data to build SPAMs
+			if options.label_mode == 'local_errors':
+				if v['name'] != v['label']:
+					name = v['name']
+				else:	continue
+			elif options.label_mode == 'local_ok':
+				if v['name'] == v['label']:
+					name = v['name']
+				else:	continue
+			elif options.label_mode == 'global_errors':
+				if v['name'] != v['label']:
+					name = 'error'
+				else:	continue
+			elif options.label_mode == 'global_ok':
+				if v['name'] == v['label']:
+					name = 'ok'
+				else:	continue
+			elif options.label_mode in ['name', 'label']:
+				name = v[options.label_mode]
+			if segments_weights and segments_weights_g != None:
+				W = segments_weights_g
+				for j, name in enumerate(W.colnames()):
+					if not name.startswith('proba_'):
+						continue
+					name = name[6:]
+					if selected_sulcus is not None and \
+						name not in selected_sulcus:
+							continue
+					w = W[W[:, 0] == v['index']][0, j]
+					if w < 0.01: continue
+					update_sulci_set(sulci_set, i,
+						filename, name, v, w)
 			else:
-				sulci_set[name] = {
-					i : {'vertices' : [v],
-					     'name' : filename}
-					}
+				if selected_sulcus is not None and \
+					name not in selected_sulcus: continue
+				update_sulci_set(sulci_set, i, \
+					filename, name, v, None)
 
 			ss_map = v[bucket_name].get()
 			size_in = numpy.array([ss_map.sizeX(),
@@ -202,6 +248,8 @@ def compute_spams(graphs, distribdir, sigma_value, sigma_file, data_type,
 def parseOpts(argv):
 	description = 'Compute Spam from a list of graphs.\n' \
 	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg...\n'
+	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg ... == posterior1.csv posterior2.csv...\n'
+	"use 'None' as csv filename to ignore the segments weights"
 	parser = OptionParser(description)
 	add_translation_option_to_parser(parser)
 	parser.add_option('-d', '--distribdir', dest='distribdir',
@@ -214,6 +262,15 @@ def parseOpts(argv):
 		metavar = 'NAME', action='store', default = None,
 		help='Compute spam only for one sulcus ' \
 			'(default : compute all spams)')
+	parser.add_option('--label-mode', dest='label_mode',
+		metavar = 'STR', type='choice', choices=('name', 'label',
+		'local_errors', 'global_errors', 'local_ok', 'global_ok'),
+		action='store', default='name',
+		help="'name': build SPAMs from manual " + \
+		"labeling, 'label': build SPAMs from automatic labeling, " + \
+		"'local_errors': build SPAMs from sulciwise errors, " + \
+		"'global_errors': build SPAMs from unnamed errors " + \
+		"(default: %default)")
 	parser.add_option('--data-type', dest='data_type',
 		metavar = 'TYPE', action='store', default = 'simple_surface',
 		help="data type on which spam are learned. Choose one of " \
@@ -246,12 +303,23 @@ def parseOpts(argv):
 
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
-	graphnames = args[1:]
-	if len(graphnames) == 0:
-		parser.print_help()
+	inputs = args[1:]
+	if len(inputs) == 0:
+		print "missing graph"
 		sys.exit(1)
-	
+	ind = [i for i, input in enumerate(inputs) if input == '==']
+	if len(ind) == 0:
+		graphnames = inputs
+		input_segments_weights = None
+	else:
+		ind = ind[0]
+		graphnames = inputs[:ind]
+		input_segments_weights = inputs[ind + 1:]
 	graphs = io.load_graphs(options.transfile, graphnames)
+	if input_segments_weights:
+		segments_weights = io.read_segments_weights(\
+					input_segments_weights)
+	else:	segments_weights = None
 
 	# options
 	if options.data_type == 'simple_surface':
@@ -269,8 +337,8 @@ def main():
 	sigma_value = int(options.sigma_value)
 
 	if options.mode == 'normal' :
-		compute_spams(graphs, options.distribdir, sigma_value,
-			options.sigma_file, data_type, bucket_name,
+		compute_spams(graphs, segments_weights, options.distribdir,
+			sigma_value, options.sigma_file, data_type, bucket_name,
 			ss, options.sulcus, options)
 	elif options.mode == 'loo' :
 		print "-- all --"
@@ -278,10 +346,13 @@ def main():
 		if options.sigma_file is None:
 			sigma_file = None
 		else:	sigma_file = os.path.join('all', options.sigma_file)
-		compute_spams(graphs, distribdir, sigma_value, sigma_file,
+		compute_spams(graphs, segments_weights, distribdir,
+			sigma_value, sigma_file,
 			data_type, bucket_name, ss, options.sulcus, options)
 		for i in range(len(graphs)):
 			subgraphs = graphs[:i] + graphs[i+1:]
+			subsegments_weights = segments_weights[:i] + \
+						segments_weights[i+1:]
 			directory = 'cv_%d' % i
 			print '-- %s --' % directory
 			distribdir = os.path.join(directory, options.distribdir)
@@ -289,7 +360,8 @@ def main():
 				sigma_file = None
 			else:	sigma_file = os.path.join(directory,
 					options.sigma_file)
-			compute_spams(subgraphs, distribdir, sigma_value,
+			compute_spams(subgraphs, subsegments_weights,
+					distribdir, sigma_value,
 					sigma_file, data_type, bucket_name,
 					ss, options.sulcus, options)
 	else:

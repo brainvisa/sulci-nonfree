@@ -92,7 +92,8 @@ class SpamGroupRegistration(SpamRegistration):
 		return s_logli, numpy.exp(s_logli)
 
 class SpamMixtureRegistration(Registration):
-	def __init__(self, X, weights, spams_mixture, groups, verbose=0):
+	def __init__(self, X, weights, spams_mixture, groups,
+				is_affine=False, verbose=0):
 		Registration.__init__(self, verbose=verbose)
 		if len(weights) != len(spams_mixture):
 			raise ValueError("number of spams/weights" + \
@@ -103,6 +104,7 @@ class SpamMixtureRegistration(Registration):
 		self._spams_mixture = spams_mixture
 		self._groups = groups
 		self._size = len(spams_mixture)
+		self._is_affine = is_affine
 
 	def energy(self):
 		X2 = self._R * self._X + self._t
@@ -113,6 +115,14 @@ class SpamMixtureRegistration(Registration):
 			logli, li = spam.weighted_prodlikelihoods_groups(X2.T,
 								w, self._groups)
 			en -= logli
+		if self._is_affine:
+			# add gamma prior over each scaling factor with mean
+			# equal to 1 and with scale parameter k = 1600
+			# (std ~= 0.035)
+			# P(x|k) = x^(k-1) * exp(-kx) * (k^k) / gamma(k)
+			# log(P(x|k)) = (k-1)*log(x) - k*x + C(k)
+			en -= (1599 * numpy.log(self._D) \
+					- 1600 * self._D).sum()
 		return en
 
 

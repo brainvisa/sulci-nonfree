@@ -18,7 +18,7 @@ import sulci.registration.spam
 class Tagger(object):
 	def __init__(self, sulcimodel, gaussians_distrib, descriptor,
 		graph_data, input_motion, available_labels, csvname,
-		selected_sulci, node_index, verbose=0):
+		selected_sulci, node_index, no_tal, is_affine, verbose=0):
 		self._sulcimodel = sulcimodel
 		self._distrib = sulcimodel.segments_distrib()
 		self._descriptor = descriptor
@@ -27,7 +27,11 @@ class Tagger(object):
 		self._states_map = dict((label, i) \
 			for i, label in enumerate(self._states))
 		self._graph_data = graph_data
-		self._motion = aims.GraphManip.talairach(graph_data)
+		if no_tal:
+			self._motion = aims.Motion()
+			self._motion.setToIdentity()
+		else:	self._motion = aims.GraphManip.talairach(graph_data)
+		self._is_affine = is_affine
 		if input_motion: self._motion = input_motion * self._motion
 		self._selected_sulci = selected_sulci
 		self._node_index = node_index
@@ -119,11 +123,13 @@ class Tagger(object):
 		L = numpy.vstack(L)
 		return L
 
-	def tag(self, mode='global', eps=1, user_func=(lambda self,x : None),
-							user_data=None):
+	def tag(self, mode='global', eps=1, maxiter=numpy.inf,
+			user_func=(lambda self,x : None),
+			user_data=None):
 		if mode == 'global' :
 			opt = [self._X.T, self._mixture, self._groups,
-				self._available_labels, self._verbose]
+				self._available_labels,
+				self._is_affine, self._verbose]
 			reg = MixtureGlobalRegistration(*opt)
 		elif mode == 'local' :
 			rotations_prior = self._local_rotations_prior
@@ -133,8 +139,9 @@ class Tagger(object):
 				self._available_labels, self._verbose]
 			reg = MixtureLocalRegistration(*opt)
 		trans, posteriors, loglikelihoods, likelihoods = \
-			reg.optimize(eps=eps, user_func=user_func,
-                        user_data=user_data, mode=self._opt_mode)
+			reg.optimize(eps=eps, maxiter=maxiter,
+			user_func=user_func, user_data=user_data,
+			mode=self._opt_mode, affine=self._is_affine)
 		available_labels = {}
 
 		# set label to maximum a posteriori
@@ -188,7 +195,7 @@ class GaussianTagger(Tagger):
 	def _get_mixture_model(self):
 		return distribution.GaussianMixtureModel
 
-	def vtk_tag(self, mode, eps=1.):
+	def vtk_tag(self, mode, eps=1., maxiter=numpy.inf):
 		import sulci.registration.vtk_helpers as V
 		n = 100
 		means = self._mixture.get_means()
@@ -228,8 +235,8 @@ class GaussianTagger(Tagger):
 				w * 10/ numpy.linalg.norm(w))
 			plotter.render()
 		
-		trans, available_labels = self.tag(mode, eps, update_vtk, \
-					(pcX, fgl, vec, plotter))
+		trans, available_labels = self.tag(mode, eps, maxiter,
+				update_vtk, (pcX, fgl, vec, plotter))
 			
 		plotter.show()
 		return trans, available_labels
@@ -299,11 +306,24 @@ def parseOpts(argv):
 		metavar = 'FILE', action='store', default = '0',
 		help='verbosity level : 0 no verbosity, 1, 2... more verbosity')
 	parser.add_option('-e', '--eps', dest='eps', metavar = 'FLOAT',
-		action='store', default = '1.', help='precision to stop EM')
+		action='store', default = 1., type='float',
+		help='precision to stop EM')
+	parser.add_option('--maxiter', dest='maxiter', metavar = 'INT',
+		action='store', default = numpy.inf, type='int',
+		help="max iterations number of optimization process")
 	parser.add_option('--mode', dest='mode', metavar = 'MODE',
 		action='store', default = 'global', help="registration " + \
 		"mode : 'global' (one rotation+translation)  or 'local' " + \
 		"(one rotation+translation by sulcus)")
+	parser.add_option('--no-talairach', dest='no_tal',
+		action='store_true', default = False,
+		help="if not specified the internal transformation from " + \
+		"subject to Talairach is used before any other given " + \
+		"transformation.")
+	parser.add_option('--affine', dest='is_affine',
+		action='store_true', default = False,
+		help="if not specified: rigid transformation." + \
+		" if specified: affine transformation")
 	parser.add_option('--translation-prior', dest='translation_prior',
 		metavar = 'FILE', action='store', default=None,
 		help="translation prior (see learn_transformation_prior.py)")
@@ -399,7 +419,8 @@ def main():
 	else:	input_motion = None
 	tagger_opt = [sulcimodel, gaussians_distrib, descriptor, graph,
 		input_motion, availablelabels, options.csvname, selected_sulci, 
-		node_index, int(options.verbose)]
+		node_index, options.no_tal, options.is_affine,
+		int(options.verbose)]
 	if model_type == 'gaussian' : d = GaussianTagger(*tagger_opt)
 	elif model_type == 'spam' : d = SpamTagger(*tagger_opt)
 	print "tag..."
@@ -407,8 +428,10 @@ def main():
 
 	# tag/registration + write outputs
 	if options.vtk:
-		trans, available_labels = d.vtk_tag(mode, float(options.eps))
-	else:	trans, available_labels = d.tag(mode, float(options.eps))
+		trans, available_labels = d.vtk_tag(mode, options.eps,
+							options.maxiter)
+	else:	trans, available_labels = d.tag(mode, options.eps,
+							options.maxiter)
 	if options.motion:
 		if mode == 'global': trans.write(options.motion)
 		elif mode == 'local':

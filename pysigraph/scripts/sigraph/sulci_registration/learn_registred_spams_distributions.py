@@ -12,6 +12,62 @@ from sulci.registration.transformation import RigidTransformation, \
 
 
 ################################################################################
+def update_sulci_set(sulci_set, i, filename, name, v, c, s, w=None):
+	if sulci_set.has_key(name):
+		h = sulci_set[name]
+		if h.has_key(i):
+			h[i]['vertices'].append(v)
+			if w: h[i]['weights'].append(w)
+			h[i]['gravity_center'][0].append(c)
+			h[i]['gravity_center'][1].append(s)
+		else:
+			h[i] = {
+				'vertices' : [v],
+				'name' : filename,
+				'weights' : None,
+				'gravity_center' : [[c], [s]]
+			}
+			if w: h[i]['weights'] = [w]
+	else:
+		sulci_set[name] = {
+			i : {'vertices' : [v],
+			'name' : filename,
+			'weights' : None,
+			'gravity_center' : [[c], [s]] }
+			}
+		if w: sulci_set[name][i]['weights'] = [w]
+
+
+def update_sulci_set2(sulci_set, selected_sulci, segments_weights_g,
+					i, filename, name, v, no_tal):
+	if no_tal:
+		c = v['gravity_center']
+		s = v['size']
+	else:
+		c = v['refgravity_center']
+		s = v['refsize']
+	if segments_weights_g != None:
+		W = segments_weights_g
+		weights = {}
+		for j, name in enumerate(W.colnames()):
+			if not name.startswith('proba_'): continue
+			name = name[6:]
+			if selected_sulci is not None \
+				and name not in selected_sulci: continue
+			w = W[W[:, 0] == v['index']][0, j]
+			if w < 0.01: continue
+			update_sulci_set(sulci_set, i, filename,
+						name, v, c, s, w)
+			weights[name] = w
+		return weights
+	else:
+		if selected_sulci is not None and name not in selected_sulci:
+			return []
+		update_sulci_set(sulci_set, i, filename, name, v, c, s, None)
+		return None
+
+
+################################################################################
 def compute_gravity_centers(sulci_set, input_motions=None,
 				local_transformations=None):
 	'''
@@ -32,32 +88,54 @@ def compute_gravity_centers(sulci_set, input_motions=None,
 			else:
 				motion = aims.Motion()
 				motion.setToIdentity()
-			if transformations:
+			if local_transformations:
 				local_trans = local_transformations[i][sulcus]
 				local_motion = local_trans.to_motion()
 				motion = local_motion * motion
 			db.append(motion.transform(g))
-		distr = distribution.Gaussian()
-		gravity_centers[sulcus] = distr.fit(db)
+		db = numpy.array(db)
+		distr = distribution.FixedSphericalGaussian(1.)
+		distr.fit(db)
+		gravity_centers[sulcus] = distr
 	return gravity_centers
+
+def estimate_gravity_center(sulcus, graphs, global_graph_trans):
+	Id3 = numpy.identity(3)
+	Ra = numpy.asmatrix(numpy.zeros((3, 3)))
+	ta = numpy.asmatrix(numpy.zeros((3, 1)))
+	for i, g in enumerate(graphs):
+		trans = global_graph_trans[i][sulcus]
+		if trans is None: continue
+		R, t0 = trans._R, trans._t
+		A = Id3 - R
+		Ra += A + A.T
+		ta += A.T * t0
+	g = numpy.asarray(Ra.I * ta)
+	return g
 
 ################################################################################
 class SpamLearner(object):
-	def __init__(self, graphs, input_motions, ss, selected_sulci,
-			sigmas, sigma_value, fromlog):
+	def __init__(self, graphs, segments_weights, input_motions, ss,
+		selected_sulci, label_mode, sigmas, sigma_value, fromlog,
+		no_tal, is_affine):
 		self._graphs = graphs
+		self._segments_weights = segments_weights
 		self._input_motions = input_motions
 		self._ss = ss
 		self._selected_sulci = selected_sulci
+		self._label_mode = label_mode
 		self._sigmas = sigmas
 		self._sigma_value = sigma_value
 		self._fromlog = fromlog
+		self._no_tal = no_tal
+		self._is_affine = is_affine
 		self._init_data()
 
 	def get_labels(self): return self._labels
 
 	def _init_data(self):
 		subjects_data = []
+		subjects_data_weights = []
 		labels = set()
 		sulci_set = {}
 		motions = []
@@ -68,41 +146,31 @@ class SpamLearner(object):
 		gravity_centers = {}
 
 		for i, g in enumerate(self._graphs):
-			motion = aims.GraphManip.talairach(g)
+			if self._segments_weights:
+				segments_weights_g = self._segments_weights[i]
+			else:	segments_weights_g = None
+			if self._no_tal:
+				motion = aims.Motion()
+				motion.setToIdentity()
+			else:	motion = aims.GraphManip.talairach(g)
 			filename = g['aims_reader_filename']
 			if self._input_motions:
 				motion = self._input_motions[i] * motion
 			motions.append(motion)
-			data = {}
+			if self._segments_weights and \
+				segments_weights_g != None:
+				data = []
+			else:	data = {}
+			data_weights = []
 			for v in g.vertices():
 				if v.getSyntax() != 'fold': continue
-				name = v['name']
-				if self._selected_sulci != None and \
-					name not in self._selected_sulci:
-					continue
+				name = v[self._label_mode]
 				labels.add(name)
-				c = v['refgravity_center']
-				w = v['refsize']
-				if sulci_set.has_key(name):
-					h = sulci_set[name]
-					if h.has_key(i):
-						h[i]['vertices'] += [v]
-						h[i]['gravity_center'][0].append(c)
-						h[i]['gravity_center'][1].append(w)
-					else:
-						h[i] = {
-							'vertices' : [v],
-							'name' : filename,
-							'gravity_center' : \
-								[[c], [w]]
-						}
-				else:
-					sulci_set[name] = {
-						i : {'vertices' : [v],
-						     'name' : filename,
-						     'gravity_center' : \
-								[[c], [w]] }
-						}
+				weights = update_sulci_set2(sulci_set,
+					self._selected_sulci,
+					segments_weights_g,i, filename,
+					name, v, self._no_tal)
+				if weights == []: continue
 				ss_map = v[bucket_name].get()
 				size_in = numpy.array([ss_map.sizeX(),
 					ss_map.sizeY(), ss_map.sizeZ()])
@@ -111,47 +179,57 @@ class SpamLearner(object):
 					p_in = aims.Point3df(p_in * size_in)
 					p_out = motion.transform(p_in)
 					X.append(p_out)
-				if data.has_key(name):
-					data[name].append(X)
-				else:	data[name] = [X]
-			for sulcus, data in sulci_set.items():
-				d = data[i]
+				if segments_weights_g is None:
+					if data.has_key(name):
+						data[name].append(X)
+					else:	data[name] = [X]
+				else:
+					data.append(X)
+					data_weights.append(weights)
+			for sulcus, h in sulci_set.items():
+				if not h.has_key(i): continue
+				d = h[i]
 				C = d['gravity_center'][0]
 				W = d['gravity_center'][1]
 				d['gravity_center'] = numpy.dot(W, C)
+				d['gravity_center'] /= numpy.sum(W)
 
 			subjects_data.append(data)
+			subjects_data_weights.append(data_weights)
 		self._gravity_centers = compute_gravity_centers(sulci_set,
 							self._input_motions)
 		self._subjects_data = subjects_data
+		self._subjects_data_weights = subjects_data_weights
 		self._sulci_set = sulci_set
 		self._labels = labels
 		self._motions = motions
 
 
 class GlobalSpamLearner(SpamLearner):
-	def __init__(self, graphs, input_motions, ss, selected_sulci,
-			sigmas, sigma_value, fromlog):
-		SpamLearner.__init__(self, graphs, input_motions, ss,
-			selected_sulci, sigmas, sigma_value, fromlog)
+	def __init__(self, *args, **kwargs):
+		SpamLearner.__init__(self, *args, **kwargs)
 
 	def _init_data(self):
 		SpamLearner._init_data(self)
 			
 		# compute weights, groups, priors (voxels/segments)
-		weights = []
-		groups = []
+		self._weights = []
+		self._groups = []
 		for i, g in enumerate(self._graphs):
-			data = self._subjects_data[i]
-			subject_voxels = []
-			subweights = [[] for k in range(len(self._labels))]
-			subgroups = []
+			self._init_data_one_graph(i)
+	
+	def _init_data_one_graph(self, i):
+		data = self._subjects_data[i]
+		data_weights = self._subjects_data_weights[i]
+		subject_voxels = []
+		subweights = [[] for k in range(len(self._labels))]
+		subgroups = []
+		if self._segments_weights == None:
 			for j, label in enumerate(self._labels):
 				try:
 					segments = data[label]
 				except KeyError:
 					segments = []
-				size = len(segments)
 				for k, w in enumerate(subweights):
 					if k == j:
 						w += [1.]
@@ -161,14 +239,20 @@ class GlobalSpamLearner(SpamLearner):
 				voxels_size = len(label_voxels)
 				subject_voxels += label_voxels
 				subgroups += [j] * voxels_size
-			X = numpy.asmatrix(numpy.vstack(subject_voxels))
-			self._subjects_data[i] = X
-			weights.append(numpy.asmatrix(numpy.vstack(subweights)))
-			groups.append(numpy.array(subgroups))
-
-		# store data
-		self._weights = weights
-		self._groups = groups
+		else:
+			for j, segment in enumerate(data):
+				voxels_size = len(segment)
+				for k, label in enumerate(self._labels):
+					w = subweights[k] 
+					if data_weights[j].has_key(label):
+						w += [data_weights[j][label]]
+					else:	w += [0.]
+				subject_voxels += segment
+				subgroups += [j] * voxels_size
+		X = numpy.asmatrix(numpy.vstack(subject_voxels))
+		self._subjects_data[i] = X
+		self._weights.append(numpy.asmatrix(numpy.vstack(subweights)))
+		self._groups.append(numpy.array(subgroups))
 
 	def learn_spams(self, motions, sulci_set):
 		models = []
@@ -192,10 +276,11 @@ class GlobalSpamLearner(SpamLearner):
 		eps = 0.001
 		X = self._subjects_data[i]
 		reg = SpamMixtureRegistration(X.T, self._weights[i],
-				mixture, self._groups[i], verbose - 1)
+			mixture, self._groups[i], self._is_affine, verbose - 1)
 		old_R, old_t = self._old_params[i]
 		reg.set_initialization(old_R, old_t)
-		R, t = reg.optimize(eps=eps, mode='powell')
+		R, t = reg.optimize(eps=eps, mode='powell',
+				affine=self._is_affine)
 		self._old_params[i] = R, t
 		energy = reg.energy()
 		trans = RigidTransformation(R, t)
@@ -256,10 +341,8 @@ class GlobalSpamLearner(SpamLearner):
 
 
 class GlobalSpamLearnerLoo(GlobalSpamLearner):
-	def __init__(self, graphs, input_motions, ss, selected_sulci,
-			sigmas, sigma_value, fromlog):
-		GlobalSpamLearner.__init__(self, graphs, input_motions, ss,
-			selected_sulci, sigmas, sigma_value, fromlog)
+	def __init__(self, *args, **kwargs):
+		GlobalSpamLearner.__init__(self, *args, **kwargs)
 
 	def learn_spams_loo(self, i, motions):
 		sulci_set = copy.copy(self._sulci_set)
@@ -291,10 +374,12 @@ class GlobalSpamLearnerLoo(GlobalSpamLearner):
 
 
 class LocalSpamLearner(SpamLearner):
-	def __init__(self, graphs, input_motions, ss, selected_sulci,
-			sigmas, sigma_value, fromlog, dir_priors):
-		SpamLearner.__init__(self, graphs, input_motions, ss,
-				selected_sulci, sigmas, sigma_value, fromlog)
+	def __init__(self, graphs, segments_weights, input_motions,
+		ss, selected_sulci, label_mode, sigmas,
+		sigma_value, fromlog, no_tal, is_affine, dir_priors):
+		SpamLearner.__init__(self, graphs, segments_weights,
+			input_motions, ss, selected_sulci, label_mode, sigmas,
+			sigma_value, fromlog, no_tal, is_affine)
 		self._dir_priors = dir_priors
 
 	def _init_data(self):
@@ -361,7 +446,7 @@ class LocalSpamLearner(SpamLearner):
 				print "graph %d/%d" % (i + 1, len(self._graphs))
 			X = X_subjects[i]
 			if X is None:
-				transformations.append((None, None))
+				transformations.append(None)
 				if verbose > 1: print "(skip graph)"
 				continue
 			global_trans, energy = self.register(sulcus, i, X, spam,
@@ -412,7 +497,8 @@ class LocalSpamLearner(SpamLearner):
 		spam = self.learn_spam(sulcus, cur_motions, self._sulci_set)
 		return transformations, spam
 
-	def learn(self, miniter=0., maxiter=numpy.inf, verbose=0):
+	def learn(self, optimized_gravity_centers,
+		miniter=0., maxiter=numpy.inf, verbose=0):
 		d = dict(zip(self._labels, [None] * len(self._labels)))
 		local_graph_trans = [copy.copy(d) for i in self._graphs]
 		global_graph_trans = [copy.copy(d) for i in self._graphs]
@@ -426,16 +512,23 @@ class LocalSpamLearner(SpamLearner):
 						miniter, maxiter, verbose - 1)
 			spams.append(spam)
 			for i, global_trans in enumerate(transformations):
-				global_graph_trans[i][sulcus] = transformations
+				global_graph_trans[i][sulcus] = global_trans
 
 		# gravity_centers in optimized referential space
-		self._new_gravity_centers = compute_gravity_centers(sulci_set,
-				self._input_motions, global_graph_trans)
+		self._new_gravity_centers = compute_gravity_centers(\
+			self._sulci_set, self._input_motions,global_graph_trans)
 		for sulcus in self._labels:
-			for i, g in enumerate(self._graphs):
+			if optimized_gravity_centers:
+				g = estimate_gravity_center(sulcus,
+					self._graphs, global_graph_trans)
+			else:	g = numpy.asarray(self._new_gravity_centers[\
+					sulcus].mean()).T
+			for i, graph in enumerate(self._graphs):
 				trans = global_graph_trans[i][sulcus]
+				if trans is None:
+					local_graph_trans[i][sulcus] = None
+					continue
 				R, t0 = trans._R, trans._t
-				g = self._new_gravity_centers[sulcus]
 				tg = t0 + R * g - g
 				local_trans = RigidTransformation(R, tg)
 				local_graph_trans[i][sulcus] = local_trans
@@ -449,11 +542,13 @@ class LocalSpamLearner(SpamLearner):
 
 
 class LocalSpamLearnerLoo(LocalSpamLearner):
-	def __init__(self, graphs, input_motions, ss, selected_sulci,
-			sigmas, sigma_value, fromlog, dir_priors):
-		LocalSpamLearner.__init__(self, graphs, input_motions, ss,
-					selected_sulci, sigmas, sigma_value,
-					fromlog, dir_priors)
+	def __init__(self, graphs, segments_weights, input_motions, ss,
+		selected_sulci, label_mode, sigmas, sigma_value,
+		fromlog, no_tal, is_affine, dir_priors):
+		LocalSpamLearner.__init__(self, graphs, segments_weights,
+			input_motions, ss, selected_sulci, label_mode,
+			sigmas, sigma_value, fromlog, no_tal,
+			is_affine,dir_priors)
 
 	def learn_spam_loo(self, sulcus, i, motions):
 		sulci_set = copy.copy(self._sulci_set)
@@ -494,8 +589,13 @@ class LocalSpamLearnerLoo(LocalSpamLearner):
 def parseOpts(argv):
 	description = 'Compute Spam from a list of graphs.\n' \
 	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg...\n' \
-	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... -- ' \
-	'motion1.trm motion2.trm...'
+	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... == ' \
+	'motion1.trm motion2.trm...\n'
+	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... == '\
+	'motion1.trm motion2.trm... === posterior1.csv posterior2.csv...\n'
+	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... === '\
+	'posterior1.csv posterior2.csv...\n'
+	"use 'None' as csv filename to ignore the segments weights"
 	parser = OptionParser(description)
 	add_translation_option_to_parser(parser)
 	parser.add_option('-d', '--distribdir', dest='distribdir',
@@ -513,6 +613,12 @@ def parseOpts(argv):
 	parser.add_option('-s', '--sulci', dest='sulci',
 		metavar = 'LIST', action='store', default = None,
 		help='tag only specified manually tagged sulci.')
+	parser.add_option('--label-mode', dest='label_mode',
+		metavar = 'STR', type='choice', choices=('name', 'label'),
+		action='store', default = 'name',
+		help="'name' : build SPAMs from manual labeling, " + \
+		"'label' : build SPAMs from automatic labeling " + \
+		"(default: %default)")
 	parser.add_option('--data-type', dest='data_type',
 		metavar = 'TYPE', action='store', default = 'simple_surface',
 		help="data type on which spam are learned. Choose one among " \
@@ -536,11 +642,27 @@ def parseOpts(argv):
 		action='store', default = 'global',
 		help="use 'global' or 'local' (sulcuswise) registration")
 	parser.add_option('--maxiter', dest='maxiter', metavar = 'INT',
-		action='store', default = numpy.inf,
+		action='store', default = numpy.inf, type='int', 
 		help="max iterations number of optimization process")
 	parser.add_option('--miniter', dest='miniter', metavar = 'INT',
 		action='store', default = 0,
 		help="min iterations number of optimization process")
+	parser.add_option('--no-talairach', dest='no_tal',
+		action='store_true', default = False,
+		help="if not specified the internal transformation from " + \
+		"subject to Talairach is used before any other given " + \
+		"transformation.")
+	parser.add_option('--affine', dest='is_affine',
+		action='store_true', default = False,
+		help="if not specified: rigid transformation." + \
+		" if specified: affine transformation")
+	parser.add_option('--optimized-gravity-centers',
+		dest='optimized_gravity_centers', action='store_true',
+		default = False, help='if not specified, gravity centers ' \
+		'and their related local transformations are expressed ' \
+		'from the mean sulci gravity centers from the estimated ' \
+		'output space. If specified the gravity centers are ' \
+		'optimized to reduce the variability of translations.')
 	parser.add_option('--loo', dest='loo', action='store_true',
 		default = False,
 		help="leave one out in registration estimation (each subject" +\
@@ -556,19 +678,38 @@ def main():
 	if len(inputs) == 0:
 		parser.print_help()
 		sys.exit(1)
-	ind = [i for i, input in enumerate(inputs) if input == '==']
+	ind = [i for i, input in enumerate(inputs) \
+		if (input == '==' or input == '===')]
 	if len(ind) == 0:
 		graphnames = inputs
 		input_motions_names = None
-	else:
+		input_segments_weights = None
+	elif len(ind) == 1:
 		ind = ind[0]
 		graphnames = inputs[:ind]
-		input_motions_names = inputs[ind + 1:]
+		if inputs[ind] == '==':
+			input_motions_names = inputs[ind + 1:]
+			input_segments_weights = None
+		elif inputs[ind] == '===':
+			input_motions_names = None
+			input_segments_weights = inputs[ind + 1:]
+	elif len(ind) == 2:
+		ind1, ind2 = ind
+		graphnames = inputs[:ind1]
+		input_motions_names = inputs[ind1 + 1:ind2]
+		input_segments_weights = inputs[ind2 + 1:]
+
 	graphs = io.load_graphs(options.transfile, graphnames)
 	if input_motions_names:
 		reader = aims.Reader()
 		input_motions = [reader.read(f) for f in input_motions_names]
 	else:	input_motions = None
+	if input_segments_weights:
+		segments_weights = io.read_segments_weights(\
+					input_segments_weights)
+	else:	segments_weights = None
+
+
 
 	# options
 	if options.sulci is None:
@@ -598,8 +739,10 @@ def main():
 
 	# learn
 	if options.mode == 'global':
-		opt = [graphs, input_motions, ss, selected_sulci, sigmas,
-				sigma_value, options.fromlog]
+		opt = [graphs, segments_weights, input_motions, ss,
+			selected_sulci,	options.label_mode, sigmas,
+			sigma_value, options.fromlog, options.no_tal,
+			options.is_affine]
 		if options.loo:
 			Learner = GlobalSpamLearnerLoo
 		else:	Learner = GlobalSpamLearner
@@ -609,13 +752,21 @@ def main():
 					options.dir_priorsname,
 					selected_sulci=selected_sulci)
 		else:	dir_priors = None
-		opt = [graphs, input_motions, ss, selected_sulci, sigmas,
-				sigma_value, options.fromlog, dir_priors]
+		opt = [graphs, segments_weights, input_motions, ss,
+			selected_sulci,	options.label_mode, sigmas, sigma_value,
+			options.fromlog, options.no_tal, options.is_affine,
+			dir_priors]
 		if options.loo:
 			Learner = LocalSpamLearnerLoo
 		else:	Learner = LocalSpamLearner
 	learner = Learner(*opt)
-	transformations, mixture = learner.learn(float(options.miniter),
+	if options.mode == 'global':
+		transformations, mixture = learner.learn(float(options.miniter),
+				float(options.maxiter), verbose=int(options.verbose))
+	elif options.mode == 'local':
+		transformations, mixture = learner.learn(
+			options.optimized_gravity_centers,
+			float(options.miniter),
 			float(options.maxiter), verbose=int(options.verbose))
 	spams = mixture.get_models()
 	labels = learner.get_labels()
@@ -636,15 +787,16 @@ def main():
 			global_trans.write(dir + '_global', dir + '_global.dat')
 	if options.mode == 'local':
 		gravity_centers = learner._new_gravity_centers
-		prefix = options.distrib_gaussians
-		try:    os.mkdir(prefix)
+		gprefix = options.distrib_gaussians
+		try:    os.mkdir(gprefix)
 		except OSError, e:
 			print e
 			sys.exit(1)
 		h = {'data_type' : 'refgravity_center', 'files' : {},
 			'level' : 'segments'}
 		for sulcus, distr in gravity_centers.items():
-			filename = io.node2densityname(prefix,'gaussian',sulcus)
+			filename = io.node2densityname(gprefix,\
+					'gaussian', sulcus)
 			distr.write(filename)
 			h['files'][sulcus] = (distr.name(), filename)
 		summary_file = options.distrib_gaussians + '.dat'

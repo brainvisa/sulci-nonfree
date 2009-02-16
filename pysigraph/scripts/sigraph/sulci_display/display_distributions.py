@@ -103,6 +103,11 @@ class Display(object):
 	def _handle_features(self):
 		msg.warning('feature option not available for this ' \
 							'distribution')
+
+	def find_color(self, sulcus):
+		if sulcus == 'error': return [0, 0.5, 1]
+		elif sulcus == 'ok': return [1, 0.5, 0]
+		return self._hie.find_color(sulcus)
 		
 
 class GaussianDisplay(Display):
@@ -114,7 +119,7 @@ class GaussianDisplay(Display):
 								1, 96)
 
 	def _display_one(self, sulcus, gaussian):
-		color = self._hie.find_color(sulcus)
+		color = self.find_color(sulcus)
 		if isinstance(gaussian, distribution.Dirac) or \
 			gaussian.type() == 'fake_gaussian' :
 			return
@@ -207,73 +212,73 @@ def addBorder(img_in, width=1, border_value=0., aims_border=False):
 
 	return img_out
 
+# Old Gmm display
+#class GmmDisplay(Display):
+#	def __init__(self, *args, **kwargs):
+#		Display.__init__(self, *args, **kwargs)
+#		self._probs = [0.3, 0.6, 0.8]
+#		self._alphas = [1, 0.6, 0.2]
+#		self._mesher = aimsalgo.Mesher()
+#
+#	def _sample(self, gmm, gd, shape):
+#		array = gmm.sample(gd, None, verbose=0).reshape(shape)
+#		return numpy.exp(array)
+#
+#	def _display_one(self, sulcus, gmm):
+#		gmm = gmm._gmm
+#		n = gmm.k
+#		#limits = []
+#		# find bounding box of 2 std limits border of each gaussian
+#		# weights are not considered
+#		#for k in range(n):
+#		#	c  = gmm.centers[k]
+#		#	w = gmm.weights[k]
+#		#	if gmm.prec_type == 0:
+#		#		metric = gmm.precision[k].reshape(3, 3)
+#		#	elif gmm.prec_type == 1:
+#		#		metric = numpy.diag(gmm.precision[k])
+#		#	eigval, eigvect = numpy.linalg.eig(metric)
+#		#	for i in range(3):
+#		#		l, v = eigval[i], eigvect[i]
+#		#		v = 2 * numpy.sqrt(1./l) * v * w
+#		#		limits += [c + v, c - v]
+#		#limits = numpy.vstack(limits)
+#		c = (numpy.asarray(gmm.centers) * \
+#			gmm.weights[None].T).sum(axis=0)
+#		e1 = numpy.array([40, 0, 0])
+#		e2 = numpy.array([0, 40, 0])
+#		e3 = numpy.array([0, 0, 40])
+#		limits = numpy.array([c + e1, c + e2, c + e3,
+#					c - e1, c - e2, c - e3])
+#		xmin, ymin, zmin = limits.min(axis=0)
+#		xmax, ymax, zmax = limits.max(axis=0)
+#		gd = fff.GMM.grid_descriptor(3)
+#		shape = [int(xmax - xmin), int(ymax - ymin), int(zmax - zmin)]
+#		shape = numpy.array(shape)
+#		#shape /= min(30, shape.min())
+#		gd.getinfo([xmin, xmax, ymin, ymax, zmin, zmax], shape)
+#		array = self._sample(gmm, gd, shape)
+#		array /= array.sum() # spurious normalization
+#		shape = array.shape
+#		img_density = aims.AimsData_FLOAT(*array.shape)
+#		img_density.volume().arraydata()[:] = array.T
+#		if self._generate_all:
+#			self._writer.write(img_density, 'img_%s.ima' % sulcus)
+#		meshes, img_thresholds = distributionArray3DToMeshes(\
+#				self._mesher, (xmin, ymin, zmin),
+#				img_density, array, self._probs)
+#		color = self._hie.find_color(sulcus)
+#		self._aobjects += colorMeshes(meshes, color, self._alphas)
+#		for i, mesh in enumerate(meshes):
+#			self._writer.write(mesh, 'gmm_%s_%d.mesh' %(sulcus, i))
+#		if self._generate_all:
+#			for i, img_threshold in enumerate(img_thresholds):
+#				self._writer.write(img_threshold,
+#					'img_threshold_%s_%d.ima' % (sulcus, i))
 
-class GmmDisplay(Display):
-	def __init__(self, *args, **kwargs):
-		Display.__init__(self, *args, **kwargs)
-		self._probs = [0.3, 0.6, 0.8]
-		self._alphas = [1, 0.6, 0.2]
-		self._mesher = aimsalgo.Mesher()
-
-	def _sample(self, gmm, gd, shape):
-		array = gmm.sample(gd, None, verbose=0).reshape(shape)
-		return numpy.exp(array)
-
-	def _display_one(self, sulcus, gmm):
-		gmm = gmm._gmm
-		n = gmm.k
-		#limits = []
-		# find bounding box of 2 std limits border of each gaussian
-		# weights are not considered
-		#for k in range(n):
-		#	c  = gmm.centers[k]
-		#	w = gmm.weights[k]
-		#	if gmm.prec_type == 0:
-		#		metric = gmm.precision[k].reshape(3, 3)
-		#	elif gmm.prec_type == 1:
-		#		metric = numpy.diag(gmm.precision[k])
-		#	eigval, eigvect = numpy.linalg.eig(metric)
-		#	for i in range(3):
-		#		l, v = eigval[i], eigvect[i]
-		#		v = 2 * numpy.sqrt(1./l) * v * w
-		#		limits += [c + v, c - v]
-		#limits = numpy.vstack(limits)
-		c = (numpy.asarray(gmm.centers) * \
-			gmm.weights[None].T).sum(axis=0)
-		e1 = numpy.array([40, 0, 0])
-		e2 = numpy.array([0, 40, 0])
-		e3 = numpy.array([0, 0, 40])
-		limits = numpy.array([c + e1, c + e2, c + e3,
-					c - e1, c - e2, c - e3])
-		xmin, ymin, zmin = limits.min(axis=0)
-		xmax, ymax, zmax = limits.max(axis=0)
-		gd = fff.GMM.grid_descriptor(3)
-		shape = [int(xmax - xmin), int(ymax - ymin), int(zmax - zmin)]
-		shape = numpy.array(shape)
-		#shape /= min(30, shape.min())
-		gd.getinfo([xmin, xmax, ymin, ymax, zmin, zmax], shape)
-		array = self._sample(gmm, gd, shape)
-		array /= array.sum() # spurious normalization
-		shape = array.shape
-		img_density = aims.AimsData_FLOAT(*array.shape)
-		img_density.volume().arraydata()[:] = array.T
-		if self._generate_all:
-			self._writer.write(img_density, 'img_%s.ima' % sulcus)
-		meshes, img_thresholds = distributionArray3DToMeshes(\
-				self._mesher, (xmin, ymin, zmin),
-				img_density, array, self._probs)
-		color = self._hie.find_color(sulcus)
-		self._aobjects += colorMeshes(meshes, color, self._alphas)
-		for i, mesh in enumerate(meshes):
-			self._writer.write(mesh, 'gmm_%s_%d.mesh' %(sulcus, i))
-		if self._generate_all:
-			for i, img_threshold in enumerate(img_thresholds):
-				self._writer.write(img_threshold,
-					'img_threshold_%s_%d.ima' % (sulcus, i))
-
-class BGmmDisplay(GmmDisplay):
-	def _sample(self, gmm, gd, shape):
-		return gmm.VB_sample(gd, None).reshape(shape)
+#class BGmmDisplay(GmmDisplay):
+#	def _sample(self, gmm, gd, shape):
+#		return gmm.VB_sample(gd, None).reshape(shape)
 
 
 class SpamDisplay(Display):
@@ -283,17 +288,21 @@ class SpamDisplay(Display):
 		self._alpha = [1, 0.6, 0.2]
 		self._mesher = aimsalgo.Mesher()
 
-	def _display_one(self, sulcus, spam):
-		color = self._hie.find_color(sulcus)
-
-		bb_talairach_offset, bb_talairach_size = spam.bb_talairach()
+	def _get_data(self, sulcus, spam):
 		if self._sulci_weights != None:
 			w = self._sulci_weights[sulcus]
 			array = spam.powered_img_density(1. - w)
 			img_density = aims.Volume_FLOAT(array)
-		else:
-			img_density = spam.img_density()
-			array = img_density.volume().get().arraydata()
+		else:	img_density = spam.img_density()
+		return img_density
+
+	def _display_one(self, sulcus, spam):
+		color = self.find_color(sulcus)
+
+		bb_talairach_offset, bb_talairach_size = spam.bb_talairach()
+		img_density = self._get_data(sulcus, spam)
+		try:	array = img_density.volume().get().arraydata()
+		except:	array = img_density.arraydata()
 		if spam.is_fromlog(): array = numpy.exp(array)
 			
 		if numpy.isnan(array).sum():
@@ -303,7 +312,7 @@ class SpamDisplay(Display):
 	
 		if self._generate_all:
 			# sulcus in subject axis
-			self._write.write(img_density,
+			self._writer.write(img_density,
 					'img_density_%s.ima' % sulcus)
 
 		meshes, img_thresholds = distributionArray3DToMeshes(\
@@ -317,15 +326,38 @@ class SpamDisplay(Display):
 				self._writer.write(img_threshold,
 					'img_threshold_%s_%d.ima' % (sulcus, i))
 
+class GmmFromSpamDisplay(SpamDisplay):
+	def __init__(self, *args, **kwargs):
+		SpamDisplay.__init__(self, *args, **kwargs)
 
+	def _get_data(self, sulcus, gmm):
+		bb_talairach_offset, bb_talairach_size = gmm.bb_talairach()
+
+		bb_talairach_offset = numpy.array(bb_talairach_offset)
+		from numpy.lib import index_tricks
+		X = numpy.array([x for x in index_tricks.ndindex( \
+					tuple(bb_talairach_size))])
+		X += bb_talairach_offset
+		d = 100
+		n = (X.shape[0] / d)
+		li = []
+		for i in range(d + 1):
+			Xi = X[i * n: (i + 1) * n]
+			logli, li_i = gmm.likelihoods(Xi)
+			li.append(li_i)
+		li = numpy.hstack(li)
+		array = li.reshape(bb_talairach_size).T[None].astype('float32')
+		return aims.Volume_FLOAT(array)
+
+################################################################################
 def parseOpts(argv):
 	description = 'Display learned bayesian local models ' \
 			'(one for each sulci).'
 	parser = OptionParser(description)
-	parser.add_option('-m', '--graphmodel', dest='graphmodelname',
-		metavar = 'FILE', action='store',
-		default = 'bayesian_graphmodel.dat',
-		help='graphical model structure (default : %default)')
+	#parser.add_option('-m', '--graphmodel', dest='graphmodelname',
+	#	metavar = 'FILE', action='store',
+	#	default = 'bayesian_graphmodel.dat',
+	#	help='graphical model structure (default : %default)')
 	parser.add_option('-d', '--distrib', dest='distribname',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')
@@ -370,7 +402,7 @@ def main():
 	if options.sulci is None:
 		selected_sulci = None
 	else:	selected_sulci = options.sulci.split(',')
-	sulcimodel = io.read_full_model(options.graphmodelname,
+	sulcimodel = io.read_full_model(None,#options.graphmodelname,
 		segmentsdistribname=options.distribname,
 		selected_sulci=selected_sulci)
 	distribs = sulcimodel.segments_distrib()['vertices']
@@ -381,7 +413,7 @@ def main():
 		sys.exit(1)
 	model_type = list(model_types)[0]
 	if not (model_type in ['gaussian', 'spam', 'depth_weighted_spam',
-						'gmm', 'fixed_bgmm']):
+						'gmm_from_spam']):
 		print "error : unhandle model type '%s'" % model_type
 		sys.exit(1)
 	else:	print "model type '%s' found" % model_type
@@ -389,8 +421,7 @@ def main():
 			options.all, options.features, sulci_weights]
 	if model_type == 'gaussian' : d = GaussianDisplay(*args)
 	#if model_type == 'bloc_gaussian' : d = BlocGaussianDisplay(*args)
-	elif model_type == 'gmm': d = GmmDisplay(*args)
-	elif model_type == 'fixed_bgmm' : d = BGmmDisplay(*args)
+	elif model_type == 'gmm_from_spam': d = GmmFromSpamDisplay(*args)
 	elif model_type in ['spam', 'depth_weighted_spam']:
 		d = SpamDisplay(*args)
 	d.display()

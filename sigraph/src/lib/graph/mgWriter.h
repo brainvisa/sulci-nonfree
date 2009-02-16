@@ -21,13 +21,14 @@ namespace sigraph
 			     const std::string & mstr = "model" );
     virtual void write( const Graph & ao );
     virtual std::string name() const;
+    virtual std::string dataDirectory( const Graph & ao ) const;
 
   protected:
     virtual void write( const GraphObject & ao );
     virtual void write( const Vertex & ao );
     virtual void write( const Edge & ao );
 
-    std::string	_filenameBase;
+    mutable std::string	_filenameBase;
 
   private:
     std::string	_mgFilename;
@@ -51,7 +52,7 @@ namespace sigraph
   }
 
 
-  inline void MGWriter::write( const Graph & ao )
+  inline std::string MGWriter::dataDirectory( const Graph & ao ) const
   {
     if( !ao.getProperty( "filename_base", _filenameBase ) )
       _filenameBase = "";
@@ -62,6 +63,13 @@ namespace sigraph
         _filenameBase = _filenameBase.substr( 0, _filenameBase.length() - 4 );
       _filenameBase += ".data";
     }
+    return _filenameBase;
+  }
+
+
+  inline void MGWriter::write( const Graph & ao )
+  {
+    dataDirectory( ao );
     if( !is_open() )
       open( name() );
 

@@ -133,7 +133,10 @@ def filtred(labels, filter, mode):
 
 def save_adaptive_callback(ad, user_data):
 	ao = ad.topModel().parentAO()
-	user_data['frgwriter'].parseModel(ao, "model_file", "model")
+        print ao
+	mw = user_data['frgwriter']
+        mw.dataDirectory( user_data[ 'graph' ] )
+        mw.parseModel(ao, "model_file", "model")
 
 
 def save(model, filename, filter = None, filter_mode = None):
