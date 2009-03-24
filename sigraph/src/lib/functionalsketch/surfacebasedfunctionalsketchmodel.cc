@@ -9,6 +9,7 @@
  *
  */
 
+#include <cstdlib>
 #include <si/functionalsketch/surfacebasedfunctionalsketchmodel.h>
 #include <si/functionalsketch/surfacebasedfunctionalsketchattrib.h>
 #include <si/graph/vertexclique.h>

@@ -8,6 +8,7 @@
  *  	France
  */
 
+#include <cstdlib>
 #include <aims/distancemap/projection.h>
 #include <aims/distancemap/meshparcellation.h>
 #include <aims/distancemap/thickness.h>

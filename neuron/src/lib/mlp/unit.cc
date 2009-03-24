@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <neur/mlp/unit.h>
 #include <iostream>
 #include <string>

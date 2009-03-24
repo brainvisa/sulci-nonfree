@@ -8,6 +8,7 @@
  *  	France
  */
 
+#include <cstdlib>
 #include <si/global/global.h>
 #include <si/model/mReader.h>
 #include <si/domain/domReader.h>

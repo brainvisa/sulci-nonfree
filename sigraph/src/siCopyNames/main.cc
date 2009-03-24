@@ -8,6 +8,7 @@
  *  	France
  */
 
+#include <cstdlib>
 #include <si/global/global.h>
 #include <graph/graph/graph.h>
 #include <graph/graph/greader.h>

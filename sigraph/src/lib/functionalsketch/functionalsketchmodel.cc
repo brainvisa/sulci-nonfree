@@ -9,6 +9,7 @@
  *
  */
 
+#include <cstdlib>
 #include <si/functionalsketch/functionalsketchmodel.h>
 #include <si/functionalsketch/functionalsketchattrib.h>
 #include <si/graph/vertexclique.h>

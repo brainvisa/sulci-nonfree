@@ -1,6 +1,7 @@
 
 #ifndef SI_NO_SVMLIB
 
+#include <cstdlib>
 #include <si/subadaptive/subadsvm.h>
 #include <si/model/mWriter.h>
 #include <si/subadaptive/saParser.h>

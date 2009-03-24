@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <si/global/global.h>
 #include <si/fold/frgReader.h>
 #include <si/fold/foldReader.h>

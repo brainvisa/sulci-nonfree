@@ -9,6 +9,7 @@
  *
  */
 
+#include <cstdlib>
 #include <neur/mlp/pat.h>
 #include <fstream>
 #include <sstream>

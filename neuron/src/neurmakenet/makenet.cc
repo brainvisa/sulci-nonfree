@@ -9,6 +9,7 @@
  *
  */
 
+#include <cstdlib>
 #include <neur/mlp/mlp.h>
 #include <iostream>
 #include <vector>

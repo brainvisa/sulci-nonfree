@@ -10,6 +10,7 @@
  *  Slices of a mask to buckets
  */
 
+#include <cstdlib>
 #include <si/model/mReader.h>
 #include <si/fold/fdParser.h>
 #include <si/model/adaptiveTree.h>

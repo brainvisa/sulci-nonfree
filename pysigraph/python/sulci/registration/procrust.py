@@ -562,6 +562,27 @@ class Registration(object):
 			else:	old_energy = new_energy
 		return self._R, self._t
 
+	def optimize_translation_powell(self, eps=10e-5,
+		user_func=(lambda self,x : None), user_data=None):
+		self._n = 0
+		self._w = numpy.array([0., 0., 0.])
+		def func(x, self, user_func, user_data):
+			self._t = numpy.asmatrix(x).T
+			if not (self._n % 100):
+				user_func(self, user_data)
+			self._energy = self.energy()
+			if self._verbose > 0:
+				print "powell, en = %f " % (self._energy)
+			self._n += 1
+			return self._energy
+		x0 = numpy.asarray(self._t).ravel()
+		import scipy.optimize
+		res = scipy.optimize.fmin_powell(func, x0,
+			args=(self, user_func, user_data), disp=0, ftol=eps)
+		func(res, self, user_func, user_data)
+		user_func(self, user_data)
+		return self._R, self._t
+
 	def optimize_rigid_powell(self, eps=10e-5,
 		user_func=(lambda self,x : None), user_data=None):
 		self._n = 0
@@ -589,6 +610,7 @@ class Registration(object):
 		res = scipy.optimize.fmin_powell(func, x0,
 			args=(self, user_func, user_data), disp=0, ftol=eps)
 		func(res, self, user_func, user_data)
+		user_func(self, user_data)
 		return self._R, self._t
 
 	def optimize_affine_powell(self, eps=10e-5,
@@ -635,6 +657,7 @@ class Registration(object):
 		res = scipy.optimize.fmin_powell(func, x0,
 			args=(self, user_func, user_data), disp=0, ftol=eps)
 		func(res, self, user_func, user_data)
+		user_func(self, user_data)
 		return self._R, self._t
 	
 
@@ -742,7 +765,7 @@ class ProcrustMetricField(Registration):
 		metrics = gaussian_mixture.get_metrics()
 		self._X = numpy.asmatrix(X)
 		self._weights = numpy.asmatrix(weights)
-		self._centers = [numpy.asmatrix(c).T for c in centers]
+		self._centers = [numpy.asmatrix(c) for c in centers]
 		self._metrics = [numpy.asmatrix(c) for c in metrics]
 		if len(centers) != len(metrics):
 			raise ValueError("number of centers/metrics" + \

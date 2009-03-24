@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <aims/getopt/getopt2.h>
 #include <si/subadaptive/subAdMlp.h>
 #include <si/model/mReader.h>

@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <si/fold/frgraph.h>
 #include <si/fold/fgraph.h>
 #include <si/fold/foldReader.h>

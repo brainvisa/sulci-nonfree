@@ -612,7 +612,14 @@ bool FoldDescr2::makeVectorElements( const Clique* cl, vector<double> & vec,
 #else
 		(*ipe)->getProperty( cdistatt, distc );
 #endif
-		assert( distc > 0 );
+		//assert( distc > 0 );
+                if( distc <= 0 )
+                {
+                  cout << "distc <= 0 : " << distc << endl;
+                  int cl = 0;
+                  (*ipe)->getProperty( "cortical_label", cl );
+                  cout << "cortical_label: " << cl << endl;
+                }
 		float &mi 
 		  = rels[ pair<CComponent *, CComponent *>( cc1b, cc2b ) ];
 		if( mi == 0 || distc < mi )

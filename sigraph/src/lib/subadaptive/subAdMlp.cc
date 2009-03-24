@@ -9,6 +9,7 @@
  *
  */
 
+#include <cstdlib>
 #include <si/subadaptive/subAdMlp.h>
 #include <si/model/adaptiveLeaf.h>
 #include <si/model/mWriter.h>

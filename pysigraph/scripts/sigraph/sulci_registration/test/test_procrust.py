@@ -2,9 +2,9 @@
 
 import os, sys, vtk
 import numpy
-import sulci_registration as S
-import sulci_registration.vtk_helpers as V
-from bayesian_sulci import distribution
+import sulci.registration as S
+import sulci.registration.vtk_helpers as V
+from sulci.models import distribution
 
 def update_cloud(procrust, (Y, pcX, tcl, vec, plotter)):
 	X = procrust._X
@@ -114,16 +114,16 @@ def test2():
 	covariances = [numpy.matrix(cov) for cov in covariances]
 	metrics = [cov.I for cov in covariances]
 
-	n = 10
+	n = 1000
 	#J = S.antisymetric_matrix_from_vector([0, 0, 0])
-	J = S.antisymetric_matrix_from_vector([0, 0., numpy.pi/5.])
+	J = S.antisymetric_matrix_from_vector([0, 0., numpy.pi/10.])
 	R = S.rotation_from_antisymetric_matrix(J)
 	#t = numpy.array([[20, 0, 0]]).T
-	t = 0.
+	t = numpy.array([[0.], [0.], [0.]])
 	print "-- Real transformation --"
 	print "t = ", t
 	print "R = ", R
-	X = R.T * (gen_data_gmm(centers, covariances, n) - t)
+	X = R.T * (V.gen_data_gmm(centers, covariances, n) - t)
 	weights = []
 	sum = 0.
 	for i in range(size):
@@ -138,7 +138,7 @@ def test2():
 		weights.append(w)
 	weights = numpy.asmatrix((numpy.vstack(weights) / sum))
 
-	Y = gen_data_gmm(centers, covariances, 1000)
+	Y = V.gen_data_gmm(centers, covariances, 1000)
 
 	pcX = V.PointsCloud(X)
 	pcX.set_color([1, 0, 0])
@@ -196,18 +196,19 @@ def test3():
 	metrics = [cov.I for cov in covariances]
 	priors = [0.33333, 0.33333, 0.33333]
 
-	n = 100
-	#J = S.antisymetric_matrix_from_vector([0, 0, 0])
-	J = S.antisymetric_matrix_from_vector([0, 0., numpy.pi/5.])
+	n = 200
+	J = S.antisymetric_matrix_from_vector([0, 0, 0])
+	#J = S.antisymetric_matrix_from_vector([0, 0., numpy.pi/5.])
 	R = S.rotation_from_antisymetric_matrix(J)
-	#t = numpy.array([[20, 0, 0]]).T
-	t = 0.
+	t = numpy.array([[10, 0, 0]]).T
+	#t = 0.
 	print "-- Real transformation --"
 	print "t = ", t
 	print "R = ", R
-	X = R.T * (gen_data_gmm(centers, covariances, n) - t)
-
-	Y = gen_data_gmm(centers, covariances, 1000)
+	#X = R.T * (V.gen_data_gmm(centers, covariances, n) - t)
+	X = R * numpy.asmatrix(numpy.hstack(centers)) - t #FIXME
+	n = 1 #FIXME
+	Y = V.gen_data_gmm(centers, covariances, 1000)
 
 	pcX = V.PointsCloud(X)
 	pcX.set_color([1, 0, 0])
@@ -230,11 +231,15 @@ def test3():
 	gmm = distribution.GaussianMixtureModel()
 	gmm.set_means_covs(centers, covariances)
 	gmm.set_priors(numpy.array(priors))
-	pmf = S.ProcrustMetricField(X, weights, gmm)
+	pmf = S.ProcrustMetricField(X, weights, gmm, verbose=2)
 
-	pmf = S.MixtureGlobalRegistration(X, gmm)
-	R, t, weights, loglis, lis = pmf.optimize(user_func=update_cloud2,
-		                       user_data=(Y, pcX, fgl, vec, plotter))
+	#pmf = S.MixtureGlobalRegistration(X, gmm)
+	#R, t = pmf.optimize_translation_powell(eps=0.0001,
+	R, t = pmf.optimize_riemannian(eps=0.0001,
+	#trans, weights, loglis, lis = pmf.optimize(eps=10.,
+		user_func=update_cloud2, user_data=(Y, pcX, fgl, vec, plotter))
+	#R = trans._R
+	#t = trans._t
 	print "-- Estimated transformation --"
 	print "t = ", t
 	print "R = ", R

@@ -1209,7 +1209,7 @@ class Kent(Distribution):
 
     given the following density function :
 
-            exp (k*<x,g1> + b * (<x,g2>^2 - <x,g3>^2)) * 2 * pi
+            exp (k*<x,g1> + b * (<x,g2>^2 - <x,g3>^2))
     f(x) = -----------------------------------------------------
                        exp(-k) * sqrt(k^2 - 4*b^2)
 		'''
@@ -1219,7 +1219,7 @@ class Kent(Distribution):
 		self._kappa = kappa
 		self._beta = beta
 		if not None in [gamma, kappa, beta]:
-			self._update()
+			self.update()
 		else: self._normalization = None
 
 	def setUniform(self, dim=3):
@@ -1346,7 +1346,7 @@ class Watson(Distribution):
 		self._mu = mu
 		self._kappa = kappa
 		if not None in [mu, kappa]:
-			self._update()
+			self.update()
 		else: self._normalization = self._lognormalization = None
 
 	def kappa(self): return self._kappa
@@ -1380,7 +1380,7 @@ class Watson(Distribution):
 
 	def likelihood(self, x):
 		k, m = self._kappa, self._mu
-		d = numpy.dot(x, mu)
+		d = numpy.dot(x, m)
 		logli = k * (d ** 2) + self._lognormalisation
 		li = numpy.exp(k * (d ** 2)) * self._normalisation
 		return logli, li
@@ -1439,17 +1439,17 @@ class Dirichlet(Distribution):
 
 	def fit(self, X):
 		'''
-    estimate k = sum(alpha_i) through minimizing MSE :
-    k = argmin_k sum (var_i - marginal_variance(X_i))^2
+    estimate c = sum(alpha_i) through minimizing MSE :
+    c = argmin_c sum (var_i - marginal_variance(X_i))^2
 		'''
 		if not self._check(X): return
-		fi = X.mean(axis=0)
-		var_fi = X.var(axis=0)
-		f0 = fi.sum()
-		a = ((fi * (f0 - fi)) ** 2).sum()
-		b = f0 ** 2 * (fi * (f0-fi) * var_fi).sum()
-		k = (a / b - 1) / f0
-		self._alpha = k * fi
+		m = X.mean(axis=0)
+		v = X.var(axis=0)
+		m0 = m.sum()
+		f2 = ((m * (m0 - m)) ** 2).sum()
+		fv = (m0 ** 2) * (m * (m0 - m) * v).sum()
+		c = (f2 / fv - 1) / m0
+		self._alpha = c * m
 		self.update()
 
 	def likelihood(self, x):
@@ -1699,7 +1699,8 @@ class MixtureModel(Distribution):
 		likelihoods = numpy.vstack(likelihoods)
 		return loglikelihoods.T, likelihoods.T
 
-	def posteriors(self, X):
+	# FIXME : argument L ajouter juste pour que recalage+gmm marche
+	def posteriors(self, X, L=None):
 		loglikelihoods, likelihoods = self.likelihoods(X)
 		if self._priors is not None:
 			posteriors = numpy.multiply(likelihoods, self._priors)
@@ -1764,7 +1765,6 @@ class GaussianMixtureModel(MixtureModel):
 
 	def get_covariances(self):
 		return [m.covariance() for m in self._models]
-
 
 
 class GammaExponentialMixtureModel(MixtureModel):

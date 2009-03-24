@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <si/fold/inertialDomainBox.h>
 #include <aims/math/eigen.h>
 #include <aims/bucket/bucket.h>

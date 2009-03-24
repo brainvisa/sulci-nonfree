@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <neur/mlp/mlp.h>
 #include <neur/rand/rand.h>
 #include <string>

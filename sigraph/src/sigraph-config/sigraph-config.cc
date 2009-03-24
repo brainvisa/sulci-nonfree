@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <aims/getopt/getopt2.h>
 #include <si/global/global.h>
 #include <aims/def/path.h>

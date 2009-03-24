@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <si/fold/foldReader.h>
 #include <cartobase/exception/parse.h>
 #include <iostream>

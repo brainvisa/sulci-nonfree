@@ -9,6 +9,7 @@
  */
 
 
+#include <cstdlib>
 #include <aims/getopt/getopt2.h>
 #include <aims/vector/vector.h>
 #include <si/global/global.h>

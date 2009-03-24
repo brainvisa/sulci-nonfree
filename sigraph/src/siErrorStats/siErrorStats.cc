@@ -8,6 +8,7 @@
  *  	France
  */
 
+#include <cstdlib>
 #include <si/fold/fgraph.h>
 #include <si/fold/foldReader.h>
 #include <si/fold/frgraph.h>

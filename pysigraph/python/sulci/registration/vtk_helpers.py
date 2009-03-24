@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import vtk
+import vtk, numpy
 
 
 def gen_data_gmm(centers, covariances, n):
@@ -276,6 +276,7 @@ class Vector(VtkOneData):
 		self.set(pos, dir)
 
 	def set(self, pos, dir):
+		if numpy.linalg.norm(dir) == 0: return
 		points = vtk.vtkPoints()
 		points.InsertNextPoint(pos[0], pos[1], pos[2])
 		self._data.SetPoints(points)

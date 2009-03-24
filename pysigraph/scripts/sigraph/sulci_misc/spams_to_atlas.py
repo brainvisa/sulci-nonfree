@@ -11,7 +11,6 @@ from sulci.models.distribution import UniformFrequency
 def compute_bb(models):
 	cmins = []
 	cmaxs = []
-	print len(models)
 	for sulcus, spam in models.items():
 		off, size = spam.bb_talairach()
 		off = numpy.asarray(off)
@@ -41,7 +40,7 @@ def select_priors(models, priors_distribs=None, selected_sulci=None):
 	else:	priors = UniformFrequency(sulci_n).frequencies()
 	return numpy.ravel(numpy.asarray(priors))
 
-def make_atlas(models, priors, bb, threshold):
+def make_atlas_deterministic(models, priors, bb, threshold, output):
 	off, size = bb
 	sulci_map = {'background' : 0}
 	priors /= priors.sum()
@@ -74,6 +73,8 @@ def make_atlas(models, priors, bb, threshold):
 	# add motion
 	trans = aims.Motion()
 	trans.setTranslation(off)
+	del L
+	del P
 	labels = aims.AimsData_U8(labels)
 	header = labels.header()
 	s = aims.vector_STRING()
@@ -81,8 +82,57 @@ def make_atlas(models, priors, bb, threshold):
 	header['referentials'] = s
 	header['transformations'] = [trans.toVector()]
 
-	return labels, sulci_map
+	# write
+	aims.Writer().write(labels, output)
+
+	return sulci_map
 		
+
+def make_atlas_probabilistic(models, priors, bb, threshold, output):
+	output = os.path.splitext(output)
+	off, size = bb
+	sulci_map = {'background' : 0}
+	priors /= priors.sum()
+
+	# normalization factor
+	for i, (sulcus, spam) in enumerate(models.items()):
+		proba = aims.Volume_FLOAT(*size)
+		P = proba.arraydata()
+		P.fill(0.)
+		img_density = spam.img_density()
+		off_spam, size_spam = spam.bb_talairach()
+		li = img_density.volume().get().arraydata() * priors[i]
+		# limits
+		doff = (off_spam - off).astype('int')
+		pi, pa = doff, (doff + size_spam).astype('int')
+		ind = i + 1
+		Pbb = P[:, pi[2]:pa[2], pi[1]:pa[1], pi[0]:pa[0]]
+		Ps = (li > Pbb)
+		Pbb[Ps] = li[Ps]
+		sulci_map[ind] = sulcus
+
+		# brain mask
+		shift = 10.
+		P[P < threshold * numpy.exp(shift)] = 0
+
+		# add motion
+		trans = aims.Motion()
+		trans.setTranslation(off)
+		del P
+		proba = aims.AimsData_FLOAT(proba)
+		header = proba.header()
+		s = aims.vector_STRING()
+		s.append('Talairach-AC/PC-Anatomist')
+		header['referentials'] = s
+		header['transformations'] = [trans.toVector()]
+
+		# write
+		aims.Writer().write(proba, output[0] + "_" + sulcus + output[1])
+		del header
+		del proba
+
+	return sulci_map
+	
 
 ################################################################################
 def parseOpts(argv):
@@ -107,6 +157,10 @@ def parseOpts(argv):
 	parser.add_option('-s', '--sulci', dest='sulci',
 		metavar = 'LIST', action='store', default = None,
 		help='tag only specified manually tagged sulci.')
+	parser.add_option('--mode', dest='mode',
+		metavar = 'STR', action='store', default='deterministic',
+		type='choice', choices=('deterministic', 'probabilistic'),
+		help="'deterministic' or 'probabilistic'")
 
 	return parser, parser.parse_args(argv)
 
@@ -141,10 +195,12 @@ def main():
 	# compute
 	bb = compute_bb(models)
 	priors = select_priors(models, priors_distribs, selected_sulci)
-	atlas, sulci_map = make_atlas(models, priors, bb, options.threshold)
+	opt = [models, priors, bb, options.threshold, options.output]
+	if options.mode == 'deterministic':
+		sulci_map = make_atlas_deterministic(*opt)
+	else:	sulci_map = make_atlas_probabilistic(*opt)
 
 	# write
-	aims.Writer().write(atlas, options.output)
 	fd = open(options.sulci_map, 'w')
 	fd.write('sulci_map = \\\n')
 	p = pprint.PrettyPrinter(indent=4, width=1000, stream=fd)

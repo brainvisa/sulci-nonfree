@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <neur/mlp/net.h>
 #include <neur/mlp/misc.h>
 #include <sys/types.h>

@@ -8,6 +8,7 @@
  *  	France
  */
 
+#include <cstdlib>
 #include <si/fold/labelsTranslator.h>
 #include <si/graph/vertexclique.h> 
 #include <si/fold/foldReader.h>

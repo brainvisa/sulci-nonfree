@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <neur/koho/kohonen.h>
 #include <cmath>
 #include <string>

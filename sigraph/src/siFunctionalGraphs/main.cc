@@ -10,6 +10,7 @@
  *   France
  */
 
+#include <cstdlib>
 #include <aims/getopt/getopt2.h>
 #include <aims/io/reader.h>
 #include <aims/io/writer.h>

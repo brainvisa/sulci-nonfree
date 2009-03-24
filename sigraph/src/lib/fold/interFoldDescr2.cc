@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <si/fold/interFoldDescr2.h>
 #include <si/fold/foldDescr2.h>
 #include <si/graph/vertexclique.h>

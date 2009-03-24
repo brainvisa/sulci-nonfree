@@ -9,6 +9,7 @@
  *
  */
 
+#include <cstdlib>
 #include <assert.h>
 #include <graph/tree/tree.h>
 #include <graph/tree/treader.h>

@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <si/subadaptive/subAdaptive.h>
 #include <si/learnable/vectorLearnable.h>
 #include <graph/tree/tree.h>

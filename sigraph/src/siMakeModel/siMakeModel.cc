@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <si/fold/foldLabels.h>
 #include <si/fold/fdParser.h>
 #include <si/model/mReader.h>

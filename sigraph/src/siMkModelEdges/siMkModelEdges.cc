@@ -8,6 +8,7 @@
  *  	France
  */
 
+#include <cstdlib>
 #include <si/global/global.h>
 #include <si/fold/foldLabels.h>
 #include <si/model/mReader.h>
