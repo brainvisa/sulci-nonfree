@@ -1,1 +1,3 @@
-import classifier_datamind
+try:
+	import classifier_datamind
+except ImportError: pass

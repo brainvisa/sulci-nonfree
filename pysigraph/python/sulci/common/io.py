@@ -5,7 +5,10 @@ from sulci.models import distribution, distribution_all, \
 			classifier, classifier_all, sulci
 import sigraph
 from soma import aims
-import datamind.io.old_csvIO as datamind_io
+try:
+	import datamind.io.old_csvIO as datamind_io
+except ImportError, e:
+	print "datamind disable: ", e
 
 
 ################################################################################
