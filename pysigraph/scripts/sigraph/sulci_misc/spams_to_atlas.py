@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os, sys, numpy, pprint
 from optparse import OptionParser
-from soma import aims
+from soma import aims, aimsalgo
 from sulci.common import io
 from sulci.models import distribution, distribution_aims
 from sulci.models.distribution import UniformFrequency
@@ -20,6 +20,9 @@ def compute_bb(models):
 	off = numpy.min(cmins, axis=0).astype('int') - 1
 	size = (numpy.max(cmaxs, axis=0) - off).astype('int') + 1
 	return off, size
+
+def getSize(img):
+	return img.dimX(), img.dimY(), img.dimZ(), img.dimT()
 
 def select_priors(models, priors_distribs=None, selected_sulci=None):
 	sulci = models.keys()
@@ -40,7 +43,9 @@ def select_priors(models, priors_distribs=None, selected_sulci=None):
 	else:	priors = UniformFrequency(sulci_n).frequencies()
 	return numpy.ravel(numpy.asarray(priors))
 
-def make_atlas_deterministic(models, priors, bb, threshold, output):
+################################################################################
+def make_atlas_deterministic(models, priors, bb, threshold,
+					output, voxels_size):
 	off, size = bb
 	sulci_map = {'background' : 0}
 	priors /= priors.sum()
@@ -76,19 +81,40 @@ def make_atlas_deterministic(models, priors, bb, threshold, output):
 	del L
 	del P
 	labels = aims.AimsData_U8(labels)
-	header = labels.header()
+
+	# resample
+	tr = aims.Motion()
+	tr.setToIdentity()
+	if voxels_size != 1:
+		sX, sY, sZ, sT = getSize(labels)
+		labels2 = aims.AimsData_S16(sX, sY, sZ, sT)
+		converter = aims.Converter_Volume_U8_Volume_S16()
+		converter.convert(labels, labels2)
+		sX /= voxels_size
+		sY /= voxels_size
+		sZ /= voxels_size
+		#labels2 = aims.AimsData_U8(sX, sY, sZ, sT)
+		labels3 = aims.AimsData_S16(sX, sY, sZ, sT)
+		#resampler = aimsalgo.NearestNeighborResampler_U8()
+		resampler = aimsalgo.NearestNeighborResampler_S16()
+		tr.scale([1.] * 3, [voxels_size] *3)
+		resampler.resample(labels2, tr, 0, labels3, False)
+	else:	labels3 = labels
+
+	header = labels3.header()
 	s = aims.vector_STRING()
 	s.append('Talairach-AC/PC-Anatomist')
 	header['referentials'] = s
-	header['transformations'] = [trans.toVector()]
+	header['transformations'] = [(trans * tr.inverse()).toVector()]
 
 	# write
-	aims.Writer().write(labels, output)
+	aims.Writer().write(labels3, output)
 
 	return sulci_map
 		
 
-def make_atlas_probabilistic(models, priors, bb, threshold, output):
+def make_atlas_probabilistic(models, priors, bb, threshold,
+					output, voxels_size):
 	output = os.path.splitext(output)
 	off, size = bb
 	sulci_map = {'background' : 0}
@@ -120,16 +146,33 @@ def make_atlas_probabilistic(models, priors, bb, threshold, output):
 		trans.setTranslation(off)
 		del P
 		proba = aims.AimsData_FLOAT(proba)
-		header = proba.header()
+
+
+		# resample
+		tr = aims.Motion()
+		tr.setToIdentity()
+		if voxels_size != 1:
+			sX, sY, sZ, sT = getSize(proba)
+			sX /= voxels_size
+			sY /= voxels_size
+			sZ /= voxels_size
+			proba2 = aims.AimsData_FLOAT(sX, sY, sZ, sT)
+			resampler = aimsalgo.NearestNeighborResampler_FLOAT()
+			tr.scale([1.] * 3, [voxels_size] *3)
+			resampler.resample(proba, tr, 0, proba2, False)
+		else:	proba2 = proba
+
+		header = proba2.header()
 		s = aims.vector_STRING()
 		s.append('Talairach-AC/PC-Anatomist')
 		header['referentials'] = s
-		header['transformations'] = [trans.toVector()]
+		header['transformations'] = [(trans * tr.inverse()).toVector()]
 
 		# write
-		aims.Writer().write(proba, output[0] + "_" + sulcus + output[1])
+		aims.Writer().write(proba2,output[0] + "_" + sulcus + output[1])
 		del header
 		del proba
+		del proba2
 
 	return sulci_map
 	
@@ -161,6 +204,11 @@ def parseOpts(argv):
 		metavar = 'STR', action='store', default='deterministic',
 		type='choice', choices=('deterministic', 'probabilistic'),
 		help="'deterministic' or 'probabilistic'")
+	parser.add_option('--voxels-size', dest='voxels_size',
+		metavar = 'float', action='store', default=1., type='float',
+		help="size of voxels in millimeters use '3' for functionnal "+ \
+		"standard size and '1' for anatomical standard size "+\
+		"(default: %default)")
 
 	return parser, parser.parse_args(argv)
 
@@ -195,7 +243,8 @@ def main():
 	# compute
 	bb = compute_bb(models)
 	priors = select_priors(models, priors_distribs, selected_sulci)
-	opt = [models, priors, bb, options.threshold, options.output]
+	opt = [models, priors, bb, options.threshold, options.output,
+		options.voxels_size]
 	if options.mode == 'deterministic':
 		sulci_map = make_atlas_deterministic(*opt)
 	else:	sulci_map = make_atlas_probabilistic(*opt)
