@@ -373,6 +373,7 @@ class PySpam(Distribution):
 		if not X.flags['C_CONTIGUOUS']: X = X.copy('C')
 		db.init(X)
 		aimsalgo.AimsGeneralizedKnnParzenPdf(db, img_count, k)
+		#aimsalgo.AimsKnnPdf(db, img_count, k)
 		array = img_count.volume().get().arraydata()
 		# apply correction if needed
 		array[array < 0.] = 0.

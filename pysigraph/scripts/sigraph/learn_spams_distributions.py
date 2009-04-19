@@ -334,7 +334,7 @@ def main():
 		print "error : '%s' is not a valid data type" % \
 						options.data_type
 		sys.exit(1)
-	sigma_value = int(options.sigma_value)
+	sigma_value = float(options.sigma_value)
 
 	if options.mode == 'normal' :
 		compute_spams(graphs, segments_weights, options.distribdir,
