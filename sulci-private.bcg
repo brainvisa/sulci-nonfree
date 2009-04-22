@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
-class SigraphComponent( GenericMakerModuleComponent ):
-  _name = 'sigraph'
+class SulciPrivateComponent( GenericMakerModuleComponent ):
+  _name = 'sulci-private'
 
   def dependencies( self ):
     return [ 'sigraphlib' ]

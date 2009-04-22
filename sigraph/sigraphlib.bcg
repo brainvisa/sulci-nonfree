@@ -12,6 +12,9 @@ class SigraphlibComponent( GenericMakerComponent ):
     # Default options values
     self.setDefaultOption( 'sisvm', 1 )
 
+  def sourceName( self ):
+    return 'sigraph'
+
   def dependencies( self ):
     deps = [ 'neuron', 'aimsalgo(aims)' ]
     return deps
@@ -26,16 +29,22 @@ class SigraphlibComponent( GenericMakerComponent ):
   def _libraries( self ):
     return [ 'sigraph' ]
 
+  def shareDir( self ):
+    return os.path.join( 'share', 'sigraph-' + self.version() )
+
+  def docDir( self ):
+    return os.path.join( 'share', 'doc', 'sulci-' + self.version() )
+
 #-----------------------------------------------------------------------------
 class SiSvmComponent( GenericMakerModuleComponent ):
-	_name = 'sisvm'
+  _name = 'sisvm'
 
-	def sourceName(self):
-		return 'sigraph'
+  def sourceName(self):
+    return 'sigraph-private'
 
-	def dependencies(self):
-		return [SigraphlibComponent, 'datamind_libsvm(datamind)']
+  def dependencies(self):
+    return [SigraphlibComponent, 'datamind_libsvm(datamind)']
 
-	def _libraries( self ):
-		return ['sigraphsvm']
+  def _libraries( self ):
+    return ['sigraphsvm']
 

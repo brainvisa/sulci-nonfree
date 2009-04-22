@@ -14,3 +14,4 @@ LIBS_SVM        = @sisvm:libDepsLine@
 
 defmodule(sisvm)	= @sisvm:enabled@
 module(sisvm):INCLUDEPATH += @libsvm:includes@
+INCBDIR = si
