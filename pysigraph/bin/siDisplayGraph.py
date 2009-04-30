@@ -3,9 +3,13 @@ import os, sys, exceptions, numpy
 import qt, glob, re
 from optparse import OptionParser
 import sigraph
+from sulci.common import io, add_translation_option_to_parser
 import anatomist.direct.api as anatomist
 from soma import aims
-import datamind.io.old_csvIO as io
+try:
+	import datamind.io.old_csvIO as csv_io
+except ImportError:
+	print "import failed: disable datamind"
 
 
 ################################################################################
@@ -144,7 +148,7 @@ class CsvDisplay(Display):
 	def __init__(self, write, dirname):
 		Display.__init__(self, write)
 		self._files = glob.glob(os.path.join(dirname, "siMorpho*.dat"))
-		self._reader = io.ReaderHeaderCsv()
+		self._reader = csv_io.ReaderHeaderCsv()
 
 	def display(self):
 		for f in self._files:
@@ -304,7 +308,7 @@ class GravityCentersDisplay(FoldDisplay):
 	def _display_one_vertex_callback(self, v):
 		# create nodes gravity spheres
 		g = numpy.asarray(v['refgravity_center'].list())
-		s = aims.SurfaceGenerator.sphere(g, 2, 96)
+		s = aims.SurfaceGenerator.sphere(g, 1, 96)
 		name = v['name']
 		if self._meshes.has_key(name):
 			self._meshes[name] += s
@@ -620,11 +624,12 @@ def parseOpts(argv):
 	description = 'Display graphs with usefull representations.\n' \
 		'Usage : siDisplayGraph.py [Options] graph1.arg graph2.arg ...'
 	parser = OptionParser(description)
+	add_translation_option_to_parser(parser)
 	parser.add_option('-m', '--mode', dest='mode',
 		metavar = 'FILE', action='store', default = None,
-		help='wireframe, gravity_clouds, extremity1, extremity2, ' \
-			'intersection, pure_cortical, diff_gravity_centers, '\
-			'centerdist_cortical.')
+		help='wireframe, gravity_centers, extremity1, extremity2, ' \
+			'hull_intersection, pure_cortical, ' \
+			'diff_gravity_centers, centerdist_cortical.')
 	parser.add_option('-d', '--dir', dest='dirname',
 		metavar = 'DIR', action='store', default = None,
 		help='directory with siMorpho output files ' \
@@ -643,8 +648,7 @@ def main():
 		sys.exit(1)
 
 	graphnames = args[1:]
-	graphs = []
-	for graphname in graphnames: graphs += [aims.Reader().read(graphname)]
+	graphs = io.load_graphs(options.transfile, graphnames)
 	if options.mode == 'wireframe':
 		disp = WireFrameDisplay(options.write, graphs)
 	elif options.mode == 'gravity_centers':

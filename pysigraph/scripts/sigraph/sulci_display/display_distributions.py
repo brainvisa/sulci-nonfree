@@ -118,17 +118,13 @@ class GaussianDisplay(Display):
 		self._unit_sphere = aims.SurfaceGenerator.sphere([0, 0, 0],
 								1, 96)
 
-	def _display_one(self, sulcus, gaussian):
+	def _generate_one(self, sulcus, mean, cov, scale=1):
 		color = self.find_color(sulcus)
-		if isinstance(gaussian, distribution.Dirac) or \
-			gaussian.type() == 'fake_gaussian' :
-			return
-		mean = gaussian.mean()
 		mean3df = aims.Point3df(numpy.asarray(mean).flatten())
-		cov = gaussian.covariance()
 		eigval, eigvect = numpy.linalg.eig(cov)
 		d = numpy.diag(numpy.sqrt(eigval))
-		for i in range(3):
+		meshes = []
+		for i in range(len(self._ratio)):
 			color2 = list(color) + [self._alpha[i]]
 			cov = eigvect * (d * self._ratio[i]) * eigvect.I
 			mesh = aims.AimsTimeSurface_3(self._unit_sphere)
@@ -136,8 +132,11 @@ class GaussianDisplay(Display):
 			transformation[:3, :3] = cov
 			flattrans = numpy.asarray(transformation).flatten()
 			motion = aims.Motion(flattrans)
+			if scale != 1:
+				motion.scale([1.] * 3, [scale] *3)
 			motion.setTranslation(mean3df)
 			aims.SurfaceManip.meshTransform(mesh, motion)
+			mesh.updateNormals()
 			asphere = a.toAObject(mesh)
 			material = anatomist.cpp.Material()
 			go =  {'diffuse' : color2}
@@ -145,9 +144,19 @@ class GaussianDisplay(Display):
 			asphere.SetMaterial(material)
 			self._aobjects += [asphere]
 			mesh.header()['material'] = go
-			self._writer.write(mesh,
-				'gaussian_%s_%d.mesh' % (sulcus,i))
+			meshes.append(mesh)
+		return meshes
 
+	def _display_one(self, sulcus, gaussian):
+		if isinstance(gaussian, distribution.Dirac) or \
+			gaussian.type() == 'fake_gaussian' :
+			return
+		mean = gaussian.mean()
+		cov = gaussian.covariance()
+		meshes = self._generate_one(sulcus, mean, cov)
+		for i in range(3):
+			self._writer.write(meshes[i],
+				'gaussian_%s_%d.mesh' % (sulcus, i))
 
 class BlocGaussianDisplay(Display):
 	def __init__(self, *args, **kwargs):
@@ -349,15 +358,36 @@ class GmmFromSpamDisplay(SpamDisplay):
 		array = li.reshape(bb_talairach_size).T[None].astype('float32')
 		return aims.Volume_FLOAT(array)
 
+
+class GmmFromGaussians(Display):
+	def __init__(self, *args, **kwargs):
+		Display.__init__(self, *args, **kwargs)
+		self._gaussian_display = GaussianDisplay(*args, **kwargs)
+
+
+	def _display_one(self, sulcus, gaussian):
+		all_meshes = []
+		pimax = numpy.max(gaussian._pi)
+		for i in range(gaussian._k):
+			mean = numpy.asmatrix(gaussian._C[i].astype('float'))
+			cov = numpy.asmatrix(gaussian._S[i].astype('float'))
+			scale = gaussian._pi[i]
+			self._gaussian_display._ratio = [1]
+			self._gaussian_display._alpha = [scale / pimax]
+			meshes = self._gaussian_display._generate_one(sulcus,
+							mean, cov)
+
+			all_meshes.append(meshes[0])
+		for i, m in enumerate(all_meshes):
+			self._writer.write(m, 'gmm_%s_%d.mesh' % (sulcus, i))
+
+
+
 ################################################################################
 def parseOpts(argv):
 	description = 'Display learned bayesian local models ' \
 			'(one for each sulci).'
 	parser = OptionParser(description)
-	#parser.add_option('-m', '--graphmodel', dest='graphmodelname',
-	#	metavar = 'FILE', action='store',
-	#	default = 'bayesian_graphmodel.dat',
-	#	help='graphical model structure (default : %default)')
 	parser.add_option('-d', '--distrib', dest='distribname',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')
@@ -375,6 +405,9 @@ def parseOpts(argv):
 		metavar='FILE', action='store', default=None,
 		help="csv storing sulci_weights : need 'sulci' and " \
 		"'size_errors' columns name")
+	parser.add_option('--repr-number', dest='repr_number',
+		metavar='INT', action='store', default=0, type='int',
+		help="number of the representation (default: %default)")
 	return parser, parser.parse_args(argv)
 
 def main():
@@ -421,7 +454,11 @@ def main():
 			options.all, options.features, sulci_weights]
 	if model_type == 'gaussian' : d = GaussianDisplay(*args)
 	#if model_type == 'bloc_gaussian' : d = BlocGaussianDisplay(*args)
-	elif model_type == 'gmm_from_spam': d = GmmFromSpamDisplay(*args)
+	elif model_type == 'gmm_from_spam':
+		if options.repr_number == 0:
+			d = GmmFromSpamDisplay(*args)
+		elif options.repr_number == 1:
+			d = GmmFromGaussians(*args)
 	elif model_type in ['spam', 'depth_weighted_spam']:
 		d = SpamDisplay(*args)
 	d.display()

@@ -2185,8 +2185,21 @@ class Gmm(Distribution):
 
 		# init E-step with kmeans
 		W = weights
+
+		#import os #FIXME
+		#filedump = "filedump" #FIXME
 		if W is not None:
+		#	if not os.path.exists(filedump):
+		#		print "write"
 			C, labels = my_vq.kmeans2(X, k, weights=W)
+		#		fd = open(filedump, 'w')
+		#		pickle.dump((C,labels), fd)
+		#		fd.close()
+		#	else:
+		#		print "read"
+		#		fd = open(filedump, 'r')
+		#		C, labels = pickle.load(fd)
+		#		fd.close()
 			n = W.sum()
 		else:
 			C, labels = C.vq.kmeans2(X, k)
@@ -2212,7 +2225,6 @@ class Gmm(Distribution):
 			theta = numpy.repeat(theta, self._k)
 		if not isinstance(alpha, numpy.ndarray):
 			alpha = numpy.repeat(alpha, self._k)
-		for i in range(self._k): S0[i] = S0[i] * theta[i]
 		alpha1 = alpha - 1
 
 
@@ -2230,29 +2242,48 @@ class Gmm(Distribution):
 
 			# M-step
 			Psum = P.sum(axis=1)
+			#self._C = M #
 			self._C = numpy.dot(P, X) + (M.T * tau).T
 			self._C = (self._C.T / (Psum + tau)).T
 			self._S = []
 			for i in range(self._k):
-				X2 = X - C[i]
-				M2 = M[i] - C[i]
-				S = numpy.dot(X2.T, (X2.T * P[i]).T) + \
-					S0[i] + tau[i] * numpy.dot(M2.T, M2)
+				X2 = (X - self._C[i]).T
+				M2 = (M[i] - self._C[i])[None].T
+				S = numpy.dot(X2, (X2 * P[i]).T) + \
+					tau[i] * numpy.dot(M2, M2.T) + S0[i]
 				self._S.append(S / (Psum[i] + theta[i]))
-			self._pi = P.sum(axis=1) + n * alpha1
+				#self._S.append(numpy.identity(3) * 3.) #
+			self._pi = Psum + alpha1
+			#self._pi = Psum #
+			#self._pi[:] = 1. #
 			self._pi /= self._pi.sum()
+			#print "C = ", self._C
+			#print "S = ", self._S
+			#print "pi = ", self._pi
+
 
 			# energy
 			self.update()
 			logL = self.modelwise_loglikelihoods(X)
 			logL[numpy.isnan(logL)] = -1000
 			L = (numpy.exp(logL).T * self._pi).T
-			tr = 0.
+			tr = dist = 0.
 			for i in range(self._k):
 				tr += numpy.trace(S0[i] * self._Sinv[i])
-			en = (P * logL).sum() + \
-				numpy.dot(alpha1, numpy.log(self._pi)) - \
-				0.5 * (numpy.dot(theta,numpy.log(self._det))+tr)
+				M2 = (M[i] - self._C[i])[None].T
+				dist += tau[i] * numpy.dot(M2.T,
+					numpy.dot(self._Sinv[i], M2))
+
+			# en = -log[P(X;M|{w_i})]
+			#    = -log[P(M)] - log[P(X|{w_i}M)]
+			#    = -log[P(M)] - \sum_i wi log[P(xi|M)]
+			en = -(numpy.dot(numpy.log(L.sum(axis=0)), W) + \
+			#en = -((P * logL).sum() + \
+				(P.T * numpy.log(self._pi)).sum() + \
+				(numpy.dot(alpha1, numpy.log(self._pi)) - \
+				0.5 * (dist + numpy.log(self._det).sum() + 
+				numpy.dot(1-theta,numpy.log(1./self._det))+tr)))
+				
 			en /= n
 			if verbose >= 1: print "%d) en = %f" % (t, en)
 			if ((t > itermin) and (en <= olden) \
@@ -2271,7 +2302,7 @@ class Gmm(Distribution):
 			P = L / Lsum
 			P[:, Lsumz] = 0.
 			m = numpy.argmax(P, axis=0)
-			id = numpy.argwhere(Lsum).ravel().tolist()
+			id = numpy.argwhere(Lsumz).ravel().tolist()
 			P[m[id], numpy.arange(P.shape[1])[id]] = 1.
 		if W is not None:
 			li = numpy.dot(numpy.log(L.sum(axis=0)), W)
@@ -2282,7 +2313,7 @@ class Gmm(Distribution):
 
 	def modelwise_loglikelihoods(self, X):
 		'''
-    return P(X|L=l) P(L=l), one row for each label l
+    return P(X|L=l), one row for each label l
 		'''
 		L = []
 		halfdim = self._dim / 2.
@@ -2340,19 +2371,33 @@ class GmmFromSpam(Gmm):
 		s = numpy.array(s)
 		self._bb_talairach_offset = t.copy()
 		self._bb_talairach_size = s.copy()
-		shape = tuple((s[::-1] - 1) / freq)
+		shape = tuple((s - 1) / freq)
+		#import os #FIXME
+		#filedump = "filedumpS" #FIXME
+		#if not os.path.exists(filedump):
 		X = numpy.array([x for x in index_tricks.ndindex(shape)])
 		X *= freq
 		X += t
+		#	print X.min(axis=0), X.max(axis=0)
 		logli, W = spam.likelihoods(X, shift=0.)
+		#	print "write"
+		#	obj = (X, logli, W)
+		#	fd = open(filedump, 'w')
+		#	pickle.dump(obj, fd)
+		#	fd.close()
+		#else:
+		#	print "read"
+		#	fd = open(filedump, 'r')
+		#	(X, logli, W) = pickle.load(fd)
+		#	fd.close()
 
 		# parameters
 		M = 'auto'
-		tau = 1. / 4 ** 2
-		theta = 20
-		S0_sigma = 5
+		tau = 1.#0.5
+		theta = 0.3/X.shape[0] #0.02
+		S0_sigma = 10e-2#0.2
 		S0 = numpy.identity(3) * (S0_sigma ** 2)
-		alpha = 1.05
+		alpha = 1.005
 		Wz = W > 10e-10
 		W = W[Wz]
 		X = X[Wz]

@@ -96,6 +96,8 @@ namespace sigraph
 			      carto::GenericObject* model = 0,
 			      double outp = 0 );
     virtual void reset();
+    void setNormalizedMode( NormalizedMode x ) { _normalized = x; }
+    NormalizedMode normalizedMode() const { return _normalized; }
 
     void setNStats( unsigned n ) { _nnorm = n; }
     void setNormal( double nx, double ny, double nz )

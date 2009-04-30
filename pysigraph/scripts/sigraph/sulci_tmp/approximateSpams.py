@@ -72,7 +72,7 @@ def fit_gmm(spam, n, k):
 	#bic = gmm.fit(spam, n, k, freq=1,
 	#		eps=10e-4, itermin=50, verbose=1)
 	bic = gmm.fit(spam, n, k, freq=1,
-			eps=10e-3, itermin=10, verbose=1)
+			eps=10e-4, itermin=10, itermax=40,verbose=1)
 	return gmm, bic
 
 ################################################################################
@@ -132,8 +132,7 @@ def parseOpts(argv):
 def main():
 	# options
 	parser, (options, args) = parseOpts(sys.argv)
-	if None in [options.input_distrib, options.output_distrib,
-					options.voxels_filename]:
+	if None in [options.input_distrib, options.output_distrib]:
 		parser.print_help()
 		sys.exit(1)
 
@@ -141,7 +140,10 @@ def main():
 		selected_sulci = None
 	else:	selected_sulci = options.selected_sulci.split(',')
 
-	voxels_n = io.read_from_exec(options.voxels_filename, 'voxels_number')
+	if options.voxels_filename:
+		voxels_n = io.read_from_exec(options.voxels_filename,
+						'voxels_number')
+	else:	voxels_n = None
 
 	# read input
 	input_distrib = io.read_segments_distrib(options.input_distrib,
@@ -171,6 +173,9 @@ def main():
 	data_type = input_distrib['data_type']
 	h = {'level' : level, 'data_type' : data_type, 'files' : {}}
 	for sulcus, filename in input_distrib['vertices'].items():
+		if voxels_n:
+			voxels_n_sulcus = voxels_n[sulcus]
+		else:	voxels_n_sulcus = 1.
 		if (selected_sulci != None) and (sulcus not in selected_sulci):
 			continue
 		filename = io.node2densityname(prefix,
@@ -181,8 +186,8 @@ def main():
 		print "*** %s ***" % sulcus
 		spam = input_distrib['vertices'][sulcus]
 		if options.k is not None:
-			gmm, bic = fit_gmm(spam, voxels_n[sulcus], options.k)
-		else:	gmm, bic = autofit_gmm(spam, voxels_n[sulcus])
+			gmm, bic = fit_gmm(spam, voxels_n_sulcus, options.k)
+		else:	gmm, bic = autofit_gmm(spam, voxels_n_sulcus)
 		print "bic, k = ", bic, gmm._k
 		gmm.write(filename)
 		h['files'][sulcus] = (model_type, filename)

@@ -21,6 +21,7 @@ using namespace std;
 
 FoldDescr4::FoldDescr4() : FoldDescr2()
 {
+  // setNormalizedMode( NormalizedNone );
 }
 
 FoldDescr4::FoldDescr4( const FoldDescr4 & f )  : FoldDescr2( f )
@@ -48,14 +49,17 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
     int                         mid_inter_voxels_vertex;
     float                       thickness_vertex;
     float                       thickness = 0;
-    
+
 //     FOLD_OPENING
     float                       surface_area = vec[SIZE];
     float                       LCR_volume_clique = 0;
     float                       LCR_volume_vertex;
     float                       fold_opening;
-     
-    
+    float                       area;
+
+    bool normd = normalizedMode() != NormalizedNone;
+    if( normd )
+      surface_area = 0;
     cl->getProperty( SIA_LABEL, label );
     for( iv=vcl->begin(); iv!=fv; ++iv )
     {
@@ -64,7 +68,13 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
       if( label == labelV )
       {
         if( v->getProperty("LCR_volume",LCR_volume_vertex) )
+        {
           LCR_volume_clique += LCR_volume_vertex;
+          // in normalize mode we have to recalculate the unnormalized
+          // surface
+          if( normd && v->getProperty("surface_area", area ) )
+            surface_area += area;
+        }
         // else cout << "no LCR_volume in node\n";
         if( v->getProperty("mid_interface_voxels",mid_inter_voxels_vertex) )
         {

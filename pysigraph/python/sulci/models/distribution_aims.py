@@ -368,11 +368,38 @@ class PySpam(Distribution):
 		bb_talairach_size = [(s + 10) for s in bb_talairach_size]
 
 		img_count = aims.AimsData_FLOAT(*bb_talairach_size)
-		db = aims.knn.Database()
-		X = (X - numpy.array(bb_talairach_offset)).T[::-1].T
-		if not X.flags['C_CONTIGUOUS']: X = X.copy('C')
-		db.init(X)
-		aimsalgo.AimsGeneralizedKnnParzenPdf(db, img_count, k)
+
+		# with scipy
+		import scipy.spatial
+		img_count.fill(0.)
+		kd = scipy.spatial.cKDTree(X)
+
+		from numpy.lib import index_tricks
+		for (x, y) in index_tricks.ndindex(*bb_talairach_size[:2]):
+			# all z in one pass
+			v = numpy.array([x, y, 0]) + bb_talairach_offset
+			Z = range(img_count.dimZ())
+			V = v[None].repeat(img_count.dimZ(), 0)
+			V[:, 2] += Z
+			D, ID = kd.query(V, k)
+			for i in range(len(D)):
+				d, id, z, v = D[i], ID[i], Z[i], V[i]
+				h = d[-1]
+				if (h == 0): h = 10e-10
+				# knn
+				#img_count.setValue(k / (h**3), x, y, z)
+				#diff = v - X[id]
+				diff = v - X
+				dist2 = (diff ** 2).sum(axis=1)
+				val = numpy.exp(-0.5*dist2/(h**2)).sum()
+				img_count.setValue(val / (h**3), x, y, z)
+
+		# with aims
+		#X = (X - numpy.array(bb_talairach_offset)).T[::-1].T
+		#if not X.flags['C_CONTIGUOUS']: X = X.copy('C')
+		#db = aims.knn.Database()
+		#db.init(X)
+		#aimsalgo.AimsGeneralizedKnnParzenPdf(db, img_count, k)
 		#aimsalgo.AimsKnnPdf(db, img_count, k)
 		array = img_count.volume().get().arraydata()
 		# apply correction if needed
