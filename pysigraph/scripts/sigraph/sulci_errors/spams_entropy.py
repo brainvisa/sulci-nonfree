@@ -48,7 +48,7 @@ def compute_entropy(spams, bb):
 				a[0, z, y, x] = e
 	return vol
 
-def compute_entropy2(spams, bb):
+def compute_entropy2(spams, bb, is_exp):
 	off, size = bb
 
 	# normalization factor
@@ -80,7 +80,7 @@ def compute_entropy2(spams, bb):
 		logp = numpy.log(p)
 		logp[numpy.isneginf(logp)] = -100
 		a[:, pi[2]:pa[2], pi[1]:pa[1], pi[0]:pa[0]] -= p * logp
-	a[:] = numpy.exp(a)
+	if is_exp: a[:] = numpy.exp(a)
 	return vol
 		
 
@@ -95,6 +95,12 @@ def parseOpts(argv):
 	parser.add_option('-o', '--output', dest='output',
 		metavar = 'FILE', action='store', default = None,
 		help='output 3D volume')
+	parser.add_option('-m', '--motion', dest='motion',
+		metavar = 'FILE', action='store', default = None,
+		help='output motion')
+	parser.add_option('-e', '--exp', dest='exp',
+		metavar = 'FILE', action='store_true', default = False,
+		help='returns exponential of voxelwise entropy if specified')
 
 	return parser, parser.parse_args(argv)
 
@@ -107,16 +113,19 @@ def main():
 		sys.exit(1)
 
 	# read
-	model = io.read_bayesian_model(node_distribname=options.distribname)
+	model = io.read_segments_distrib(options.distribname)
 	sulci = model['vertices'].keys()
 	distribs = []
 	for sulcus in sulci:
-		info = model['vertices'][sulcus]
-		distribs.append(info['density'])
+		distrib = model['vertices'][sulcus]
+		distribs.append(distrib)
 
 	# compute
-	bb = compute_bb(distribs)
-	entropy_vol = compute_entropy2(distribs, bb)
+	off, size = bb = compute_bb(distribs)
+	entropy_vol = compute_entropy2(distribs, bb, options.exp)
 	aims.Writer().write(entropy_vol, options.output)
+	motion = aims.Motion()
+	motion.setTranslation(off)
+	aims.Writer().write(motion, options.motion)
 
 if __name__ == '__main__' : main()

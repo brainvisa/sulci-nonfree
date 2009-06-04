@@ -88,5 +88,4 @@ def execution( self, context ):
       context.system( 'svm-train', '-b', '1', '-c', self.C, '-g', self.sigma,
                       input, self.output_classifier )
     self.output_classifier.updateMinf( { 'svm_mode' : self.svm_mode } )
-    self.output_classifier.saveMinf()
 

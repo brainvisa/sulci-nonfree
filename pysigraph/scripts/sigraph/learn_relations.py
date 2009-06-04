@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 import os, sys, numpy, pprint, re, glob, pickle
 from optparse import OptionParser
-import matplotlib
-matplotlib.use('QtAgg')
-import pylab
+try:
+	import matplotlib
+	matplotlib.use('QtAgg')
+	import pylab
+except IOError, e:
+	print "can't import matplotlib : ", e
 import sigraph
 from soma import aims
 from sulci.common import io, add_translation_option_to_parser
@@ -32,12 +35,14 @@ def save_fig(relation, distr, X, filename):
 
 
 ################################################################################
-def compute_relations(graphs, distribdir, selected_sulci, options):
+def compute_relations(graphs, distribdir, input_motions,
+				selected_sulci, options):
 	min_db_size = options.size_threshold
 	graph_th = len(graphs) / 2
 	sulci_set = {}
 	descriptor = descriptorFactory(options.data_type)
-	data = descriptor.data_from_graphs(graphs, selected_sulci)
+	data = descriptor.data_from_graphs(graphs, input_motions,
+				options.no_tal, selected_sulci)
 
 	# create output directory
 	prefix = distribdir
@@ -122,7 +127,9 @@ def compute_relations(graphs, distribdir, selected_sulci, options):
 ################################################################################
 def parseOpts(argv):
 	description = 'Compute relations models from a list of graphs.\n' \
-	'learn_relations.py [OPTIONS] graph1.arg graph2.arg...\n'
+	'learn_relations.py [OPTIONS] graph1.arg graph2.arg...\n' \
+	'learn_relations.py [OPTIONS] graph1.arg graph2.arg... ==\n' \
+	'motion1.trm motion2.trm...\n'
 	parser = OptionParser(description)
 	add_translation_option_to_parser(parser)
 	parser.add_option('-d', '--distribdir', dest='distribdir',
@@ -171,6 +178,11 @@ def parseOpts(argv):
 		metavar='INT', action='store', default=100, type='int',
 		help="under this threshold the relations models are learned " +\
 		" grouped in 2 big classes (inter-labels) and (intra-labels)")
+	parser.add_option('--no-talairach', dest='no_tal',
+		action='store_true', default = False,
+		help="if not specified the internal transformation from " + \
+		"subject to Talairach is used before any other given " + \
+		"transformation.")
 
 	return parser, parser.parse_args(argv)
 
@@ -178,10 +190,20 @@ def parseOpts(argv):
 def main():
 	# options
 	parser, (options, args) = parseOpts(sys.argv)
-	graphnames = args[1:]
-	if len(graphnames) == 0:
-		print "error : at least one graph is needed"
+	inputs = args[1:]
+	if len(inputs) == 0:
+		print "error: at least one graph is needed"
 		parser.print_help()
+		sys.exit(1)
+	ind = [i for i, input in enumerate(inputs) if (input == '==')]
+	if len(ind) == 0:
+		graphnames = inputs
+		input_motions_names = None
+	elif len(ind) == 1:
+		ind = ind[0]
+		graphnames, input_motions_names = inputs[:ind], inputs[ind + 1:]
+	else:
+		print "error: unintelligible input: 'only one == tag needed'"
 		sys.exit(1)
 
 	# read data
@@ -189,11 +211,15 @@ def main():
 	if options.sulci is None:
 		selected_sulci = None
 	else:	selected_sulci = options.sulci.split(',')
+	if input_motions_names:
+		reader = aims.Reader()
+		input_motions = [reader.read(f) for f in input_motions_names]
+	else:	input_motions = None
 
 	# computations
 	if options.mode == 'normal' :
-		compute_relations(graphs, options.distribdir,
-					selected_sulci, options)
+		compute_relations(graphs, options.distribdir, input_motions,
+						selected_sulci, options)
 	elif options.mode == 'loo' :
 		print "-- all --"
 		distribdir = os.path.join('all', options.distribdir)
@@ -210,7 +236,7 @@ def main():
 				sigma_file = None
 			else:	sigma_file = os.path.join(directory,
 					options.sigma_file)
-			compute_relations(subgraphs, distribdir,
+			compute_relations(subgraphs, distribdir, input_motions,
 					selected_sulci, options)
 	else:
 		print "error : '%s' unknown mode" % options.mode

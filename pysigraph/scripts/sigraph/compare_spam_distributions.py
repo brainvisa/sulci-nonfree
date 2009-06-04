@@ -157,22 +157,20 @@ def main():
 	models = []
 	names = []
 	for name, distribname in zip(inputs[::2], inputs[1::2]):
-		model = io.read_bayesian_model(node_distribname=distribname,
-						filter_label=options.sulcus)
+		model = io.read_segments_distrib(distribname, options.sulcus)
 		models.append((name, model))
 		names.append(name)
 
 	infos = {}
-	sulci = models[0][1]['vertices'].keys()
+	sulci = model['vertices'].keys()
 	pcts = []
 	for sulcus in sulci:
 		print "*** %s ***" % sulcus
 		l, vols, entropies, distribs, vols_th = [], [], [], [], []
 		for name, model in models:
 			try:
-				info = model['vertices'][sulcus]
+				distrib = model['vertices'][sulcus]
 			except KeyError: break
-			distrib = info['density']
 			vol, entropy, weights, cumvol, vol_th = \
 					compute_volume(sulcus, distrib)
 			l.append((name, weights, cumvol))

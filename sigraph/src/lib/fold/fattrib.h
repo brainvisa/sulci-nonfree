@@ -140,6 +140,7 @@
 #define SIA_E1E2			"e1e2"
 #define	SIA_NSTATS_DIR			"nstats_dir"
 #define	SIA_DIRECTION			"direction"
+#define SIA_NORMALIZED_OUTPUT           "normalized_output"
 
 
 //	Domaines

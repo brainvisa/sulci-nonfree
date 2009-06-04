@@ -93,6 +93,12 @@ void FDParser::buildFDescr2( AttributedObject* parent, Tree* t,
       fd->setDirStats( nnorm );
       fd->setDirection( nrm[0], nrm[1], nrm[2] );
     }
+  int nout = 1;
+  t->getProperty( SIA_NORMALIZED_OUTPUT, nout );
+  if( nout != 0 )
+    fd->setNormalizedMode( FoldDescr2::Normalized );
+  else
+    fd->setNormalizedMode( FoldDescr2::NormalizedNone );
 
   DescrParser::parseDescr( parent, t, fd );
 }
@@ -125,6 +131,12 @@ void FDParser::buildFDescr3( AttributedObject* parent, Tree* t,
       fd->setDirStats( nnorm );
       fd->setDirection( nrm[0], nrm[1], nrm[2] );
     }
+  int nout = 1;
+  t->getProperty( SIA_NORMALIZED_OUTPUT, nout );
+  if( nout != 0 )
+    fd->setNormalizedMode( FoldDescr2::Normalized );
+  else
+    fd->setNormalizedMode( FoldDescr2::NormalizedNone );
 
   DescrParser::parseDescr( parent, t, fd );
 }
@@ -157,6 +169,12 @@ void FDParser::buildFDescr4( AttributedObject* parent, Tree* t,
       fd->setDirStats( nnorm );
       fd->setDirection( nrm[0], nrm[1], nrm[2] );
     }
+  int nout = 1;
+  t->getProperty( SIA_NORMALIZED_OUTPUT, nout );
+  if( nout != 0 )
+    fd->setNormalizedMode( FoldDescr2::Normalized );
+  else
+    fd->setNormalizedMode( FoldDescr2::NormalizedNone );
 
   DescrParser::parseDescr( parent, t, fd );
 }
@@ -189,6 +207,12 @@ void FDParser::buildFDescr5( AttributedObject* parent, Tree* t,
       fd->setDirStats( nnorm );
       fd->setDirection( nrm[0], nrm[1], nrm[2] );
     }
+  int nout = 1;
+  t->getProperty( SIA_NORMALIZED_OUTPUT, nout );
+  if( nout != 0 )
+    fd->setNormalizedMode( FoldDescr2::Normalized );
+  else
+    fd->setNormalizedMode( FoldDescr2::NormalizedNone );
 
   DescrParser::parseDescr( parent, t, fd );
 }
@@ -208,6 +232,12 @@ void FDParser::buildIFDescr2( AttributedObject* parent, Tree* t,
 {
   InterFoldDescr2	*fd = new InterFoldDescr2;
   t->setProperty( SIA_POINTER, (CliqueDescr *) fd );
+  int nout = 1;
+  t->getProperty( SIA_NORMALIZED_OUTPUT, nout );
+  if( nout != 0 )
+    fd->setNormalizedMode( InterFoldDescr2::Normalized );
+  else
+    fd->setNormalizedMode( InterFoldDescr2::NormalizedNone );
   parseDescr( parent, t, fd );
 }
 
@@ -217,16 +247,28 @@ void FDParser::buildIFDescr4( AttributedObject* parent, Tree* t,
 {
   InterFoldDescr4	*fd = new InterFoldDescr4;
   t->setProperty( SIA_POINTER, (CliqueDescr *) fd );
+  int nout = 1;
+  t->getProperty( SIA_NORMALIZED_OUTPUT, nout );
+  if( nout != 0 )
+    fd->setNormalizedMode( InterFoldDescr2::Normalized );
+  else
+    fd->setNormalizedMode( InterFoldDescr2::NormalizedNone );
   parseDescr( parent, t, fd );
 }
 
 
-void FDParser::buildIFDescr5( AttributedObject* parent, Tree* t, 
-			      const string & )
+void FDParser::buildIFDescr5( AttributedObject* parent, Tree* t,
+                              const string & )
 {
-  // ### TODO ###
+  // ### TODO ###
   InterFoldDescr5	*fd = new InterFoldDescr5;
   t->setProperty( SIA_POINTER, (CliqueDescr *) fd );
+  int nout = 1;
+  t->getProperty( SIA_NORMALIZED_OUTPUT, nout );
+  if( nout != 0 )
+    fd->setNormalizedMode( InterFoldDescr2::Normalized );
+  else
+    fd->setNormalizedMode( InterFoldDescr2::NormalizedNone );
   parseDescr( parent, t, fd );
 }
 

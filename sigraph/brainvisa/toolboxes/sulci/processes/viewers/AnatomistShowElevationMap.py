@@ -68,5 +68,5 @@ def execution( self, context ):
                           method='FusionTexSurfMethod' )
     w = a.createWindow( '3D' )
     w.addObjects( (f2,) )
-    a.waitEndProcessing() # sync anatomist before destroying temporary mesh files
+    a.sync() # sync anatomist before destroying temporary mesh files
     return ( mesh, meshf, map, f1, f2, w )

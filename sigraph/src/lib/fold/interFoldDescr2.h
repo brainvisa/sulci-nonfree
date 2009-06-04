@@ -70,6 +70,8 @@ namespace sigraph
     virtual void buildTree( Tree & t );
     virtual std::vector<std::string> descriptorsNames() const;
     virtual std::string name() const;
+    void setNormalizedMode( NormalizedMode x ) { _normalized = x; }
+    NormalizedMode normalizedMode() const { return _normalized; }
 
     virtual bool makeLearnVector( const Clique* cl, std::vector<double> & vec, 
 				  carto::GenericObject* model = 0 );

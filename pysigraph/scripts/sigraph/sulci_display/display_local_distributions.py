@@ -96,7 +96,6 @@ class RelationsDisplay(GlobalModelDisplay):
 		# mesher
 		Mesher, mesher_opt = mesherFactory(ld.name(), self._options)
 		mesher = Mesher(ld)
-		mesher.setColor(color)
 		meshes = mesher.mesh(*mesher_opt)
 	
 		# split the mesh in 2 parts along a plane directed by
@@ -106,14 +105,15 @@ class RelationsDisplay(GlobalModelDisplay):
 		plane2 = tuple(dir)
 		borderline1 = aims.AimsTimeSurface_2()
 		borderline2 = aims.AimsTimeSurface_2()
-		meshes1, meshes2 = [], []
+		mesh1 = aims.AimsSurfaceTriangle()
+		mesh2 = aims.AimsSurfaceTriangle()
 		for m in meshes:
 			m1 = aims.AimsSurfaceTriangle()
 			m2 = aims.AimsSurfaceTriangle()
 			aims.SurfaceManip.cutMesh(m, plane1, m1, borderline1)
 			aims.SurfaceManip.cutMesh(m, plane2, m2, borderline2)
-			meshes1.append(m1)
-			meshes2.append(m2)
+			mesh1 += m1
+			mesh2 += m2
 
 		# add color
 		label1, label2 = relation
@@ -138,8 +138,8 @@ class RelationsDisplay(GlobalModelDisplay):
 			if len(meshes) != 1 :
 				id = '_%d' % i
 			else:	id = ''
-			aims.Writer().write(mesh, '%s_%s%s.mesh' % \
-					(self._output, sulcus, id))
+			#aims.Writer().write(mesh, '%s_%s%s.mesh' % \
+			#		(self._output, sulcus, id))
 			aims.Writer().write(mesh1, '%s_%s,%s_1%s.mesh' % \
 					(self._output, label1, label2, id))
 			aims.Writer().write(mesh2, '%s_%s,%s_2%s.mesh' % \

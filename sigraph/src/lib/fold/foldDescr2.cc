@@ -967,6 +967,8 @@ void FoldDescr2::buildTree( Tree & t )
       v.push_back( _dHJz );
       t.setProperty( SIA_DIRECTION, v );
     }
+  if( _normalized == NormalizedNone )
+    t.setProperty( SIA_NORMALIZED_OUTPUT, (int) 0 );
 }
 
 

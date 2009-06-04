@@ -257,11 +257,17 @@ class RelationDescriptor(Descriptor):
 				else:	P[s1, s2] = numpy.exp(-en)
 		return P, (r1, r2)
 
-	def data_from_graphs(self, graphs, selected_sulci=None):
+	def data_from_graphs(self, graphs, input_motions,
+				no_tal, selected_sulci=None):
 		data = {}
 		count = {}
-		for g in graphs:
-			motion = aims.GraphManip.talairach(g)
+		for i, g in enumerate(graphs):
+			if no_tal:
+				motion = aims.Motion()
+				motion.setToIdentity()
+			else:	motion = aims.GraphManip.talairach(g)
+			if input_motions:
+				motion = input_motions[i] * motion
 			graph_edges = self.edges_from_graph(g, selected_sulci)
 			for (r1, r2), ((v1, v2), edges) in graph_edges.items():
 				name1, name2 = v1['name'], v2['name']
@@ -434,14 +440,20 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 		x = [vj['index'] for vj in cj]
 		return False
 
-	def data_from_graphs(self, graphs, selected_sulci=None):
+	def data_from_graphs(self, graphs, input_motions,
+				no_tal, selected_sulci=None):
 		data = {}
 		count = {}
 		# If the squared distance between the gravity centers of
 		# sulci is over this threshold the model is not computed
 		dist2_th = 1000
-		for g in graphs:
-			motion = aims.GraphManip.talairach(g)
+		for i, g in enumerate(graphs):
+			if no_tal:
+				motion = aims.Motion()
+				motion.setToIdentity()
+			else:	motion = aims.GraphManip.talairach(g)
+			if input_motions:
+				motion = input_motions[i] * motion
 			group = self.group_segments_per_labels(g)
 			for g1 in group.items():
 				(name1, segments1) = g1
@@ -529,7 +541,7 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 		else:	mi2 = th_min
 		if sX < sY:
 			nX, nY = mi2, ma2
-		else:	nY, nX = ma2, mi2
+		else:	nX, nY = ma2, mi2
 		import scipy.cluster as C
 		X, lX = C.vq.kmeans(X, nX)
 		Y, lY = C.vq.kmeans(Y, nY)
@@ -553,9 +565,24 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 		m = munkres.Munkres()
 		indexes = m.compute(C.copy())
 		dist = []
+		#m3 = aims.AimsSurfaceTriangle()
 		for (i,j) in indexes:
 			if i >= nX or j >= nY: continue
 			dist.append(C[i, j])
+		#	print C[i,j]
+		#	if C[i,j] > 60: continue
+		#	m3 += aims.SurfaceGenerator.cylinder(X[i], Y[j], 0.3, 0.3, 10, 1, 1)
+		#aims.Writer().write(m3, "plop3_0.mesh")
+
+		#m1 = aims.AimsSurfaceTriangle()
+		#for x in X:
+		#	m1 += aims.SurfaceGenerator.sphere(x, 1, 32)
+		#aims.Writer().write(m1, "plop1_0.mesh")
+		#m2 = aims.AimsSurfaceTriangle()
+		#for x in Y:
+		#	m2 += aims.SurfaceGenerator.sphere(x, 1, 32)
+		#aims.Writer().write(m2, "plop2_0.mesh")
+
 		if len(dist):
 			return numpy.vstack(dist)
 		else:	return None
@@ -751,6 +778,44 @@ class AllConnectedDirectionRelationDescriptor(AllConnectedDistanceRelationDescri
 
 	def data_cc_specific(self, X, Y):
 		data = self.euclidian_directions(X, Y)
+#		m1 = aims.AimsSurfaceTriangle()
+#		for x in X:
+#			m1 += aims.SurfaceGenerator.sphere(x, 1, 32)
+#		aims.Writer().write(m1, "plop1_0.mesh")
+#		m2 = aims.AimsSurfaceTriangle()
+#		for x in Y:
+#			m2 += aims.SurfaceGenerator.sphere(x, 1, 32)
+#		aims.Writer().write(m2, "plop2_0.mesh")
+#		m3 = aims.AimsSurfaceTriangle()
+#		county = numpy.zeros(len(Y))
+#		countx = numpy.zeros(len(X))
+#		for j, x in enumerate(X):
+#			dist = []
+#			for y in Y:
+#				d = numpy.sqrt(((x - y) ** 2).sum())
+#				dist.append(d)
+#
+#			ind = numpy.argsort(dist)
+#			for i in ind[:3]:
+#				#if dist[i] > 50: continue
+#				if county[i] > 3: continue
+#				m3 += aims.SurfaceGenerator.cylinder(x, Y[i], 0.3, 0.3, 10, 1, 1)
+#				county[i] += 1
+#				countx[j] += 1
+#		for y in Y:
+#			dist = []
+#			if county[i] > 3: continue
+#			for x in X:
+#				d = numpy.sqrt(((x - y) ** 2).sum())
+#				dist.append(d)
+#			ind = numpy.argsort(dist)
+#			for i in ind[:3]:
+#				if countx[i] > 3: continue
+#				m3 += aims.SurfaceGenerator.cylinder(x, Y[i], 0.3, 0.3, 10, 1, 1)
+#				county[i] += 1
+#				countx[j] += 1
+#		aims.Writer().write(m3, "plop3_0.mesh")
+
 		if data.shape[0]:
 			return data
 		else:	return None
