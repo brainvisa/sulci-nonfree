@@ -8,6 +8,7 @@
  *
  */
 
+#include <cstdlib>
 #include <si/subadaptive/svmparser.h>
 #include <si/subadaptive/subadsvm.h>
 #include <si/subadaptive/saParser.h>

@@ -11,6 +11,7 @@
  *
  */
 
+#include <cstdlib>
 #include <si/global/global.h>
 #include <aims/def/path.h>
 #include <si/fold/foldReader.h>

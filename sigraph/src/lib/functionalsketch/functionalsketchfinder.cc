@@ -21,6 +21,7 @@
 #include <si/graph/vertexclique.h>
 #include <si/domain/domain.h>
 #include <iostream>
+#include <stdio.h>
 
 using namespace sigraph;
 using namespace aims;

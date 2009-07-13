@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <si/fold/annealConnectVoidExtension.h>
 #include <si/graph/anneal.h>
 #include <si/graph/vertexclique.h>

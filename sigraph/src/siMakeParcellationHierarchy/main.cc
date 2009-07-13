@@ -8,6 +8,7 @@
  *  	France
  */
 
+#include <cstdlib>
 #include <aims/distancemap/meshparcellation.h>
 #include <aims/distancemap/meshdistance.h>
 #include <aims/getopt/getopt.h>

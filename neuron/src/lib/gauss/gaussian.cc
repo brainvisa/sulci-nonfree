@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <neur/gauss/gaussian.h>
 #include <stdlib.h>
 
