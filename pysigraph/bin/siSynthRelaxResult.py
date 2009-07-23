@@ -76,16 +76,16 @@ def old_compute_all_info(filename, details):
 	for n in ['train', 'test', 'gen', 'all']:
 		rmean, rstd, emean, estd, s = infos[n]
 		msg.write('\t%s' % n, 'green')
-		try:
-			rmean.mask
-			msg.write('\tNA', 'thin_gray')
-		except AttributeError:
-			msg.write('\t%2.2f' % rmean)
-		try:
-			rstd.mask
-			msg.write('\tNA', 'thin_gray')
-		except AttributeError:
-			msg.write('\t%2.2f' % rstd)
+		#try:
+		#	rmean.mask
+		#	msg.write('\tNA', 'thin_gray')
+		#except AttributeError:
+		msg.write('\t%2.2f' % rmean)
+		#try:
+		#	rstd.mask
+		#	msg.write('\tNA', 'thin_gray')
+		#except AttributeError:
+		msg.write('\t%2.2f' % rstd)
 		msg.write('\t|', 'cyan')
 		try:
 			emean.mask

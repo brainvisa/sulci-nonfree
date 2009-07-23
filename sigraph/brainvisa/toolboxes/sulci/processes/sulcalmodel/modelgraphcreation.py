@@ -44,14 +44,12 @@ signature = Signature(
     'model_graph', WriteDiskItem( 'Model Graph', 'Graph' ),
     'learningbase_data_graphs',
     ListOf( ReadDiskItem( "Data graph", 'Graph',
-                          requiredAttributes = { 'labelled' : 'Yes',
-                                                 'manually_labelled': 'Yes' }
-                          ) ),
+      requiredAttributes = { 'labelled' : 'Yes', 'manually_labelled': 'Yes' }
+      ) ),
     'testbase_data_graphs',
     ListOf( ReadDiskItem( "Data graph", 'Graph',
-                          requiredAttributes = { 'labelled' : 'Yes',
-                                                 'manually_labelled': 'Yes' }
-                          ) ),
+      requiredAttributes = { 'labelled' : 'Yes', 'manually_labelled': 'Yes' }
+      ) ),
     'labels_translation_map',
     ReadDiskItem( 'Label Translation',
                   [ 'Label Translation', 'DEF Label translation' ] ),
@@ -177,7 +175,8 @@ def execution( self, context ):
              'graphFiles\t' + string.join( base ) + '\n' 
              'mode\ttrainStats\n' 
              'stats\t1\n' 
-             'cycles\t1\n' 
+             'cycles\t1\n'
+             'label_attribute\tname\n'
              '*END\n' )
     f.close()
     f = open( stats.fullPath() )

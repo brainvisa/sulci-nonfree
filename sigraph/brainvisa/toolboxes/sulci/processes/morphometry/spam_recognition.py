@@ -53,6 +53,11 @@ signature = Signature(
     ReadDiskItem( 'Label Translation',
                   [ 'Label Translation', 'DEF Label translation' ] ),
     'priors', ReadDiskItem( 'Bayesian Recognition Priors', 'Text Data Table' ),
+    'mode', Choice( 'no_registration', 'global_registration',
+      #'local_registration',
+      ),
+    'output_transformation', WriteDiskItem( 'Transformation matrix',
+      'Transformation matrix' ),
     )
 
 def initialization( self ):
@@ -63,6 +68,8 @@ def initialization( self ):
     self.labels_translation_map = \
       self.signature[ 'labels_translation_map' ].findValue(
         { 'filename_variable' : 'sulci_model_2008' } )
+    self.mode = 'no_registration'
+    self.setOptional( 'output_transformation' )
 
 def execution( self, context ):
     tmpfile = context.temporary( 'Text file' )
@@ -82,10 +89,21 @@ def execution( self, context ):
       gm2 = len( modname )
     graphmodel = modname[:gm1] + 'graphmodel' + modname[gm2:] + '.dat'
     # now run it
-    context.system( sys.executable, progname, '-i', self.data_graph, '-o',
+    cmd = [ sys.executable, progname, '-i', self.data_graph, '-o',
       self.output_graph, '-t', self.labels_translation_map, '-d', self.model,
-      '-m', graphmodel, '--maxiter', 0, '--mode', 'global', '-c',
-      self.posterior_probabilities, '-l', tmpfile, '-p', self.priors )
+      '-m', graphmodel, '-c', self.posterior_probabilities, '-l', tmpfile,
+      '-p', self.priors ]
+    if self.mode == 'no_registration':
+      cmd += [ '--maxiter', 0, '--mode', 'global' ]
+    elif self.mode == 'global_registration':
+      cmd += [ '--mode', 'global' ]
+      if self.output_transformation is not None:
+        cmd += [ '--motion', self.output_transformation ]
+    elif self.mode == 'local_registration':
+      cmd += [ '--mode', 'local' ]
+      if self.output_transformation is not None:
+        cmd += [ '--motion', self.output_transformation ]
+    context.system( *cmd )
     trManager = registration.getTransformationManager()
     trManager.copyReferential( self.data_graph, self.output_graph )
 

@@ -1543,7 +1543,7 @@ class UnivariateDimensionReduction(datamind.ml.dimreduction.DimensionReduction):
 		ranks = self.getRanks()
 		if n > 0: 
 			selected_dims = ranks[:n]
-		else:	selected_dim = ranks
+		else:	selected_dims = ranks
 		db = test.share_or_copy(copy)
 		db.setX(X[:, selected_dims])
 		return db
