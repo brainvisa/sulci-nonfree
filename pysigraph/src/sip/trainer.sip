@@ -29,12 +29,6 @@ class Trainer
 #include <si/learner/trainer.h>
 %End
 
-%TypeCode
-#if SIP_VERSION < 0x040700
-#include "sipsigraphsipsigraphCGraph.h"
-#endif
-%End
-
 public:
   typedef sigraph::TrainerIterator iterator;
 
@@ -86,9 +80,13 @@ public:
         PyErr_SetString( PyExc_TypeError, s.str().c_str() );
         break;
       }
-      ptr = sipForceConvertTo_sigraph_CGraph( po, &sipIsErr );
+      ptr = sipForceConvertToInstance( po, sipClass_sigraph_CGraph, 0, 0, 0,
+                                       &sipIsErr );
       if( ptr )
+      {
         lrn.insert( reinterpret_cast<sigraph::CGraph *>( ptr ) );
+        // should call sipReleadeInstance() !
+      }
       else
         break;
     }
@@ -109,9 +107,13 @@ public:
           PyErr_SetString( PyExc_TypeError, s.str().c_str() );
           break;
         }
-        ptr = sipForceConvertTo_sigraph_CGraph( po, &sipIsErr );
+        ptr = sipForceConvertToInstance( po, sipClass_sigraph_CGraph, 0, 0, 0,
+                                         &sipIsErr );
         if( ptr )
+        {
           tst.insert( reinterpret_cast<sigraph::CGraph *>( ptr ) );
+          // should call sipReleadeInstance() !
+        }
         else
           break;
       }
@@ -156,9 +158,13 @@ public:
         PyErr_SetString( PyExc_TypeError, s.str().c_str() );
         break;
       }
-      ptr = sipForceConvertTo_sigraph_CGraph( po, &sipIsErr );
+      ptr = sipForceConvertToInstance( po, sipClass_sigraph_CGraph, 0, 0, 0,
+                                       &sipIsErr );
       if( ptr )
+      {
         lrn.insert( reinterpret_cast<sigraph::CGraph *>( ptr ) );
+        // should call sipReleadeInstance() !
+      }
       else
         break;
     }
@@ -179,9 +185,13 @@ public:
           PyErr_SetString( PyExc_TypeError, s.str().c_str() );
           break;
         }
-        ptr = sipForceConvertTo_sigraph_CGraph( po, &sipIsErr );
+        ptr = sipForceConvertToInstance( po, sipClass_sigraph_CGraph, 0, 0, 0,
+                                         &sipIsErr );
         if( ptr )
+        {
           tst.insert( reinterpret_cast<sigraph::CGraph *>( ptr ) );
+          // should call sipReleadeInstance() !
+        }
         else
           break;
       }
@@ -221,9 +231,6 @@ class SelectiveTrainer : sigraph::Trainer
 {
 %TypeHeaderCode
 #include <si/learner/selectiveTrainer.h>
-#if SIP_VERSION < 0x040700
-#include "sipsigraphsipset_AdaptivePtr.h"
-#endif
 #ifndef PYAIMSSIP_SET_STRING_DEFINED
 #define PYAIMSSIP_SET_STRING_DEFINED
 typedef std::set<std::string> set_STRING;
