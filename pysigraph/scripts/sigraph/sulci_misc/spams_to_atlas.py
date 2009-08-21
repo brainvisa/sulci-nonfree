@@ -179,7 +179,7 @@ def make_atlas_probabilistic(models, priors, bb, threshold,
 
 ################################################################################
 def parseOpts(argv):
-	description = 'compute voxel-based entropies for spam models\n' + \
+	description = 'compute atlas from spam models\n' + \
 		'./spams_to_atlas.py [OPTIONS] -d distrib.dat -o output_image -m sulci_map'
 	parser = OptionParser(description)
 	parser.add_option('-d', '--distrib', dest='distribnames',
