@@ -194,8 +194,8 @@ def parseOpts(argv):
 	parser.add_option('-m', '--sulci-map', dest='sulci_map',
 		metavar = 'FILE', action='store', default = None,
 		help='output sulcus map (indices)')
-	parser.add_option('-t', '--threshold', dest='threshold', type='int',
-		metavar = 'INT', action='store', default = 10e-15,
+	parser.add_option('-t', '--threshold', dest='threshold', type='float',
+		metavar = 'FLOAT', action='store', default = 10e-13,
 		help='threshold to create a masked atlas (default: %default)')
 	parser.add_option('-s', '--sulci', dest='sulci',
 		metavar = 'LIST', action='store', default = None,
