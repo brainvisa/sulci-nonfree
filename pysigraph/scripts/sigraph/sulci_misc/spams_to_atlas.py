@@ -47,7 +47,7 @@ def select_priors(models, priors_distribs=None, selected_sulci=None):
 def make_atlas_deterministic(models, priors, bb, threshold,
 					output, voxels_size):
 	off, size = bb
-	sulci_map = {'background' : 0}
+	sulci_map = {0 : 'background'}
 	priors /= priors.sum()
 
 	# normalization factor
