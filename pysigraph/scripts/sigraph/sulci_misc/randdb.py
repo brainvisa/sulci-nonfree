@@ -4,44 +4,47 @@ from optparse import OptionParser
 
 
 def parseOpts(argv):
-	description = 'Generate crossvalidation split ' + \
-			'for training and testing databases.'
+	description = 'Randomly generate training/testing split ' + \
+			'based on training database size'
 	parser = OptionParser(description)
-	parser.add_option('-n', '--folds-number', dest='folds_number',
-		metavar='FILE', action='store', default=None,
-		help='number of crossvalidation folds (default : leave ' + \
-		'one out)')
+	parser.add_option('-n', '--training-size', dest='training_size',
+		metavar='FILE', action='store', default=None, type='int',
+		help='number of subjects for training')
 	parser.add_option('-f', '--graphs-files', dest='graphsfile',
 		metavar='FILE', action='store', default=None,
 		help='file with one sulci graph per line')
+	parser.add_option('-r', '--runs', dest='runs', type='int',
+		metavar='FILE', action='store', default=1,
+		help='number of run')
 
 	return parser, parser.parse_args(argv)
 
 def main():
+	# options
 	parser, (options, args) = parseOpts(sys.argv)
+	if None in [options.training_size, options.graphsfile]:
+		print "missing option(s)"
+		parser.print_help()
+		sys.exit(1)
+
 	# read graph names
 	graphsfile = options.graphsfile
 	fd = open(graphsfile)
-	lines = fd.readlines()
-	lines = [l.rstrip('\n') for l in lines]
+	lines = [l.rstrip('\n') for l in fd.readlines()]
 	fd.close()
-
-	if options.folds_number:
-		folds_n = int(options.folds_number)
-	else:	folds_n = len(lines)
 
 	# cv :
 	size = len(lines)
-	ind = range(size)
-	fold_size = size / folds_n
-	s1 = (size - fold_size) / (folds_n - 1)
-	for i in range(folds_n):
+	for i in range(options.runs):
+		indices = numpy.arange(size)
+		numpy.random.shuffle(indices)
+
 		# split
-		test = ind[i * s1:i * s1 + fold_size]
-		train = ind[:i * s1] + ind[i * s1 + fold_size:]
+		train = indices[:options.training_size]
+		test = indices[options.training_size:]
 
 		# directory
-		dir = "cv_%d" % i
+		dir = "run_%d" % i
 		os.mkdir(dir)
 
 		# test
