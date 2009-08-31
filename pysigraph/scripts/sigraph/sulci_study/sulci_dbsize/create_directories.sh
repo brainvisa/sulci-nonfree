@@ -38,10 +38,9 @@ do
 
 	# prior / learning
 	cd nodes_prior_$side
-	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/learn_priors.py -m bayesian_graphmodel.dat $(cat $d/train_graphs.dat) --translation $TRANSLATION --type label_frequency\" > ${d}_learning.log"; done > batch_prior_learning
+	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/learn_priors.py -m bayesian_graphmodel.dat $(cat $d/train_graphs.dat) --translation $TRANSLATION --type label_frequency\" > ${d}_learning.log"; done > ../batch_learning
 	cd ..
 
-	
 	cd spam_model_$side
 	# Talairach / learning
 	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/learn_spams_distributions.py $(cat $d/train_graphs.dat) --translation $TRANSLATION --sigma-value 2\" > ${d}_learning.log"; done > batch_spam_learning
@@ -53,13 +52,17 @@ do
 	cd registred_spam_model_$side
 	# Global registration / learning
 	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/learn_registred_spams_distributions.py $(cat $d/train_graphs.dat) --translation $TRANSLATION --sigma-value 2\" > ${d}_learning.log"; done > batch_spam_learning
+	# Global registration / testing
+	# FIXME
 	cd ..
 
 	cd locally_from_global_registred_spam_model_$side
-	# Local registration /learning
+	# Local registration / learning
 	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/learn_registred_spams_distributions.py --translation $TRANSLATION --sigma-value 2 --mode local --distrib-gaussians gravity_centers $(cat $d/train_graphs.dat) == $(for a in $(cat $d/train_graphs.dat); do b=$(basename $a); echo -en ../../registred_spam_model_${side}/$d/bayesian_spam_distribs/${b%%.arg}_motion.trm' ' ; done)\" > ${d}_learning.log"; done > batch_spam_learning
+	# Local registration / testing
+	# FIXME
 	cd ..
-	cat */batch_spam_learning > batch_spam_learning
+	cat */batch_spam_learning >> batch_learning
 
 	# cleaning
 	rm -rf base_$side
