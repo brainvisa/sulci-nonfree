@@ -1,17 +1,8 @@
-
-getFromPro(sigraph.pro HEADERS SOURCES)
-
-SHFJ_COPY_HEADERS(include/si ${HEADERS})
-
-ADD_LIBRARY(sigraph SHARED
-${SOURCES}
-)
-
-TARGET_LINK_LIBRARIES(sigraph
-aimsalgo
-neuron
-)
-
-SET_TARGET_PROPERTIES(sigraph PROPERTIES ${BrainVISA_LIBRARY_PROPERTIES})
-
-INSTALL(TARGETS sigraph DESTINATION lib/)
+BRAINVISA_GET_FILE_LIST_FROM_PRO(  ${CMAKE_CURRENT_SOURCE_DIR}/sigraph.pro "HEADERS" _headers "SOURCES" _sources )
+BRAINVISA_COPY_AND_INSTALL_HEADERS( _headers si )
+add_library( sigraph SHARED ${_sources} )
+set_property( TARGET sigraph PROPERTY VERSION ${${PROJECT_NAME}_VERSION} )
+target_link_libraries( sigraph ${AIMS-FREE_LIBRARIES} neuron )
+BRAINVISA_INSTALL( TARGETS sigraph
+              DESTINATION lib
+              COMPONENT ${PROJECT_NAME} )

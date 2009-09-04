@@ -7,3 +7,57 @@ IF( SVM_FOUND )
     ADD_SUBDIRECTORY(bundle_sisvm)
   ENDIF(APPLE)
 ENDIF( SVM_FOUND )
+
+#------------------------------------------------------------------------------
+# Build targets for commands
+#------------------------------------------------------------------------------
+foreach( _command
+  readFolds
+  siChangeModels
+  siCopyNames
+  siDivNamelist
+  siDomTrain
+  siEnergy
+  siError
+  siErrorStats
+  siFlip
+  siFunctionalGraphs
+  siGraph2Label
+  sigraph-config
+  siLearn
+  siLyxErrors
+  siMakeColoredHierarchy
+  siMakeModel
+  siMakeParcellationHierarchy
+  siMergeModels
+  siMeshSulciOperture
+  siMeshSulciProjection
+  siMkModelEdges
+  siMorpho
+  siMultilabelCompare
+  siParcellation
+  siPIDcommand
+  siPutTextureInModel
+  siRelax
+  siRevert
+  siSulcalParcellation
+  siTestModels
+  siTriangModel
+  siTryGauss )
+  if( IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${_command}" )
+    file( GLOB _pro "${CMAKE_CURRENT_SOURCE_DIR}/${_command}/*.pro" )
+    BRAINVISA_GET_FILE_LIST_FROM_PRO( "${_pro}"
+    TARGET _target
+    SOURCES _proSources )
+    set( _sources )
+    foreach( _f ${_proSources} )
+      set( _sources ${_sources} ${_command}/${_f} )
+    endforeach( _f ${_proSources} )
+    add_executable( ${_target} ${_sources} )
+    target_link_libraries( ${_target} sigraph )
+    BRAINVISA_INSTALL( TARGETS ${_target}
+    DESTINATION bin
+    COMPONENT ${PROJECT_NAME} )
+  endif( IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${_command}" )
+endforeach( _command )
+
