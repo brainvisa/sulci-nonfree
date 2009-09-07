@@ -58,6 +58,7 @@ def main():
 			sys.exit(1) #FIXME
 
 	for sulcus, motions in data.items():
+		n = len(motions)
 		translations = []
 		directions = []
 		thetas = []
@@ -75,14 +76,25 @@ def main():
 		translations = numpy.vstack(translations)
 		directions = numpy.vstack(directions)
 		thetas = numpy.array(thetas)
+		# init
 		dir_prior = distribution_aims.Bingham()
-		dir_prior.fit(directions)
-		dir_priors[sulcus] = dir_prior
 		angle_prior = distribution.VonMises()
-		angle_prior.fit(thetas[None].T)
-		angle_priors[sulcus] = angle_prior
 		translation_prior = distribution.Gaussian()
-		translation_prior.fit(translations)
+		# fit
+		if n < 3:
+			dir_prior.setUniform(directions.shape[1])
+			angle_prior.setUniform()
+		else:
+			r = dir_prior.fit(directions)
+			if not r: dir_prior.setUniform(directions.shape[1])
+			angle_prior.fit(thetas[None].T)
+		r = translation_prior.fit(translations, robust=True)
+		if (n < 3) or (not r):
+			translation_prior.set_cov(numpy.identity(3) * 2)
+			translation_prior.update()
+		# store
+		dir_priors[sulcus] = dir_prior
+		angle_priors[sulcus] = angle_prior
 		translation_priors[sulcus] = translation_prior
 
 	# save translation prior

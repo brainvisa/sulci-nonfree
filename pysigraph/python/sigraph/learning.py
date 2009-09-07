@@ -1632,14 +1632,14 @@ def optimizedDim(mode, model, train, test, opt):
 	basename = "optimized_dim_errors.data"
 	filename = os.path.join(prefix, basename)
 	fd = open(filename, 'a')
-	fcntl.flock(fd.fileno(), fcntl.LOCK_EX)
+	fcntl.lockf(fd.fileno(), fcntl.LOCK_EX)
 	if fd.tell() == 0:
 		fd.write('labels\t' +'\t'.join([str(d) for d in dimrange])+'\n')
 	txt = ','.join(opt['labels']) + '\t'
 	txt += '\t'.join([str(t) for t in errors[dimrange].tolist()])
 	txt += '\n'
 	fd.write(txt)
-	fcntl.flock(fd.fileno(), fcntl.LOCK_UN)
+	fcntl.lockf(fd.fileno(), fcntl.LOCK_UN)
 	fd.close()
 
 	# fit

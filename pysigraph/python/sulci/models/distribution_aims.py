@@ -800,8 +800,12 @@ class Bingham(Distribution):
 		import scipy.optimize
 		z0 = numpy.zeros(self._M.shape[0])
 		eps = 10e-5
-		res = scipy.optimize.fmin_powell(func, z0, args=(X, weights),
-							disp=0, ftol=eps)
+		try:
+			res = scipy.optimize.fmin_powell(func, z0,
+					args=(X, weights), disp=0, ftol=eps)
+		except RuntimeError:
+			print "warning: Bingham: optimization failed."
+			return None
 		return numpy.asarray(res).ravel()
 
 	def fit(self, X, weights=None):
@@ -819,7 +823,10 @@ class Bingham(Distribution):
 		ind = numpy.argsort(val)
 		self._M = numpy.asmatrix(vec[:, ind])
 		self._Z = self.compute_Z(X, weights)
+		if self._Z is None:
+			return False
 		self.update()
+		return True
 
 	def likelihoods(self, X):
 		X = numpy.asarray(X).reshape(-1, X.shape[-1])

@@ -16,7 +16,7 @@ RANDDB="/home/mp210984/svn/brainvisa/sulci/sulci-private/trunk/pysigraph/scripts
 CARTOPACK="/i2bm/research/Mandriva-2008.0-i686/cartopack-Mandriva-2008.0-i686-devel_4.0-2009_07_28i2bm"
 TRANSLATION="$CARTOPACK/share/shfj-4.0/nomenclature/translation/sulci_model_2008.trl"
 SETUP=". $CARTOPACK/bin/cartopack.sh $CARTOPACK/"
-SIERROR='echo -en siErrorLightWrapper.py -t $TRANSLATION -l $f -b $g -c test_global.csv -n $n; echo -en ";" siError.py -l $f -b $g -s $n --csv test_local.csv'
+SIERROR='echo -en siErrorLightWrapper.py -t $TRANSLATION -l $f -b $g -c test_global.csv -n $n; echo -en "&&" siError.py -t $TRANSLATION -l $f -b $g -s $n --csv test_local.csv'
 
 mkdir dbsize_$1;
 cd dbsize_$1;
@@ -25,17 +25,17 @@ do
 	echo "- generate database for $side side...";
 
 	# generate training/testing splits
-	#mkdir base_$side;
-	#cd base_$side
-	#$RANDDB -n $1 -r $2 -f ../../all_${side}_graphs.dat
-	#cd ..
+	mkdir base_$side;
+	cd base_$side
+	$RANDDB -n $1 -r $2 -f ../../all_${side}_graphs.dat
+	cd ..
 
 	echo "  copy database for several models...";
 	# copy
-	#for dir in nodes_prior gaussian_model spam_model registred_spam_model locally_from_global_registred_spam_model;
-	#do
-	#	cp -a base_$side ${dir}_$side;
-	#done;
+	for dir in nodes_prior gaussian_model spam_model registred_spam_model locally_from_global_registred_spam_model;
+	do
+		cp -a base_$side ${dir}_$side;
+	done;
 
 	echo "  - prior model";
 	# prior / learning
@@ -54,7 +54,9 @@ do
 	# Talairach / learning
 	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/learn_spams_distributions.py $(cat $d/train_graphs.dat) --translation $TRANSLATION --sigma-value 2\" > ${d}_learning.log"; done > batch_learning
 	# Talairach / testing
-	for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/independent_tag.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $f -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat; $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing
+	# with old script
+	#for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/independent_tag.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $f -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat && $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing
+	for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/independent_tag_with_registration.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $f -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat --motion motion_${n}.trm --mode global --maxiter 0 && $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing
 	cd ..
 
 	echo "  - spam (global rigid registration) model";
@@ -62,7 +64,7 @@ do
 	# Global registration / learning
 	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/learn_registred_spams_distributions.py $(cat $d/train_graphs.dat) --translation $TRANSLATION --sigma-value 2\" > ${d}_learning.log"; done > batch_learning
 	# Global registration / testing
-	for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/independent_tag_with_registration.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $(echo $g | sed 's#.*/##g;s#.arg#_auto.arg#g') -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat --motion motion_${n}.trm --mode global; $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing
+	for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/independent_tag_with_registration.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $f -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat --motion motion_${n}.trm --mode global && $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing
 	cd ..
 
 	echo "  - spam (local rigid registration) model";
@@ -70,14 +72,22 @@ do
 	# Local registration / learning
 	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/learn_registred_spams_distributions.py --translation $TRANSLATION --sigma-value 2 --mode local --distrib-gaussians gravity_centers $(cat $d/train_graphs.dat) == $(for a in $(cat $d/train_graphs.dat); do b=$(basename $a); echo -en ../../registred_spam_model_${side}/$d/bayesian_spam_distribs/${b%%.arg}_motion.trm' ' ; done) && python $CARTOPACK/scripts/sigraph/sulci_registration/learn_transformation_prior.py *motion_local.dat\" > ${d}_learning.log"; done > batch_learning2
 	# Local registration / testing
-	for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/independent_tag_with_registration.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $(echo $g | sed 's#.*/##g;s#.arg#_auto.arg#g') -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat --motion motion_${n}.trm --mode local --translation-prior bayesian_translation_distribs.dat --direction-prior bayesian_direction_distribs.dat --angle-prior bayesian_angle_distribs.dat --distrib-gaussians ../../gaussian_model_${side}/$d/bayesian_gaussian_distribs.dat --input-motion ../../registred_spam_model_${side}/$d/motion_${n}.trm; $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing
+	for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/independent_tag_with_registration.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $f -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat --motion motion_${n}.trm --mode local --translation-prior bayesian_translation_distribs.dat --direction-prior bayesian_direction_distribs.dat --angle-prior bayesian_angle_distribs.dat --distrib-gaussians ../../gaussian_model_${side}/$d/bayesian_gaussian_distribs.dat --input-motion ../../registred_spam_model_${side}/$d/motion_${n}.trm && $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing2
 	cd ..
 	cat *_$side/batch_learning >> batch_learning
 	cat locally_from_global_registred_spam_model_$side/batch_learning2 >> batch_learning2
 	cat *_$side/batch_testing >> batch_testing
+	cat locally_from_global_registred_spam_model_$side/batch_testing2 >> batch_testing2
 
 	# cleaning
 	rm -rf base_$side
 done;
-
+echo "# learning state 1: prior + gaussian + Talairach + global rigid registration" > CMD
+echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_learning --timeslot - --log grid_learning.log --broken broken_learning.batch" >> CMD
+echo "# learning state 2: local rigid registration" >> CMD
+echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_learning2 --timeslot - --log grid_learning2.log --broken broken_learning2.batch" >> CMD
+echo "# testing state 1: Talairach + global rigid registration" >> CMD
+echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_testing --timeslot - --log grid_testing.log --broken broken_testing.batch" >> CMD
+echo "# testing state 2: local rigid registration" >> CMD
+echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_testing2 --timeslot - --log grid_testing2.log --broken broken_testing2.batch" >> CMD
 cd ..

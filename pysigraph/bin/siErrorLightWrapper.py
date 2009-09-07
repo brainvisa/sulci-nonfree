@@ -8,13 +8,13 @@ from soma.sorted_dictionary import SortedDictionary
 
 def addInfoToCSV(csvfilename, graphname, errors, nrj):
 	fd = open(csvfilename, 'a')
-	fcntl.flock(fd.fileno(), fcntl.LOCK_EX)
+	fcntl.lockf(fd.fileno(), fcntl.LOCK_EX)
 	if fd.tell() == 0:
 		h = 'Subject\t%s\tEnergy\n' % '\t'.join(errors.keys())
 		fd.write(h)
 	errors_str = '\t'.join(str(x) for x in errors.values())
 	fd.write('%s\t%s\t%s\n' % (graphname, errors_str, str(nrj)))
-	fcntl.flock(fd.fileno(), fcntl.LOCK_UN)
+	fcntl.lockf(fd.fileno(), fcntl.LOCK_UN)
 	fd.close()
 
 

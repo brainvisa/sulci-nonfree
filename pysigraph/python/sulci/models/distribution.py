@@ -2,6 +2,47 @@
 
 import pickle, numpy, scipy.stats, scipy.special
 
+# from Gael Varoquaux
+def ledoit_wolf(x):
+	""" Estimates the shrunk Ledoit-Wolf covariance matrix.
+
+	Parameters
+	----------
+	x: 2D ndarray, shape (p, n)
+	The data matrix, with p features and n samples.
+
+	Returns
+	-------
+	regularised_cov: 2D ndarray
+	Regularized covariance
+	regularisation_factor: float
+	Regularisation factor
+
+	Notes
+	-----
+	The regularisation should be applied with a scaling to conserve
+	the trace: if cov is the sample covariance, the scaling is::
+
+	scaling = np.trace(cov)/n_features
+
+	and the regularised covariance is::
+
+	(1 - regularisation_factor)*cov 
+	+ scaling*regularisation_factor*np.identity(n_features)
+	"""
+	n_features, n_samples = x.shape
+	cov = numpy.dot(x, x.T)/n_samples
+	i = numpy.identity(n_features)
+	mu = numpy.trace(cov)/n_features
+	delta = ((cov - mu*i)**2).sum()/n_features
+	beta_ = 1./n_samples**2 * sum([
+		((numpy.dot(this_x[:, numpy.newaxis], this_x[numpy.newaxis, :]) 
+		- cov)**2).sum()/n_features
+		for this_x in x.T]) 
+	beta = min(beta_, delta)
+	alpha = delta - beta
+	return beta/delta * mu * i + alpha/delta * cov, beta
+
 class Distribution(object):
 	def __init__(self):
 		'''
@@ -239,7 +280,10 @@ class Gaussian(Distribution):
 	def fromTuple(self, tuple):
 		self._name, self._mean, self._cov = tuple
 
-	def fit(self, db, weights=None):
+	def fit(self, db, weights=None, robust=False):
+		'''
+    if robust is true use ledoit_wolf covariance estimator.
+		'''
 		try:	X = db.getX()
 		except AttributeError:
 			X = db
@@ -248,14 +292,30 @@ class Gaussian(Distribution):
 		X = numpy.asmatrix(X)
 		Xm = X.mean(axis=0)
 		Xc = X - Xm
+		self._mean = Xm
 		if weights is not None:
 			weights = weights * n / weights.sum()
 			cov = numpy.multiply(Xc.T, weights) * Xc / (n - 1)
 		else:	
-			cov = Xc.T * Xc / (n - 1)
-		self._mean = Xm
+			if robust:
+				if (len(X) == 1):
+					print "warning: covariance matrix " + \
+					"estimation failed: not enough data."
+					self._cov = None
+					return False
+				else:
+					cov = numpy.asmatrix(ledoit_wolf(\
+						numpy.asarray(Xc).T)[0])
+			else:	cov = Xc.T * Xc / (n - 1)
+			l, v = numpy.linalg.eigh(cov.I)
+			if numpy.min(l) < 0:
+				print "warning: covariance matrix " + \
+					"estimation failed: negative eigvalue."
+				self._cov = None
+				return False
 		self._cov = cov
 		self.update()
+		return True
 
 	def likelihood(self, x):
 		x = numpy.asmatrix(x) - self._mean
@@ -430,17 +490,29 @@ class FakeGaussian(Gaussian):
 
 	def _compute_norm(self): pass
 
+	def mean(self): return self._mean
+
 	def toTuple(self):
-		return self._name, self._val
+		return self._name, self._val, self._mean
 
 	def fromTuple(self, tuple):
-		self._name, self._val = tuple
+		try:
+			self._name, self._val, self._mean = tuple
+		except ValueError:
+			self._name, self._val = tuple
+			self._mean = None
 
-	def write(self, filename): pass
+	def write(self, filename):
+		Distribution.write(self, filename)
 
-	def read(self, filename): pass
+	def read(self, filename):
+		Distribution.read(self, filename)
 
-	def fit(self, db): pass
+	def fit(self, db):
+		try:	X = db.getX()
+		except AttributeError:
+			X = db
+		self._mean = numpy.asmatrix(X).mean(axis=0)
 
 	def likelihood(self, x):
 		return numpy.log(self._val), self._val
@@ -937,6 +1009,8 @@ class Dirac(Distribution):
 		X = db.getX()
 		self._values = X.mean(axis=0)
 
+	def mean(self): return self._values[None]
+
 	def toTuple(self):
 		return (self._name, self._values)
 
@@ -980,6 +1054,11 @@ class VonMises(Distribution):
 		self._kappa = kappa
 		self._bias = bias
 		self._normalization = None
+
+	def setUniform(self):
+		self._mu = 0.
+		self._kappa = 0.
+		self.update()
 
 	def _check(self, X):
 		if X.shape[1] == 1: return 1

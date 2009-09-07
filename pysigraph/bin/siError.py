@@ -14,7 +14,7 @@ def addInfoToCSV(csvfilename, subject, sulci_errors):
     - binary errors : perfect tag : 0, one or more error : 1.
 	'''
 	fd = open(csvfilename, 'a')
-	fcntl.flock(fd.fileno(), fcntl.LOCK_EX)
+	fcntl.lockf(fd.fileno(), fcntl.LOCK_EX)
 	if fd.tell() == 0:
 		header = ['subjects', 'sulci', 'size_errors', 'binary_errors',
 			'node_errors', 'SI_error', 'false_positive',
@@ -31,7 +31,7 @@ def addInfoToCSV(csvfilename, subject, sulci_errors):
 		be = (se != 0.)
 		fd.write(('%s\t%s' + '\t%f' * 7 + '\n') % (subject, sulcus, \
 			se, be, ne, sie, fp, fn, tp))
-	fcntl.flock(fd.fileno(), fcntl.LOCK_UN)
+	fcntl.lockf(fd.fileno(), fcntl.LOCK_UN)
 	fd.close()
 
 def parseOpts(argv):
