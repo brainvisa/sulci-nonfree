@@ -5,6 +5,8 @@ BRAINVISA_PROJECT()
 BRAINVISA_FIND_PACKAGE( aims-free REQUIRED )
 include( "${AIMS-FREE_USE_FILE}" )
 
+find_package( SVM )
+
 add_subdirectory( neuron )
 add_subdirectory( sigraph )
 
