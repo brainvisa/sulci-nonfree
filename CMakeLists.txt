@@ -5,6 +5,7 @@ BRAINVISA_PROJECT()
 BRAINVISA_FIND_PACKAGE( aims-free REQUIRED )
 include( "${AIMS-FREE_USE_FILE}" )
 
+BRAINVISA_FIND_PACKAGE( datamind )
 find_package( SVM )
 
 add_subdirectory( neuron )
