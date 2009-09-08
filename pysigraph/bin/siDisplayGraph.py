@@ -264,8 +264,8 @@ class WireFrameDisplay(GraphDisplay):
 	def _display_one_vertex_callback(self, v):
 		g = numpy.asarray(v['refgravity_center'].list())
 		s = aims.SurfaceGenerator.sphere(g, 2, 96)
-		as = self._an.toAObject(s)
-		self._aobjects += [as]
+		aas = self._an.toAObject(s)
+		self._aobjects += [aas]
 
 	def _display_one_edge_callback(self, e, v1, v2):
 		g1 = numpy.asarray(v1['refgravity_center'].list())
