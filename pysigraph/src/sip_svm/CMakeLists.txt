@@ -1,39 +1,27 @@
+include_directories( ${SVM_INCLUDE_DIR} )
 
+BRAINVISA_GET_FILE_LIST_FROM_PRO( "${CMAKE_CURRENT_SOURCE_DIR}/sipsvm.pro" "HEADERS" _headers "SOURCES" _sources )
+# BRAINVISA_COPY_AND_INSTALL_HEADERS( _headers pysigraph headersTarget )
 
-getFromPro(sipsvm.pro SIP_HDRS SIP_SRCS)
+set( SIGRAPH_RELATIVE_SIP_DIRECTORY
+     "share/sip/sigraph-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}" )
 
-SHFJ_COPY_HEADERS(include/pysigraph ${SIP_HDRS})
+file( GLOB _sipSources "${CMAKE_CURRENT_SOURCE_DIR}/*.sip" )
 
-FILE(GLOB globbedTpl           ${CMAKE_CURRENT_SOURCE_DIR}/*.tpl)
-FILE(GLOB relativeTpl RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.tpl)
-FILE(GLOB globbedSip           ${CMAKE_CURRENT_SOURCE_DIR}/*.sip)
-FILE(GLOB relativeSip RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.sip)
+BRAINVISA_ADD_SIP_PYTHON_MODULE( sigraphsvmsip
+  sigraph 
+  "${CMAKE_CURRENT_SOURCE_DIR}/sigraphsvm.sip"
+  SIP_SOURCES ${_sipSources}
+#   ${_generatedSipFileList} 
+  SIP_INCLUDE "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
+    "${AIMS-FREE_SIP_DIRECTORY}" "${CMAKE_CURRENT_SOURCE_DIR}/../sip" )
+# add_dependencies( sigraphsip ${headersTarget} )
+target_link_libraries( sigraphsvmsip
+  ${PYTHON_LIBRARY}
+  pysigraph sisvm
+  ${AIMS_PYAIMS_LIB} )
+BRAINVISA_INSTALL( TARGETS sigraphsvmsip
+                   DESTINATION python/sigraph
+                   COMPONENT ${PROJECT_NAME} )
 
-# Copy sip & tpl files for further compilation
-COPY_FILES(${CMAKE_BINARY_DIR}/sip ${globbedSip})
-COPY_FILES(${CMAKE_BINARY_DIR}/tpl ${globbedTpl})
-
-
-SET(SIP_INCLUDES 
-${PYAIMS_SIP_DIR}
-${CMAKE_BINARY_DIR}/sip 
-${PYQT${DESIRED_QT_VERSION}_SIP_DIR}
-)
-SET(SIP_CONCAT_PARTS 1)
-SET(SIP_TAGS ALL WS_X11 Qt_3_3_0)
-SET(SIP_DISABLE_FEATURES 
-VendorID 
-Qt_STYLE_WINDOWSXP 
-Qt_STYLE_INTERLACE
-Qt_STYLE_WINDOWSXP
-)
-SET(SIP_EXTRA_OPTIONS -e)
-SET(SIP_EXTRA_DEPENDENCIES ${globbedSip})
-SET(SIP_MAIN_FILE          ${CMAKE_BINARY_DIR}/sip/sigraphsvm.sip)
-
-ADD_SIP_PYTHON_MODULE(sigraphsvmsip ${SIP_MAIN_FILE}
-pysigraph
-)
-
-
-INSTALL(TARGETS sigraphsvmsip DESTINATION python/sigraph)
+# TODO: install .sip files in devel package

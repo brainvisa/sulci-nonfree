@@ -1,61 +1,48 @@
+BRAINVISA_GET_FILE_LIST_FROM_PRO( "${CMAKE_CURRENT_SOURCE_DIR}/sip.pro" "HEADERS" _headers "SOURCES" _sources )
+BRAINVISA_COPY_AND_INSTALL_HEADERS( _headers pysigraph headersTarget )
 
-getFromPro(sip.pro SIP_HDRS SIP_SRCS)
+set( SIGRAPH_RELATIVE_SIP_DIRECTORY
+     "share/sip/sigraph-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}" )
 
-SHFJ_COPY_HEADERS(include/pysigraph ${SIP_HDRS})
+file( GLOB _sipTemplates RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/*.tpl" )
+BRAINVISA_COPY_FILES( ${PROJECT_NAME}-devel
+                      typessub.py ${_sipTemplates}
+                      SOURCE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                      DESTINATION "${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
+                      IMMEDIATE )
 
-FILE(GLOB globbedTpl           ${CMAKE_CURRENT_SOURCE_DIR}/*.tpl)
-FILE(GLOB relativeTpl RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.tpl)
-FILE(GLOB globbedSip           ${CMAKE_CURRENT_SOURCE_DIR}/*.sip)
-FILE(GLOB relativeSip RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.sip)
+file( GLOB _sipSources "${CMAKE_CURRENT_SOURCE_DIR}/*.sip" )
 
-# Copy sip & tpl files for further compilation
-COPY_FILES(${CMAKE_BINARY_DIR}/sip ${globbedSip})
-COPY_FILES(${CMAKE_BINARY_DIR}/tpl ${globbedTpl})
+file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}" )
+exec_program( "${PYTHON_EXECUTABLE}"
+  ARGS "${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py"
+        -s "${AIMS-FREE_SIP_DIRECTORY}"
+        -i "${CMAKE_CURRENT_SOURCE_DIR}/generatedtypes.py"
+        -p "${CMAKE_CURRENT_SOURCE_DIR}"
+        -o "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
+        -t "${AIMS-FREE_SIP_DIRECTORY}/typessub.py"
+        -t "${CMAKE_CURRENT_SOURCE_DIR}/typessub.py"
+        -l
+  OUTPUT_VARIABLE _generatedSipFileList 
+  RETURN_VALUE _returnValue )
 
+if( NOT _returnValue EQUAL 0 )
+  message( SEND_ERROR "The sip generation from ${PROJECT_NAME} templates returned an error:\n  ${_generatedSipFileList}\n========================")
+endif( NOT _returnValue EQUAL 0 )
 
-SET(SIP_TYPESSUB                  ${CMAKE_CURRENT_SOURCE_DIR}/typessub.py)
-SET(makeTemplatesGeneratedTypePy  ${CMAKE_CURRENT_SOURCE_DIR}/generatedtypes.py)
-SET(TPL_DIRECTORY                 ${CMAKE_BINARY_DIR}/tpl)
+BRAINVISA_ADD_SIP_PYTHON_MODULE( sigraphsip
+  sigraph 
+  "${CMAKE_CURRENT_SOURCE_DIR}/sigraph.sip"
+  SIP_SOURCES ${_generatedSipFileList} ${_sipSources}
+  SIP_INCLUDE "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
+    "${AIMS-FREE_SIP_DIRECTORY}" )
+add_dependencies( sigraphsip ${headersTarget} )
+target_link_libraries( sigraphsip
+  ${PYTHON_LIBRARY}
+  pysigraph
+  ${AIMS_PYAIMS_LIB} )
+BRAINVISA_INSTALL( TARGETS sigraphsip
+                   DESTINATION python/sigraph
+                   COMPONENT ${PROJECT_NAME} )
 
-
-SIP_MAKE_TEMPLATES(${makeTemplatesGeneratedTypePy} 
-${TPL_DIRECTORY} 
-${CMAKE_CURRENT_BINARY_DIR}/sip 
-${globbedTpl}
-)
-
-
-# Get the .sip files that have been created
-FILE(GLOB SIPPED_TPL ${CMAKE_CURRENT_BINARY_DIR}/sip/*.sip)
-
-
-# copy the sipped files to a common directory so that external libraries
-# can access them for further compilation
-COPY_FILES(${CMAKE_BINARY_DIR}/sip ${SIPPED_TPL})
-
-
-
-SET(SIP_INCLUDES 
-${PYAIMS_SIP_DIR}
-${CMAKE_BINARY_DIR}/sip 
-${PYQT${DESIRED_QT_VERSION}_SIP_DIR}
-)
-SET(SIP_CONCAT_PARTS 1)
-SET(SIP_TAGS ALL WS_X11 Qt_3_3_0)
-SET(SIP_DISABLE_FEATURES 
-VendorID 
-Qt_STYLE_WINDOWSXP 
-Qt_STYLE_INTERLACE
-Qt_STYLE_WINDOWSXP
-)
-SET(SIP_EXTRA_OPTIONS -e)
-SET(SIP_EXTRA_DEPENDENCIES ${SIPPED_TPL} ${globbedSip})
-SET(SIP_MAIN_FILE          ${CMAKE_BINARY_DIR}/sip/sigraph.sip)
-
-ADD_SIP_PYTHON_MODULE(sigraphsip ${SIP_MAIN_FILE}
-pysigraph
-sigraph
-)
-
-
-INSTALL(TARGETS sigraphsip DESTINATION python/sigraph)
+# TODO: install .sip files in devel package

@@ -11,7 +11,7 @@ find_package( SVM )
 add_subdirectory( neuron )
 add_subdirectory( sigraph )
 
-if( AIMS-PYAIMS_LIB )
+if( AIMS_PYAIMS_LIB )
   add_subdirectory( pysigraph )
 endif()
 
