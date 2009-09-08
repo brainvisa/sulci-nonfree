@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-import os, sys, exceptions, fcntl, numpy
+import os, sys, exceptions, numpy
 from optparse import OptionParser
 import sigraph
 import sigraph.error
+from sulci.common import lock, unlock
 from soma import aims
 
 
@@ -13,8 +14,8 @@ def addInfoToCSV(csvfilename, subject, sulci_errors):
     - nodes errors : only count the number of nodes bad tagged.
     - binary errors : perfect tag : 0, one or more error : 1.
 	'''
+	lock(csvfilename + '.lock')
 	fd = open(csvfilename, 'a')
-	fcntl.lockf(fd.fileno(), fcntl.LOCK_EX)
 	if fd.tell() == 0:
 		header = ['subjects', 'sulci', 'size_errors', 'binary_errors',
 			'node_errors', 'SI_error', 'false_positive',
@@ -31,8 +32,8 @@ def addInfoToCSV(csvfilename, subject, sulci_errors):
 		be = (se != 0.)
 		fd.write(('%s\t%s' + '\t%f' * 7 + '\n') % (subject, sulcus, \
 			se, be, ne, sie, fp, fn, tp))
-	fcntl.lockf(fd.fileno(), fcntl.LOCK_UN)
 	fd.close()
+	unlock(csvfilename + '.lock')
 
 def parseOpts(argv):
 	description = 'Count labelling differences on auto/manual ' \

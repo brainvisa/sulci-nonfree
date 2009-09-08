@@ -1,21 +1,22 @@
 #!/usr/bin/env python
-import os, sys, fcntl, numpy
+import os, sys, numpy
 from optparse import OptionParser
 import sigraph.error, sigraph.nrj
 from soma import aims
+from sulci.common import lock, unlock
 from soma.sorted_dictionary import SortedDictionary
 
 
 def addInfoToCSV(csvfilename, graphname, errors, nrj):
+	lock(csvfilename + '.lock')
 	fd = open(csvfilename, 'a')
-	fcntl.lockf(fd.fileno(), fcntl.LOCK_EX)
 	if fd.tell() == 0:
 		h = 'Subject\t%s\tEnergy\n' % '\t'.join(errors.keys())
 		fd.write(h)
 	errors_str = '\t'.join(str(x) for x in errors.values())
 	fd.write('%s\t%s\t%s\n' % (graphname, errors_str, str(nrj)))
-	fcntl.lockf(fd.fileno(), fcntl.LOCK_UN)
 	fd.close()
+	unlock(csvfilename + '.lock')
 
 
 
