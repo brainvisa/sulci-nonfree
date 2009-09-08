@@ -90,4 +90,18 @@ echo "# testing state 1: Talairach + global rigid registration" >> CMD
 echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_testing --timeslot - --log grid_testing.log --broken broken_testing.batch" >> CMD
 echo "# testing state 2: local rigid registration" >> CMD
 echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_testing2 --timeslot - --log grid_testing2.log --broken broken_testing2.batch" >> CMD
+echo >> CMD
+echo "# check if all results has been computed :" >> CMD
+echo "# - local ones :" >> CMD
+echo 'for a in */*/test_local.csv; do n=$(cat $a | awk '\''{ print $1 }'\''| sort| uniq| wc -l); s=$(cat $(dirname $a)/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then echo "($n != $s) for '\''$a'\''"; fi; done' >> CMD
+echo "# - global ones :" >> CMD
+echo 'for a in */*/test_global.csv; do n=$(cat $a | wc -l); s=$(cat $(dirname $a)/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then echo "($n != $s) for '\''$a'\''"; fi; done' >> CMD
+echo >> CMD
+echo "# get results" >> CMD
+echo "# - global ones :" >> CMD
+echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '$1' --output ../results_global.csv --mode global locally_from_global_registred_spam_model_Left locally_from_global_registred_spam_model_Right registred_spam_model_Left registred_spam_model_Right spam_model_Left spam_model_Right' >> CMD
+echo "# - local ones (left):" >> CMD
+echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '$1' --output ../results_local.csv --mode local locally_from_global_registred_spam_model_Left registred_spam_model_Left spam_model_Left' >> CMD
+echo "# - local ones (right):" >> CMD
+echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '$1' --output ../results_local.csv --mode local locally_from_global_registred_spam_model_Right registred_spam_model_Right spam_model_Right' >> CMD
 cd ..
