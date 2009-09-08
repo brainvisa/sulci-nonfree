@@ -1,12 +1,13 @@
 
 ADD_SUBDIRECTORY(lib)
 
-# IF( SVM_FOUND )
-#   ADD_SUBDIRECTORY(libsigraphsvm)
-#   IF(APPLE)
-#     ADD_SUBDIRECTORY(bundle_sisvm)
-#   ENDIF(APPLE)
-# ENDIF( SVM_FOUND )
+IF( datamind_FOUND AND SVM_FOUND )
+  include( "${DATAMIND_USE_FILE}" )
+  ADD_SUBDIRECTORY(libsigraphsvm)
+  IF(APPLE)
+    ADD_SUBDIRECTORY(bundle_sisvm)
+  ENDIF()
+ENDIF()
 
 #------------------------------------------------------------------------------
 # Build targets for commands
