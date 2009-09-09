@@ -2,7 +2,7 @@ BRAINVISA_GET_FILE_LIST_FROM_PRO( "${CMAKE_CURRENT_SOURCE_DIR}/sip.pro" "HEADERS
 BRAINVISA_COPY_AND_INSTALL_HEADERS( _headers pysigraph headersTarget )
 
 set( SIGRAPH_RELATIVE_SIP_DIRECTORY
-     "share/sip/sigraph-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}" )
+     "share/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}/sip" )
 
 file( GLOB _sipTemplates RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/*.tpl" )
 BRAINVISA_COPY_FILES( ${PROJECT_NAME}-devel
@@ -12,6 +12,11 @@ BRAINVISA_COPY_FILES( ${PROJECT_NAME}-devel
                       IMMEDIATE )
 
 file( GLOB _sipSources "${CMAKE_CURRENT_SOURCE_DIR}/*.sip" )
+BRAINVISA_COPY_FILES( ${PROJECT_NAME}-devel
+                      ${_sipSources}
+                      SOURCE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                      DESTINATION "${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
+                      IMMEDIATE )
 
 file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}" )
 exec_program( "${PYTHON_EXECUTABLE}"
@@ -27,7 +32,7 @@ exec_program( "${PYTHON_EXECUTABLE}"
   RETURN_VALUE _returnValue )
 
 if( NOT _returnValue EQUAL 0 )
-  message( SEND_ERROR "The sip generation from ${PROJECT_NAME} templates returned an error:\n  ${_generatedSipFileList}\n========================")
+  message( SEND_ERROR "The sip generation from ${PROJECT_NAME} templates with \"${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py\" returned an error:\n${_generatedSipFileList}\n========================")
 endif( NOT _returnValue EQUAL 0 )
 
 BRAINVISA_ADD_SIP_PYTHON_MODULE( sigraphsip
