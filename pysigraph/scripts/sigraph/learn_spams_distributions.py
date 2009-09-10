@@ -196,9 +196,7 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
 	prefix = distribdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print e
-		sys.exit(1) #FIXME
-
+		print "warning: directory '%s' allready exists" % prefix
 	if options.depth_weighted:
 		model_type = 'depth_weighted_spam'
 	else:	model_type = 'spam'

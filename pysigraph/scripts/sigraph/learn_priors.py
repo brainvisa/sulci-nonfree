@@ -135,8 +135,7 @@ def compute_prior(graphs, MyPrior, distr, options, output):
 	prefix = output
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print e
-		sys.exit(1)
+		print "warning: directory '%s' allready exists" % prefix
 
 	prior = MyPrior(graphs, distr,
 			options.compute_likelihoods)

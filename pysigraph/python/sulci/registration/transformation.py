@@ -55,7 +55,7 @@ class SulcusWiseRigidTransformations(Transformation):
 	def write(self, directory, summary_filename):
 		try:	os.mkdir(directory)
 		except OSError, e:
-			raise OSError
+			print "directory '%s' allready exists" % directory
 		h = {}
 		for sulcus, trans in self._transformations.items():
 			if trans is None: continue

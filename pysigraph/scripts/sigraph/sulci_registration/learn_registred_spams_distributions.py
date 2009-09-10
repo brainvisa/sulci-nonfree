@@ -734,8 +734,7 @@ def main():
 	prefix = options.distribdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print e
-		sys.exit(1)
+		print "warning: directory '%s' allready exists" % prefix
 
 	# learn
 	if options.mode == 'global':

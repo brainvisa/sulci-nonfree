@@ -166,8 +166,7 @@ def main():
 	if not options.skip:
 		try:	os.mkdir(prefix)
 		except OSError, e:
-			print e
-			sys.exit(1) #FIXME
+			print "warning: directory '%s' allready exists" % prefix
 
 	level = input_distrib['level']
 	data_type = input_distrib['data_type']

@@ -54,8 +54,7 @@ def main():
 		prefix = distribdir
 		try:	os.mkdir(prefix)
 		except OSError, e:
-			print e
-			sys.exit(1) #FIXME
+			print "warning: directory '%s' allready exists" % prefix
 
 	for sulcus, motions in data.items():
 		n = len(motions)

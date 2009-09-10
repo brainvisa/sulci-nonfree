@@ -116,8 +116,7 @@ class Compute(object):
 		prefix = self._distribdir
 		try:	os.mkdir(prefix)
 		except OSError, e:
-			print e
-			sys.exit(1)
+			print "warning: directory '%s' allready exists" % prefix
 
 	def compute_orientations(self):
 		# first mean orientation estimation to reorient direction of

@@ -49,8 +49,7 @@ def main():
 	# create output directory
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print e
-		sys.exit(1)
+		print "warning: directory '%s' allready exists" % prefix
 
 	# db => mean/cov
 	# bayesian_*.minf => bayesian_density_*.minf
