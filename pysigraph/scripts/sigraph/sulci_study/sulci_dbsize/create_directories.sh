@@ -10,6 +10,7 @@ then
 fi
 
 echo "training db size: $1"
+size=$1
 echo "number of runs: $2"
 
 RANDDB="/home/mp210984/svn/brainvisa/sulci/sulci-private/trunk/pysigraph/scripts/sigraph/sulci_misc/randdb.py"
@@ -93,15 +94,24 @@ echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_testing2 --times
 echo >> CMD
 echo "# check if all results has been computed :" >> CMD
 echo "# - local ones :" >> CMD
-echo 'for a in */*/test_local.csv; do n=$(cat $a | awk '\''{ print $1 }'\''| sort| uniq| wc -l); s=$(cat $(dirname $a)/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then echo "($n != $s) for '\''$a'\''"; fi; done' >> CMD
+echo 'for a in *spam*/*/; do n=$(cat $a/test_local.csv 2> /dev/null | awk '\''{ print $1 }'\''| sort| uniq| wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then echo "($n != $s) for '\''$a'\''"; fi; done' >> CMD
 echo "# - global ones :" >> CMD
-echo 'for a in */*/test_global.csv; do n=$(cat $a | wc -l); s=$(cat $(dirname $a)/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then echo "($n != $s) for '\''$a'\''"; fi; done' >> CMD
+echo 'for a in *spam*/*/; do n=$(cat $a/test_global.csv 2> /dev/null | wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then echo "($n != $s) for '\''$a'\''"; fi; done' >> CMD
+echo >> CMD
+echo "# create new batch from failed results :" >> CMD
+echo "# - local ones :" >> CMD
+echo 'for a in *spam*/*/; do n=$(cat $a/test_local.csv 2> /dev/null | awk '\''{ print $1 }'\''| sort| uniq| wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then grep "/$(dirname $a/plop) " batch_testing; fi; done > batch_testing_error' >> CMD
+echo "# - global ones :" >> CMD
+echo 'for a in *spam*/*/; do n=$(cat $a/test_global.csv 2> /dev/null | wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then grep "/$(dirname $a/plop) " batch_testing; fi; done >> batch_testing_error' >> CMD
 echo >> CMD
 echo "# get results" >> CMD
 echo "# - global ones :" >> CMD
-echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '$1' --output ../results_global.csv --mode global locally_from_global_registred_spam_model_Left locally_from_global_registred_spam_model_Right registred_spam_model_Left registred_spam_model_Right spam_model_Left spam_model_Right' >> CMD
+echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '${size}' --output ../results_global.csv --mode global locally_from_global_registred_spam_model_Left locally_from_global_registred_spam_model_Right registred_spam_model_Left registred_spam_model_Right spam_model_Left spam_model_Right' >> CMD
 echo "# - local ones (left):" >> CMD
-echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '$1' --output ../results_local.csv --mode local locally_from_global_registred_spam_model_Left registred_spam_model_Left spam_model_Left' >> CMD
+echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '${size}' --output ../results_left_local.csv --mode local locally_from_global_registred_spam_model_Left registred_spam_model_Left spam_model_Left' >> CMD
 echo "# - local ones (right):" >> CMD
-echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '$1' --output ../results_local.csv --mode local locally_from_global_registred_spam_model_Right registred_spam_model_Right spam_model_Right' >> CMD
-cd ..
+echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '${size}' --output ../results_right_local.csv --mode local locally_from_global_registred_spam_model_Right registred_spam_model_Right spam_model_Right' >> CMD
+echo >> CMD
+echo "# clean results" >> CMD
+echo "/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/clean.py *spam*/" >> CMD
+echo "rm -rf gaussian_model* nodes_prior_*" >> CMD
