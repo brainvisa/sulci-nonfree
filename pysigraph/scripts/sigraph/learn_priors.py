@@ -15,7 +15,8 @@ class Prior(object):
 			compute_likelihoods=False):
 		self._sulci = set()
 		for g in graphs:
-			self._sulci.update(v['name'] for v in g.vertices())
+			self._sulci.update(v['name'] for v in g.vertices() \
+						if v.getSyntax() == 'fold')
 		self._sulci_map = dict((s, i) \
 			for (i, s) in enumerate(self._sulci))
 		self._graphs = graphs
