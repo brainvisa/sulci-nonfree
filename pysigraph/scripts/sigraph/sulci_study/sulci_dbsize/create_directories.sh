@@ -14,6 +14,7 @@ size=$1
 echo "number of runs: $2"
 
 RANDDB="/home/mp210984/svn/brainvisa/sulci/sulci-private/trunk/pysigraph/scripts/sigraph/sulci_misc/randdb.py"
+CV="/home/mp210984/svn/brainvisa/sulci/sulci-private/trunk/pysigraph/scripts/sigraph/sulci_misc/cv.py"
 CARTOPACK="/i2bm/research/Mandriva-2008.0-i686/cartopack-Mandriva-2008.0-i686-devel_4.0-2009_07_28i2bm"
 TRANSLATION="$CARTOPACK/share/shfj-4.0/nomenclature/translation/sulci_model_2008.trl"
 SETUP=". $CARTOPACK/bin/cartopack.sh $CARTOPACK/"
@@ -28,7 +29,23 @@ do
 	# generate training/testing splits
 	mkdir base_$side;
 	cd base_$side
-	$RANDDB -n $1 -r $2 -f ../../all_${side}_graphs.dat
+	total_size=$(cat ../../all_${side}_graphs.dat| wc -l)
+	if [ "${total_size}" -eq "$1" ];
+	then
+		$CV -n $1 -f ../../all_${side}_graphs.dat;
+		for d in cv_*; do mv $d $(echo $d | sed 's/cv_/run_/g'); done;
+	elif [ "1" -eq "$1" ];
+	then
+		$CV -n ${total_size} -f ../../all_${side}_graphs.dat
+		for d in cv_*; do
+			mv $d/train_graphs.dat $d/tmp.dat;
+			mv -f $d/test_graphs.dat $d/train_graphs.dat;
+			mv $d/tmp.dat $d/test_graphs.dat;
+			mv $d $(echo $d | sed 's/cv_/run_/g');
+		done;
+	else
+		$RANDDB -n $1 -r $2 -f ../../all_${side}_graphs.dat
+	fi;
 	cd ..
 
 	echo "  copy database for several models...";

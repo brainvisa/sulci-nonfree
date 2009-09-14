@@ -19,11 +19,12 @@ def read_local_error(filename):
 	sulci_col = a[:, 'sulci']
 	for sulcus in sulci:
 		e = numpy.array(a[sulci_col == a.code(sulcus), 'size_errors'])
+		e *= 100 # percentages
 		res[sulcus] = e.mean()
 	return res
 
 def compute_global_error_info(dir):
-	files = glob.glob('%s/run_*/test_global.csv' % dir)
+	files = glob.glob('%s/*/test_global.csv' % dir)
 	n = len(files)
 	errors = numpy.zeros(n)
 	for i, file in enumerate(files):
@@ -32,7 +33,7 @@ def compute_global_error_info(dir):
 	return errors.mean(), errors.std(), n
 
 def compute_local_error_info(dir):
-	files = glob.glob('%s/run_*/test_local.csv' % dir)
+	files = glob.glob('%s/*/test_local.csv' % dir)
 	n = len(files)
 	res = collections.defaultdict(lambda: numpy.zeros(n))
 	for i, file in enumerate(files):
