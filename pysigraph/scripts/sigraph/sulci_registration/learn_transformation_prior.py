@@ -73,20 +73,21 @@ def main():
 			translations.append(T)
 			thetas.append(theta)
 		translations = numpy.vstack(translations)
-		directions = numpy.vstack(directions)
+		if len(directions): directions = numpy.vstack(directions)
 		thetas = numpy.array(thetas)
 		# init
 		dir_prior = distribution_aims.Bingham()
 		angle_prior = distribution.VonMises()
 		translation_prior = distribution.Gaussian()
 		# fit
-		if n < 3:
-			dir_prior.setUniform(directions.shape[1])
-			angle_prior.setUniform()
+		if len(directions) < 3:
+			dir_prior.setUniform(3)
 		else:
 			r = dir_prior.fit(directions)
 			if not r: dir_prior.setUniform(directions.shape[1])
-			angle_prior.fit(thetas[None].T)
+		if n < 3:
+			angle_prior.setUniform()
+		else:	angle_prior.fit(thetas[None].T)
 		r = translation_prior.fit(translations, robust=True)
 		if (n < 3) or (not r):
 			translation_prior.set_cov(numpy.identity(3) * 2)

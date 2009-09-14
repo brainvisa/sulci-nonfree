@@ -789,8 +789,7 @@ def main():
 		gprefix = options.distrib_gaussians
 		try:    os.mkdir(gprefix)
 		except OSError, e:
-			print e
-			sys.exit(1)
+			print "warning: directory '%s' allready exists" %gprefix
 		h = {'data_type' : 'refgravity_center', 'files' : {},
 			'level' : 'segments'}
 		for sulcus, distr in gravity_centers.items():
