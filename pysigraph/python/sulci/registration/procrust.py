@@ -40,6 +40,7 @@ def vector_from_rotation(R):
 	w = numpy.asmatrix(numpy.zeros((3, 1)))
 	eps = 0.707106781187
 	cost = (numpy.trace(R) - 1)/2.
+	cost = numpy.min([1, numpy.max([cost, -1])]) # numerical errors
 	if 1 + cost > eps:
 		theta = numpy.arccos(cost)
 		if theta == 0: w[:] = 0
@@ -71,6 +72,8 @@ def vector_from_rotation(R):
 		z[1, 2] = z[2, 1] = (R[2, 1] + R[1, 2]) / g
 		for i in range(3):
 			if i != ind: w[i] *= numpy.sign(z[ind, i])
+	import pdb
+	pdb.set_trace()
 	return w
 
 J_i = [antisymetric_matrix_from_vector([1, 0, 0]),

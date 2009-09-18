@@ -4,13 +4,49 @@ import glob, sys, os, numpy, collections
 from optparse import OptionParser
 from datamind.io import csvIO
 
-def read_global_error(filename):
+# -- global --
+def get_global_errors(filename):
 	r = csvIO.ReaderCsv()
 	a = r.read(filename)
-	e = numpy.array(a[:, 'Weighted_Mean_Local_SI_Error'])
-	return e.mean()
+	return a[:, ["Subject", "Weighted_Mean_Local_SI_Error"]]
 
-def read_local_error(filename):
+def samples_global_mean_error(filename):
+	a = get_global_errors(filename)
+	return a[:, 1].mean()
+
+def samples_global_error(dir):
+	files = glob.glob('%s/*/test_global.csv' % dir)
+	n = len(files)
+	errors = numpy.zeros(n)
+	for i, file in enumerate(files):
+		e = samples_global_mean_error(file)
+		errors[i] = e
+	return errors.mean(), errors.std(), n
+
+def subjects_global_error(dir):
+	files = glob.glob('%s/*/test_global.csv' % dir)
+	n = len(files)
+	errors = []
+	for i, file in enumerate(files):
+		errors.append(get_global_errors(file))
+	errors = numpy.vstack(errors)
+	subjects = numpy.unique1d(errors[:, 0])
+	se = numpy.array([errors[errors[:, 0] == s, 1].mean() \
+					for s in subjects])
+	if numpy.isnan(se).any():
+		print ("warning: not enough sample: some subjects "
+			"have not been tested")
+		se = se[numpy.logical_not(numpy.isnan(se))]
+	return se.mean(), se.std(), n
+
+
+# -- local --
+def get_local_errors(filename):
+	r = csvIO.ReaderCsv()
+	a = r.read(filename)
+	return a[:, ['subjects', 'sulci', 'size_errors']]
+
+def get_sulcuswise_local_errors(filename):
 	r = csvIO.ReaderCsv()
 	a = r.read(filename)
 	# list of sulci may change from one database sample to another
@@ -18,31 +54,57 @@ def read_local_error(filename):
 	res = {}
 	sulci_col = a[:, 'sulci']
 	for sulcus in sulci:
-		e = numpy.array(a[sulci_col == a.code(sulcus), 'size_errors'])
-		e *= 100 # percentages
-		res[sulcus] = e.mean()
+		s = a[:, ['subjects', 'size_errors']]
+		res[sulcus] = s[sulci_col == a.code(sulcus)]
 	return res
 
-def compute_global_error_info(dir):
-	files = glob.glob('%s/*/test_global.csv' % dir)
-	n = len(files)
-	errors = numpy.zeros(n)
-	for i, file in enumerate(files):
-		e = read_global_error(file)
-		errors[i] = e
-	return errors.mean(), errors.std(), n
+def samples_local_mean_error(filename):
+	res = get_sulcuswise_local_errors(filename)
+	for sulcus, a in res.items():
+		res[sulcus] = a[:, 1].mean() * 100 # convert to percentage
+	return res
 
-def compute_local_error_info(dir):
+def samples_local_error(dir):
 	files = glob.glob('%s/*/test_local.csv' % dir)
 	n = len(files)
 	res = collections.defaultdict(lambda: numpy.zeros(n))
 	for i, file in enumerate(files):
-		r = read_local_error(file)
+		r = samples_local_mean_error(file)
 		for sulcus, error in r.items():
 			res[sulcus][i] = error
 	for sulcus, errors in res.items():
 		res[sulcus] = errors.mean(), errors.std()
 	return res, n
+
+def subjects_local_error(dir):
+	files = glob.glob('%s/*/test_local.csv' % dir)
+	n = len(files)
+	n = len(files)
+	res = collections.defaultdict(lambda: [])
+	errors = []
+	for i, file in enumerate(files):
+		errors.append(get_local_errors(file))
+	code = errors[0].code
+	decode = errors[0].decode
+	errors = numpy.vstack(errors)
+	subjects = numpy.unique1d(errors[:, 0])
+	sulci = map(decode, numpy.unique1d(errors[:, 1]))
+	res = {}
+	sulci_col = errors[:, 1]
+	for subject in subjects:
+		su = errors[errors[:, 0] == subject]
+		if len(su) == 0:
+			print ("warning: not enough sample: some subjects "
+				"have not been tested")
+	for sulcus in sulci:
+		se = errors[sulci_col == code(sulcus)][:, [0, 2]]
+		su = numpy.array([se[se[:, 0] == subject, 1].mean() \
+					for subject in subjects]) * 100
+		if numpy.isnan(su).any():
+			su = su[numpy.logical_not(numpy.isnan(su))]
+		res[sulcus] = su.mean(), su.std()
+	return res, n
+
 
 ################################################################################
 def parseOpts(argv):
@@ -56,6 +118,12 @@ def parseOpts(argv):
 		metavar = 'FILE', action='store', default = 'global',
 		type = 'choice', choices=('global', 'local'),
 		help="mode : 'global' or 'local' (default: %default)")
+	parser.add_option('-g', '--group', dest='group',
+		metavar = 'FILE', action='store', default = 'subject',
+		type = 'choice', choices=('sample', 'subject'),
+		help="group first by 'sample' or 'subject' (default: %default),"
+		"then compute mean on each group. Finally compute mean and "
+		"standard deviation on the result")
 	parser.add_option('-s', '--size', dest='size',
 		metavar = 'INT', action='store', default = None,
 		help='database size') # size is stored as a string
@@ -88,7 +156,11 @@ def main():
 def main_global(options, directories):
 	s = []
 	for dir in directories:
-		mean, std, n = compute_global_error_info(dir)
+		if options.group == 'subject':
+			mean, std, n = subjects_global_error(dir)
+		elif options.group == 'sample':
+			mean, std, n = samples_global_error(dir)
+
 		print "* " + dir
 		print "    mean (std) = %2.2f (%2.2f), n = %d" % (mean, std, n)
 		s.append('%2.2f\t%2.2f\t%d' % (mean, std, n))
@@ -100,10 +172,12 @@ def main_global(options, directories):
 	fd.close()
 
 def main_local(options, directories):
-	#s = []
 	res = collections.defaultdict(lambda: numpy.zeros(len(directories) * 3))
 	for i, dir in enumerate(directories):
-		r, n = compute_local_error_info(dir)
+		if options.group == 'subject':
+			r, n = subjects_local_error(dir)
+		elif options.group == 'sample':
+			r, n = samples_local_error(dir)
 		for sulcus, (error, std) in r.items():
 			a = res[sulcus]
 			a[3 * i:3 * i + 3] = error, std, n

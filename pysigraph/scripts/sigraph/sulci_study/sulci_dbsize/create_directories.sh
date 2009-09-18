@@ -50,7 +50,7 @@ do
 
 	echo "  copy database for several models...";
 	# copy
-	for dir in nodes_prior gaussian_model spam_model registred_spam_model locally_from_global_registred_spam_model;
+	for dir in nodes_prior spam_model registred_spam_model locally_from_global_registred_spam_model;
 	do
 		cp -a base_$side ${dir}_$side;
 	done;
@@ -61,11 +61,11 @@ do
 	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/learn_priors.py $(cat $d/train_graphs.dat) --translation $TRANSLATION --type label_frequency\" > ${d}_learning.log"; done > batch_learning
 	cd ..
 
-	echo "  - gaussian model";
+	#echo "  - gaussian model";
 	# gaussian / learning
-	cd gaussian_model_$side
-	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/create_segment_databases.py -t $TRANSLATION --node-model-type refgravity_center $(cat $d/train_graphs.dat) && python $CARTOPACK/scripts/sigraph/learn_gaussians_distributions.py \" > ${d}_learning.log"; done > batch_learning
-	cd ..
+	#cd gaussian_model_$side
+	#for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/create_segment_databases.py -t $TRANSLATION --node-model-type refgravity_center $(cat $d/train_graphs.dat) && python $CARTOPACK/scripts/sigraph/learn_gaussians_distributions.py \" > ${d}_learning.log"; done > batch_learning
+	#cd ..
 
 	echo "  - spam (Talairach) model";
 	cd spam_model_$side
@@ -90,7 +90,8 @@ do
 	# Local registration / learning
 	for d in run_*; do echo "cd $PWD/$d && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/learn_registred_spams_distributions.py --translation $TRANSLATION --sigma-value 2 --mode local --distrib-gaussians gravity_centers $(cat $d/train_graphs.dat) == $(for a in $(cat $d/train_graphs.dat); do b=$(basename $a); echo -en ../../registred_spam_model_${side}/$d/bayesian_spam_distribs/${b%%.arg}_motion.trm' ' ; done) && python $CARTOPACK/scripts/sigraph/sulci_registration/learn_transformation_prior.py *motion_local.dat\" > ${d}_learning.log"; done > batch_learning2
 	# Local registration / testing
-	for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/independent_tag_with_registration.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $f -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat --motion motion_${n}.trm --mode local --translation-prior bayesian_translation_distribs.dat --direction-prior bayesian_direction_distribs.dat --angle-prior bayesian_angle_distribs.dat --distrib-gaussians ../../gaussian_model_${side}/$d/bayesian_gaussian_distribs.dat --input-motion ../../registred_spam_model_${side}/$d/motion_${n}.trm && $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing2
+	# use gravity_centers (mean sulcu location in destination space)
+	for d in run_*; do cd $d; for g in $(cat test_graphs.dat); do n=$(echo $(basename $g) | sed 's/^[LR]//g;s/_default_session_manual.arg//g;s/_man.arg//g;s/\.arg//g'); f=$(echo $g | sed 's#.*/##g;s#manual#auto#g;s#_man\.#_auto\.#g'); echo $f | grep auto > /dev/null; if [ $? -eq 1 ]; then f=$(echo $f| sed 's#\.arg#_auto\.arg#g'); fi; echo "cd $PWD && nice bash -c \"$SETUP; python $CARTOPACK/scripts/sigraph/sulci_registration/independent_tag_with_registration.py -t $TRANSLATION -d bayesian_spam_distribs.dat -i $g -o $f -p ../../nodes_prior_${side}/$d/bayesian_prior.dat -c posteriors_${n}.csv -l output_labels_${n}.dat --motion motion_${n}.trm --mode local --translation-prior bayesian_translation_distribs.dat --direction-prior bayesian_direction_distribs.dat --angle-prior bayesian_angle_distribs.dat --distrib-gaussians gravity_centers.dat --input-motion ../../registred_spam_model_${side}/$d/motion_${n}.trm && $(eval $SIERROR)\" > ${d}_${n}_testing.log"; done; cd ..; done > batch_testing2
 	cd ..
 	cat *_$side/batch_learning >> batch_learning
 	cat locally_from_global_registred_spam_model_$side/batch_learning2 >> batch_learning2
@@ -100,7 +101,7 @@ do
 	# cleaning
 	rm -rf base_$side
 done;
-echo "# learning state 1: prior + gaussian + Talairach + global rigid registration" > CMD
+echo "# learning state 1: prior + Talairach + global rigid registration" > CMD
 echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_learning --timeslot - --log grid_learning.log --broken broken_learning.batch" >> CMD
 echo "# learning state 2: local rigid registration" >> CMD
 echo "grid.py --host ~/hosts.Mandriva-2008.0-i686 --tasks batch_learning2 --timeslot - --log grid_learning2.log --broken broken_learning2.batch" >> CMD
@@ -117,9 +118,9 @@ echo 'for a in *spam*/*/; do n=$(cat $a/test_global.csv 2> /dev/null | wc -l); s
 echo >> CMD
 echo "# create new batch from failed results :" >> CMD
 echo "# - local ones :" >> CMD
-echo 'for a in *spam*/*/; do n=$(cat $a/test_local.csv 2> /dev/null | awk '\''{ print $1 }'\''| sort| uniq| wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then grep "/$(dirname $a/plop) " batch_testing; fi; done > batch_testing_error' >> CMD
+echo 'for a in *spam*/*/; do n=$(cat $a/test_local.csv 2> /dev/null | awk '\''{ print $1 }'\''| sort| uniq| wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then grep "/$(dirname $a/plop) " batch_testin{g,g2}; fi; done > batch_testing_error' >> CMD
 echo "# - global ones :" >> CMD
-echo 'for a in *spam*/*/; do n=$(cat $a/test_global.csv 2> /dev/null | wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then grep "/$(dirname $a/plop) " batch_testing; fi; done >> batch_testing_error' >> CMD
+echo 'for a in *spam*/*/; do n=$(cat $a/test_global.csv 2> /dev/null | wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then grep "/$(dirname $a/plop) " batch_testin{g,g2}; fi; done >> batch_testing_error' >> CMD
 echo >> CMD
 echo "# get results" >> CMD
 echo "# - global ones :" >> CMD
@@ -131,4 +132,4 @@ echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsiz
 echo >> CMD
 echo "# clean results" >> CMD
 echo "/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/clean.py *spam*/" >> CMD
-echo "rm -rf gaussian_model* nodes_prior_*" >> CMD
+echo "rm -rf nodes_prior_*" >> CMD

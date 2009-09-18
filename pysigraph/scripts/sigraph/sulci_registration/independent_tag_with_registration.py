@@ -106,8 +106,8 @@ class Tagger(object):
 					print "warning : labels order differs"+\
 						" between sulcimodel and " + \
 						"prior : order fixed."
-					indices = [numpy.argwhere(s == x)[0,0] \
-								for x in p]
+					indices = [numpy.argwhere(p == x)[0,0] \
+								for x in s]
 					priors = numpy.asarray(priors)[0][indices]
 			else:
 				indices = []
