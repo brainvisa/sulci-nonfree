@@ -9,7 +9,8 @@ def compute_prototypes(files):
 	'''
     compute min, med and max error rated samples.
 	'''
-	errors = numpy.array([error.read_global_error(file) for file in files])
+	errors = numpy.array([error.samples_global_mean_error(file) \
+						for file in files])
 	arg = numpy.argsort(errors)
 	min, med, max = arg[0], arg[len(errors)/2], arg[-1]
 	return {'min' : min, 'med' : med, 'max' : max}

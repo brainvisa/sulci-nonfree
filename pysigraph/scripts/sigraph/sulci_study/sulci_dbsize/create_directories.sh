@@ -123,8 +123,10 @@ echo "# - global ones :" >> CMD
 echo 'for a in *spam*/*/; do n=$(cat $a/test_global.csv 2> /dev/null | wc -l); s=$(cat $a/test_graphs.dat| wc -w); let s++; if [ "$n" != "$s" ]; then grep "/$(dirname $a/plop) " batch_testin{g,g2}; fi; done >> batch_testing_error' >> CMD
 echo >> CMD
 echo "# get results" >> CMD
-echo "# - global ones :" >> CMD
-echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '${size}' --output ../results_global.csv --mode global locally_from_global_registred_spam_model_Left locally_from_global_registred_spam_model_Right registred_spam_model_Left registred_spam_model_Right spam_model_Left spam_model_Right' >> CMD
+echo "# - global ones (left):" >> CMD
+echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '${size}' --output ../results_left_global.csv --mode global locally_from_global_registred_spam_model_Left registred_spam_model_Left spam_model_Left' >> CMD
+echo "# - global ones (right):" >> CMD
+echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '${size}' --output ../results_right_global.csv --mode global locally_from_global_registred_spam_model_Right registred_spam_model_Right spam_model_Right' >> CMD
 echo "# - local ones (left):" >> CMD
 echo '/home/mp210984/svn/links/pysigraph/scripts/sigraph/sulci_study/sulci_dbsize/error.py -s '${size}' --output ../results_left_local.csv --mode local locally_from_global_registred_spam_model_Left registred_spam_model_Left spam_model_Left' >> CMD
 echo "# - local ones (right):" >> CMD
