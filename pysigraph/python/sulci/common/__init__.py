@@ -22,6 +22,8 @@ import time, getpass, StringIO, re
 
 def import_from(filename):
 	modulename = distutils.spawn.find_executable(filename)
+	if modulename is None:
+		raise ImportError, filename
 	loader = ihooks.BasicModuleLoader()
 	path, file = os.path.split(modulename)
 	name, ext = os.path.splitext(file)
@@ -41,8 +43,12 @@ class NoMessage(object):
 	def write(self, msg, color = 'back'): pass
 	def write_list(self, msg_list): pass
 
-grid = import_from('grid.py')
-grid.msg = NoMessage()
+try:
+	grid = import_from('grid.py')
+except ImportError, e:
+	print "warning: can't load grid module '%s'" %e
+else:
+	grid.msg = NoMessage()
 
 def unlock(filename):
 	try:	os.unlink(filename) # atomic on NFS
