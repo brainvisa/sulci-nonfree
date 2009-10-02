@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os, sys
 import numpy, pylab
@@ -24,6 +25,21 @@ def parseOpts(argv):
 	parser.add_option('-s', '--show-only', dest='show_only',
 		metavar = 'FILE', action='store_true', default = False,
 		help='only show result')
+	parser.add_option('-l', '--lang', dest='lang',
+		metavar = 'LANG', action='store', default = 'eng',
+		type='choice', choices=('eng', 'fr'),
+		help="language of outputs : 'fr' or 'eng' (default)")
+	parser.add_option('--no-title', dest='notitle',
+		action='store_true', default = False,
+		help='default: input csv filename is used as a title')
+	parser.add_option('--grid', dest='grid',
+		action='store_true', default = False,
+		help='display grid (default: no grid)')
+	parser.add_option('--legend', dest='legend',
+		metavar = 'LIST', action='store', default = None,
+		help="comma separated list, len much match number " + \
+		"of csv columns divided by 3 (default: use csv header)")
+
 	return parser, parser.parse_args(argv)
 
 def main():
@@ -55,6 +71,8 @@ def main():
 		labels = [h.strip('_mean') for h in header \
 				if h.endswith('_mean')]
 	fd.close()
+	if options.legend:
+		labels = options.legend.split(',')
 	x = numpy.lib.io.genfromtxt(options.input, delimiter='\t',
 		skiprows=1, usecols=usecols)
 	x = x[numpy.argsort(x[:, 0])]
@@ -68,11 +86,20 @@ def main():
 		lines.append(pylab.errorbar(size, error, std)[0])
 	pylab.xticks([1, 10, 20, 30, 40, 50, 62])
 	pylab.xlim(-10, 70)
-	pylab.xlabel('size of database')
-	pylab.ylabel('error rates (%)')
+	if options.lang == 'eng':
+		xlabel = 'size of database'
+		ylabel = 'error rates (%)'
+	elif options.lang == 'fr':
+		xlabel = u'taille de la base de données'
+		ylabel = "taux d'erreurs (%)"
+	if options.grid:
+		pylab.grid()
+	pylab.xlabel(xlabel)
+	pylab.ylabel(ylabel)
 	pylab.legend(lines, labels,
 		prop=matplotlib.font_manager.FontProperties(size=6))
-	pylab.title(os.path.basename(options.input))
+	if not options.notitle:
+		pylab.title(os.path.basename(options.input))
 	if options.show_only:
 		pylab.show()
 	else:	pylab.savefig(options.output, dpi=300)
