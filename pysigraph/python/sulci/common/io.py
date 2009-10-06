@@ -13,7 +13,12 @@ except ImportError, e:
 
 ################################################################################
 # load data graph
-def load_graphs(transfile, graphnames):
+def load_graphs(transfile, graphnames, label_mode='name'):
+	'''
+    transfile :  translation file
+    graphnames : list of graph names
+    label_mode : name (default), label or both
+	'''
 	# translation of labels
 	ft = sigraph.FoldLabelsTranslator(transfile)
 	sigraph.si().setLabelsTranslPath(transfile)
@@ -23,12 +28,16 @@ def load_graphs(transfile, graphnames):
 	for graphname in graphnames:
 		g = reader.read(graphname)
 		graphs += [g]
-		ft.translate(g)
+		if label_mode == 'both':
+			ft.translate(g, 'label', 'label')
+			ft.translate(g, 'name', 'name')
+		else:
+			ft.translate(g, label_mode, label_mode)
 
 	return graphs
 
-def load_graph(transfile, graphname):
-	return load_graphs(transfile, [graphname])[0]
+def load_graph(transfile, graphname, label_mode='name'):
+	return load_graphs(transfile, [graphname], label_mode)[0]
 
 ################################################################################
 # read posterior segmentwise probabilities
