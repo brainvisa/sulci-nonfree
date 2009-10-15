@@ -769,6 +769,69 @@ class DiffGravityCentersDisplay(CorticalDisplay):
 			self._aobjects += [amesh]
 
 
+class MarkovRelationsDisplay(SegmentDisplay):
+	def __init__(self, write, selected_sulci, graphs, rewrite_graphs):
+		SegmentDisplay.__init__(self, write, selected_sulci, graphs)
+		self._name = 'markov_relations'
+		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
+					'nomenclature', 'hierarchy',
+					'sulcal_root_colors.hie')
+		transfile = os.path.join(aims.carto.Paths.shfjShared(),
+				'nomenclature', 'translation',
+				'sulci_model_noroots.trl')
+		self._hie = aims.Reader().read(hie_filename)
+		self._translator = sigraph.FoldLabelsTranslator(transfile)
+		self._meshes = {}
+		self._rewrite_graphs = rewrite_graphs
+
+	def _display_one_graph_callback(self, graph):
+		self._translator.translate(graph)
+		self._cur_graph = graph
+
+	def _display_one_vertex_callback(self, v):
+		g =  numpy.asarray(v['refgravity_center'].list())
+		s = aims.SurfaceGenerator.sphere(g, 2, 96)
+		sulcus = v['name']
+		index = v['index']
+		if self._meshes.has_key(sulcus):
+			self._meshes[sulcus] += s
+		else:	self._meshes[sulcus] = s
+		if self._rewrite_graphs:
+			aims.GraphManip.storeAims( self._cur_graph, v,
+				'cortexWhite', aims.rc_ptr_AimsTimeSurface_3(s))
+
+	def _display_one_edge_callback(self, e, v1, v2):
+		pfv1 = e.vertices()[0]
+		pfv2 = e.vertices()[1]
+		# create nodes gravity spheres
+		g1 =  numpy.asarray(pfv1['refgravity_center'].list())
+		g2 =  numpy.asarray(pfv2['refgravity_center'].list())
+		c = aims.SurfaceGenerator.cylinder(g1, g2, 0.2, 0.2, 6,
+							False, True)
+		if self._meshes.has_key('links'):
+			self._meshes['links'] += c
+		else:	self._meshes['links'] = c
+
+	def _display_after_callback(self):
+		# add color
+		for name, mesh in self._meshes.items():
+			amesh = self._an.toAObject(mesh)
+			material = anatomist.cpp.Material()
+			if name == 'links':
+				color = [0, 0, 0]
+			else:	color = self._hie.find_color(name)
+			go =  aims.Object({'diffuse' : color})
+			mesh.header()['material'] = go
+			material.set(go.get())
+			amesh.SetMaterial(material)
+			self._aobjects += [amesh]
+		if self._rewrite_graphs:
+			for g in self._graphs:
+				filename = g['aims_reader_filename']
+				w = sigraph.FoldWriter(filename)
+				w.write(g)
+
+
 class IntersectionDisplay(JunctionDisplay):
 	def __init__(self, write, selected_sulci, graphs, hull):
 		JunctionDisplay.__init__(self, write,
@@ -937,7 +1000,7 @@ def parseOpts(argv):
 			'hull_line, bivariate_spline,' \
 			'extremity1, extremity2, hull_intersection, ' \
 			'pure_cortical, diff_gravity_centers, ' \
-			'centerdist_cortical.')
+			'centerdist_cortical, markov_relations')
 	parser.add_option('-d', '--dir', dest='dirname',
 		metavar = 'DIR', action='store', default = None,
 		help='directory with siMorpho output files ' \
@@ -948,6 +1011,10 @@ def parseOpts(argv):
 	parser.add_option('-w', '--write', dest='write',
 		action='store_true', default = False,
 		help='Write meshes')
+	parser.add_option('--rewrite-graphs', dest='rewrite_graphs',
+		action='store_true', default = False,
+		help='if specified, input graphs may be modified')
+
 
 	return parser, parser.parse_args(argv)
 
@@ -996,6 +1063,9 @@ def main():
 	elif options.mode == 'diff_gravity_centers':
 		disp = DiffGravityCentersDisplay(options.write,
 				selected_sulci, graphs)
+	elif options.mode == 'markov_relations':
+		disp = MarkovRelationsDisplay(options.write,
+				selected_sulci, graphs, options.rewrite_graphs)
 	elif options.mode == 'centerdist_cortical':
 		disp = CenterDistCorticalDisplay(options.write,
 				selected_sulci, graphs)
