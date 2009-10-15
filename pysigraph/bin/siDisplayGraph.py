@@ -798,7 +798,7 @@ class MarkovRelationsDisplay(SegmentDisplay):
 		else:	self._meshes[sulcus] = s
 		if self._rewrite_graphs:
 			aims.GraphManip.storeAims( self._cur_graph, v,
-				'cortexWhite', aims.rc_ptr_AimsTimeSurface_3(s))
+				'cortexWhite', aims.AimsSurfaceTriangle(s))
 
 	def _display_one_edge_callback(self, e, v1, v2):
 		pfv1 = e.vertices()[0]
