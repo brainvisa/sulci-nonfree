@@ -168,7 +168,7 @@ def main():
 			except exceptions.KeyError: continue
 		for i, h in enumerate(labels):
 			v['csv_mean_' + h] = data[0][i]
-			if options.log:
+			if options.log and data[0][i] != 0:
 				v['csv_log_mean_' + h] = numpy.log(data[0][i])
 			# add only no-null std
 			if data[1][i]: v['csv_std_' + h] = data[1][i]

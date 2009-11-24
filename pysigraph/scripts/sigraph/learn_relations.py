@@ -48,8 +48,7 @@ def compute_relations(graphs, distribdir, input_motions,
 	prefix = distribdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print e
-		sys.exit(1)
+		print "warning: directory '%s' allready exists" % prefix
 
 	if options.model_type == 'direction':
 		mtype_inter = 'kent'

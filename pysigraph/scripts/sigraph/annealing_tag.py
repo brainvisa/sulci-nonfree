@@ -120,6 +120,38 @@ class GuiLabelsObserver(GuiObserver):
 		time.sleep(0.001)
 		self._n += 1
 
+class GuiNrjObserver(GuiObserver):
+	def __init__(self):
+		GuiObserver.__init__(self)
+
+	def init(self, tagger):
+		GuiObserver.init(self, tagger)
+		self._ag.setColorMode(self._ag.PropertyMap)
+		self._ag.setColorProperty('nrj')
+		self._ag.updateColors()
+		self._ag.notifyObservers()
+		self._ag.setChanged()
+
+	def after_pass(self, tagger):
+		import qt
+		for s in tagger._segments:
+			id = s['index']
+			if tagger._changes[id] or self._n == 0:
+				p = numpy.exp(-tagger.local_energy(id) / \
+							tagger._temp)
+				s['nrj'] = p[tagger._taglabels[id]] / p.sum()
+				#en = tagger.local_energy(id)
+				#s['nrj'] = en[tagger._taglabels[id]]
+    		palette = self._ag.getOrCreatePalette()
+		palette.setMin1(0.)
+		palette.setMax1(1)
+		self._ag.updateColors()
+		self._ag.setChanged()
+		self._ag.notifyObservers()
+		qt.qApp.processEvents()
+		time.sleep(0.001)
+		self._n += 1
+
 class GuiLabelsChangedObserver(GuiLabelsObserver):
 	def __init__(self):
 		GuiLabelsObserver.__init__(self)
@@ -305,26 +337,72 @@ class Tagger(object):
 		else:
 			self._prior_descriptor = None
 			return
+		self._prior_distrib = self._labels_prior['prior']
+		# FIXME : marche uniquement avec les priors Freq
+		# les autres priors ne fonctionnent plus
+		priors = numpy.ravel(numpy.asarray(\
+				self._prior_distrib.frequencies()))
 		prior_labels = self._labels_prior['labels']
 		self._prior_descriptor.compute_data(self._graph,
 			self._taglabels, self._availablelabels,
 				self._seg_indices, prior_labels)
-		if self._states != prior_labels:
-			print "error : labels order differs "+ \
-					"between sulcimodel and prior"
-			sys.exit(1)
-		self._prior_distrib = self._labels_prior['prior']
+		if self._selected_sulci is None:
+			p = numpy.array(prior_labels)
+			s = numpy.array(self._states)
+			if self._states != prior_labels:
+				if len(self._states) != \
+					len(prior_labels):
+					print "error : labels size " + \
+						"differs between " + \
+						"sulcimodel and prior."
+					sys.exit(1)
+				print "warning : labels order differs"+\
+					" between sulcimodel and " + \
+					"prior : order fixed."
+				indices = [numpy.argwhere(p == x)[0,0] \
+							for x in s]
+				priors = numpy.asarray(priors)[indices]
+		else:
+			indices = []
+			for sulcus in self._states:
+				ind = numpy.argwhere(numpy.array(\
+					[x == sulcus \
+					for x in prior_labels]))[0,0]
+				indices.append(ind)
+			priors = numpy.asarray(priors)[0][indices]
+
 
 	def initialize_init_prior(self):
 		if not self._init_prior_distr: return
 		d = self._init_prior_distr['prior']
-		self._init_priors = numpy.ravel(numpy.asarray(\
+		priors = numpy.ravel(numpy.asarray(\
 						d.frequencies()))
 		prior_labels = self._init_prior_distr['labels']
-		if self._states != prior_labels:
-			print "error : labels order differs "+ \
-					"between sulcimodel and prior"
-			sys.exit(1)
+		if self._selected_sulci is None:
+			p = numpy.array(prior_labels)
+			s = numpy.array(self._states)
+			if self._states != prior_labels:
+				if len(self._states) != \
+					len(prior_labels):
+					print "error : labels size " + \
+						"differs between " + \
+						"sulcimodel and prior."
+					sys.exit(1)
+				print "warning : labels order differs"+\
+					" between sulcimodel and " + \
+					"prior : order fixed."
+				indices = [numpy.argwhere(p == x)[0,0] \
+							for x in s]
+				priors = numpy.asarray(priors)[indices]
+		else:
+			indices = []
+			for sulcus in self._states:
+				ind = numpy.argwhere(numpy.array(\
+					[x == sulcus \
+					for x in prior_labels]))[0,0]
+				indices.append(ind)
+			priors = numpy.asarray(priors)[0][indices]
+		self._init_priors = priors
 
 	def precompute_from_data(self, init_mode, weighting_mode,
 				select_mode, picklename=None):
@@ -951,11 +1029,11 @@ def parseOpts(argv):
 		default=False, help="display and save images of labels " + \
 		"with anatomist during labeling process")
 	misc_group.add_option('--gui-mode', dest='gui_mode', action='store',
-		type='choice', choices=('labels', 'labels_changed', 'changes'),
-		default='labels', help="'labels' : display labels (refresh " + \
-		" after each pass), 'labels_changed' : display labels " + \
-		"(refresh after each change), 'changes' : display " + \
-		"number of changes")
+		type='choice', choices=('labels', 'labels_changed', 'changes',
+		'nrj'),	default='labels', help="'labels': display labels " + \
+		"(refresh after each pass), 'labels_changed': display labels "+\
+		"(refresh after each change), 'changes': display " + \
+		"number of changes, 'nrj': display local nrj")
 	misc_group.add_option('--weighting-mode', dest='weighting_mode',
 		metavar = 'MODE', action='store', default='none', type='choice',
 		choices=('contact_area', 'sizes', 'number', 'none'),
@@ -1014,6 +1092,7 @@ def main():
 		elif options.gui_mode == 'labels_changed':
 			obs = GuiLabelsChangedObserver()
 		elif options.gui_mode == 'changes': obs = GuiChangesObserver()
+		elif options.gui_mode == 'nrj': obs = GuiNrjObserver()
 		tagger.addObserver(obs)
 	if options.lookat_seg_id:
 		indices = [int(id) for id in options.lookat_seg_id.split(',')]

@@ -47,7 +47,7 @@ def select_priors(models, priors_distribs=None, selected_sulci=None):
 def make_atlas_deterministic(models, priors, bb, threshold,
 					output, voxels_size):
 	off, size = bb
-	sulci_map = {'background' : 0}
+	sulci_map = {0 : 'background'}
 	priors /= priors.sum()
 
 	# normalization factor
@@ -179,7 +179,7 @@ def make_atlas_probabilistic(models, priors, bb, threshold,
 
 ################################################################################
 def parseOpts(argv):
-	description = 'compute voxel-based entropies for spam models\n' + \
+	description = 'compute atlas from spam models\n' + \
 		'./spams_to_atlas.py [OPTIONS] -d distrib.dat -o output_image -m sulci_map'
 	parser = OptionParser(description)
 	parser.add_option('-d', '--distrib', dest='distribnames',
@@ -194,8 +194,8 @@ def parseOpts(argv):
 	parser.add_option('-m', '--sulci-map', dest='sulci_map',
 		metavar = 'FILE', action='store', default = None,
 		help='output sulcus map (indices)')
-	parser.add_option('-t', '--threshold', dest='threshold', type='int',
-		metavar = 'INT', action='store', default = 10e-15,
+	parser.add_option('-t', '--threshold', dest='threshold', type='float',
+		metavar = 'FLOAT', action='store', default = 10e-13,
 		help='threshold to create a masked atlas (default: %default)')
 	parser.add_option('-s', '--sulci', dest='sulci',
 		metavar = 'LIST', action='store', default = None,

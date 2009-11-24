@@ -11,10 +11,12 @@ from sulci.models import distribution
 
 ################################################################################
 class Prior(object):
-	def __init__(self, graphmodel, graphs, distr,
+	def __init__(self, graphs, distr,
 			compute_likelihoods=False):
-		self._graphmodel = graphmodel
-		self._sulci = graphmodel['vertices'].keys()
+		self._sulci = set()
+		for g in graphs:
+			self._sulci.update(v['name'] for v in g.vertices() \
+						if v.getSyntax() == 'fold')
 		self._sulci_map = dict((s, i) \
 			for (i, s) in enumerate(self._sulci))
 		self._graphs = graphs
@@ -129,15 +131,14 @@ def priorFactory(type):
 
 
 ################################################################################
-def compute_prior(graphmodel, graphs, MyPrior, distr, options, output):
+def compute_prior(graphs, MyPrior, distr, options, output):
 	# create output directory
 	prefix = output
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print e
-		sys.exit(1)
+		print "warning: directory '%s' allready exists" % prefix
 
-	prior = MyPrior(graphmodel, graphs, distr,
+	prior = MyPrior(graphs, distr,
 			options.compute_likelihoods)
 	prior.eval()
 
@@ -165,10 +166,6 @@ def parseOpts(argv):
 		'./learn_priors.py [OPTIONS] graph1.arg graph2.arg...'
 	parser = OptionParser(description)
 	add_translation_option_to_parser(parser)
-	parser.add_option('-m', '--graphmodel', dest='graphmodelname',
-		metavar = 'FILE', action='store',
-		default = 'bayesian_graphmodel.dat', help='bayesian model : ' \
-			'graphical model structure (default : %default)')
 	parser.add_option('--type', dest='prior_type',
 		metavar = 'FILE', action='store', default = 'label_frequency',
 		help='type : one among %s ,' % str(prior_map.keys()) + \
@@ -213,25 +210,22 @@ def main():
 
 	# reading...
 	graphs = io.load_graphs(options.transfile, graphnames)
-	graphmodel = io.read_graphmodel(options.graphmodelname)
 	MyPrior, Distr, distr_opt = priorFactory(options.prior_type)
 	distr = Distr(*distr_opt)
 
 
 	if options.mode == 'normal' :
-		compute_prior(graphmodel, graphs, MyPrior, distr,
-				options, options.output)
+		compute_prior(graphs, MyPrior, distr, options, options.output)
 	elif options.mode == 'loo' :
 		print "-- all --"
 		distribdir = os.path.join('all', options.output)
-		compute_prior(graphmodel, graphs, MyPrior, distr,
-				options, distribdir)
+		compute_prior(graphs, MyPrior, distr, options, distribdir)
 		for i in range(len(graphs)):
 			subgraphs = graphs[:i] + graphs[i+1:]
 			dir = 'cv_%d' % i
 			print '-- %s --' % dir
 			distribdir = os.path.join(dir, options.output)
-			compute_prior(graphmodel, subgraphs, MyPrior, distr,
+			compute_prior(subgraphs, MyPrior, distr,
 				options, distribdir)
 	else:
 		print "error : '%s' unknown mode" % options.mode

@@ -69,8 +69,7 @@ def main():
 	# create output directory
 	try:	os.mkdir(dbdir)
 	except OSError, e:
-		print e
-		sys.exit(1)
+		print "warning: directory '%s' allready exists" % dbdir
 
 	#clf_type = 'gaussian_crvm'
 	clf_type = 'optimized_gaussian_crvm'

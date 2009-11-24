@@ -47,10 +47,21 @@ class Tagger(object):
 			priors = labels_prior_distrib['prior'].frequencies()
 			prior_labels = labels_prior_distrib['labels']
 			if self._selected_sulci is None:
+				p = numpy.array(prior_labels)
+				s = numpy.array(self._states)
 				if self._states != prior_labels:
-					print "error : labels order differs "+ \
-						"between sulcimodel and prior"
-					sys.exit(1)
+					if len(self._states) != \
+						len(prior_labels):
+						print "error : labels size " + \
+							"differs between " + \
+							"sulcimodel and prior."
+						sys.exit(1)
+					print "warning : labels order differs"+\
+						" between sulcimodel and " + \
+						"prior : order fixed."
+					indices = [numpy.argwhere(p == x)[0,0] \
+								for x in s]
+					priors = numpy.asarray(priors)[0][indices]
 			else:
 				indices = []
 				for sulcus in self._states:
@@ -112,10 +123,6 @@ def parseOpts(argv):
 		metavar = 'FILE', action='store',
 		default = 'posterior_independent.arg',
 		help='output tagged graph (default : %default)')
-	parser.add_option('-m', '--graphmodel', dest='graphmodelname',
-		metavar = 'FILE', action='store',
-		default = 'bayesian_graphmodel.dat', help='bayesian model : ' \
-			'graphical model structure (default : %default)')
 	parser.add_option('-d', '--distrib', dest='distribname',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')
@@ -153,7 +160,7 @@ def main():
 	if options.sulci is None:
 		selected_sulci = None
 	else:	selected_sulci = options.sulci.split(',')
-	sulcimodel = io.read_full_model(options.graphmodelname,
+	sulcimodel = io.read_full_model(None,
 		segmentsdistribname=options.distribname,
 		labelspriorname=options.priorname,
 		selected_sulci=selected_sulci)

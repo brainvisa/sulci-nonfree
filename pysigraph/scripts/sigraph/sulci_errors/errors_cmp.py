@@ -33,7 +33,7 @@ def compute_local(X1, X2, test):
 		val2 = numpy.array(val2)
 		print "*", sulcus
 		pvals = []
-		for n in range(val1.shape[1]):
+		for n in range(min(val1.shape[1], val2.shape[1])):
 			t, pval = test(val1[:, n],val2[:, n])
 			pval *= sulci_n
 			pvals.append(pval)

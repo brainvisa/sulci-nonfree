@@ -69,8 +69,7 @@ def main():
 
 	try:	os.mkdir(options.dbdir)
 	except OSError, e:
-		print e
-		sys.exit(1)
+		print "warning: directory '%s' allready exists" % dbdir
 
 	graphs = io.load_graphs(options.transfile, graphnames)
 	voxels_dict = compute(graphs)

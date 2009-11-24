@@ -1,0 +1,4 @@
+# study the relation between sulci recognition rates (local and global) according to the size of the learning database.
+
+# script to generate 100 subdatabases splits of size 30
+

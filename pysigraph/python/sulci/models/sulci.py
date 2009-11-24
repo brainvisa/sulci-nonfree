@@ -11,7 +11,16 @@ class SulciModel(object):
 		self._global_rotation_prior = global_rotation_prior
 		self._local_rotations_prior = local_rotations_prior
 
-	def labels(self): return self._graphmodel['vertices'].keys()	
+	def labels(self):
+		if self._segments_distrib:
+			return self._segments_distrib['vertices'].keys()
+		elif self._relations_distrib:
+			pairs = self._segments_distrib['vertices'].keys()
+			return set([pairs[0] for x in l]+[pairs[1] for x in l])
+		else:
+			print "error : not implemented"
+			import sys
+			sys.exit(1)
 	def graphmodel(self): return self._graphmodel
 	def segments_distrib(self): return self._segments_distrib
 	def relations_distrib(self): return self._relations_distrib

@@ -318,8 +318,7 @@ def compute_database(graphs, dbdir, options):
 	prefix = dbdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print e
-		sys.exit(1)
+		print "warning: directory '%s' allready exists" % prefix
 
 	N, R = dbcreatorFactory(options.node_model_type, options.rel_model_type)
 

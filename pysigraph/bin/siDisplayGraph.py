@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 import os, sys, exceptions, numpy
 import qt, glob, re
+from scipy.interpolate.fitpack2 import BivariateSpline, dfitpack
+from collections import defaultdict
 from optparse import OptionParser
+from sulci.features.descriptors import SurfaceSimpleSegmentDescriptor
+from sulci.features.descriptors import HullJunctionDescriptor
 import sigraph
 from sulci.common import io, add_translation_option_to_parser
 import anatomist.direct.api as anatomist
@@ -127,7 +131,8 @@ class TwoConnectedSpheresFactory(DirectedObjectsFactory):
 
 ################################################################################
 class Display(object):
-	def __init__(self, write=False):
+	def __init__(self, write=False, selected_sulci=None):
+		self._selected_sulci = selected_sulci
 		self._an = anatomist.Anatomist()
 		self._awin = self._an.createWindow('3D')
 		self._aobjects = []
@@ -145,8 +150,8 @@ class Display(object):
 
 class CsvDisplay(Display):
 	'''Display information from sulcus csv.'''
-	def __init__(self, write, dirname):
-		Display.__init__(self, write)
+	def __init__(self, write, selected_sulci, dirname):
+		Display.__init__(self, write, selected_sulci)
 		self._files = glob.glob(os.path.join(dirname, "siMorpho*.dat"))
 		self._reader = csv_io.ReaderHeaderCsv()
 
@@ -163,8 +168,8 @@ class CsvDisplay(Display):
 
 
 class GraphDisplay(Display):
-	def __init__(self, write, graphs):
-		Display.__init__(self, write)
+	def __init__(self, write, selected_sulci, graphs):
+		Display.__init__(self, write, selected_sulci)
 		self._graphs = graphs
 
 	def display(self):
@@ -177,9 +182,9 @@ class GraphDisplay(Display):
 	def _display_one_graph_callback(self, graph): pass
 
 
-class FoldDisplay(GraphDisplay):
-	def __init__(self, write, graphs):
-		GraphDisplay.__init__(self, write, graphs)
+class SegmentDisplay(GraphDisplay):
+	def __init__(self, write, selected_sulci, graphs):
+		GraphDisplay.__init__(self, write, selected_sulci, graphs)
 
 	def _display_one_graph(self, graph):
 		self._display_one_graph_callback(graph)
@@ -198,10 +203,46 @@ class FoldDisplay(GraphDisplay):
 	def _display_one_vertex_callback(self, v): pass
 	def _display_one_edge_callback(self, e, v1, v2): pass
 
+class SulciDisplay(GraphDisplay):
+	def __init__(self, write, selected_sulci, graphs):
+		GraphDisplay.__init__(self, write, selected_sulci, graphs)
+		self._synth = aims.set_STRING(["junction", "plidepassage"])
+
+	def _display_one_graph(self, graph):
+		self._display_one_graph_callback(graph)
+		h = defaultdict(list)
+		for v in graph.vertices():
+			if v.getSyntax() != 'fold': continue
+			sulcus = v['name']
+			if (self._selected_sulci is None) or \
+				(sulcus in self._selected_sulci):
+				h[sulcus].append(v)
+		for sulci, vertices in h.items():
+			self._display_one_sulci(sulci, vertices)
+
+	def _display_one_sulci(self, sulci, vertices): pass
+
+	def cc_size(self, cc):
+		s = 0.
+		for v in cc:
+			j = self._descr.hull_junction(v)
+			if j is not None: s += j['refsize']
+		return s
+
+	def cc_to_X(self, cc):
+		X = []
+		for v in cc:
+			d = self._descr.data(self._motion, v)
+			if d is not None: X.append(d)
+		if X:
+			return numpy.vstack(X)
+		else:	return None
+
+
 
 class JunctionDisplay(GraphDisplay):
-	def __init__(self, write, graphs, hull):
-		GraphDisplay.__init__(self, write, graphs)
+	def __init__(self, write, selected_sulci, graphs, hull):
+		GraphDisplay.__init__(self, write, selected_sulci, graphs)
 		if hull:
 			self._syntax = 'hull_junction'
 		else:	self._syntax = 'junction'
@@ -216,8 +257,8 @@ class JunctionDisplay(GraphDisplay):
 
 
 class CorticalDisplay(GraphDisplay):
-	def __init__(self, write, graphs):
-		GraphDisplay.__init__(self, write, graphs)
+	def __init__(self, write, selected_sulci, graphs):
+		GraphDisplay.__init__(self, write, selected_sulci, graphs)
 
 	def _display_one_graph(self, graph):
 		self._display_one_graph_callback(graph)
@@ -229,8 +270,8 @@ class CorticalDisplay(GraphDisplay):
 
 
 class PureCorticalDisplay(GraphDisplay):
-	def __init__(self, write, graphs):
-		GraphDisplay.__init__(self, write, graphs)
+	def __init__(self, write, selected_sulci, graphs):
+		GraphDisplay.__init__(self, write, selected_sulci, graphs)
 
 	def _display_one_graph(self, graph):
 		self._display_one_graph_callback(graph)
@@ -257,8 +298,8 @@ class PureCorticalDisplay(GraphDisplay):
 
 
 class WireFrameDisplay(GraphDisplay):
-	def __init__(self, write, graphs):
-		GraphDisplay.__init__(self, write, graphs)
+	def __init__(self, write, selected_sulci, graphs):
+		GraphDisplay.__init__(self, write, selected_sulci, graphs)
 		self._name = 'wireframe'
 
 	def _display_one_vertex_callback(self, v):
@@ -288,10 +329,10 @@ class WireFrameDisplay(GraphDisplay):
 		self._aobjects += [ac]
 
 
-class GravityCentersDisplay(FoldDisplay):
-	def __init__(self, write, graphs):
-		GraphDisplay.__init__(self, write, graphs)
-		self._name = 'gravityclouds'
+class GravityCentersDisplay(SegmentDisplay):
+	def __init__(self, write, selected_sulci, graphs):
+		SegmentDisplay.__init__(self, write, selected_sulci, graphs)
+		self._name = 'gravity_centers'
 		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
 					'nomenclature', 'hierarchy',
 					'sulcal_root_colors.hie')
@@ -326,10 +367,272 @@ class GravityCentersDisplay(FoldDisplay):
 			amesh.SetMaterial(material)
 			self._aobjects += [amesh]
 
+class SulciGravityCentersDisplay(SulciDisplay):
+	def __init__(self, write, selected_sulci, graphs):
+		SulciDisplay.__init__(self, write, selected_sulci, graphs)
+		self._name = 'sulci_gravity_centers'
+		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
+					'nomenclature', 'hierarchy',
+					'sulcal_root_colors.hie')
+		transfile = os.path.join(aims.carto.Paths.shfjShared(),
+				'nomenclature', 'translation',
+				'sulci_model_noroots.trl')
+		self._hie = aims.Reader().read(hie_filename)
+		self._translator = sigraph.FoldLabelsTranslator(transfile)
+
+	def _display_one_graph_callback(self, graph):
+		self._translator.translate(graph)
+
+	def _display_one_sulci(self, sulci, vertices):
+		centers = []
+		sizes = []
+		for v in vertices :
+			centers.append(numpy.asarray(v['refgravity_center'].list()))
+			sizes.append(v['size'])
+		sizes = numpy.array(sizes)
+		g = numpy.dot(numpy.vstack(centers).T, sizes / sizes.sum())
+		mesh = aims.SurfaceGenerator.sphere(g, 1, 96)
+		# add color
+		amesh = self._an.toAObject(mesh)
+		material = anatomist.cpp.Material()
+		color = self._hie.find_color(sulci)
+		go =  aims.Object({'diffuse' : color})
+		mesh.header()['material'] = go
+		material.set(go.get())
+		amesh.SetMaterial(material)
+		self._aobjects += [amesh]
+
+
+
+class MySmoothBivariateSpline(BivariateSpline):
+	'''from scipy/interpolate/fitpack2.py'''
+	def __init__(self, x, y, z, w=None, bbox = [None]*4,
+	                 kx=3, ky=3, s=None, eps=None):
+		xb,xe,yb,ye = bbox
+		nx,tx,ny,ty,c,fp,wrk1,ier = dfitpack.surfit_smth(x,y,z,w,
+							 xb,xe,yb,ye,
+							 kx,ky,s=s,
+							 eps=eps,lwrk2=1)
+		if ier in [0,-1,-2]: # normal return
+			self._ok = True
+		else:	self._ok = False
+		self.fp = fp
+		self.tck = tx[:nx],ty[:ny],c[:(nx-kx-1)*(ny-ky-1)]
+		self.degrees = kx,ky
+
+class SulciBivariateSpline(SulciDisplay):
+	def __init__(self, write, selected_sulci, graphs):
+		SulciDisplay.__init__(self, write, selected_sulci, graphs)
+		self._name = 'bivariate_spline'
+		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
+					'nomenclature', 'hierarchy',
+					'sulcal_root_colors.hie')
+		transfile = os.path.join(aims.carto.Paths.shfjShared(),
+				'nomenclature', 'translation',
+				'sulci_model_noroots.trl')
+		self._hie = aims.Reader().read(hie_filename)
+		self._translator = sigraph.FoldLabelsTranslator(transfile)
+		self._descr = SurfaceSimpleSegmentDescriptor()
+
+	def _display_one_graph_callback(self, graph):
+		self._translator.translate(graph)
+		self._motion = aims.GraphManip.talairach(graph)
+
+	def smooth(self, X):
+		x, y, z = X[:, 0], X[:, 1], X[:, 2]
+		s = 2000
+		for i in range(10):
+			r = MySmoothBivariateSpline(x, y, z, s=s)
+			if r._ok: break
+			s *= 2
+		return r
+
+	def _display_one_sulci(self, sulcus, vertices):
+		if sulcus == 'unknown': return
+		print "sulcus = ", sulcus
+
+		s = aims.set_VertexPtr()
+		for seg in vertices: s.add(seg)
+		cc = sigraph.VertexClique.connectivity(s, self._synth)
+		mesh = aims.AimsSurfaceTriangle()
+		for ci in cc:
+			X = self.cc_to_X(ci)
+			if len(X) > 16: # (kx+1)*(ky+1) with kx,ky=3,3 (smooth)
+				m = self._display_one_cc(X)
+				if m is not None: mesh += m
+		# add color
+		amesh = self._an.toAObject(mesh)
+		material = anatomist.cpp.Material()
+		color = self._hie.find_color(sulcus)
+		go =  aims.Object({'diffuse' : color})
+		mesh.header()['material'] = go
+		material.set(go.get())
+		amesh.SetMaterial(material)
+		self._aobjects += [amesh]
+
+
+	def _display_one_cc(self, X):
+		import scipy.cluster as C
+		import scipy.interpolate as I
+		import scipy.spatial
+		from scipy.interpolate import splprep, splev
+
+		Xmean = X.mean(axis=0)
+		X -= Xmean
+		X, d, Vt = numpy.linalg.svd(X, full_matrices=0) # rotate U
+		X = numpy.dot(X, numpy.diag(d))
+		r = self.smooth(X) # 2D interpolation
+		xmin, xmax = X[:, 0].min(), X[:, 0].max()
+		ymin, ymax = X[:, 1].min(), X[:, 1].max()
+		zmin, zmax = X[:, 2].min(), X[:, 2].max()
+		zmean = X[:, 2].mean()
+		n = 100
+		# compute top/bottom lines
+		line_min = []
+		line_max = []
+
+
+		for x in numpy.linspace(xmin, xmax, n):
+			Y = X[X[:, 0] < x + 1]
+			Y = Y[Y[:, 0] > x - 1]
+			Ysel = Y[:, 1]
+			if len(Ysel) == 0: continue
+			pmin = Y[Ysel.argmin()]
+			pmax = Y[Ysel.argmax()]
+			if not line_min or (line_min[-1] != pmin).all():
+				line_min.append(pmin)
+			if not line_max or (line_max[-1] != pmax).all():
+				line_max.append(pmax)
+		#del X
+		line_min = numpy.vstack(line_min)
+		line_max = numpy.vstack(line_max)
+		tckp,u = splprep(line_min[:, :2].T,s=50,k=2,nest=-1)
+		line_min = numpy.array(splev(numpy.linspace(0,1,n),tckp)).T
+		tckp,u = splprep(line_max[:, :2].T,s=50,k=2,nest=-1)
+		line_max = numpy.array(splev(numpy.linspace(0,1,n),tckp)).T
+		line_min = numpy.hstack((line_min, numpy.zeros(100)[None].T))
+		line_max = numpy.hstack((line_max, numpy.zeros(100)[None].T))
+		# top and bottom lines
+		mesh2 = aims.AimsSurfaceTriangle()
+		#for i in range(n-1):
+		#	p1 = numpy.dot(line_min[i], Vt) + Xmean
+		#	p2 = numpy.dot(line_min[i+1], Vt) + Xmean
+		#	c = aims.SurfaceGenerator.cylinder(p1,
+		#		p2, 0.1, 0.1, 6, False, True)
+		#	s = aims.SurfaceGenerator.sphere(p1, 0.1, 96)
+		#	mesh2 += c
+		#	mesh2 += s
+		#for i in range(n-1):
+		#	p1 = numpy.dot(line_max[i], Vt) + Xmean
+		#	p2 = numpy.dot(line_max[i+1], Vt) + Xmean
+		#	c = aims.SurfaceGenerator.cylinder(p1,
+		#		p2, 0.1, 0.1, 6, False, True)
+		#	s = aims.SurfaceGenerator.sphere(p1, 0.1, 96)
+		#	mesh2 += c
+		#	mesh2 += s
+
+		# spline 2D
+		mesh = aims.AimsSurfaceTriangle()
+		vertices = mesh.vertex()
+		triangles = mesh.polygon()
+		for i in range(n):
+			l = float(i)/n
+			line = l * line_min + (1 - l) * line_max
+			for j in range(n):
+				x, y, z = line[j]
+				z = r.ev(x, y)
+				if z > zmax: z = zmax
+				if z < zmin: z = zmin
+				p = numpy.array([x, y, z])
+				p = numpy.dot(p, Vt) + Xmean
+				vertices.append(aims.Point3df(p))
+
+		for i in range(n - 1):
+			for j in range(n - 1):
+				p1 = i * n + j
+				p2 = (i + 1) * n + j
+				p3 = i * n + (j + 1)
+				p4 = (i + 1) * n + (j + 1)
+				t1 = aims.AimsVector_U32_3(p1, p2, p4)
+				triangles.append(t1)
+				t2 = aims.AimsVector_U32_3(p1, p4, p3)
+				triangles.append(t2)
+		mesh.updateNormals()
+		mesh += mesh2
+		return mesh
+
+class SulciHullLineDisplay(SulciDisplay):
+	def __init__(self, write, selected_sulci, graphs):
+		SulciDisplay.__init__(self, write, selected_sulci, graphs)
+		self._name = 'hull_line'
+		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
+					'nomenclature', 'hierarchy',
+					'sulcal_root_colors.hie')
+		transfile = os.path.join(aims.carto.Paths.shfjShared(),
+				'nomenclature', 'translation',
+				'sulci_model_noroots.trl')
+		self._hie = aims.Reader().read(hie_filename)
+		self._translator = sigraph.FoldLabelsTranslator(transfile)
+		self._descr = HullJunctionDescriptor()
+
+	def _display_one_graph_callback(self, graph):
+		self._translator.translate(graph)
+		self._motion = aims.GraphManip.talairach(graph)
+
+	def _display_one_sulci(self, sulci, vertices):
+		import scipy.cluster as C
+		import nipy.neurospin.graph.graph as G
+		n = 0.05 # density of centroids
+		s = aims.set_VertexPtr()
+		for seg in vertices: s.add(seg)
+		cc = sigraph.VertexClique.connectivity(s, self._synth)
+		mesh = aims.AimsSurfaceTriangle()
+		for ci in cc:
+			X = self.cc_to_X(ci)
+			if X is None: continue
+			size = self.cc_size(ci)
+			nX = int(n * size)
+			if nX < 2: continue
+			X, lX = C.vq.kmeans(X, nX)
+			nX = len(X)
+			if nX < 2: continue
+			g = G.WeightedGraph(nX)
+			e = g.mst(X)
+			r = g.floyd()
+			id = numpy.argmax(r, axis=1)
+			p2 = numpy.argmax(r[tuple(range(len(id))), id])
+			p1 = id[p2]
+			A = g.adjacency()
+			p = numpy.array(p1)
+			while p != p2:
+				Ap = A[p]
+				nz = Ap != 0
+				ids = numpy.nonzero(nz)
+				relid = numpy.argmin(r[ids, p2])
+				newp = numpy.argwhere(nz.cumsum() == \
+						(relid + 1))[0, 0]
+				c = aims.SurfaceGenerator.cylinder(X[p],
+					X[newp], 0.2, 0.2, 6, False, True)
+				s = aims.SurfaceGenerator.sphere(X[p], 0.2, 96)
+				mesh += c
+				mesh += s
+				p = newp
+		# add color
+		amesh = self._an.toAObject(mesh)
+		material = anatomist.cpp.Material()
+		color = self._hie.find_color(sulci)
+		go =  aims.Object({'diffuse' : color})
+		mesh.header()['material'] = go
+		material.set(go.get())
+		amesh.SetMaterial(material)
+		self._aobjects += [amesh]
+
+
+
 
 class DataCorticalDisplay(CorticalDisplay):
-	def __init__(self, write, graphs):
-		GraphDisplay.__init__(self, write, graphs)
+	def __init__(self, write, selected_sulci, graphs):
+		GraphDisplay.__init__(self, write, selected_sulci, graphs)
 		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
 					'nomenclature', 'hierarchy',
 					'sulcal_root_colors.hie')
@@ -407,16 +710,17 @@ class DataCorticalDisplay(CorticalDisplay):
 			self._aobjects += [amesh]
 
 class CenterDistCorticalDisplay(DataCorticalDisplay):
-	def __init__(self, write, graphs):
-		DataCorticalDisplay.__init__(self, write, graphs)
+	def __init__(self, write, selected_sulci, graphs):
+		DataCorticalDisplay.__init__(self, write,
+				selected_sulci, graphs)
 		self._name = 'centerdist_cortical'
 
 	def _compute_cortical_data(self, e, info):
 		return info['dist']
 
 class DiffGravityCentersDisplay(CorticalDisplay):
-	def __init__(self, write, graphs):
-		GraphDisplay.__init__(self, write, graphs)
+	def __init__(self, write, selected_sulci, graphs):
+		GraphDisplay.__init__(self, write, selected_sulci, graphs)
 		self._name = 'gravityclouds'
 		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
 					'nomenclature', 'hierarchy',
@@ -465,9 +769,73 @@ class DiffGravityCentersDisplay(CorticalDisplay):
 			self._aobjects += [amesh]
 
 
+class MarkovRelationsDisplay(SegmentDisplay):
+	def __init__(self, write, selected_sulci, graphs, rewrite_graphs):
+		SegmentDisplay.__init__(self, write, selected_sulci, graphs)
+		self._name = 'markov_relations'
+		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
+					'nomenclature', 'hierarchy',
+					'sulcal_root_colors.hie')
+		transfile = os.path.join(aims.carto.Paths.shfjShared(),
+				'nomenclature', 'translation',
+				'sulci_model_noroots.trl')
+		self._hie = aims.Reader().read(hie_filename)
+		self._translator = sigraph.FoldLabelsTranslator(transfile)
+		self._meshes = {}
+		self._rewrite_graphs = rewrite_graphs
+
+	def _display_one_graph_callback(self, graph):
+		self._translator.translate(graph)
+		self._cur_graph = graph
+
+	def _display_one_vertex_callback(self, v):
+		g =  numpy.asarray(v['refgravity_center'].list())
+		s = aims.SurfaceGenerator.sphere(g, 2, 96)
+		sulcus = v['name']
+		index = v['index']
+		if self._meshes.has_key(sulcus):
+			self._meshes[sulcus] += s
+		else:	self._meshes[sulcus] = s
+		if self._rewrite_graphs:
+			aims.GraphManip.storeAims( self._cur_graph, v,
+				'cortexWhite', aims.AimsSurfaceTriangle(s))
+
+	def _display_one_edge_callback(self, e, v1, v2):
+		pfv1 = e.vertices()[0]
+		pfv2 = e.vertices()[1]
+		# create nodes gravity spheres
+		g1 =  numpy.asarray(pfv1['refgravity_center'].list())
+		g2 =  numpy.asarray(pfv2['refgravity_center'].list())
+		c = aims.SurfaceGenerator.cylinder(g1, g2, 0.2, 0.2, 6,
+							False, True)
+		if self._meshes.has_key('links'):
+			self._meshes['links'] += c
+		else:	self._meshes['links'] = c
+
+	def _display_after_callback(self):
+		# add color
+		for name, mesh in self._meshes.items():
+			amesh = self._an.toAObject(mesh)
+			material = anatomist.cpp.Material()
+			if name == 'links':
+				color = [0, 0, 0]
+			else:	color = self._hie.find_color(name)
+			go =  aims.Object({'diffuse' : color})
+			mesh.header()['material'] = go
+			material.set(go.get())
+			amesh.SetMaterial(material)
+			self._aobjects += [amesh]
+		if self._rewrite_graphs:
+			for g in self._graphs:
+				filename = g['aims_reader_filename']
+				w = sigraph.FoldWriter(filename)
+				w.write(g)
+
+
 class IntersectionDisplay(JunctionDisplay):
-	def __init__(self, write, graphs, hull):
-		JunctionDisplay.__init__(self, write, graphs, hull)
+	def __init__(self, write, selected_sulci, graphs, hull):
+		JunctionDisplay.__init__(self, write,
+				selected_sulci, graphs, hull)
 		self._name = 'intersection'
 		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
 					'nomenclature', 'hierarchy',
@@ -525,8 +893,9 @@ class IntersectionDisplay(JunctionDisplay):
 
 
 class GravityPureCorticalDisplay(PureCorticalDisplay):
-	def __init__(self, write, graphs):
-		PureCorticalDisplay.__init__(self, write, graphs)
+	def __init__(self, write, selected_sulci, graphs):
+		PureCorticalDisplay.__init__(self, write,
+				selected_sulci, graphs)
 		self._name = 'gravitypurecortical'
 		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
 					'nomenclature', 'hierarchy',
@@ -582,8 +951,8 @@ class ExtremityCloudsDisplay(CsvDisplay):
 
     number : 1 or 2.
 	'''
-	def __init__(self, write, dirname, number):
-		CsvDisplay.__init__(self, write, dirname)
+	def __init__(self, write, selected_sulci, dirname, number):
+		CsvDisplay.__init__(self, write, selected_sulci, dirname)
 		self._name = 'extremity%d' % number
 		hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
 					'nomenclature', 'hierarchy',
@@ -627,16 +996,25 @@ def parseOpts(argv):
 	add_translation_option_to_parser(parser)
 	parser.add_option('-m', '--mode', dest='mode',
 		metavar = 'FILE', action='store', default = None,
-		help='wireframe, gravity_centers, extremity1, extremity2, ' \
-			'hull_intersection, pure_cortical, ' \
-			'diff_gravity_centers, centerdist_cortical.')
+		help='wireframe, gravity_centers, sulci_gravity_centers, ' \
+			'hull_line, bivariate_spline,' \
+			'extremity1, extremity2, hull_intersection, ' \
+			'pure_cortical, diff_gravity_centers, ' \
+			'centerdist_cortical, markov_relations')
 	parser.add_option('-d', '--dir', dest='dirname',
 		metavar = 'DIR', action='store', default = None,
 		help='directory with siMorpho output files ' \
 				'(used by extremities mode).')
+	parser.add_option('-s', '--sulci', dest='sulci',
+		metavar = 'LIST', action='store', default = None,
+		help='display only specified sulci.')
 	parser.add_option('-w', '--write', dest='write',
 		action='store_true', default = False,
 		help='Write meshes')
+	parser.add_option('--rewrite-graphs', dest='rewrite_graphs',
+		action='store_true', default = False,
+		help='if specified, input graphs may be modified')
+
 
 	return parser, parser.parse_args(argv)
 
@@ -647,26 +1025,50 @@ def main():
 		parser.print_help()
 		sys.exit(1)
 
+	if options.sulci is None:
+		selected_sulci = None
+	else:	selected_sulci = options.sulci.split(',')
+
 	graphnames = args[1:]
 	graphs = io.load_graphs(options.transfile, graphnames)
 	if options.mode == 'wireframe':
-		disp = WireFrameDisplay(options.write, graphs)
+		disp = WireFrameDisplay(options.write, selected_sulci, graphs)
 	elif options.mode == 'gravity_centers':
-		disp = GravityCentersDisplay(options.write, graphs)
+		disp = GravityCentersDisplay(options.write,
+				selected_sulci, graphs)
+	elif options.mode == 'sulci_gravity_centers':
+		disp = SulciGravityCentersDisplay(options.write,
+					selected_sulci, graphs)
+	elif options.mode == 'hull_line':
+		disp = SulciHullLineDisplay(options.write,
+				selected_sulci, graphs)
+	elif options.mode == 'bivariate_spline':
+		disp = SulciBivariateSpline(options.write,
+				selected_sulci, graphs)
 	elif options.mode == 'extremity1':
-		disp = ExtremityCloudsDisplay(options.write, options.dirname, 1)
+		disp = ExtremityCloudsDisplay(options.write,
+				selected_sulci, options.dirname, 1)
 	elif options.mode == 'extremity2':
-		disp = ExtremityCloudsDisplay(options.write, options.dirname, 2)
+		disp = ExtremityCloudsDisplay(options.write,
+				selected_sulci, options.dirname, 2)
 	elif options.mode == 'intersection':
-		disp = IntersectionDisplay(options.write, graphs, False)
+		disp = IntersectionDisplay(options.write,
+				selected_sulci, graphs, False)
 	elif options.mode == 'hull_intersection':
-		disp = IntersectionDisplay(options.write, graphs, True)
+		disp = IntersectionDisplay(options.write,
+				selected_sulci, graphs, True)
 	elif options.mode == 'pure_cortical':
-		disp = GravityPureCorticalDisplay(options.write, graphs)
+		disp = GravityPureCorticalDisplay(options.write,
+				selected_sulci, graphs)
 	elif options.mode == 'diff_gravity_centers':
-		disp = DiffGravityCentersDisplay(options.write, graphs)
+		disp = DiffGravityCentersDisplay(options.write,
+				selected_sulci, graphs)
+	elif options.mode == 'markov_relations':
+		disp = MarkovRelationsDisplay(options.write,
+				selected_sulci, graphs, options.rewrite_graphs)
 	elif options.mode == 'centerdist_cortical':
-		disp = CenterDistCorticalDisplay(options.write, graphs)
+		disp = CenterDistCorticalDisplay(options.write,
+				selected_sulci, graphs)
 	disp.display()
 	qt.qApp.exec_loop()
 

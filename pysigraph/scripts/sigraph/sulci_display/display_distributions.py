@@ -385,12 +385,19 @@ class GmmFromGaussians(Display):
 
 ################################################################################
 def parseOpts(argv):
+	hierarchy = os.path.join(aims.carto.Paths.shfjShared(),
+					'nomenclature', 'hierarchy',
+					'sulcal_root_colors.hie')
 	description = 'Display learned bayesian local models ' \
 			'(one for each sulci).'
 	parser = OptionParser(description)
 	parser.add_option('-d', '--distrib', dest='distribname',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')
+	parser.add_option('--hierarchy', dest='hierarchy',
+		metavar = 'FILE', action='store', default = hierarchy,
+		help='hierarchy (links between names and colors), ' + \
+		'default : %default')
 	parser.add_option('-a', '--all', dest='all',
 		action='store_true', default = False,
 		help='generate all intermediate image needed to compute meshes')
@@ -425,11 +432,7 @@ def main():
 		sulci_weights = dict(zip(sulci, errors))
 	else:	sulci_weights = None
 
-	hie_filename = os.path.join(aims.carto.Paths.shfjShared(),
-					'nomenclature', 'hierarchy',
-					'sulcal_root_colors.hie')
-	print hie_filename
-	hie = aims.Reader().read(hie_filename)
+	hie = aims.Reader().read(options.hierarchy)
 
 	print "read..."
 	if options.sulci is None:

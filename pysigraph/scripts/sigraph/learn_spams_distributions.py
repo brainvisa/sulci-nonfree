@@ -196,9 +196,7 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
 	prefix = distribdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print e
-		sys.exit(1) #FIXME
-
+		print "warning: directory '%s' allready exists" % prefix
 	if options.depth_weighted:
 		model_type = 'depth_weighted_spam'
 	else:	model_type = 'spam'
@@ -315,7 +313,12 @@ def main():
 		ind = ind[0]
 		graphnames = inputs[:ind]
 		input_segments_weights = inputs[ind + 1:]
-	graphs = io.load_graphs(options.transfile, graphnames)
+	if options.label_mode in ['local_errors', 'local_ok',
+				'global_errors', 'global_ok']:
+		label_mode = 'both'
+	else:
+		label_mode = options.label_mode
+	graphs = io.load_graphs(options.transfile, graphnames, label_mode)
 	if input_segments_weights:
 		segments_weights = io.read_segments_weights(\
 					input_segments_weights)
