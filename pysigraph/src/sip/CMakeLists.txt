@@ -43,9 +43,9 @@ BRAINVISA_ADD_SIP_PYTHON_MODULE( sigraphsip
     "${AIMS-FREE_SIP_DIRECTORY}" )
 add_dependencies( sigraphsip ${headersTarget} )
 target_link_libraries( sigraphsip
-  ${PYTHON_LIBRARY}
+  ${PYTHON_LIBRARIES}
   pysigraph
-  ${AIMS_PYAIMS_LIB} )
+  "${AIMS_PYAIMS_LIB}" )
 BRAINVISA_INSTALL( TARGETS sigraphsip
                    DESTINATION python/sigraph
                    COMPONENT ${PROJECT_NAME} )
