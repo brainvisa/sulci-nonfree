@@ -16,16 +16,16 @@ using namespace carto;
 using namespace std;
 
 
-SyntaxSet	FoldReader::syntax( FoldReader::initSyntax
-				    ( Path::singleton().syntax() + 
-				      "/graph.stx" ) );
+SyntaxSet	FoldReader::syntax;
 
 
 FoldReader::FoldReader( const string & filename ) 
   : ExoticGraphReader( filename, FoldReader::syntax )
 {
   if( syntax.empty() )
-    initSyntax( si().basePath() + "/config/fold.stx" );
+    syntax = initSyntax( Path::singleton().syntax() + "/graph.stx" );
+  if( syntaxSet().empty() )
+    setSyntax( syntax );
 }
 
 
