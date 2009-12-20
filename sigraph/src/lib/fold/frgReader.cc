@@ -64,27 +64,27 @@ MReader & FrgReader::defaultMReader()
   mr.addFactory( SIA_FUNCTIONALSKETCH_SIMILARITY_MODEL_SYNTAX,
                  &FunctionalSketchSimilarityModel::buildSimilarity );
   mr.addFactory( SIA_FUNCTIONALSKETCH_DATADRIVEN_MODEL_SYNTAX,
-                 &FunctionalSketchDataDrivenModel::buildDataDriven );                 
+                 &FunctionalSketchDataDrivenModel::buildDataDriven );
   mr.addFactory( SIA_FUNCTIONALSKETCH_LOWERSCALEBEST_MODEL_SYNTAX,
                  &FunctionalSketchLowerScaleModel::buildLowerScale );
   mr.addFactory( SIA_FUNCTIONALSKETCH_INTRAPS_MODEL_SYNTAX,
-                 &FunctionalSketchIntraPSModel::buildIntraPS );    
+                 &FunctionalSketchIntraPSModel::buildIntraPS );
   mr.addFactory( SIA_SURFACEBASEDFUNCTIONALSKETCH_SIMILARITY_MODEL_SYNTAX,
                  &SurfaceBasedFunctionalSketchSimilarityModel::buildSimilarity );
   mr.addFactory( SIA_SURFACEBASEDFUNCTIONALSKETCH_DATADRIVEN_MODEL_SYNTAX,
-                 &SurfaceBasedFunctionalSketchDataDrivenModel::buildDataDriven );                 
+                 &SurfaceBasedFunctionalSketchDataDrivenModel::buildDataDriven );
   mr.addFactory( SIA_SURFACEBASEDFUNCTIONALSKETCH_LOWERSCALEBEST_MODEL_SYNTAX,
                  &SurfaceBasedFunctionalSketchLowerScaleModel::buildLowerScale );
   mr.addFactory( SIA_SURFACEBASEDFUNCTIONALSKETCH_INTRAPS_MODEL_SYNTAX,
-                 &SurfaceBasedFunctionalSketchIntraPSModel::buildIntraPS );    
+                 &SurfaceBasedFunctionalSketchIntraPSModel::buildIntraPS );
   mr.addFactory( SIA_ARNAUD_SIMILARITY_MODEL_SYNTAX,
                  &ArnaudSimilarityModel::buildSimilarity );
   mr.addFactory( SIA_ARNAUD_DATADRIVEN_MODEL_SYNTAX,
-                 &ArnaudDataDrivenModel::buildDataDriven );                 
+                 &ArnaudDataDrivenModel::buildDataDriven );
   mr.addFactory( SIA_ARNAUD_LOWERSCALEBEST_MODEL_SYNTAX,
                  &ArnaudLowerScaleModel::buildLowerScale );
   mr.addFactory( SIA_ARNAUD_INTRAPS_MODEL_SYNTAX,
-                 &ArnaudIntraPSModel::buildIntraPS );                 
+                 &ArnaudIntraPSModel::buildIntraPS );
   return( mr );
 }
 

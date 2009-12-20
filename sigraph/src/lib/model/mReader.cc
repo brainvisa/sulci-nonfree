@@ -7,7 +7,6 @@
  *  	91401 Orsay cedex
  *  	France
  *
- *  Slices of a mask to buckets
  */
 
 #include <si/global/global.h>
@@ -38,10 +37,7 @@ using namespace sigraph;
 using namespace std;
 
 
-SyntaxSet MReader::syntax( MReader::initSyntax
-			   ( Path::singleton().syntax() + 
-                             FileUtil::separator() + "adap.stx" ) );
-
+SyntaxSet MReader::syntax;
 AttributedReader::HelperSet MReader::helpers( MReader::initHelpers() );
 
 PythonReader::HelperSet
@@ -55,8 +51,12 @@ MReader::MReader( const string & filename,
   : ExoticTreeReader( filename, synt, helpers), _knownElems( fs )
 {
   if( syntax.empty() )
-    initSyntax( Path::singleton().syntax() + FileUtil::separator() +
-	"adap.stx" );
+  {
+    syntax = initSyntax( Path::singleton().syntax()
+      + FileUtil::separator() + "adap.stx" );
+  }
+  if( syntaxSet().empty() )
+    setSyntax( syntax );
 }
 
 
@@ -65,6 +65,13 @@ MReader::MReader( const TreePostParser::FactorySet & fs,
 		  const AttributedReader::HelperSet& helpers )
   : ExoticTreeReader( synt, helpers ), _knownElems( fs )
 {
+  if( syntax.empty() )
+  {
+    syntax = initSyntax( Path::singleton().syntax()
+    + FileUtil::separator() + "adap.stx" );
+  }
+  if( syntaxSet().empty() )
+    setSyntax( syntax );
 }
 
 
@@ -76,7 +83,8 @@ static void	gridOptimizerParametersReader(GenericObject &object,
 			const std::string &semantic, carto::DataSource& is)
 {
 	rc_ptr<DataSource>	ds(&is);
-	PythonReader		pr(ds, MReader::syntax, MReader::python_helpers);
+	PythonReader		pr(ds, MReader::syntax,
+                                   MReader::python_helpers);
 	AttributedObject	*val = NULL;
 	try {
 		val = new AttributedObject("grid_optimizer_parameters");
