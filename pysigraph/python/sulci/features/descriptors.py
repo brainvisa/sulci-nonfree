@@ -236,7 +236,7 @@ class RelationDescriptor(Descriptor):
 		(r1, r2), ((v1, v2), edges) = edge_infos
 		data = self.data_potential_edges(motion, edges)
 		labels_1, labels_2 = avalaible_labels[r1], avalaible_labels[r2]
-		P = numpy.zeros((len(labels_1), len(labels_2)), numpy.float96)
+		P = numpy.zeros((len(labels_1), len(labels_2)), numpy.longdouble)
 		if data is None:
 			if not potential: P += numpy.inf
 			return P, (r1, r2)
@@ -300,7 +300,7 @@ class ComboRelationsDescriptor(RelationDescriptor):
 
 	def potential_matrix(self, motion, distribs, edge_infos,
 				avalaible_labels, potential=True):
-		P = numpy.float96(0.)
+		P = numpy.longdouble(0.)
 		for datatype in self._descriptors.keys():
 			subdistribs = distribs[datatype]
 			Pi, ind = self._descriptors[datatype].potential_matrix(\
@@ -909,7 +909,7 @@ class LabelGlobalFrequencyDescriptor(GlobalFrequencyDescriptor):
 			if v.getSyntax() != 'fold': continue
 			ind = v['index']
 		label_map = {}
-		X = numpy.zeros(len(labels), numpy.float96)
+		X = numpy.zeros(len(labels), numpy.longdouble)
 		for (i, label) in enumerate(labels):
 			label_map[label] = i
 		for id in segments:
@@ -935,7 +935,7 @@ class SizeGlobalFrequencyDescriptor(GlobalFrequencyDescriptor):
 			ind = v['index']
 			sizes[ind] = size
 		label_map = {}
-		X = numpy.zeros(len(labels), numpy.float96)
+		X = numpy.zeros(len(labels), numpy.longdouble)
 		for (i, label) in enumerate(labels):
 			label_map[label] = i
 		for id in segments:

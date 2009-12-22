@@ -280,7 +280,7 @@ def parseOpts(argv):
 		'space of segments model')
 	parser.add_option('--motion', action='store', dest='motion',
                 metavar = 'FILE', default = None,
-                help='output .trm motion file to register data on model')
+                help='In global mode, output .trm motion file to register data on model. In local mode, it is the directory which will contain individual sulcus-wise transformations.')
 	parser.add_option('-d', '--distrib', dest='distribname',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')

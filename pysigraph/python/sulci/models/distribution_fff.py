@@ -40,7 +40,7 @@ class Gmm(Distribution):
 		x = numpy.asmatrix(x)
 		labels, loglis, bic = self._gmm.partition(x)
 		logli = loglis.mean()
-		logli = numpy.float96(logli)
+		logli = numpy.longdouble(logli)
 		return logli, numpy.exp(logli)
 
 	def write(self, filename):

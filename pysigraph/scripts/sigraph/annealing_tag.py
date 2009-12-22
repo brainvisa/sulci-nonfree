@@ -210,7 +210,7 @@ class SegmentObserver(Observer):
 		availablelabels = tagger.getAvailableLabels(id1)
 		availablelabels_n = len(availablelabels)
 		if availablelabels_n == 1: return 0, 0
-		relcum = numpy.zeros(availablelabels_n, dtype=numpy.float96)
+		relcum = numpy.zeros(availablelabels_n, dtype=numpy.longdouble)
 		w = tagger.getSegWeights(id1)
 		if not w: w = 1.
 		neighbours_n = len(tagger.getNeighbours(id1))
@@ -427,8 +427,8 @@ class Tagger(object):
 		for s in self._segments:
 			node_index = s['index']
 			self._neighbours[node_index] = set()
-			logli = numpy.zeros(self._states_n, dtype=numpy.float96)
-			li = numpy.zeros(self._states_n, dtype=numpy.float96)
+			logli = numpy.zeros(self._states_n, dtype=numpy.longdouble)
+			li = numpy.zeros(self._states_n, dtype=numpy.longdouble)
 			if segdistr:
 				for i, label in enumerate(self._states):
 					distrib = segdistr[label]
@@ -659,7 +659,7 @@ class Tagger(object):
 		self._freq = {}
 		for id in self._seg_indices:
 			size = len(self._availablelabels[id1])
-			self._freq[id] = numpy.zeros(size, dtype=numpy.float96)
+			self._freq[id] = numpy.zeros(size, dtype=numpy.longdouble)
 		self._temp, rate, stopRate, tmax = self._anneal_opt
 		self._current_seg_id = None
 		t = 0
@@ -702,7 +702,7 @@ class Tagger(object):
 		return en_rel + en_seg + self.eval_prior() + en_sulci
 
 	def local_energy(self, id1):
-		en = numpy.float96(0.)
+		en = numpy.longdouble(0.)
 		for id2 in self._neighbours[id1]:
 			l2 = self._taglabels[id2]
 			if id1 > id2:
@@ -760,7 +760,7 @@ class Tagger(object):
 						self._states, self._segments)
 
 		# init energy
-		self._sulci_en = numpy.zeros(self._states_n,dtype=numpy.float96)
+		self._sulci_en = numpy.zeros(self._states_n,dtype=numpy.longdouble)
 		d = self._sulci_descriptor
 		for i in range(self._states_n):
 			self._sulci_en[i] = d.likelihood(self._sulci_distrib,
@@ -770,7 +770,7 @@ class Tagger(object):
 		if not self._sulci_descriptor: return 0.
 		l1 = self._taglabels[id]
 		tl1 = self._labelsind[id][l1]
-		en = numpy.zeros(len(self._labelsind[id]), dtype=numpy.float96)
+		en = numpy.zeros(len(self._labelsind[id]), dtype=numpy.longdouble)
 		en2 = numpy.array(self._sulci_en)
 		en2[tl1] = 0.
 
@@ -799,7 +799,7 @@ class Tagger(object):
 		'''
 		if not self._labels_prior: return 0.
 		l1 = self._taglabels[id]
-		en = numpy.zeros(len(self._labelsind[id]), dtype=numpy.float96)
+		en = numpy.zeros(len(self._labelsind[id]), dtype=numpy.longdouble)
 		if self._prior_descriptor:
 			old_l2 = l1 = self._labelsind[id][l1]
 			for i, l2 in enumerate(self._labelsind[id]):
@@ -854,7 +854,7 @@ class Tagger(object):
 		for id1 in self._seg_indices:
 			l1 = self._taglabels[id1]
 			availablelabels_n = len(self._availablelabels[id1])
-			en = numpy.zeros(availablelabels_n, dtype=numpy.float96)
+			en = numpy.zeros(availablelabels_n, dtype=numpy.longdouble)
 			for id2 in self._neighbours[id1]:
 				l2 = self._taglabels[id2]
 				if id1 > id2:

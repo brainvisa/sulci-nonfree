@@ -72,8 +72,6 @@ def vector_from_rotation(R):
 		z[1, 2] = z[2, 1] = (R[2, 1] + R[1, 2]) / g
 		for i in range(3):
 			if i != ind: w[i] *= numpy.sign(z[ind, i])
-	import pdb
-	pdb.set_trace()
 	return w
 
 J_i = [antisymetric_matrix_from_vector([1, 0, 0]),

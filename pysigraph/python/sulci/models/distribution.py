@@ -188,7 +188,7 @@ class Frequency(Distribution):
 	def likelihood(self, x):
 		'''x : array of ordred measures over labels (one per label)'''
 		logli = numpy.sum(numpy.log(self._freq) * x)
-		logli = numpy.float96(logli)
+		logli = numpy.longdouble(logli)
 		return logli, numpy.exp(logli)
 
 	def toTuple(self):
@@ -321,7 +321,7 @@ class Gaussian(Distribution):
 		x = numpy.asmatrix(x) - self._mean
 		d = (x * self._metric * x.T)[0, 0]
 		logli = -0.5 * d - numpy.log(self._norm)
-		logli = numpy.float96(logli)
+		logli = numpy.longdouble(logli)
 		return logli, numpy.exp(logli)
 
 # works but too much memory required
@@ -329,7 +329,7 @@ class Gaussian(Distribution):
 #		X = numpy.asmatrix(X) - self._mean
 #		d = numpy.diag(X * self._metric * X.T)
 #		logli = -0.5 * d - numpy.log(self._norm)
-#		logli = numpy.float96(logli)
+#		logli = numpy.longdouble(logli)
 #		return logli, numpy.exp(logli)
 
 	def likelihood_expectation(self):
