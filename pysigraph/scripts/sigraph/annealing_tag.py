@@ -41,10 +41,14 @@ class GuiObserver(Observer):
 
 	def init(self, tagger):
 		import anatomist.cpp as cpp
+		import brainvisa.quaternion as quaternion
 		import qt
 		self._ag = self._a.toAObject(tagger.graph())
+		m = aims.Reader().read('/home/mp210984/ccrt/base2008/mesh_white/Lammon_white.tri')
+		self._white = self._a.toAObject(m)
+		self._aobjects = [self._ag, self._white]
 		# default : names color, we want labels
-		self._aobjects = [self._ag]
+		#self._aobjects = [self._ag]
 		self._a.addObjects(self._aobjects, [self._win])
 		motion = aims.GraphManip.talairach(self._ag.graph())
 		vector = motion.toMatrix()[:3,3].tolist() + \
@@ -58,6 +62,7 @@ class GuiObserver(Observer):
     		t = self._a.Transformation(self._a, t.trans())
 		#if mesh: amesh.setReferential(origin.internalRep)
 		self._ag.setReferential(origin.internalRep)
+		self._white.setReferential(origin.internalRep)
 		c = self._a.getControlWindow()
 		c.SelectWindow(self._win.internalRep)
 		cpp.ObjectActions.displayGraphChildrenMenuCallback().doit(\
@@ -69,7 +74,7 @@ class GuiObserver(Observer):
 					qt.Qt.WindowFullScreen)
 		self._win.setFocus()
 		self._win.raiseW()
-		q, q2 = aims.Quaternion(), aims.Quaternion()
+		q, q2 = quaternion.Quaternion(), quaternion.Quaternion()
 		q.fromAxis([0, 1, 0], numpy.pi / 2.)
 		q2.fromAxis([1, 0, 0], numpy.pi / 2.)
 		q = q.compose(q2)
@@ -137,17 +142,22 @@ class GuiNrjObserver(GuiObserver):
 		for s in tagger._segments:
 			id = s['index']
 			if tagger._changes[id] or self._n == 0:
-				p = numpy.exp(-tagger.local_energy(id) / \
-							tagger._temp)
-				s['nrj'] = p[tagger._taglabels[id]] / p.sum()
+				p = numpy.exp(-tagger.local_energy(id)) #/ \
+							#tagger._temp)
+				proba = p[tagger._taglabels[id]] / p.sum()
+				s['nrj'] = max(min(proba, 1.), 0.0)
 				#en = tagger.local_energy(id)
 				#s['nrj'] = en[tagger._taglabels[id]]
-    		palette = self._ag.getOrCreatePalette()
-		palette.setMin1(0.)
-		palette.setMax1(1)
+    		#palette = self._ag.getOrCreatePalette()
+		#palette.setMin1(0.)
+		#palette.setMax1(1.)
+		self._ag.setInternalsChanged()
+		self._ag.updateAfterAimsChange()
 		self._ag.updateColors()
 		self._ag.setChanged()
 		self._ag.notifyObservers()
+  		#self._a.setObjectPalette([self._ag], 'Blue-Red',
+		#	minVal=0., maxVal=1., absoluteMode=1)
 		qt.qApp.processEvents()
 		time.sleep(0.001)
 		self._n += 1
@@ -370,6 +380,7 @@ class Tagger(object):
 					for x in prior_labels]))[0,0]
 				indices.append(ind)
 			priors = numpy.asarray(priors)[0][indices]
+		self._prior_distrib.set_frequencies(priors)
 
 
 	def initialize_init_prior(self):
@@ -911,10 +922,6 @@ def parseOpts(argv):
 
 	# input models
 	models_group = OptionGroup(parser, "Input models")
-	models_group.add_option('-m', '--graphmodel', dest='graphmodelname',
-		metavar = 'FILE', action='store',
-		default = 'bayesian_graphmodel.dat', help='bayesian model : ' \
-			'graphical model structure (default : %default)')
 	models_group.add_option('-d', '--distrib_segments',
 		dest='distribsegmentsname', metavar = 'FILE', action='store',
 		default = None, help='distribution models for segments ' + \
@@ -978,8 +985,8 @@ def parseOpts(argv):
 		metavar = 'MODE', action='store', default='threshold',
 		type='choice', help="select available labels on each " + \
 		"segment. 'threshold' : select labels with posterior of " + \
-		"local segment potential over the threshold, 'all' : keep " + \
-		"all labels defined in graph_model, 'store_labels' : select " +\
+		"local segment potential over the threshold, 'all' : keep all"+\
+		" labels defined in segment models, 'store_labels' : select " +\
 		"only the labels stored in 'label' attribute of the " + \
 		"input graph", choices=('threshold', 'all', 'store_labels'))
 	algo_group.add_option('--init-temperature', dest='init_temp',
@@ -1071,7 +1078,7 @@ def main():
 
 	# read graph_model and distrib models
 	graph = io.load_graph(options.transfile, options.input_graphname)
-	sulcimodel = io.read_full_model(options.graphmodelname,
+	sulcimodel = io.read_full_model(None,
 		segmentsdistribname=options.distribsegmentsname,
 		reldistribname=options.distribrelname,
 		sulcidistribname=options.distribsulciname,
