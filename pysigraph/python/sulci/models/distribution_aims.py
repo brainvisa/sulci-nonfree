@@ -491,7 +491,7 @@ class PySpam(Distribution):
 				loglikelihood += numpy.log(P[pos])
 			else:   loglikelihood += -50
 		loglikelihood /= voxels_n
-		likelihood = numpy.exp(numpy.float96(loglikelihood) + shift)
+		likelihood = numpy.exp(numpy.longdouble(loglikelihood) + shift)
 		del P
 		del Px
 		return loglikelihood, likelihood
@@ -537,7 +537,7 @@ class PySpam(Distribution):
 				loglikelihoods.append(numpy.log(P[pos]))
 			else:   loglikelihoods.append(-50)
 		loglikelihoods = numpy.array(loglikelihoods)
-		likelihoods = numpy.exp(numpy.float96(loglikelihoods) + shift)
+		likelihoods = numpy.exp(numpy.longdouble(loglikelihoods) + shift)
 		del P
 		del Px
 		return loglikelihoods, likelihoods
@@ -561,7 +561,7 @@ class PySpam(Distribution):
 				loglikelihood += w * numpy.log(P[pos])
 			else:   loglikelihood += w * (-50)
 		loglikelihood /= voxels_n
-		likelihood = numpy.exp(numpy.float96(loglikelihood) + shift)
+		likelihood = numpy.exp(numpy.longdouble(loglikelihood) + shift)
 		del P
 		del Px
 		return loglikelihood, likelihood
@@ -638,7 +638,7 @@ class PySpam(Distribution):
 			loglikelihood += numpy.log(P[pos])
 			A[pos] = 0.0001
 		loglikelihood /= voxels_n
-		likelihood = numpy.exp(numpy.float96(loglikelihood) + 10)
+		likelihood = numpy.exp(numpy.longdouble(loglikelihood) + 10)
 		aims.Writer().write(img, "img_%s.ima" % sulci)
 		del P 
 		del Px

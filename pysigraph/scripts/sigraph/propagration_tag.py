@@ -27,7 +27,7 @@ class VertexModel(object):
 
 	def _compute_priors(self):
 		priors = numpy.asmatrix(numpy.zeros(self._states_n,
-						numpy.float96)).T
+						numpy.longdouble)).T
 		if self._prior_ind == -1: # no prior
 			return priors + 1.
 		gv = self._bayesian_model['vertices']
@@ -61,7 +61,7 @@ class GravityCenterVertexModel(VertexModel):
 	
 	def _transmat(self, xi):
 		n = self._states_n
-		phi_i = numpy.asmatrix(numpy.zeros(n, numpy.float96)).T
+		phi_i = numpy.asmatrix(numpy.zeros(n, numpy.longdouble)).T
 		# gravity center :
 		g = numpy.asarray(xi['refgravity_center'].list())
 		for si in range(n):
@@ -78,7 +78,7 @@ class SpamVertexModel(VertexModel):
 	
 	def _transmat(self, xi):
 		n = self._states_n
-		phi_i = numpy.asmatrix(numpy.zeros(n, dtype=numpy.float96)).T
+		phi_i = numpy.asmatrix(numpy.zeros(n, dtype=numpy.longdouble)).T
 		# gravity center :
 		g = numpy.asarray(xi['refgravity_center'].list())
 
@@ -122,7 +122,7 @@ class EdgeModel(object):
 
 	def _compute_priors(self):
 		n = self._states_n
-		priors = numpy.asmatrix(numpy.zeros((n, n), numpy.float96))
+		priors = numpy.asmatrix(numpy.zeros((n, n), numpy.longdouble))
 		if self._prior_ind == -1: # no prior
 			return priors + 1.
 		ge = self._bayesian_model['edges']
@@ -212,7 +212,7 @@ class GravityCentersDeltaEdgeModel(EdgeModel):
 		g2 = numpy.asarray(xj['refgravity_center'].list())
 		dg = g1 - g2
 		n = self._states_n
-		psi_ij = numpy.zeros((n, n), numpy.float96)
+		psi_ij = numpy.zeros((n, n), numpy.longdouble)
 		psi_ij = numpy.asmatrix(psi_ij)
 		for si in range(n):
 			label_i = self._states[si]
@@ -241,7 +241,7 @@ class GravityCentersDistanceEdgeModel(EdgeModel):
 		g2 = numpy.asarray(xj['refgravity_center'].list())
 		dist = numpy.sqrt(((g1 - g2) ** 2).sum())
 		n = self._states_n
-		psi_ij = numpy.zeros((n, n), numpy.float96)
+		psi_ij = numpy.zeros((n, n), numpy.longdouble)
 		psi_ij = numpy.asmatrix(psi_ij)
 
 		for si in range(n):
@@ -272,7 +272,7 @@ class MinDistanceEdgeModel(EdgeModel):
 		dist = numpy.sqrt(((pi - pj) ** 2).sum())
 
 		n = self._states_n
-		psi_ij = numpy.zeros((n, n), numpy.float96)
+		psi_ij = numpy.zeros((n, n), numpy.longdouble)
 		psi_ij = numpy.asmatrix(psi_ij)
 		for si in range(n):
 			label_i = self._states[si]
@@ -379,7 +379,7 @@ class LoopyBeliefPropagation(object):
 
 	def _init_messages(self):
 		# init data : messages
-		z = numpy.zeros((self._states_n, 1), numpy.float96) + \
+		z = numpy.zeros((self._states_n, 1), numpy.longdouble) + \
 						1. / self._states_n
 		bar = ProgressionBarPct(len(self._graph_data.vertices()),
 							'#', color = 'cyan')
@@ -424,7 +424,7 @@ class LoopyBeliefPropagation(object):
 		for xi in g.vertices():
 			if xi.getSyntax() != 'fold' : continue
 			prod_mki = numpy.zeros((self._states_n, 1),
-						numpy.float96) + 1.
+						numpy.longdouble) + 1.
 			prod_mki = numpy.asmatrix(prod_mki)
 			ri = xi['index']
 			for xk in xi.neighbours():

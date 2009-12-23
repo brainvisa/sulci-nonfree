@@ -101,8 +101,8 @@ class Tagger(object):
 		return available_labels
 
 	def _likelihoods(self, xi):
-		li = numpy.zeros(self._states_n, dtype=numpy.float96)
-		logli = numpy.zeros(self._states_n, dtype=numpy.float96)
+		li = numpy.zeros(self._states_n, dtype=numpy.longdouble)
+		logli = numpy.zeros(self._states_n, dtype=numpy.longdouble)
 		distribs = self._distrib['vertices']
 		for i, label in enumerate(self._states):
 			distrib = distribs[label]
