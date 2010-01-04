@@ -41,6 +41,7 @@ class GuiObserver(Observer):
 
 	def init(self, tagger):
 		import anatomist.cpp as cpp
+		import brainvisa.quaternion as quaternion
 		import qt
 		self._ag = self._a.toAObject(tagger.graph())
 		m = aims.Reader().read('/home/mp210984/ccrt/base2008/mesh_white/Lammon_white.tri')
@@ -73,7 +74,7 @@ class GuiObserver(Observer):
 					qt.Qt.WindowFullScreen)
 		self._win.setFocus()
 		self._win.raiseW()
-		q, q2 = aims.Quaternion(), aims.Quaternion()
+		q, q2 = quaternion.Quaternion(), quaternion.Quaternion()
 		q.fromAxis([0, 1, 0], numpy.pi / 2.)
 		q2.fromAxis([1, 0, 0], numpy.pi / 2.)
 		q = q.compose(q2)

@@ -1,13 +1,15 @@
 
 ADD_SUBDIRECTORY(lib)
 
-IF( datamind_FOUND AND SVM_FOUND )
+if( DATAMIND_FOUND AND SVM_FOUND )
   include( "${DATAMIND_USE_FILE}" )
   ADD_SUBDIRECTORY(libsigraphsvm)
   IF(APPLE)
     ADD_SUBDIRECTORY(bundle_sisvm)
   ENDIF()
-ENDIF()
+else()
+  message( "WARNING: libsigraphsvm will not be build beacause of dependencies: datamind_FOUND=\"${datamind_FOUND}\" AND SVM_FOUND=\"${SVM_FOUND}\"" )
+endif()
 
 #------------------------------------------------------------------------------
 # Build targets for commands
