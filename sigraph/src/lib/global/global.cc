@@ -53,7 +53,7 @@ namespace
       ( PluginLoader::PluginFile( si().basePath() + FileUtil::separator() 
                                   + "plugins" + FileUtil::separator() 
                                   + "sigraph.plugins", 
-                                  si().shortVersion() ) );
+                                  si().version() ) );
     /*cout << "plugins file: " 
          << si().basePath() + FileUtil::separator() + "plugins" 
       + FileUtil::separator() + "sigraph.plugins" 
