@@ -68,6 +68,7 @@ void paramError( const char* name, const string & file, const string & param  )
 }
 
 
+/*
 char escapedchar( char c )
 {
   switch( c )
@@ -82,16 +83,18 @@ char escapedchar( char c )
     return c;
   };
 }
+*/
 
 string readstring( istringstream & s )
 {
   char c, quote = '\0';
-  bool esc = false;
+  // bool esc = false;
   string item;
 
   c = s.get();
   while( s && c )
   {
+    /*
     if( esc )
     {
       item += escapedchar( c );
@@ -99,7 +102,8 @@ string readstring( istringstream & s )
     }
     else if( c == '\\' )
       esc = true;
-    else if( c == '"' || c == '\'' )
+    else */
+    if( c == '"' || c == '\'' )
     {
       if( quote == '\0' )
         quote = c;
@@ -113,7 +117,7 @@ string readstring( istringstream & s )
           item += c;
       }
     }
-    else if( c == ' ' && !esc && quote == '\0' )
+    else if( c == ' ' /* && !esc*/ && quote == '\0' )
     {
       return item;
     }

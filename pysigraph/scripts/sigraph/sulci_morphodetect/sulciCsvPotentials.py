@@ -42,12 +42,18 @@ def csvPotentials( stats, outpotfile, stds ):
 if __name__ == '__main__':
   if sys.argv[1] in ( '-h', '--help' ):
     print 'usage:'
-    print sys.argv[0], 'stats.txt outcsv.txt'
+    print sys.argv[0], 'stats.txt outcsv.txt [altstats.txt]'
     print 'Transform stats dictionary (given by sulciRecordStats) into a CSV potentials file with the following columns columns: subject, side, sulcus, potential, centered/scaled potential, mean pot, stdev pot, num pot recordings'
+    print 'if altstats.txt is provided, means/stdev are taken from this alternate source'
     sys.exit(0)
 
   statsfile = sys.argv[1]
   outcsv = sys.argv[2]
   execfile( statsfile )
+  if len( sys.argv) > 3:
+    altstats = sys.argv[3]
+    x = {}
+    execfile( altstats, x, x )
+    totalstats = x[ 'totalstats' ]
   csvPotentials( subjectspotentials, outcsv, totalstats )
 
