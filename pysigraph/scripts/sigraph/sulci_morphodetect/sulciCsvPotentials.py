@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+import os, sys
+
+def csvPotentials( stats, outpotfile, stds ):
+  f = open( outpotfile, 'w' )
+  f.write( 'subject side label potential normpotential mean_pot stddev_pot numobs_pot\n' )
+  for sfile, pots in stats.iteritems():
+    side = 'none'
+    subject = os.path.basename( sfile )
+    if subject.endswith( '.arg' ):
+      subject = subject[ :-4 ]
+    if subject.startswith( 'L' ) or subject.startswith( 'R' ):
+      if subject[0] == 'L':
+        side = 'left'
+      else:
+        side = 'right'
+      subject = subject[ 1: ]
+    if subject.endswith( '_auto' ):
+      subject = subject[ :-5 ]
+    elif subject.endswith( '_manual' ):
+      subject = subject[ :-7 ]
+    if subject.endswith( '_default_session' ):
+      subject = subject[ :-16 ]
+    for slabel, pot in pots.iteritems():
+      label = slabel
+      if label.endswith( '_left' ):
+        side = 'left'
+        label = label[ :-5 ]
+      elif label.endswith( '_right' ):
+        side = 'right'
+        label = label[ :-6 ]
+      cs = stds[ slabel ]
+      if cs[ 'std' ] == 0:
+        npot = 0.
+      else:
+        npot = ( pot - cs[ 'mean' ] ) / cs[ 'std' ]
+      f.write( '%s %s %s %f %f %f %f %d\n' % ( subject, side, label, pot, npot, cs[ 'mean' ], cs[ 'std' ], cs[ 'number' ] ) )
+  f.close()
+
+
+if __name__ == '__main__':
+  if sys.argv[1] in ( '-h', '--help' ):
+    print 'usage:'
+    print sys.argv[0], 'stats.txt outcsv.txt'
+    print 'Transform stats dictionary (given by sulciRecordStats) into a CSV potentials file with the following columns columns: subject, side, sulcus, potential, centered/scaled potential, mean pot, stdev pot, num pot recordings'
+    sys.exit(0)
+
+  statsfile = sys.argv[1]
+  outcsv = sys.argv[2]
+  execfile( statsfile )
+  csvPotentials( subjectspotentials, outcsv, totalstats )
+

@@ -34,7 +34,7 @@ def sulciRecordStats( inputs, modelfile, output ):
         label = c[ 'label' ]
         print 'label:', label
         cs = nodecliquestats.get( label )
-        if not cs:
+        if cs is None:
           cs = { 'number' : 0, 'sum' : 0., 'squaresum' : 0. }
           nodecliquestats[ label ] = cs
         cs[ 'number' ] += 1
@@ -54,7 +54,7 @@ def sulciRecordStats( inputs, modelfile, output ):
         label1 = l[0]
         label2 = l[1]
         cs = relcliquestats.get( l )
-        if not cs:
+        if cs is None:
           cs = { 'number' : 0, 'sum' : 0., 'squaresum' : 0. }
           relcliquestats[ l ] = cs
         cs[ 'number' ] += 1
@@ -74,7 +74,7 @@ def sulciRecordStats( inputs, modelfile, output ):
     print 'gogo2.1'
     for label, p in totstats_persubject.items():
       cs = totalstats.get( label )
-      if not cs:
+      if cs is None:
         cs = { 'number' : 0, 'sum' : 0., 'squaresum': 0. }
         totalstats[ label ] = cs
       cs[ 'number' ] += 1
