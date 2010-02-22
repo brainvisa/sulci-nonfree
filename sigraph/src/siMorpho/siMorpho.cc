@@ -35,7 +35,7 @@ using namespace aims;
 using namespace std;
 
 
-FRGraph	rg;	// global pour permettre l'accès dans une interruption
+FRGraph	rg;	// global pour permettre l'accï¿½s dans une interruption
 
 
 struct Params
@@ -65,6 +65,66 @@ void paramError( const char* name, const string & file, const string & param  )
   cerr << name << " : bad param in file " << file << ", param " << param 
        << endl;
   exit( EXIT_FAILURE );
+}
+
+
+char escapedchar( char c )
+{
+  switch( c )
+  {
+  case 't':
+    return '\t';
+  case 'n':
+    return '\n';
+  case 'r':
+    return '\r';
+  default:
+    return c;
+  };
+}
+
+string readstring( istringstream & s )
+{
+  char c, quote = '\0';
+  bool esc = false;
+  string item;
+
+  c = s.get();
+  while( s && c )
+  {
+    if( esc )
+    {
+      item += escapedchar( c );
+      esc = false;
+    }
+    else if( c == '\\' )
+      esc = true;
+    else if( c == '"' || c == '\'' )
+    {
+      if( quote == '\0' )
+        quote = c;
+      else
+      {
+        if( c == quote )
+        {
+          quote = '\0';
+        }
+        else
+          item += c;
+      }
+    }
+    else if( c == ' ' && !esc && quote == '\0' )
+    {
+      return item;
+    }
+    else
+    {
+      item += c;
+    }
+    c = s.get();
+  };
+
+  return item;
 }
 
 
@@ -119,11 +179,11 @@ void loadParams( const string & paramFile, const char* name, Params & par )
   istringstream	sst( gf.c_str() );
 
   while( !sst.eof() )
-    {
-      sst >> str;
-      if( !str.empty() )
-	par.graphs.push_back( str );
-    }
+  {
+    str = readstring( sst );
+    if( !str.empty() )
+      par.graphs.push_back( str );
+  }
   if( par.graphs.size() == 0 )
     paramError( name, paramFile, "graphFiles" );
   cout << "Graphs : " << par.graphs.size() << endl;
@@ -245,7 +305,7 @@ int main( int argc, const char** argv )
 	    }
 	}
 
-      //	Lecture graphe modèle
+      //	Lecture graphe modï¿½le
 
       MReader			& mr1 = FrgReader::defaultMReader();
       MReader			mr;
@@ -362,7 +422,7 @@ int main( int argc, const char** argv )
         //	clears modelFinder cache
         mf.clear();
 
-        //	Préparation des cliques
+        //	Prï¿½paration des cliques
         cout << "Init cliques..." << endl;
         if( sel.begin() == sel.end() )
           rg.modelFinder().initCliques( fg, par.verbose, false, true,
