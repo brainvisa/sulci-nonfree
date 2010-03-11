@@ -15,7 +15,7 @@ BRAINVISA_ADD_SIP_PYTHON_MODULE( sigraphsvmsip
     "${AIMS-FREE_SIP_DIRECTORY}" "${CMAKE_CURRENT_SOURCE_DIR}/../sip" )
 # add_dependencies( sigraphsip ${headersTarget} )
 target_link_libraries( sigraphsvmsip
-  ${PYTHON_LIBRARIES}
+  "${PYTHON_LIBRARY}"
   pysigraph sigraphsvm
   "${AIMS_PYAIMS_LIB}" )
 BRAINVISA_INSTALL( TARGETS sigraphsvmsip
