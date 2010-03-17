@@ -95,7 +95,9 @@ def writeGraph(fd, g, hie, label_mode):
 		fd.write("\tDEF Segment%d\n" % v['index'])
 		fd.write("\tSeparator {\n")
 		writeExtendedMaterial(fd, v, 'Meta')
-		writeMaterial(fd, {'diffuseColor' : color})
+		properties = {'diffuseColor' : color[:3]}
+		if len(color) == 4: properties['transparency'] = [color[3]]
+		writeMaterial(fd, properties)
 		writeCoordinate3(fd, numpy.array(m.vertex()))
 		writeIndexedFaceSet(fd, numpy.array(m.polygon()))
 		fd.write("\t}\n")
