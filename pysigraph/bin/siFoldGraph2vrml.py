@@ -13,7 +13,8 @@ def parseOpts(argv):
 	hierarchy = os.path.join(aims.carto.Paths.shfjShared(),
 					'nomenclature', 'hierarchy',
 					'sulcal_root_colors.hie')
-	description = 'Convert Aims data fold graph to vrml1 format.'
+	description = '''Convert Aims data fold graph to vrml1 format.
+       siFoldGraph2vrml.py -i input.arg -o output.vrml [OPTIONS]'''
 	parser = OptionParser(description)
 	add_translation_option_to_parser(parser)
 	parser.add_option('-i', '--input', dest='inputname',
@@ -62,14 +63,16 @@ def writeMaterial(fd, properties={}, name=None):
 		fd.write('\t\t\t%s %s\n' % (k, ' '.join(str(x) for x in v)))
 	fd.write('\t\t}\n')
 
-def writeCoordinate3(fd, points):
+def writeCoordinate3(fd, points, name=None):
+	if name is not None: fd.write('\t\tDEF %s\n' % name)
 	fd.write('\t\tCoordinate3 {\n')
 	fd.write('\t\t\tpoint [\n')
 	for p in points: fd.write('\t\t\t\t%6.6f %6.6f %6.6f,\n' % tuple(p))
 	fd.write('\t\t\t]\n')
 	fd.write('\t\t}\n')
 
-def writeIndexedFaceSet(fd, faces):
+def writeIndexedFaceSet(fd, faces, name=None):
+	if name is not None: fd.write('\t\tDEF %s\n' % name)
 	fd.write('\t\tIndexedFaceSet {\n')
 	fd.write('\t\t\tcoordIndex [\n')
 	for f in faces: fd.write('\t\t\t\t%6d, %6d, %6d, -1,\n' % tuple(f))
@@ -97,9 +100,10 @@ def writeGraph(fd, g, hie, label_mode):
 		writeExtendedMaterial(fd, v, 'Meta')
 		properties = {'diffuseColor' : color[:3]}
 		if len(color) == 4: properties['transparency'] = [color[3]]
-		writeMaterial(fd, properties)
-		writeCoordinate3(fd, numpy.array(m.vertex()))
-		writeIndexedFaceSet(fd, numpy.array(m.polygon()))
+		writeMaterial(fd, properties, 'Material')
+		writeCoordinate3(fd, numpy.array(m.vertex()), 'Coordinate3')
+		writeIndexedFaceSet(fd, numpy.array(m.polygon()),
+						'IndexedFaceSet')
 		fd.write("\t}\n")
 	fd.write("}\n")
 
