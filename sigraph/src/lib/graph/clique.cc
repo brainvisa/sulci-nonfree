@@ -18,7 +18,9 @@ Clique::Clique( const Clique & cl )
 
 Clique::~Clique()
 {
+  cout << "~Clique " << this << endl;
   clear();
+  cout << "~Clique: cleared.\n";
 }
 
 

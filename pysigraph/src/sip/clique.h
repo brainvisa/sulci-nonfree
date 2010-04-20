@@ -26,6 +26,28 @@ inline int pysigraphCliqueP_Check( PyObject* o )
                                   SIP_NOT_NONE | SIP_NO_CONVERTORS );
 }
 
+
+inline PyObject* pysigraphConvertFrom_rc_ptr_Clique( const void * a )
+{
+  return sipConvertFromInstance( const_cast<void *>( a ),
+                                 sipClass_rc_ptr_Clique, 0 );
+}
+
+
+inline carto::rc_ptr<sigraph::Clique>* pysigraphConvertTo_rc_ptr_Clique( PyObject * o )
+{
+  int isErr = 0;
+  return static_cast<carto::rc_ptr<sigraph::Clique>*>( sipConvertToInstance( o,
+      sipClass_rc_ptr_Clique, 0, 0, 0, &isErr ) );
+}
+
+
+inline int pysigraphRcptrClique_Check( PyObject* o )
+{
+  return sipCanConvertToInstance( o, sipClass_rc_ptr_Clique,
+                                  SIP_NOT_NONE | SIP_NO_CONVERTORS );
+}
+
 #endif
 #endif
 

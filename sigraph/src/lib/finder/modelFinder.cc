@@ -161,7 +161,7 @@ void ModelFinder::initCliques( CGraph & data, bool, bool, bool, bool,
   map<string, VertexClique*>		mc;
   map<string, VertexClique*>::iterator	imc, emc = mc.end();
   VertexClique				*cl;
-  set<Clique *>				& cliques = data.cliques();
+  CGraph::CliqueSet			& cliques = data.cliques();
   map<string, string>::iterator		il, el = trans.end();
   bool	found;
 
@@ -193,7 +193,7 @@ void ModelFinder::initCliques( CGraph & data, bool, bool, bool, bool,
               cl->setProperty( SIA_LABEL, label );
               cl->setProperty( SIA_GRAPH, (Graph *) &data );
               mc[ label ] = cl;
-              cliques.insert( cl );
+              cliques.insert( rc_ptr<Clique>( cl ) );
             }
           else
             cl = imc->second;

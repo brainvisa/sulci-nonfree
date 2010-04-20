@@ -363,7 +363,7 @@ int main( int argc, const char** argv )
 	  seltr->setFiltAttributes( attrs );
 	}
 
-      set<Clique *>::iterator	ic, ec;
+      CGraph::CliqueSet::iterator	ic, ec;
       ModelFinder		& mf = rg.modelFinder();
       AttributedObject		*modAO;
       Model			*mod;
@@ -438,10 +438,10 @@ int main( int argc, const char** argv )
         cout << "nb of nodes: " << fg.order() << endl;
         cout << "nb of cliques: " << fg.cliques().size() << endl;
 
-        const set<Clique *>	& cs = fg.cliques();
+        const CGraph::CliqueSet	& cs = fg.cliques();
         for( ic=cs.begin(), ec=cs.end(); ic!=ec; ++ic )
           {
-            modAO = mf.selectModel( *ic );
+            modAO = mf.selectModel( ic->get() );
             ASSERT( modAO );
             ASSERT( modAO->getProperty( SIA_MODEL, mod ) );
             if( !seltr || seltr->checkAdap( modAO, 0 ) )
@@ -457,7 +457,7 @@ int main( int argc, const char** argv )
                     modname = "unknown";
                   }
                 }
-                outp = mod->printDescription( *ic, naming );
+                outp = mod->printDescription( ic->get(), naming );
                 if( (*ic)->getProperty( SIA_POT_VECTOR, potv ) )
                   {
                     ofstream	*& fp = files[ modname ];

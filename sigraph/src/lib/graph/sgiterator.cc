@@ -108,11 +108,11 @@ void VertexCliqueProvider::init()
 {
   _data.erase( _data.begin(), _data.end() );
 
-  const set<Clique *> 		& sc = _graph.cliques();
-  set<Clique *>::const_iterator	ic, fc=sc.end();
+  const CGraph::CliqueSet 		& sc = _graph.cliques();
+  CGraph::CliqueSet::const_iterator	ic, fc=sc.end();
 
   for( ic=sc.begin(); ic!=fc; ++ic )
-    _data.push_back( &((VertexClique *) *ic)->vertices() );
+    _data.push_back( &((VertexClique *) ic->get())->vertices() );
 }
 
 

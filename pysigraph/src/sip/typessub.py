@@ -61,13 +61,34 @@ typessub.update( {
       'PyType' : 'sigraph::Clique *',
       'sipClass' : 'sigraph_Clique*',
       'typeinclude' : '#include <si/graph/clique.h>', 
-      'sipinclude' : '#if SIP_VERSION < 0x040700\n'
-        '#include "sipsigraphsipsigraphClique.h"\n'
-        '#endif\n'
-        '#include <pysigraph/clique.h>', 
+      'sipinclude' : '#include <pysigraph/clique.h>',
       'module' : 'sigraph', 
       'testPyType' : 'pysigraphCliqueP_Check', 
-    }, 
+    },
+
+    'sigraph::Clique' :
+      classInNamespace( 'si/graph/clique.h', 'Clique', 'sigraph' ),
+
+    'carto::rc_ptr<sigraph::Clique>' : \
+    { 'typecode' : 'rc_ptr_Clique',
+      'pyFromC' : 'pysigraphConvertFrom_rc_ptr_Clique',
+      'CFromPy' : 'pysigraphConvertTo_rc_ptr_Clique',
+      'castFromSip' : '',
+      'deref' : '*',
+      'pyderef' : '*',
+      'address' : '&',
+      'pyaddress' : '&',
+      'defScalar' : '',
+      'new' : 'new carto::rc_ptr<sigraph::Clique>',
+      'NumType' : 'PyArray_OBJECT',
+      'PyType' : 'rc_ptr_Clique',
+      'sipClass' : 'rc_ptr_Clique',
+      'typeinclude' : '#include <si/graph/clique.h>\n',
+      'sipinclude' : '#include <pysigraph/clique.h>',
+      'module' : 'sigraph',
+      'testPyType' : 'pysigraphRcptrClique_Check',
+      },
+      #classInCartoNamespace( 'si/graph/clique.h', 'rc_ptr_Clique' ),
 
     } ),
 

@@ -86,11 +86,11 @@ int main( int argc, const char** argv )
       cout << "Total graph energy : " << an.initialEnergy() << endl;
       if( carto::verbose )
         {
-          const set<Clique *>		& cl = graph.cliques();
-          set<Clique *>::const_iterator	ic, ec = cl.end();
+          const CGraph::CliqueSet	& cl = graph.cliques();
+          CGraph::CliqueSet::const_iterator	ic, ec = cl.end();
           string			label1, label2;
           double			pot;
-          
+
           for( ic=cl.begin(); ic!=ec; ++ic )
             {
               if( (*ic)->getProperty( "label", label1 ) )

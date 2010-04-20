@@ -30,7 +30,7 @@ void AnnealConnectExtension::specialStep( unsigned )
   map<VertexClique*, string>		labels;
   unsigned			p;
   ModelFinder			& mf = _anneal->rGraph().modelFinder();
-  set<Clique *>::const_iterator	ic, fc=_anneal->cGraph().cliques().end();
+  CGraph::CliqueSet::const_iterator ic, fc=_anneal->cGraph().cliques().end();
   AttributedObject		*mao;
   map<Vertex *, string>		changes;
   string			voidl = _anneal->voidLabel();
@@ -43,7 +43,7 @@ void AnnealConnectExtension::specialStep( unsigned )
   for( ic=_anneal->cGraph().cliques().begin(); ic!=fc; ++ic )
     {
       // modèle associé à la clique
-      mao = mf.selectModel( *ic );
+      mao = mf.selectModel( ic->get() );
       // ne garder que les modèles de noeuds (1 label)
       if( mao && mao->getProperty( SIA_LABEL, label ) 
           && label != voidl )
@@ -54,8 +54,8 @@ void AnnealConnectExtension::specialStep( unsigned )
 	      p = rand();
 	    } while( cliques.find( p ) != fcm );
 	  // stocker la clique numérotée et le label
-	  cliques[p] = (VertexClique *) *ic;
-	  labels[(VertexClique *) *ic] = label;
+	  cliques[p] = (VertexClique *) ic->get();
+	  labels[(VertexClique *) ic->get()] = label;
 	}
     }
 
@@ -72,6 +72,7 @@ void AnnealConnectExtension::specialStep( unsigned )
   EnergyField					ef;
   CComponent::const_iterator			iv, fv;
   set<Clique *>					*sc;
+  set<Clique *>::const_iterator                 ics, ecs;
   map<Clique *, double>::iterator		ic2, fc2;
   double					E, eE, limit;
   bool						accept;
@@ -125,8 +126,8 @@ void AnnealConnectExtension::specialStep( unsigned )
 		  // cliques concernées par les changements
 		  if( (*iv)->getProperty( SIA_CLIQUES, sc ) )
 		    {
-		      for( ic=sc->begin(), fc=sc->end(); ic!=fc; ++ic )
-			ef.involvedCliques[ *ic ] = 0;
+		      for( ics=sc->begin(), ecs=sc->end(); ics!=ecs; ++ics )
+			ef.involvedCliques[ *ics ] = 0;
 		    }
 		}
 	      ef.energy = 0;

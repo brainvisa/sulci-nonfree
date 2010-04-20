@@ -289,7 +289,7 @@ int main( int argc, char** argv )
 
       //	Affichage des potentiels des cliques
 
-      set<Clique *>::const_iterator	ic, fc=fg.cliques().end();
+      CGraph::CliqueSet::const_iterator	ic, fc=fg.cliques().end();
       string				label1, label2;
       double				pot, pot2;
       ModelFinder			& mf = rg.modelFinder();
@@ -297,10 +297,10 @@ int main( int argc, char** argv )
       Clique				*cl;
       //unsigned				i;
 
-      cout << "potentiels des cliques en fin de recuit :\n";
+      cout << "cliques potentials at annealing end :\n";
       for( ic=fg.cliques().begin(); ic!=fc; ++ic )
 	{
-	  cl = *ic;
+	  cl = ic->get();
 	  cout << cl->getSyntax() << "\t";
 	  if( cl->getProperty( "label", label1 ) )
 	    cout << label1 << "\t\t\t";

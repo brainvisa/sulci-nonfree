@@ -13,7 +13,7 @@ public:
   virtual ~CGraph();
 
   // const std::set<sigraph::Clique *> & cliques() const;
-  set_CliquePtr & cliques();
+  set_rc_ptr_Clique & cliques();
 
   virtual void deleteCliques();
   virtual void randLabels();

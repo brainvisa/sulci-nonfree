@@ -95,7 +95,7 @@ void SulcalSketchFinder::initCliques( CGraph &data, bool /* verbose */,
   map<string, map<string, VertexClique *> > cliquesdata;
   string			label, label1, mtype, subject;
   VertexClique			*vc;
-  set<Clique *>			& scl = data.cliques();
+  CGraph::CliqueSet		& scl = data.cliques();
   Domain			*fd;
   Vertex			*v;
   map<string, VertexClique *>::iterator	imc, fmc = cliquessim.end();
@@ -118,7 +118,7 @@ void SulcalSketchFinder::initCliques( CGraph &data, bool /* verbose */,
           vc->setProperty( SIA_LABEL, label );
           vc->setProperty( SIA_MODEL_TYPE, 
                             string( "sulcalsketch_similarity" ) );
-          scl.insert( vc );
+          scl.insert( rc_ptr<Clique>( vc ) );
         }
     }
 
@@ -150,7 +150,7 @@ void SulcalSketchFinder::initCliques( CGraph &data, bool /* verbose */,
                       c->setProperty( SIA_LABEL, label1 );
                       c->setProperty( SIA_MODEL_TYPE, 
                                        string( "sulcalsketch_datadriven" ) );
-                      scl.insert( c );
+                      scl.insert( rc_ptr<Clique>( c ) );
 
                     }
                   pl->push_back( label1 );	// label possible pour le noeud

@@ -926,7 +926,7 @@ void Anneal::processConfig( const set<Vertex *> & ver,
 double Anneal::processAllPotentials()
 {
   double		ener = 0, pot;
-  set<Clique*>::const_iterator	ic, fc=_cgraph.cliques().end();
+  CGraph::CliqueSet::const_iterator	ic, fc=_cgraph.cliques().end();
   ModelFinder	&mf = _mgraph.modelFinder();
   Clique	*cl;
 
@@ -934,7 +934,7 @@ double Anneal::processAllPotentials()
 
   for( ic=_cgraph.cliques().begin(); ic!=fc; ++ic )
     {
-      cl = *ic;
+      cl = ic->get();
       pot = mf.update( cl );
       //pot = mf.potential( cl );
       ener += pot;

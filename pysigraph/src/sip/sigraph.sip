@@ -12,8 +12,10 @@ carto::pyaims_init();
 %Include si.sip
 %Include clique.sip
 %Include learnparam.sip
+%Include rcptr_Clique.sip
 %Include set_AdaptivePtr.sip
 %Include set_CliquePtr.sip
+%Include set_rc_ptr_Clique.sip
 %Include model.sip
 %Include subadaptive.sip
 %Include learner.sip

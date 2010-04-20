@@ -154,7 +154,7 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
   set<Edge*>				se;
   VertexClique::iterator		ic, fc;
   unsigned				i, n;
-  set<Clique *>				& cliques = data.cliques();
+  CGraph::CliqueSet			& cliques = data.cliques();
 
   //	Création des cliques "Random Vertex" (vides d'abord)
 
@@ -175,7 +175,7 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
             cl->setProperty( SIA_ORIGINAL_CACHE, 
                               (CliqueCache *) new FoldCache );
           mc[ label1 ] = cl;
-          cliques.insert( cl );
+          cliques.insert( rc_ptr<Clique>( cl ) );
         }
       if( verbose )
 	cout << "\r" << setw(5) << i << " / " << setw( 5 ) << n << flush;
@@ -265,7 +265,7 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
 		  if( withCache )
 		    cl->setProperty( SIA_ORIGINAL_CACHE, 
 				      (CliqueCache *) new InterFoldCache );
-		  cliques.insert( cl );
+		  cliques.insert( rc_ptr<Clique>( cl ) );
 		  // ajouter tous les noeuds (des 2 cliques)
 		  for( ic=((const VertexClique *)cl1)->begin(), 
 			 fc=((const VertexClique *)cl1)->end(); ic!=fc; ++ic )
@@ -286,7 +286,7 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
       cl->setSyntax( SIA_FAKEREL );
       cl->setProperty( SIA_MODEL_TYPE, (string) SIV_FAKE_REL );
       cl->setProperty( SIA_GRAPH, (Graph *) &data );
-      cliques.insert( cl );
+      cliques.insert( rc_ptr<Clique>( cl ) );
       for( iv=data.begin(), i=1; iv!=fv; ++iv, ++i )
 	cl->addVertex( *iv );
     }

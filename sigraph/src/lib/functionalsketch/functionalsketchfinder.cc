@@ -150,7 +150,7 @@ void FunctionalSketchFinder::initCliques( CGraph &data, bool /* verbose */,
 
   string            label, label1, mtype, subject;
   VertexClique           *vc;
-  set<Clique *>               & scl = data.cliques();
+  CGraph::CliqueSet      & scl = data.cliques();
   Domain            *fd;
   Vertex            *v;
   vector<string>         *pl;
@@ -206,7 +206,7 @@ void FunctionalSketchFinder::initCliques( CGraph &data, bool /* verbose */,
           cliqueslowscale = vc;
           vc->setProperty( SIA_MODEL_TYPE,
                             string( "functionalsketch_lowerscalebest") );
-          scl.insert(  vc );
+          scl.insert(  rc_ptr<Clique>( vc ) );
       }
   }
 
@@ -247,7 +247,7 @@ void FunctionalSketchFinder::initCliques( CGraph &data, bool /* verbose */,
                       c = new VertexClique;
                       c->setProperty( SIA_MODEL_TYPE,
                                        string( "functionalsketch_datadriven" ) );
-                      scl.insert( c );
+                      scl.insert( rc_ptr<Clique>( c ) );
                   }
                   c->addVertex( v );    // noeud dans la clique
               }
@@ -315,7 +315,7 @@ void FunctionalSketchFinder::initCliques( CGraph &data, bool /* verbose */,
                                       vc->addVertex( (*iv) );
                                       vc->addVertex( (*jv) );
                                       vc->setProperty("overlap", rec);
-                                      scl.insert( vc );
+                                      scl.insert( rc_ptr<Clique>( vc ) );
                                   }
                               }
                           }
@@ -336,7 +336,7 @@ void FunctionalSketchFinder::initCliques( CGraph &data, bool /* verbose */,
                       c = new VertexClique;
                       c->setProperty( SIA_MODEL_TYPE,
                                        string( "functionalsketch_intraprimalsketch" ) );
-                      scl.insert( c );
+                      scl.insert( rc_ptr<Clique>( c ) );
                   }
                   c->addVertex( v );    // noeud dans la clique
               }

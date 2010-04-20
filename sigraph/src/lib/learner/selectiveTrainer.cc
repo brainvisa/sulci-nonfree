@@ -41,35 +41,35 @@ void SelectiveTrainer::setPattern( const string & pat )
 
 Trainer::CliquesModelMap *
 SelectiveTrainer::dataBaseToCliquesModelMap(const set<CGraph *> &lrn)
-{	
-	set<CGraph *>::const_iterator		ig, fg = lrn.end();
-	CliquesModelMap				*cl = new CliquesModelMap;
-	std::list<Clique *>::const_iterator	ic, fc;
-	Model					*mod;
-	Adaptive				*adap = NULL;
-	ModelFinder   				&mf = _mgraph.modelFinder();
+{
+  set<CGraph *>::const_iterator		ig, fg = lrn.end();
+  CliquesModelMap			*cl = new CliquesModelMap;
+  std::list<Clique *>::const_iterator	ic, fc;
+  Model					*mod;
+  Adaptive				*adap = NULL;
+  ModelFinder   			&mf = _mgraph.modelFinder();
 
-	//Regrouper les cliques selon leur mod�le
-	for (ig = lrn.begin(); ig != fg; ++ig)
-	{
-		const set<Clique*>		&cs = (**ig).cliques();
-		set<Clique*>::const_iterator	ic, fc = cs.end();
-	
-  		for(ic = cs.begin(); ic != fc; ++ic)
-		{
-			AttributedObject	*modV = mf.selectModel(*ic);
+  //Regrouper les cliques selon leur mod�le
+  for (ig = lrn.begin(); ig != fg; ++ig)
+  {
+    const CGraph::CliqueSet		&cs = (**ig).cliques();
+    CGraph::CliqueSet::const_iterator	ic, fc = cs.end();
 
-			if(modV)
-			{
-				ASSERT(modV->getProperty(SIA_MODEL, mod));
-				adap = (Adaptive *) mod;
-				if(_usedAdap.find(adap) != _usedAdap.end() ||
-					checkAdap(modV, adap))
-					(*cl)[mod].push_front(*ic);
-			}
-		}
-	}
-	return cl;
+    for(ic = cs.begin(); ic != fc; ++ic)
+    {
+      AttributedObject	*modV = mf.selectModel(ic->get());
+
+      if(modV)
+      {
+        ASSERT(modV->getProperty(SIA_MODEL, mod));
+        adap = (Adaptive *) mod;
+        if(_usedAdap.find(adap) != _usedAdap.end() ||
+          checkAdap(modV, adap))
+          (*cl)[mod].push_front(ic->get());
+      }
+    }
+  }
+  return cl;
 }
 
 std::set<Model *>	*SelectiveTrainer::modelsFromCliquesModelMap(

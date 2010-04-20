@@ -36,12 +36,14 @@ namespace sigraph
   class CGraph : public Graph
   {
   public:
+    typedef std::set<carto::rc_ptr<Clique> > CliqueSet;
+
     CGraph( std::string s = "" );
     virtual ~CGraph();
 
     virtual void deleteCliques();
-    const std::set<Clique*> & cliques() const;
-    std::set<Clique*> & cliques();
+    const CliqueSet & cliques() const;
+    CliqueSet & cliques();
 
     virtual void randLabels();
     ///	Met le label donné sur tous les noeuds
@@ -56,7 +58,7 @@ namespace sigraph
   protected:
     virtual void parseDelete( carto::AttributedObject *ao );
 
-    std::set<Clique*>	_cliques;
+    CliqueSet	_cliques;
 
   };
 
@@ -64,15 +66,15 @@ namespace sigraph
   //	Fonctions inline
 
 
-  inline const std::set<Clique*> & CGraph::cliques() const
+  inline const CGraph::CliqueSet & CGraph::cliques() const
   {
-    return( _cliques );
+    return _cliques;
   }
 
 
-  inline std::set<Clique*> & CGraph::cliques()
+  inline CGraph::CliqueSet & CGraph::cliques()
   {
-    return( _cliques );
+    return _cliques;
   }
 
 }

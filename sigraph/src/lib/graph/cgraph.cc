@@ -50,11 +50,7 @@ CGraph::~CGraph()
 
 void CGraph::deleteCliques()
 {
-  set<Clique*>::iterator	ic, fc=_cliques.end();
-
-  for( ic=_cliques.begin(); ic!=fc; ++ic )
-    delete *ic;
-  _cliques.erase( _cliques.begin(), fc );
+  _cliques.clear();
 }
 
 

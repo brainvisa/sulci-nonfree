@@ -76,7 +76,7 @@ void DGraph::initCliques( MGraph* mg )
 	      cl->setProperty( SIA_MODEL_TYPE, (string) SIV_RANDOM_VERTEX );
 	      cl->setProperty( SIA_LABEL, label );
 	      cl->setProperty( SIA_GRAPH, (Graph *) this );
-	      _cliques.insert( cl );
+	      _cliques.insert( rc_ptr<Clique>( cl ) );
 	      mc[ label ] = cl;
 	      ++nc;
 	    }
