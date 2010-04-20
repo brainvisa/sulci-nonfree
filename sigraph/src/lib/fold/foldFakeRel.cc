@@ -14,6 +14,7 @@
 #include <si/graph/cgraph.h>
 #include <si/fold/fattrib.h>
 #include <graph/tree/tree.h>
+#include <cartobase/exception/assert.h>
 #include <iostream>
 
 using namespace sigraph;
@@ -46,7 +47,7 @@ FoldFakeRel::Relmap FoldFakeRel::allocGraph( const CGraph* )
   string				label;
   map<string, int>::const_iterator	ii, fi=_ltoi.end();
 
-  //	valeurs hors-table à ne pas comptabiliser
+  //	valeurs hors-table ï¿½ ne pas comptabiliser
   _ltoi[ SIV_VOID_LABEL ] = -1;
   _ltoi[ SIV_BRAIN_HULL ] = -1;
 
@@ -114,12 +115,12 @@ double FoldFakeRel::update( const CGraph & cg, Relmap & rel )
 	if( label1 != SIV_VOID_LABEL && label2 != SIV_VOID_LABEL )
 	  {
 	    /*ii = _ltoi.find( label1 );
-	    assert( ii != fi );
+	    ASSERT( ii != fi );
 	    j1 = (*ii).second;*/
 	    j1 = _ltoi[ label1 ];
 	    // j1 est l'indice du label1
 	    /*ii = _ltoi.find( label2 );
-	    assert( ii != fi );
+	    ASSERT( ii != fi );
 	    j2 = (*ii).second;*/
 	    j2 = _ltoi[ label2 ];
 	    // j2 est l'indice du label1
@@ -131,7 +132,7 @@ double FoldFakeRel::update( const CGraph & cg, Relmap & rel )
 	  }
       }
 
-  //	ensuite les relations trouvées dans le graphe exemple
+  //	ensuite les relations trouvï¿½es dans le graphe exemple
   const set<Edge *>		& ed = cg.edges();
   set<Edge *>::const_iterator	ie, fe=ed.end();
   Vertex			*v1, *v2;
@@ -148,15 +149,15 @@ double FoldFakeRel::update( const CGraph & cg, Relmap & rel )
 	  && label2 != SIV_VOID_LABEL && label2 != SIV_BRAIN_HULL )
 	{
 	  /*ii = _ltoi.find( label1 );
-	  assert( ii != fi );
+	  ASSERT( ii != fi );
 	  j1 = (*ii).second;*/
 	  j1 = _ltoi[ label1 ];
 	  /*ii = _ltoi.find( label2 );
-	  assert( ii != fi );
+	  ASSERT( ii != fi );
 	  j2 = (*ii).second;*/
 	  j2 = _ltoi[ label2 ];
 
-	  // on est sûr que j1 != j2 pcq label1 != label2
+	  // on est sï¿½r que j1 != j2 pcq label1 != label2
 	  if( j2 < j1 )
 	    {
 	      tmp = j2;
@@ -169,7 +170,7 @@ double FoldFakeRel::update( const CGraph & cg, Relmap & rel )
 	  if( !rd.hasModel )
 	    {
 	      if( rd.num == 0 )
-		++count;	// compte seulement ceux qui passent de 0 à 1
+		++count;	// compte seulement ceux qui passent de 0 ï¿½ 1
 	      ++rd.num;
 	      /*cout << "rel entre " << label1 << " et " << label2 
 		<< endl;*/
@@ -212,7 +213,7 @@ FoldFakeRel::Reldescr* FoldFakeRel::relDescr( const CGraph* cg,
     {
       init( *cg );
       ifr = _rels.find( cg );
-      assert( ifr != _rels.end() );
+      ASSERT( ifr != _rels.end() );
     }
 
   if( j2 < j1 )
@@ -239,7 +240,7 @@ double FoldFakeRel::prop( const Clique* cl,
       cerr << "warning : clique FAKE sans attribut graph (BUG)\n";
       return( 0 );
     }
-  assert( ( cg = dynamic_cast<CGraph *>( g ) ) );
+  ASSERT( ( cg = dynamic_cast<CGraph *>( g ) ) );
 
   Relmap				& rmap = _rels[ cg ];
   if( !rmap )
@@ -256,15 +257,15 @@ double FoldFakeRel::prop( const Clique* cl,
   double	res = update( cl, changes );
   double	oldpot = 0;
 
-  assert( cl->getProperty( SIA_POTENTIAL, oldpot ) );
+  ASSERT( cl->getProperty( SIA_POTENTIAL, oldpot ) );
   // debug: le potentiel de cette clique est toujours positif
-  /*assert( oldpot >= 0 );
-  assert( oldpot + res >= 0 );
+  /*ASSERT( oldpot >= 0 );
+  ASSERT( oldpot + res >= 0 );
   // debug: comparer avec le vrai calcul
   double toto = update( *cg, rmap );
   if( oldpot + res != toto )
     {
-      cout << "incohérence dans FakeRel: oldpot : " << oldpot << ", chgt : " 
+      cout << "incohï¿½rence dans FakeRel: oldpot : " << oldpot << ", chgt : " 
 	   << res << ", newpot : " << toto << endl;
       cout << "changements : " << changes.size() << endl;
       map<Vertex*, string>::const_iterator	iv, fv=changes.end();
@@ -278,13 +279,13 @@ double FoldFakeRel::prop( const Clique* cl,
 	}
       double totobis = update( *cg, rmap );
       cout << "recalcul d'avant : " << totobis << endl;
-      // comparaison avec état avant
+      // comparaison avec ï¿½tat avant
       for( i=0; i<n; ++i )
 	for( j=0; j<n-i-1; ++j )
 	  {
 	    Reldescr	& rm = rmap[i][j];
 	    Reldescr	& cp = copy[i][j];
-	    assert( rm.hasModel == cp.hasModel 
+	    ASSERT( rm.hasModel == cp.hasModel 
 		    && rm.num == cp.num );
 	  }
       for( iv=changes.begin(); iv!=fv; ++iv )
@@ -293,7 +294,7 @@ double FoldFakeRel::prop( const Clique* cl,
 	  (*iv).first->setProperty( SIA_LABEL, (*iv).second );
 	  (*iv).second = nlab;
 	}
-      //assert( oldpot + res == toto );
+      //ASSERT( oldpot + res == toto );
       }*/
 
   //	remettre la table originale
@@ -306,7 +307,7 @@ double FoldFakeRel::prop( const Clique* cl,
   /*if( oldpot + res != toto )
     {
       double tutu = update( cl, changes );
-      assert( oldpot + res == toto );
+      ASSERT( oldpot + res == toto );
       }*/
 
   return( oldpot + res );
@@ -330,7 +331,7 @@ double FoldFakeRel::update( const Clique* cl,
       cerr << "warning : clique FAKE sans attribut graph (BUG)\n";
       return( 0 );
     }
-  assert( ( cg = dynamic_cast<CGraph *>( g ) ) );
+  ASSERT( ( cg = dynamic_cast<CGraph *>( g ) ) );
 
   Relmap				& rmap = _rels[ cg ];
   if( !rmap )
@@ -354,12 +355,12 @@ double FoldFakeRel::update( const Clique* cl,
     {
       v1 = (*iv).first;
       const string	& lold = (*iv).second;
-      assert( v1->getProperty( SIA_LABEL, label1 ) );
+      ASSERT( v1->getProperty( SIA_LABEL, label1 ) );
       j1o = _ltoi[ lold ];	// ancien indice
       j1n = _ltoi[ label1 ];	// nouveau
 
       for( ie=v1->begin(), fe=v1->end(); ie!=fe; ++ie )
-	if( done.find( edg = *ie ) == df )	// seulement si pas déjà fait
+	if( done.find( edg = *ie ) == df )	// seulement si pas dï¿½jï¿½ fait
 	  {
 	    done.insert( edg );
 
@@ -368,11 +369,11 @@ double FoldFakeRel::update( const Clique* cl,
 	    if( *iv2 == v1 )
 	      ++iv2;
 	    v2 = *iv2;
-	    assert( v2->getProperty( SIA_LABEL, label2 ) );
+	    ASSERT( v2->getProperty( SIA_LABEL, label2 ) );
 
-	    //	décrémenter l'ancien compteur
+	    //	dï¿½crï¿½menter l'ancien compteur
 	    ivo = changes.find( v2 );
-	    if( ivo != fv )			// autre bout changé aussi
+	    if( ivo != fv )			// autre bout changï¿½ aussi
 	      j2o = _ltoi[ (*ivo).second ];	// prendre l'ancien label
 	    else
 	      j2o = _ltoi[ label2 ];
@@ -397,7 +398,7 @@ double FoldFakeRel::update( const Clique* cl,
 		  }
 	      }
 
-	    //	incrémenter le nouveau compteur
+	    //	incrï¿½menter le nouveau compteur
 	    if( j1n >= 0 )
 	      {
 		if( ivo != fv )
@@ -429,9 +430,9 @@ double FoldFakeRel::update( const Clique* cl,
   //	debug
   /*if( _ltoi.size() != nl )
     {
-      cerr << "FFake rel: nombre de labels changé. " << nl << " -> " 
+      cerr << "FFake rel: nombre de labels changï¿½. " << nl << " -> " 
 	   << _ltoi.size() << endl;
-      assert( false );
+      ASSERT( false );
       }*/
 
   return( (double) nc );
@@ -448,7 +449,7 @@ double FoldFakeRel::update( const Clique* cl )
       cerr << "warning : clique FAKE sans attribut graph (BUG)\n";
       return( 0 );
     }
-  assert( ( cg = dynamic_cast<CGraph *>( g ) ) );
+  ASSERT( ( cg = dynamic_cast<CGraph *>( g ) ) );
 
   Relmap				& rmap = _rels[ cg ];
   if( !rmap )

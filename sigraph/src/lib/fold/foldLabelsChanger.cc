@@ -16,6 +16,7 @@
 #include <si/fold/interFoldCache.h>
 #include <si/fold/fattrib.h>
 #include <si/graph/vertexclique.h>
+#include <cartobase/exception/assert.h>
 #include <math.h>
 
 using namespace sigraph;
@@ -59,10 +60,10 @@ double FoldLabelsChanger::noiseFoldDescr( Clique* cl, double & outp,
   CliqueCache	*cch = 0, *ccho = 0;
 
   cl->getProperty( SIA_ORIGINAL_CACHE, ccho );
-  /*if( ccho ) cout << "original_cache trouvé\n";
+  /*if( ccho ) cout << "original_cache trouvï¿½\n";
     else cout << "Pas de original_cache\n";*/
   cl->getProperty( SIA_CACHE, cch );
-  /*if( cch ) cout << "cache trouvé\n";
+  /*if( cch ) cout << "cache trouvï¿½\n";
     else cout << "Pas de original_cache\n";*/
 
   FoldCache	*fco = 0, *fc = 0;
@@ -74,13 +75,13 @@ double FoldLabelsChanger::noiseFoldDescr( Clique* cl, double & outp,
   if( ccho )
     {
       fco = dynamic_cast<FoldCache *>( ccho );
-      assert( fco );
+      ASSERT( fco );
     }
 
   if( cch )
     {
       fc = dynamic_cast<FoldCache *>( cch );
-      assert( fc );
+      ASSERT( fc );
       //cout << "FoldCache\n";
       for( i=0; i<fco->subVecValid.size(); ++i )
 	fco->subVecValid[i] = false;
@@ -89,7 +90,7 @@ double FoldLabelsChanger::noiseFoldDescr( Clique* cl, double & outp,
 
   string	label;
 
-  assert( cl->getProperty( SIA_LABEL, label ) );
+  ASSERT( cl->getProperty( SIA_LABEL, label ) );
 
   if( fco && ( fco->vecValid 
       || ( fco->subVecValid.size() > FoldDescr::JUNC_CC && 
@@ -117,9 +118,9 @@ double FoldLabelsChanger::noiseFoldDescr( Clique* cl, double & outp,
       fc->subVecValid[ FoldDescr::JUNC_CC ] = true;
       /*cout << "sizeof( FoldCache ) : " << sizeof( *fc ) << ", " 
 	<< sizeof( FoldCache ) << endl;
-	cout << "cache mis à jour.\n";*/
+	cout << "cache mis ï¿½ jour.\n";*/
     }
-  //else cout << "cache non trouvé\n";
+  //else cout << "cache non trouvï¿½\n";
 
   dist = ( dist > 60 ? dist - 60 : 0 );
 
@@ -148,13 +149,13 @@ double FoldLabelsChanger::noiseFoldDescr2( Clique* cl, double & outp,
   if( ccho )
     {
       fco = dynamic_cast<FoldCache *>( ccho );
-      assert( fco );
+      ASSERT( fco );
     }
 
   if( cch )
     {
       fc = dynamic_cast<FoldCache *>( cch );
-      assert( fc );
+      ASSERT( fc );
       for( i=0; i<fco->subVecValid.size(); ++i )
 	fco->subVecValid[i] = false;
     }
@@ -167,7 +168,7 @@ double FoldLabelsChanger::noiseFoldDescr2( Clique* cl, double & outp,
   csynt.insert( SIA_JUNCTION_SYNTAX );
   csynt.insert( SIA_PLI_DE_PASSAGE_SYNTAX );
 
-  assert( cl->getProperty( SIA_LABEL, label ) );
+  ASSERT( cl->getProperty( SIA_LABEL, label ) );
 
   if( fco && ( fco->vecValid 
                || ( fco->subVecValid.size() > FoldDescr2::NCC_NOT_CORTICAL 
@@ -226,10 +227,10 @@ double FoldLabelsChanger::noiseIFDescr( Clique* cl, double & outp,
   CliqueCache	*cch = 0, *ccho = 0;
 
   cl->getProperty( SIA_ORIGINAL_CACHE, ccho );
-  /*if( ccho ) cout << "original_cache trouvé\n";
+  /*if( ccho ) cout << "original_cache trouvï¿½\n";
     else cout << "Pas de original_cache\n";*/
   cl->getProperty( SIA_CACHE, cch );
-  /*if( cch ) cout << "cache trouvé\n";
+  /*if( cch ) cout << "cache trouvï¿½\n";
     else cout << "Pas de original_cache\n";*/
 
   InterFoldCache	*ifco = 0, *ifc = 0;
@@ -244,13 +245,13 @@ double FoldLabelsChanger::noiseIFDescr( Clique* cl, double & outp,
   if( ccho )
     {
       ifco = dynamic_cast<InterFoldCache *>( ccho );
-      assert( ifco );
+      ASSERT( ifco );
     }
 
   if( cch )
     {
       ifc = dynamic_cast<InterFoldCache *>( cch );
-      assert( ifc );
+      ASSERT( ifc );
       //cout << "InterFoldCache\n";
       for( i=0; i<ifc->subVecValid.size(); ++i )
 	ifc->subVecValid[i] = false;
@@ -269,9 +270,9 @@ double FoldLabelsChanger::noiseIFDescr( Clique* cl, double & outp,
 	ifc->inputVector.push_back( 0 );
       while( ifc->subVecValid.size() < InterFoldDescr::END )
 	ifc->subVecValid.push_back( false );
-      //cout << "cache mis à jour.\n";
+      //cout << "cache mis ï¿½ jour.\n";
     }
-  //else cout << "cache pas trouvé\n";
+  //else cout << "cache pas trouvï¿½\n";
   return( dist );
 }
 
@@ -297,13 +298,13 @@ double FoldLabelsChanger::noiseIFDescr2( Clique* cl, double & outp,
   if( ccho )
     {
       ifco = dynamic_cast<InterFoldCache *>( ccho );
-      assert( ifco );
+      ASSERT( ifco );
     }
 
   if( cch )
     {
       ifc = dynamic_cast<InterFoldCache *>( cch );
-      assert( ifc );
+      ASSERT( ifc );
       for( i=0; i<ifc->subVecValid.size(); ++i )
 	ifc->subVecValid[i] = false;
     }
@@ -517,7 +518,7 @@ double FoldLabelsChanger::edgeDist( Vertex* v, const string & oldlabel,
 double FoldLabelsChanger::output( double, double dist )
 {
   //  return( 4. / (1. + exp( -( dist <7000 ? dist : 7000 )/100 )) -3. );
-  // celui-ci répond entre 0 et 1
+  // celui-ci rï¿½pond entre 0 et 1
   return( 2. / ( 1. + exp( - dist / 100 ) ) - 1. );
   // si besoin de couper avant underflow...
   // return( 2. / ( 1. + exp( -( dist < 10000 ? dist : 10000 ) / 100 )) - 1. );

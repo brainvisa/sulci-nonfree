@@ -12,6 +12,7 @@
  */
 
 #include <si/learner/selectiveLearner.h>
+#include <cartobase/exception/assert.h>
 #include <iostream>
 #include <assert.h>
 
@@ -38,7 +39,7 @@ void SelectiveLearner::initRegexp()
 
   getProperty( "pattern", pattern );
   cout << "SelectiveLearner pattern : " << pattern << endl;
-  assert( !regcomp( &_filter, pattern.c_str(), REG_NOSUB | REG_EXTENDED ) );
+  ASSERT( !regcomp( &_filter, pattern.c_str(), REG_NOSUB | REG_EXTENDED ) );
   _ready = true;
 }
 
@@ -63,7 +64,7 @@ bool SelectiveLearner::checkClique( const Clique* cl )
       //	   << endl;
       return( true );
     }
-  //cout << "check clique: attribute " << attname << " loupé\n";
+  //cout << "check clique: attribute " << attname << " loupï¿½\n";
   return( false );
 }
 
@@ -79,7 +80,7 @@ void SelectiveLearner::process(LearnParam *lp)
   for( il=begin(); il!=fl; ++il )
     {
       lrn = dynamic_cast<Learner *>( *il );
-      assert( lrn != 0 );
+      ASSERT( lrn != 0 );
       lrn->process(lp);
     }
 }
@@ -96,7 +97,7 @@ void SelectiveLearner::process(LearnConstParam *lp)
   for( il=begin(); il!=fl; ++il )
     {
       lrn = dynamic_cast<ConstLearner *>( *il );
-      assert( lrn != 0 );
+      ASSERT( lrn != 0 );
       lrn->process(lp);
     }
 }

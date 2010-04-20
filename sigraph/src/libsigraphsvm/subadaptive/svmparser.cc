@@ -17,6 +17,7 @@
 #include <graph/tree/tree.h>
 #include <cartobase/stream/fileutil.h>
 #include <datamind/libsvm/libsvm.h>
+#include <cartobase/exception/assert.h>
 
 using namespace sigraph;
 using namespace carto;
@@ -41,7 +42,7 @@ void SvmSAParser::buildSubSvm( AttributedObject* parent, Tree* ao,
 	      AdaptiveLeaf	*adp;
 	      string		wrk, evl, name;
 	      parent->getProperty( "pointer", mod );
-	      assert( adp = dynamic_cast<AdaptiveLeaf*>( mod ) );
+	      ASSERT( adp = dynamic_cast<AdaptiveLeaf*>( mod ) );
 	      parent->getProperty( SIA_WORK, wrk );
 	      parent->getProperty( SIA_EVAL, evl );
 	      ao->getProperty( "name", name );
@@ -54,9 +55,9 @@ void SvmSAParser::buildSubSvm( AttributedObject* parent, Tree* ao,
 		{
 		  string	str;
 
-		  //	Réseau
+		  //	Rï¿½seau
 		  ao->getProperty( "net", str );
-		  //	nom du fichier réseau
+		  //	nom du fichier rï¿½seau
 		  string	file = FileUtil::dirname( filename );
                   if( !file.empty() )
                     file += FileUtil::separator();

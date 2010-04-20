@@ -15,6 +15,7 @@
 #include <si/model/model.h>
 #include <si/fold/fattrib.h>
 #include <graph/graph/edge.h>
+#include <cartobase/exception/assert.h>
 #include <iostream>
 
 using namespace sigraph;
@@ -67,12 +68,12 @@ bool BrainJuncDescr::makeVectorElements( const Clique* cl,
 	    cerr << att << endl;
 	}
       bool clique_has_no_attribute_label1 = true;
-      assert( !clique_has_no_attribute_label1 );
+      ASSERT( !clique_has_no_attribute_label1 );
     }
-  assert( cl->getProperty( "label2", label2 ) );
+  ASSERT( cl->getProperty( "label2", label2 ) );
 
 
-  //	Opérations sur le sillon avec un vrai label
+  //	Opï¿½rations sur le sillon avec un vrai label
 
   string	label;
 
@@ -210,7 +211,7 @@ bool BrainJuncDescr::hasChanged( const Clique* cl,
 	  return( true );				// non-void
       }
 
-  return( false );	// si rien n'a changé, on ne recalcule pas
+  return( false );	// si rien n'a changï¿½, on ne recalcule pas
 }
 
 

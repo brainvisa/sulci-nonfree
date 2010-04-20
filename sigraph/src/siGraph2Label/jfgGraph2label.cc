@@ -10,6 +10,7 @@
 #include <aims/getopt/getopt2.h>
 #include <list>
 #include <vector>
+#include <cartobase/exception/assert.h>
 #include <cartobase/smart/rcptr.h>
 
 using namespace sigraph;
@@ -99,7 +100,7 @@ int main( int argc, const char** argv )
         {
           vector<int>	dims;
           vector<float>	vs;
-          assert( fg->getProperty( "boundingbox_max", dims ) 
+          ASSERT( fg->getProperty( "boundingbox_max", dims ) 
                   && dims.size() >= 3 );
           if( !fg->getProperty( "voxel_size", vs ) || vs.size() < 3 )
             {

@@ -21,6 +21,7 @@
 #include <aims/getopt/getopt2.h>
 #include <aims/selection/selection.h>
 #include <aims/io/selectionr.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/stream/sstream.h>
 #include <cartobase/object/sreader.h>
 #include <iostream>
@@ -441,8 +442,8 @@ int main( int argc, const char** argv )
         for( ic=cs.begin(), ec=cs.end(); ic!=ec; ++ic )
           {
             modAO = mf.selectModel( *ic );
-            assert( modAO );
-            assert( modAO->getProperty( SIA_MODEL, mod ) );
+            ASSERT( modAO );
+            ASSERT( modAO->getProperty( SIA_MODEL, mod ) );
             if( !seltr || seltr->checkAdap( modAO, 0 ) )
               {
                 if( !(*ic)->getProperty( SIA_LABEL, modname ) )

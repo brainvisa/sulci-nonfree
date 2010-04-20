@@ -13,6 +13,7 @@
 #include <graph/graph/graph.h>
 #include <graph/graph/greader.h>
 #include <graph/graph/gwriter.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/object/sreader.h>
 #include <cartobase/plugin/plugin.h>
 #include <aims/def/path.h>
@@ -92,9 +93,9 @@ int main( int argc, char** argv )
 
       for( iv1=gunnamed.begin(); iv1!=fv1; ++iv1 )
 	{
-	  assert( (*iv1)->getProperty( "index", id ) );
+	  ASSERT( (*iv1)->getProperty( "index", id ) );
 	  sv = gnamed.getVerticesWith( "index", id );
-	  assert( sv.size() < 2 );
+	  ASSERT( sv.size() < 2 );
 	  if( sv.empty() && !hasNotFound )
 	    {
 	      char	c;

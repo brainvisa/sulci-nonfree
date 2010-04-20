@@ -22,6 +22,7 @@
 #include <aims/getopt/getopt2.h>
 #include <graph/tree/tree.h>
 #include <graph/tree/twriter.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/object/sreader.h>
 #include <cartobase/stream/sstream.h>
 #include <vector>
@@ -222,7 +223,7 @@ int main( int argc, const char** argv )
           pos = names[i].find( '.' );
           if( pos != string::npos )
             names[i].erase( pos, names[i].size() - pos );
-          // effacer préfixe Base ou Auto
+          // effacer prï¿½fixe Base ou Auto
           pos = names[i].rfind( "Auto" );
           if( pos == string::npos )
             pos = names[i].rfind( "Base" );
@@ -246,7 +247,7 @@ int main( int argc, const char** argv )
           tr.translate( gr[i], "label", "label" );
         }
 
-      //	arbre de résultats
+      //	arbre de rï¿½sultats
       Tree			errTr( true, "siErrorStats" );
       Graph::const_iterator	iv, fv;
       string		label, name;
@@ -352,7 +353,7 @@ int main( int argc, const char** argv )
 
           nfld = npG = 0;
 
-          //	erreurs graphe par graphe sur les labels rencontrés
+          //	erreurs graphe par graphe sur les labels rencontrï¿½s
           for( it=usedTrees.begin(); it!=ft; ++it )
             {
               t = *it;
@@ -394,7 +395,7 @@ int main( int argc, const char** argv )
               t->getProperty( "adds_vector", vadd );
               t->getProperty( "rejects_vector", vrej );
               t->getProperty( "sizes_vector", vsize );
-              assert( add + rej + com > 0 );
+              ASSERT( add + rej + com > 0 );
               if( ncom + nrej != 0 )
                 {
                   ++nfld;
@@ -466,7 +467,7 @@ int main( int argc, const char** argv )
           tg->setProperty( "partly_recogn_folds", npG );
           tg->setProperty( "folds_count", nfld );
 
-          // mettre à jour les arbres inutilisés (sillons pas présents)
+          // mettre ï¿½ jour les arbres inutilisï¿½s (sillons pas prï¿½sents)
           for( imt=mtr.begin(), fmt=mtr.end(); imt!=fmt; ++imt )
             if( usedTrees.find( (*imt).second ) == ft )
               {
@@ -488,17 +489,17 @@ int main( int argc, const char** argv )
       for( imt=mtr.begin(), fmt=mtr.end(); imt!=fmt; ++imt )
         {
           t = (*imt).second;
-          assert( t->getProperty( "graphs_count", ngraphs ) );
-          assert( ngraphs > 0 );
-          assert( t->getProperty( "mean_common", mcom ) );
-          assert( t->getProperty( "mean_added", madd ) );
-          assert( t->getProperty( "mean_rejected", mrej ) );
-          assert( t->getProperty( "sigma_common", scom ) );
-          assert( t->getProperty( "sigma_added", sadd ) );
-          assert( t->getProperty( "sigma_rejected", srej ) );
-          assert( t->getProperty( "mean_error", merr ) );
-          assert( t->getProperty( "max_error", Merr ) );
-          assert( t->getProperty( "sigma_error", serr ) );
+          ASSERT( t->getProperty( "graphs_count", ngraphs ) );
+          ASSERT( ngraphs > 0 );
+          ASSERT( t->getProperty( "mean_common", mcom ) );
+          ASSERT( t->getProperty( "mean_added", madd ) );
+          ASSERT( t->getProperty( "mean_rejected", mrej ) );
+          ASSERT( t->getProperty( "sigma_common", scom ) );
+          ASSERT( t->getProperty( "sigma_added", sadd ) );
+          ASSERT( t->getProperty( "sigma_rejected", srej ) );
+          ASSERT( t->getProperty( "mean_error", merr ) );
+          ASSERT( t->getProperty( "max_error", Merr ) );
+          ASSERT( t->getProperty( "sigma_error", serr ) );
 
           mass = mcom + mrej;
           if( mass == 0 )
@@ -517,7 +518,7 @@ int main( int argc, const char** argv )
           scom = scom / ng - mcom * mcom;
           if( scom < 0 )
             {
-              cerr << "sigma négatif: " << scom << ", taille : " << mcom 
+              cerr << "sigma nï¿½gatif: " << scom << ", taille : " << mcom 
                    << endl;
               scom = 0;
             }
@@ -558,7 +559,7 @@ int main( int argc, const char** argv )
 
       errTr.setProperty( "graphs_count", (int) ng );
 
-      //	si graphe modèle: mettre aussi les énergies et les poids
+      //	si graphe modï¿½le: mettre aussi les ï¿½nergies et les poids
       if( frg )
         {
           float			en, wt, err, wte;

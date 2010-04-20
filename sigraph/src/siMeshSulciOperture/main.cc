@@ -28,6 +28,7 @@
 #include <si/global/global.h>
 #include <aims/data/data.h>
 #include <aims/bucket/bucket.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/smart/rcptr.h>
 #include <cartobase/plugin/plugin.h>
 #include <iomanip>
@@ -130,12 +131,12 @@ int main( int argc, char** argv )
   //
   cout << "reading volume info\n";
   Finder	f;
-  assert( f.check( mrifile ) );
+  ASSERT( f.check( mrifile ) );
   const PythonHeader	*hd 
     = dynamic_cast<const PythonHeader *>( f.header() );
-  assert( hd );
+  ASSERT( hd );
   vector<int>   bb;
-  assert( hd->getProperty( "volume_dimension", bb ) );
+  ASSERT( hd->getProperty( "volume_dimension", bb ) );
   
  
   
@@ -174,7 +175,7 @@ int main( int argc, char** argv )
       fr >> fg;
       fg.loadBuckets( gname, true );
      
-      assert( fg.getProperty( "voxel_size", vsz ) );
+      ASSERT( fg.getProperty( "voxel_size", vsz ) );
       surface_vol.setSizeXYZT( vsz[0], vsz[1], vsz[2], 1. );
       surface_vol = 0;
       surface_vol.fillBorder(0);
@@ -199,7 +200,7 @@ int main( int argc, char** argv )
       surface_vol = surface_vol.clone();
       for( iv=fg.begin(); iv!=fv; ++iv )
 	{
-	  assert( (*iv)->getProperty( "name", name ) );
+	  ASSERT( (*iv)->getProperty( "name", name ) );
 	  i = trans[name];
 	  if( i != 0 )
 	    {

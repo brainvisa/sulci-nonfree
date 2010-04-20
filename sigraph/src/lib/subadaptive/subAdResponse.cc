@@ -1,6 +1,5 @@
 #include <si/subadaptive/subAdaptive.h>
 #include <si/subadaptive/subAdResponse.h>
-#include <assert.h>
 #include <iostream>
 
 using namespace sigraph;

@@ -25,6 +25,7 @@
 #include <si/optimizer/gridOptimizer.h> //FIXME
 #include <si/graph/attrib.h>
 #include <aims/def/path.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/stream/fileutil.h>
 #include <cartobase/exception/ioexcept.h>
 #include <cartobase/object/pythonwriter.h>
@@ -269,7 +270,7 @@ void MReader::buildTop( carto::AttributedObject* parent, Tree* ao,
       while( s.size() > 0 )
 	{
 	  while( s[0] == ' ' || s[0] == '\t' )
-	    s.erase( 0, 1 );	// vide début de chaîne
+	    s.erase( 0, 1 );	// vide dï¿½but de chaï¿½ne
 	  string::size_type pos = s.find( ' ' );
 	  if( pos == string::npos )
 	    pos = s.size();
@@ -359,7 +360,7 @@ void MReader::buildConst( carto::AttributedObject* parent, Tree* ao,
   float		val;
 
   ao->setProperty( "pointer", (Model *) nm );
-  assert( ao->getProperty( "value", val ) );
+  ASSERT( ao->getProperty( "value", val ) );
   nm->setValue( val );
 
   parseModel( nm, parent, ao );

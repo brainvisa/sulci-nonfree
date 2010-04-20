@@ -4,6 +4,7 @@
 #include <si/finder/modelFinder.h>
 #include <si/model/mWriter.h>
 #include <si/graph/attrib.h>
+#include <cartobase/exception/assert.h>
 #include <iostream>
 
 using namespace sigraph;
@@ -15,7 +16,7 @@ SelectiveTrainer::SelectiveTrainer(MGraph & mg, Learner *learner,
 				    const string & pattern )
   : Trainer( mg, learner)
 {
-	assert(!regcomp(&_pattern, pattern.c_str(), REG_NOSUB | REG_EXTENDED));
+	ASSERT(!regcomp(&_pattern, pattern.c_str(), REG_NOSUB | REG_EXTENDED));
 }
 
 
@@ -34,7 +35,7 @@ void SelectiveTrainer::setFiltAttributes(const set<string> &atts)
 void SelectiveTrainer::setPattern( const string & pat )
 {
 	regfree(&_pattern);
-	assert(!regcomp(&_pattern, pat.c_str(), REG_NOSUB | REG_EXTENDED));
+	ASSERT(!regcomp(&_pattern, pat.c_str(), REG_NOSUB | REG_EXTENDED));
 }
 
 
@@ -48,7 +49,7 @@ SelectiveTrainer::dataBaseToCliquesModelMap(const set<CGraph *> &lrn)
 	Adaptive				*adap = NULL;
 	ModelFinder   				&mf = _mgraph.modelFinder();
 
-	//Regrouper les cliques selon leur modèle
+	//Regrouper les cliques selon leur modï¿½le
 	for (ig = lrn.begin(); ig != fg; ++ig)
 	{
 		const set<Clique*>		&cs = (**ig).cliques();
@@ -60,7 +61,7 @@ SelectiveTrainer::dataBaseToCliquesModelMap(const set<CGraph *> &lrn)
 
 			if(modV)
 			{
-				assert(modV->getProperty(SIA_MODEL, mod));
+				ASSERT(modV->getProperty(SIA_MODEL, mod));
 				adap = (Adaptive *) mod;
 				if(_usedAdap.find(adap) != _usedAdap.end() ||
 					checkAdap(modV, adap))

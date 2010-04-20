@@ -15,6 +15,7 @@
 #include <si/fold/fattrib.h>
 #include <si/fold/foldFakeRel.h>
 #include <cartobase/stream/fileutil.h>
+#include <cartobase/exception/assert.h>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -77,7 +78,7 @@ void FRGraph::addEdges( const Graph & gr, const Model* mod )
     gcnt = 0;
   setProperty( SIA_NBASEGRAPHS, gcnt+1 );
 
-  //	mémoriser les anciens nombres d'occurence des relations
+  //	mï¿½moriser les anciens nombres d'occurence des relations
   for( ime=((const FRGraph *) this)->edges().begin(), 
 	 fme=((const FRGraph *) this)->edges().end(); ime!=fme; ++ime )
     {
@@ -93,7 +94,7 @@ void FRGraph::addEdges( const Graph & gr, const Model* mod )
     {
       cout << "\b\b\b\b\b" << setw( 5 ) << i << flush;
       mver = *iv;
-      assert( mver->getProperty( SIA_LABEL, label ) );
+      ASSERT( mver->getProperty( SIA_LABEL, label ) );
       set<Vertex *>		sv = gr.getVerticesWith( SIA_LABEL, label );
       map<string, Edge *>	done;
 
@@ -115,27 +116,27 @@ void FRGraph::addEdges( const Graph & gr, const Model* mod )
 	// chaque relation de chaque noeud
 	for( ie=(*is)->begin(), fe=(*is)->end(); ie!=fe; ++ie )
 	  if( (*ie)->getSyntax() != SIA_HULLJUNCTION_SYNTAX )
-	    // (pas de modèle pour les jonctions à la boîte externe)
+	    // (pas de modï¿½le pour les jonctions ï¿½ la boï¿½te externe)
 	    {
 	      // trouver la destination du lien
 	      iv2 = (*ie)->begin();
 	      if( *iv2 == *is )
 		++iv2;	// normalement c'est un graphe binaire
-	      assert( (*iv2)->getProperty( SIA_LABEL, label2 ) );
+	      ASSERT( (*iv2)->getProperty( SIA_LABEL, label2 ) );
 	      // si le lien n'existe pas encore
 	      if( label2 != label )
 		{
 		  if( (im = done.find( label2 )) == done.end() )
 		    {
 		      noadd = false;
-		      // dans les liens du modèle
+		      // dans les liens du modï¿½le
 		      for( ism=(*iv)->begin(), fsm=(*iv)->end(); ism!=fsm; 
 			   ++ism )
 			{
 			  iv3 = (*ism)->begin();
 			  if( *iv3 == *iv )
 			    ++iv3;
-			  assert( (*iv3)->getProperty( SIA_LABEL, label3 ) );
+			  ASSERT( (*iv3)->getProperty( SIA_LABEL, label3 ) );
 			  if( label3 == label2 )
 			    {
 			      noadd = true;
@@ -150,11 +151,11 @@ void FRGraph::addEdges( const Graph & gr, const Model* mod )
 
 		      if( noadd )
 			edg = *ism;
-		      else	// pas trouvé: il faut ajouter
+		      else	// pas trouvï¿½: il faut ajouter
 			{
 			  set<Vertex *> dest = getVerticesWith( SIA_LABEL, 
 								label2 );
-			  assert( dest.size() == 1 );
+			  ASSERT( dest.size() == 1 );
 			  cout << label << " <-> " << label2 << endl;
 			  edg = makeEdge( *iv, *dest.begin(), label, label2, 
 					  mod );
@@ -162,7 +163,7 @@ void FRGraph::addEdges( const Graph & gr, const Model* mod )
 
 		      done[ label2 ] = edg;
 		    }
-		  else	// déjà dans la liste
+		  else	// dï¿½jï¿½ dans la liste
 		    {
 		      if( !(*im).second->getProperty( SIA_OCCURENCE_COUNT, 
 						       cnt ) )
@@ -195,7 +196,7 @@ void FRGraph::addEdges( const Graph & gr, const Model* mod )
       cnt = oldc + cnt/2;
       edg->setProperty( SIA_OCCURENCE_COUNT, cnt );
       if( newr )	// si relation nouvelle, elle n'avait pas d'instance
-	noins += gcnt;	// pour tous les graphes précédents de la base
+	noins += gcnt;	// pour tous les graphes prï¿½cï¿½dents de la base
       else
 	edg->removeProperty( "occurence_copy" );
       if( noins > 0 )

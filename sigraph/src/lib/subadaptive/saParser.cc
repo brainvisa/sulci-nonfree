@@ -9,7 +9,6 @@
  *
  */
 
-#include <assert.h>
 #include <si/subadaptive/saParser.h>
 #include <si/subadaptive/subAdMlp.h>
 #include <si/subadaptive/subAdLogGauss.h>
@@ -120,7 +119,11 @@ void SAParser::buildSubMlp( AttributedObject* parent, Tree* ao,
 	      AdaptiveLeaf	*adp;
 	      string		wrk, evl, wrkm, evlm, name;
 	      parent->getProperty( "pointer", mod );
-	      assert( adp = dynamic_cast<AdaptiveLeaf*>( mod ) );
+	      adp = dynamic_cast<AdaptiveLeaf*>( mod );
+	      if ( ! adp ) 
+	      {
+	        throw runtime_error( "Internal error: dynamic cast failed" );
+	      }
 	      parent->getProperty( SIA_WORK, wrk );
 	      parent->getProperty( SIA_EVAL, evl );
 	      parent->getProperty( SIA_WORKMEMO, wrkm );
@@ -202,7 +205,10 @@ void SAParser::parseSubAd( AttributedObject*, Tree* t,
   t->getProperty( SIA_SIGMA, sig );
   t->getProperty( SIA_MEAN, mean );
 
-  assert( sig.size() == mean.size() );
+  if ( sig.size() != mean.size() )
+  {
+    throw runtime_error( "Internal error: sig and mean have different sizes" );
+  }
 
   for( i=0; i< mean.size(); ++i )
     {
@@ -336,7 +342,11 @@ void SAParser::buildSubGauss( AttributedObject* parent, Tree* ao,
 	      AdaptiveLeaf	*adp;
 	      string		wrk, evl, name;
 	      parent->getProperty( "pointer", mod );
-	      assert( adp = dynamic_cast<AdaptiveLeaf*>( mod ) );
+	      adp = dynamic_cast<AdaptiveLeaf*>( mod );
+	      if ( ! adp ) 
+	      {
+	        throw runtime_error( "Internal error: dynamic cast failed" );
+	      }
 	      parent->getProperty( "work", wrk );
 	      parent->getProperty( "eval", evl );
 	      ao->getProperty( "name", name );
@@ -481,7 +491,11 @@ void SAParser::buildSubMixGauss( AttributedObject* parent, Tree* ao,
 	      AdaptiveLeaf	*adp;
 	      string		wrk, evl, name;
 	      parent->getProperty( "pointer", mod );
-	      assert( adp = dynamic_cast<AdaptiveLeaf*>( mod ) );
+	      adp = dynamic_cast<AdaptiveLeaf*>( mod );
+	      if ( ! adp ) 
+	      {
+	        throw runtime_error( "Internal error: dynamic cast failed" );
+	      }
 	      parent->getProperty( "work", wrk );
 	      parent->getProperty( "eval", evl );
               ao->setProperty( "parent", (AttributedObject *) parent);

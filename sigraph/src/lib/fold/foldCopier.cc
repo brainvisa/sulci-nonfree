@@ -4,6 +4,7 @@
 #include <si/fold/fattrib.h>
 #include <si/graph/cgraph.h>
 #include <si/graph/vertexclique.h>
+#include <cartobase/exception/assert.h>
 
 using namespace sigraph;
 using namespace std;
@@ -31,9 +32,9 @@ void	FoldCopier::process(LearnConstParam *lp)
   set<Vertex *>		sv;
   CliqueCache		*cch = 0, *oldc;
 
-  assert( !isLeaf() );	// si pas d'enfants, ça sert à rien
+  ASSERT( !isLeaf() );	// si pas d'enfants, ï¿½a sert ï¿½ rien
 
-  assert( lp->clique->getProperty( SIA_GRAPH, bg ) );
+  ASSERT( lp->clique->getProperty( SIA_GRAPH, bg ) );
   lp->clique->getProperty( SIA_ORIGINAL_CACHE, cch );
 
   //cout << "FoldCopier : " << size() << " children\n";
@@ -58,18 +59,18 @@ void	FoldCopier::process(LearnConstParam *lp)
       copy = new VertexClique( *vcl );
       copy->setProperty( SIA_GRAPH, &cg );
       //	marquer la clique comme copie
-      //	( pour désactiver le cache éventuel du ModelFinder )
+      //	( pour dï¿½sactiver le cache ï¿½ventuel du ModelFinder )
       copy->setProperty( "is_copy", true );
       if( cch )
 	{
 	  if( copy->getProperty( SIA_CACHE, oldc ) )
 	    {
-	      //cout << "il y avait déjà un cache\n";
+	      //cout << "il y avait dï¿½jï¿½ un cache\n";
 	      delete oldc;
 	    }
 	  //cout << "copie du cache: " << cch << ", copy = " << copy << "\n";
 	  oldc = cch->clone();
-	  //cout << "cache créé\n";
+	  //cout << "cache crï¿½ï¿½\n";
 	  copy->setProperty( SIA_CACHE, oldc );
 	  //cout << "copie du cache OK\n";
 	}
@@ -84,15 +85,15 @@ void	FoldCopier::process(LearnConstParam *lp)
 
       //cout << "Copy clique : " << copy->size() << " noeuds\n";
       lrn = dynamic_cast<Learner *>( *it );
-      assert( lrn );
+      ASSERT( lrn );
       LearnParam lp2(*lp);
       lp2.clique = copy;
       lrn->process(&lp2);
-      //cout << "FoldCopier::process() effectué\n";
+      //cout << "FoldCopier::process() effectuï¿½\n";
       delete copy;
-      //cout << "copie effacée\n";
+      //cout << "copie effacï¿½e\n";
       cg.clear();
-      //cout << "graphe temporaire nettoyé\n";
+      //cout << "graphe temporaire nettoyï¿½\n";
     }
 }
 

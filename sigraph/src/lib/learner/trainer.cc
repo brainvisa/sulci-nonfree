@@ -12,6 +12,7 @@
 #include <si/model/adaptive.h>
 #include <si/model/adaptiveLeaf.h>
 #include <si/model/topAdaptive.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/stream/fileutil.h>
 
 
@@ -103,7 +104,7 @@ Trainer::dataBaseToCliquesModelMap(const set<CGraph *> &lrn)
 
 			if(modV)
 			{
-				assert(modV->getProperty(SIA_MODEL, mod));
+				ASSERT(modV->getProperty(SIA_MODEL, mod));
 				(*cl)[mod].push_front(*ic);
 			}
 		}

@@ -17,6 +17,7 @@
 #include <aims/io/selectionr.h>
 #include <graph/tree/tree.h>
 #include <graph/tree/treader.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/object/sreader.h>
 #include <iostream>
 #include <fstream>
@@ -78,7 +79,7 @@ bool FoldLabelsTranslator::readJFM95( const string & filename )
 		  (*this)[ sillR ] = sillR;
 		  (*this)[ sillL2 ] = sillL;
 		  (*this)[ sillR2 ] = sillR;
-		  //cout << sill << " inchangé\n";
+		  //cout << sill << " inchangï¿½\n";
 		}
 	      else if( string( trans ) != SIV_VOID_LABEL )
 		{
@@ -172,11 +173,11 @@ bool FoldLabelsTranslator::makeFromModelJFM95( const MGraph & mg,
   set<string>			allowed;
   string			label;
 
-  //	liste des labels du modèle
+  //	liste des labels du modï¿½le
 
   for( im=mg.begin(); im!=fm; ++im )
     {
-      assert( (*im)->getProperty( SIA_LABEL, label ) );
+      ASSERT( (*im)->getProperty( SIA_LABEL, label ) );
       allowed.insert( label );
     }
 
@@ -184,19 +185,19 @@ bool FoldLabelsTranslator::makeFromModelJFM95( const MGraph & mg,
   set<string>		toRemove;
   set<string>::iterator	is, fs=allowed.end();
 
-  //	marquer ceux à enlever (qui n'ont pas de correspondance dans le MGraph)
+  //	marquer ceux ï¿½ enlever (qui n'ont pas de correspondance dans le MGraph)
 
   for( il=begin(); il!=fl; ++il )
     if( allowed.find( (*il).second ) == fs )
       {
-	//cout << "pas de modèle pour " << (*il).second << endl;
+	//cout << "pas de modï¿½le pour " << (*il).second << endl;
 	toRemove.insert( (*il).first );
       }
 
   //	enlever
 
   //cout << "\nnb : " << size() << endl;
-  //cout << "à enlever : " << toRemove.size() << endl;
+  //cout << "ï¿½ enlever : " << toRemove.size() << endl;
   for( is=toRemove.begin(), fs=toRemove.end(); is!=fs; ++is )
     erase( find( *is ) );
   //cout << "reste : " << size() << " labels\n\n";
@@ -213,11 +214,11 @@ bool FoldLabelsTranslator::makeFromModelHierarchy( const MGraph & mg,
   set<string>			allowed;
   string			label;
 
-  //	liste des labels du modèle
+  //	liste des labels du modï¿½le
 
   for( im=mg.begin(); im!=fm; ++im )
     {
-      assert( (*im)->getProperty( SIA_LABEL, label ) );
+      ASSERT( (*im)->getProperty( SIA_LABEL, label ) );
       allowed.insert( label );
     }
 
@@ -315,7 +316,7 @@ string FoldLabelsTranslator::lookupLabel( string label ) const
       if( pos != string::npos )
 	{
 	  label2 = label.substr( 0, pos );
-	  //cout << "translate nom composé --- " << label2 << endl;
+	  //cout << "translate nom composï¿½ --- " << label2 << endl;
 	  im = find( label2 );
 	  label.erase( 0, pos+1 );
 	}

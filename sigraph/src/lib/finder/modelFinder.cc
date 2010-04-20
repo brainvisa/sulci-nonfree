@@ -14,6 +14,7 @@
 #include <si/graph/vertexclique.h>
 #include <si/graph/attrib.h>
 #include <aims/selection/selection.h>
+#include <cartobase/exception/assert.h>
 
 using namespace sigraph;
 using namespace aims;
@@ -39,7 +40,7 @@ double ModelFinder::potential( const Clique* cl )
   if( modV )
     {
       Model	*mod;
-      assert( modV->getProperty( "model", mod ) );
+      ASSERT( modV->getProperty( "model", mod ) );
       res = mod->prop( cl );
     }
   else
@@ -60,7 +61,7 @@ double ModelFinder::potential( const Clique* cl,
   if( modV )
     {
       Model	*mod;
-      assert( modV->getProperty( "model", mod ) );
+      ASSERT( modV->getProperty( "model", mod ) );
       res = mod->prop( cl, changes );
     }
   else
@@ -80,7 +81,7 @@ double ModelFinder::update( const Clique* cl )
   if( modV )
     {
       Model	*mod;
-      assert( modV->getProperty( "model", mod ) );
+      ASSERT( modV->getProperty( "model", mod ) );
       res = mod->update( cl );
     }
   else
@@ -101,7 +102,7 @@ double ModelFinder::update( const Clique* cl,
   if( modV )
     {
       Model	*mod;
-      assert( modV->getProperty( "model", mod ) );
+      ASSERT( modV->getProperty( "model", mod ) );
       res = mod->update( cl, changes );
     }
   else
@@ -121,7 +122,7 @@ double ModelFinder::printDescription( Clique *cl, bool naming )
   if( modV )
     {
       Model	*mod;
-      assert( modV->getProperty( "model", mod ) );
+      ASSERT( modV->getProperty( "model", mod ) );
       res = mod->printDescription( cl, naming );
     }
   else

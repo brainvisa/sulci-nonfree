@@ -17,6 +17,7 @@
 #include <si/fold/foldReader.h>
 #include <si/fold/fdParser.h>
 #include <aims/getopt/getopt2.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/exception/parse.h>
 #include <cartobase/object/sreader.h>
 #include <cartobase/stream/sstream.h>
@@ -166,7 +167,7 @@ int main( int argc, const char** argv )
         }
       cout << attset.size() << " attributes to scan" << endl;
 
-      //	Lecture de l'élément adaptatif
+      //	Lecture de l'ï¿½lï¿½ment adaptatif
 
       Model	*mod;
 
@@ -183,16 +184,16 @@ int main( int argc, const char** argv )
           throw;
         }
 
-      assert( mod );
+      ASSERT( mod );
 
-      //	Expression régulière
+      //	Expression rï¿½guliï¿½re
 
 
       regex_t	pat;
-      assert( !regcomp( &pat, params.pattern.c_str(), REG_NOSUB ) );
+      ASSERT( !regcomp( &pat, params.pattern.c_str(), REG_NOSUB ) );
 
 
-      //	Lecture graphe modèle
+      //	Lecture graphe modï¿½le
 
       FRGraph	rg;
       FrgReader	rr( params.mgraphFile );
@@ -253,7 +254,7 @@ int main( int argc, const char** argv )
                 break;
               }
 
-      //	Sauvegarde du modèle
+      //	Sauvegarde du modï¿½le
 
       FrgWriter	rw( params.mgraphFile );
 

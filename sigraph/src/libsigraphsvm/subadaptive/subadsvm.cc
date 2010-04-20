@@ -13,7 +13,6 @@
 #include <cartobase/stream/directory.h>
 #include <iostream>
 #include <vector>
-#include <assert.h>
 
 using namespace sigraph;
 using namespace carto;

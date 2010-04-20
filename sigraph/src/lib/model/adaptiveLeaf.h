@@ -15,13 +15,14 @@
 #include <si/optimizer/optimizer.h>
 #include <si/graph/attrib.h>
 #include <si/graph/mgraph.h>
+#include <cartobase/exception/assert.h>
 
 
 namespace sigraph
 {
   class Learner;
 
-  /**	Elément adaptatif terminal.
+  /**	Elï¿½ment adaptatif terminal.
    */
   class AdaptiveLeaf : public Adaptive
   {
@@ -40,14 +41,14 @@ namespace sigraph
     virtual ~AdaptiveLeaf();
     virtual Model* clone() const;
 
-    /**@name	Opérateurs */
+    /**@name	Opï¿½rateurs */
     //@{
     AdaptiveLeaf & operator = ( const AdaptiveLeaf & ad );
     //@}
 
     /**@name	Fonctions de base */
     //@{
-    /// Récupère une liste de cliques
+    /// Rï¿½cupï¿½re une liste de cliques
     virtual void getVectors(AdapDescr &ad, Learner &learner,
 				const std::list<Clique *> &cliques,
 				int cycle, int &cur_cycle);
@@ -58,27 +59,27 @@ namespace sigraph
 
     virtual std::string	getDataBaseName(const std::string &prefix);
 
-    ///	Propagation (réponse de l'Adaptive)
+    ///	Propagation (rï¿½ponse de l'Adaptive)
     virtual double prop( const Clique * );
     /* virtual double prop( const Clique* cl,
 			 const std::map<Vertex*, std::string> & changes ); */
     virtual bool doesOutputChange( const Clique* cl, 
                                    const std::map<Vertex*,
                                    std::string> & changes ) const;
-    ///	Evaluation (confiance dans la réponse au point donné)
+    ///	Evaluation (confiance dans la rï¿½ponse au point donnï¿½)
     virtual double eval( const Clique * );
     ///
     virtual void init();
-    ///	Ouvre le(s) fichier(s) de sauvegardes des données reçues
+    ///	Ouvre le(s) fichier(s) de sauvegardes des donnï¿½es reï¿½ues
     virtual bool openFile( const std::string & basename = "" );
-    ///	Ferme le(s) fichier(s) de sauvegardes des données reçues
+    ///	Ferme le(s) fichier(s) de sauvegardes des donnï¿½es reï¿½ues
     virtual void closeFile();
-    ///	Donne la liste des fichiers sous le modèle
+    ///	Donne la liste des fichiers sous le modï¿½le
     virtual void subFiles( const std::string & prefix, 
 			   std::set<std::string> & listNames ) const;
     ///	Taux d'erreur d'apprentissage global
     virtual double errorRate() const { return( _work->errorRate() ); }
-    ///	Taux d'erreur de généralisation
+    ///	Taux d'erreur de gï¿½nï¿½ralisation
     virtual double genErrorRate() const 
     { return( _work->genMeanErrorRate() ); }
     virtual double relianceWeight() const
@@ -87,26 +88,26 @@ namespace sigraph
     virtual double printDescription( Clique* cl, bool withnames );
     virtual bool checkLearnFinished();
     /**	fait ce qu'il faut pour "fermer" l'apprentissage (remet le dernier 
-	mémo...) */
+	mï¿½mo...) */
     virtual void forceLearnFinished();
     //@}
 
-    /**@name	Statistiques (pour normaliser les entrées) */
+    /**@name	Statistiques (pour normaliser les entrï¿½es) */
     //@{
     ///	Vide toutes les stats
     virtual void resetStats();
-    ///	Ajout à la base de statistiques
+    ///	Ajout ï¿½ la base de statistiques
     virtual void trainStats(Learner &learner,
 			const std::list<Clique *> &cliques);
     /// center and reduce vector according to _mean and _std
     virtual void centerAndReduce(std::vector<double> &vec);
     //@}
 
-    /**@name	Accès aux données */
+    /**@name	Accï¿½s aux donnï¿½es */
     //@{
-    /// Renvoit le descripteur adaptatif du modèle s'il existe ou NULL
+    /// Renvoit le descripteur adaptatif du modï¿½le s'il existe ou NULL
     AdapDescr *getAdapDescr(void);
-    ///	Accés à l'élément efficace (qui donne la sortie utile)
+    ///	Accï¿½s ï¿½ l'ï¿½lï¿½ment efficace (qui donne la sortie utile)
     SubAdaptive & workEl() const { return( *_work ); }
     /// Return Dimension Reductor element definition
     const DimReductor* dimreductor() const { return _dimreductor; }
@@ -126,17 +127,17 @@ namespace sigraph
     void setDimReductor( DimReductor* dimreductor );
     void setOptimizer( Optimizer* opt);
     SubAdaptive *workMemoEl() const { return _workMemo; }
-    ///	Accès à l'élément d'évaluation
+    ///	Accï¿½s ï¿½ l'ï¿½lï¿½ment d'ï¿½valuation
     SubAdaptive & evalEl() { return( *_eval ); }
-    ///	Accès à l'élément d'évaluation, version const
+    ///	Accï¿½s ï¿½ l'ï¿½lï¿½ment d'ï¿½valuation, version const
     const SubAdaptive & evalEl() const { return( *_eval ); }
-    ///	Remplacement de l'élément efficace
+    ///	Remplacement de l'ï¿½lï¿½ment efficace
     void setWork( const SubAdaptive & w );
-    ///	Remplacament de l'élément d'évaluation
+    ///	Remplacament de l'ï¿½lï¿½ment d'ï¿½valuation
     void setEval( const SubAdaptive & e );
-    ///	Remplacement de l'élément efficace mémorisé
+    ///	Remplacement de l'ï¿½lï¿½ment efficace mï¿½morisï¿½
     void setWorkMemo( const SubAdaptive & w );
-    ///	Remplacament de l'élément d'évaluation mémorisé
+    ///	Remplacament de l'ï¿½lï¿½ment d'ï¿½valuation mï¿½morisï¿½
     void setEvalMemo( const SubAdaptive & e );
     const CliqueDescr & cliqueDescr() const { return( *_cliqueDescr ); }
     CliqueDescr & cliqueDescr() { return( *_cliqueDescr ); }
@@ -151,9 +152,9 @@ namespace sigraph
     void buildTree( Tree & tr ) const;
     virtual void setBaseName( const std::string & basename );
 
-    ///	Mémorisation des modèles
+    ///	Mï¿½morisation des modï¿½les
     virtual void memorize();
-    ///	Retour aux modèles mémorisés
+    ///	Retour aux modï¿½les mï¿½morisï¿½s
     virtual void revert();
     State learnState() const { return( _lrnState ); }
     void setLearnState( State s );
@@ -164,9 +165,9 @@ namespace sigraph
     void update(sigraph::AdaptiveLeaf &ad);
 
   protected:
-    ///	Elément efficace
+    ///	Elï¿½ment efficace
     SubAdaptive		*_work;
-    ///	Elément d'évaluation
+    ///	Elï¿½ment d'ï¿½valuation
     SubAdaptive		*_eval;
     ///	Descripteur de clique
     CliqueDescr		*_cliqueDescr;
@@ -175,7 +176,7 @@ namespace sigraph
     ///	Memorisation des SubAdap
     SubAdaptive		*_workMemo;
     SubAdaptive		*_evalMemo;
-    ///	Mémorisation du nombre de données apprises
+    ///	Mï¿½morisation du nombre de donnï¿½es apprises
     unsigned		_ndataMemo;
     /// dimension reduction element
     DimReductor		*_dimreductor;
@@ -252,8 +253,8 @@ namespace sigraph
     if (!true_vector)
     {
         g = tm->mGraph();
-	assert(g->getProperty( SIA_NBASEGRAPHS, ng));
-	assert(ng);
+	ASSERT(g->getProperty( SIA_NBASEGRAPHS, ng));
+	ASSERT(ng);
 	ao->getProperty(SIA_NOINSTANCE_COUNT, p);
 
 	double        f = 1. - double(p)/ng;

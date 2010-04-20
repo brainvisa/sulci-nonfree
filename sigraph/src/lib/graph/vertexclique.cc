@@ -1,6 +1,7 @@
 #include <si/graph/vertexclique.h>
 #include <graph/graph/graph.h>
 #include <si/graph/cliqueCache.h>
+#include <cartobase/exception/assert.h>
 #include <iostream>
 
 using namespace sigraph;
@@ -189,7 +190,7 @@ unsigned VertexClique::connectivity( const set<Vertex *> & vx,
 				     set<CComponent *> *sc, 
 				     const set<string> & syntTypes )
 {
-  set<Vertex *>			done;	// ceux qui ont déjà traités
+  set<Vertex *>			done;	// ceux qui ont dï¿½jï¿½ traitï¿½s
   set<Vertex *>::const_iterator	iv, fv=vx.end(), notdone=done.end();
   Vertex			*v;
   string			label2;
@@ -259,13 +260,13 @@ Clique* VertexClique::deepCopy() const
   Graph		cg( "temporary_copy_graph" );
   Graph::const_iterator	ig, fg;
 
-  assert( getProperty( "graph", bg ) );
+  ASSERT( getProperty( "graph", bg ) );
   getProperty( "original_cache", cch );
 
   bg->extract( cg, begin(), end() );
   copy->setProperty( "graph", &cg );
   //	marquer la clique comme copie
-  //	( pour désactiver le cache éventuel du ModelFinder )
+  //	( pour dï¿½sactiver le cache ï¿½ventuel du ModelFinder )
   copy->setProperty( "is_copy", true );
   if( cch )
     {

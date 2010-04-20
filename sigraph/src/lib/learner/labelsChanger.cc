@@ -8,6 +8,7 @@
 #include <si/graph/vertexclique.h>
 #include <si/graph/cliqueCache.h>
 #include <aims/math/random.h>
+#include <cartobase/exception/assert.h>
 
 using namespace sigraph;
 using namespace carto;
@@ -25,7 +26,7 @@ double LabelsChanger::noise( Clique* cl, double & outp )
   MGraph			*mg;
   TopModel			*tm;
 
-  assert( bl );
+  ASSERT( bl );
   bl->getProperty( "model", mg );
 
   ModelFinder	& mf = mg->modelFinder();
@@ -40,11 +41,11 @@ double LabelsChanger::noise( Clique* cl, double & outp )
       set<string>	& sl = tm->significantLabels();
       const string	& vl = tm->voidLabel();
 
-      if( sl.size() != 0 && vl != "" )	// définis
+      if( sl.size() != 0 && vl != "" )	// dï¿½finis
 	return( constrainedNoise( cl, outp, sl, vl ) );
     }
 
-  return( openNoise( cl, outp ) );	// tous changements autorisés
+  return( openNoise( cl, outp ) );	// tous changements autorisï¿½s
 }
 
 
@@ -53,9 +54,9 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
 					const string & vl )
 {
   VertexClique::const_iterator	iv, fv=((const VertexClique *) cl)->end();
-  // noeuds potentiellement ajoutés, enlevés, changés
+  // noeuds potentiellement ajoutï¿½s, enlevï¿½s, changï¿½s
   set<Vertex *>			an, rn;
-  map<Vertex*, set<string>* >	cn;	// liste de labels prenables associée
+  map<Vertex*, set<string>* >	cn;	// liste de labels prenables associï¿½e
   string			label, oldlabel;
   set<string>::const_iterator	fsl = sl.end();
   Vertex			*v;
@@ -69,7 +70,7 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
   if( !cl->getProperty( "cache", cch ) )
     cl->getProperty( "original_cache", cch );
 
-  //	tri des noeuds de la clique en 3 catégories
+  //	tri des noeuds de la clique en 3 catï¿½gories
   for( iv=((const VertexClique *) cl)->begin(); iv!=fv; ++iv )
     {
       v = *iv;
@@ -79,8 +80,8 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
       else
 	{
 	  rn.insert( v );	// enlevable
-	  assert( v->getProperty( "possible_labels", plv ) );
-	  //	copie ordonnée (oui: pas optimal)
+	  ASSERT( v->getProperty( "possible_labels", plv ) );
+	  //	copie ordonnï¿½e (oui: pas optimal)
 	  set<string>	pl( plv->begin(), plv->end() );
 	  //	intersection des ensembles pl et sl
 	  inter = new set<string>;
@@ -100,8 +101,8 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
   unsigned	na, nr, nc;		// nombres de changements
 
   na = randomGen( an.size() );	// nb d'ajouts effectifs
-  nr = randomGen( rn.size() );	// nb d'enlevés + changés
-  if( na + nr == 0 )		// faut que ça fasse au moins 1
+  nr = randomGen( rn.size() );	// nb d'enlevï¿½s + changï¿½s
+  if( na + nr == 0 )		// faut que ï¿½a fasse au moins 1
     {
       if( an.size() == 0 )
 	++nr;
@@ -116,7 +117,7 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
     maxc = nr;
   nc = (unsigned ) ( UniformRandom( 0U, maxc ) );
 
-  nr -= nc;	// ceux qui sont changés ne sont pas enlevés
+  nr -= nc;	// ceux qui sont changï¿½s ne sont pas enlevï¿½s
 
   // bon, maintenant qu'on sait combien on change de chaque, il faut le faire
 
@@ -137,7 +138,7 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
 
   for( ic=cn.begin(), it=todo.begin(), ft=todo.end(), i=0; it!=ft; ++ic, ++i )
     {
-      if( i == *it )	// on change celui-là
+      if( i == *it )	// on change celui-lï¿½
 	{
 	  inter = (*ic).second;
 	  //	tirage du nouveau label
@@ -164,7 +165,7 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
 
   //cout << endl;
 
-  //	enlèvements de labels significatifs (-> void)
+  //	enlï¿½vements de labels significatifs (-> void)
 
   set<Vertex *>::iterator	ir;
 
@@ -176,7 +177,7 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
 
   for( ir=rn.begin(), i=0, it=todo.begin(), ft=todo.end(); it!=ft; ++it )
     {
-      //	positionner l'itérateur de noeuds
+      //	positionner l'itï¿½rateur de noeuds
       while( i < *it )
 	{
 	  ++i;
@@ -204,7 +205,7 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
 
   for( ir=an.begin(), i=0, it=todo.begin(), ft=todo.end(); it!=ft; ++it )
     {
-      //	positionner l'itérateur de noeuds
+      //	positionner l'itï¿½rateur de noeuds
       while( i < *it )
 	{
 	  ++i;
@@ -219,7 +220,7 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
 
       if( poss.size() != 0 )
 	{
-	  // tirage parmi ceux-là
+	  // tirage parmi ceux-lï¿½
 	  num = (unsigned) ( UniformRandom( (const unsigned &) 0U, 
                                         (const unsigned &) poss.size() - 1 ) );
 	  for( j=0, il=poss.begin(); j<num; ++j )
@@ -237,8 +238,8 @@ double LabelsChanger::constrainedNoise( Clique* cl, double &,
     }
   //cout << endl;
 
-  //	Bon, moi je trouve ça compliqué, tâtu et tout, comme fonction.
-  //	j'ai mal au crâne...
+  //	Bon, moi je trouve ï¿½a compliquï¿½, tï¿½tu et tout, comme fonction.
+  //	j'ai mal au crï¿½ne...
 
   return( changed ? fabs( dist ) : 0. );
 }

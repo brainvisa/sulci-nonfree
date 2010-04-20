@@ -14,6 +14,7 @@
 #ifdef SIGRAPH_DEBUG
 #include <typeinfo>
 #endif
+#include <cartobase/exception/assert.h>
 
 #define SI_USE_BUILTIN_FOLD
 
@@ -68,7 +69,7 @@ bool InterFoldDescr2::makeVector( const Clique* cl, vector<double> & vec,
       || cl->getProperty( SIA_ORIGINAL_CACHE, cch ) )
     {
       ifc = dynamic_cast<InterFoldCache *>( cch );
-      assert( ifc );
+      ASSERT( ifc );
       if( ifc->vecValid )
 	{
 	  vec = ifc->inputVector;
@@ -100,8 +101,8 @@ bool InterFoldDescr2::makeVectorElements( const Clique* cl,
   set<Edge *>			ed;
   set<Edge *>::const_iterator	ie, fe;
 
-  assert( cl->getProperty( SIA_LABEL1, label1 ) );
-  assert( cl->getProperty( SIA_LABEL2, label2 ) );
+  ASSERT( cl->getProperty( SIA_LABEL1, label1 ) );
+  ASSERT( cl->getProperty( SIA_LABEL2, label2 ) );
 
   set<Vertex *>	sl1 = vcl->getVerticesWith( SIA_LABEL, label1 );
   set<Vertex *> sl2 = vcl->getVerticesWith( SIA_LABEL, label2 );
@@ -485,7 +486,7 @@ bool InterFoldDescr2::makeVectorElements( const Clique* cl,
       for( ie2=v1->begin(), fe2=v1->end(); 
 	   ie2!=fe2 && (*ie2)->getSyntax() != SIA_HULLJUNCTION_SYNTAX; 
 	   ++ie2 ) {}
-      assert( ie2 != fe2 );	// il y en a toujours pcq il n'y a pas de
+      ASSERT( ie2 != fe2 );	// il y en a toujours pcq il n'y a pas de
       // rel. corticales entre les sillons pas externes
       edg = *ie2;
 #ifdef SI_USE_BUILTIN_FOLD
@@ -527,7 +528,7 @@ bool InterFoldDescr2::makeVectorElements( const Clique* cl,
 	  for( ie2=v2->begin(), fe2=v2->end(); 
 	       ie2!=fe2 && (*ie2)->getSyntax() != SIA_HULLJUNCTION_SYNTAX; 
 	       ++ie2 ) {}
-	  assert( ie2 != fe2 );
+	  ASSERT( ie2 != fe2 );
 	  edg = *ie2;
 #ifdef SI_USE_BUILTIN_FOLD
           hjedg = static_cast<HullJunctionEdge *>( edg );
@@ -818,7 +819,7 @@ void InterFoldDescr2::scanFold( const set<Vertex *> & sv, float & size,
 		    + id2*2 + ( lextr[indmax2].f ? 1 : 0 );
 		  id2 = ( id3*2 + ( (*il).f ? 1 : 0 ) ) * 100000
 		    + id4*2 + ( (*jl).f ? 1 : 0 );
-		  assert( id1 != id2 );	// � ne doit JAMAIS �re �al
+		  ASSERT( id1 != id2 );	// � ne doit JAMAIS �re �al
 		  if( id2 < id1 )
 		    accept = true;
 		}

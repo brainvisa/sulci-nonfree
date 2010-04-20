@@ -13,6 +13,7 @@
 #include <si/fold/oneLabelTrier.h>
 #include <si/graph/vertexclique.h>
 #include <aims/math/random.h>
+#include <cartobase/exception/assert.h>
 #include <vector>
 #include <math.h>
 #include <assert.h>
@@ -61,7 +62,7 @@ OneLabelTrier::constrainedNoiseOLT( Clique* cl, double &,
 {
   //cout << "constrainedNoiseOLT()\n";
   VertexClique::const_iterator	iv, fv=((const VertexClique *) cl)->end();
-  // noeuds potentiellement ajoutés, enlevés, changés
+  // noeuds potentiellement ajoutï¿½s, enlevï¿½s, changï¿½s
   set<Vertex *>			an, rn;
   string			label, oldlabel;
   set<string>::const_iterator	fsl = sl.end();
@@ -71,7 +72,7 @@ OneLabelTrier::constrainedNoiseOLT( Clique* cl, double &,
   // Distance a l'exemple d'origine
   double			dist = 0;
 
-  //	tri des noeuds de la clique en 3 catégories
+  //	tri des noeuds de la clique en 3 catï¿½gories
   for( iv=((const VertexClique *) cl)->begin(); iv!=fv; ++iv )
     {
       v = *iv;
@@ -81,7 +82,7 @@ OneLabelTrier::constrainedNoiseOLT( Clique* cl, double &,
       else
 	{
 	  rn.insert( v );	// enlevable
-	  assert( v->getProperty( "possible_labels", plv ) );
+	  ASSERT( v->getProperty( "possible_labels", plv ) );
 	}
     }
 
@@ -104,7 +105,7 @@ OneLabelTrier::constrainedNoiseOLT( Clique* cl, double &,
   bool					changed = false;
   //  int				toto;
 
-  //	enlèvements de labels significatifs (-> void)
+  //	enlï¿½vements de labels significatifs (-> void)
 
   set<Vertex *>::iterator	ir, fr;
 
@@ -133,7 +134,7 @@ OneLabelTrier::constrainedNoiseOLT( Clique* cl, double &,
 
   for( ir=an.begin(), i=0, it=todo.begin(), ft=todo.end(); it!=ft; ++it )
     {
-      //	positionner l'itérateur de noeuds
+      //	positionner l'itï¿½rateur de noeuds
       while( i < *it )
 	{
 	  ++i;
@@ -148,7 +149,7 @@ OneLabelTrier::constrainedNoiseOLT( Clique* cl, double &,
 
       if( poss.size() != 0 )
 	{
-	  // tirage parmi ceux-là
+	  // tirage parmi ceux-lï¿½
 	  num = unsigned( UniformRandom( (const unsigned &) 0U, 
                                          (const unsigned &) poss.size() 
                                          - 1 ) );
@@ -165,8 +166,8 @@ OneLabelTrier::constrainedNoiseOLT( Clique* cl, double &,
     }
   //cout << endl;
 
-  //	Bon, moi je trouve ça compliqué, tâtu et tout, comme fonction.
-  //	j'ai mal au crâne...
+  //	Bon, moi je trouve ï¿½a compliquï¿½, tï¿½tu et tout, comme fonction.
+  //	j'ai mal au crï¿½ne...
 
   return( changed ? dist : 0. );
 }

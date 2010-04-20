@@ -7,6 +7,7 @@
 #include <si/fold/fgraph.h>
 #include <graph/tree/tree.h>
 #include <cartobase/smart/rcptr.h>
+#include <cartobase/exception/assert.h>
 
 using namespace sigraph;
 using namespace aims;
@@ -88,9 +89,9 @@ void InertialDomainBox::learn( const Vertex* v, const Graph* g )
       int		pn;
       vector<float>	gc;
 
-      assert( v->getProperty( SIA_INERTIA, inert ) );
-      assert( v->getProperty( SIA_POINT_NUMBER, pn ) );
-      assert( v->getProperty( _gcattrib, gc ) );
+      ASSERT( v->getProperty( SIA_INERTIA, inert ) );
+      ASSERT( v->getProperty( SIA_POINT_NUMBER, pn ) );
+      ASSERT( v->getProperty( _gcattrib, gc ) );
       _inertia( 0, 0 ) += inert[0];
       _inertia( 0, 1 ) += inert[1];
       _inertia( 0, 2 ) += inert[2];
@@ -133,7 +134,7 @@ void InertialDomainBox::learnBucket( const Vertex* v, const Graph* g )
     for( ib = (*obck)[0].begin(), fb = (*obck)[0].end(); ib!=fb; ++ib )
       learnVoxel( rot, scale, transl, vsz, ib->first );
 
-  // points extrêmes des hull_junction
+  // points extrï¿½mes des hull_junction
 
   Vertex::const_iterator	ie, fe=v->end();
   Edge				*e;
@@ -175,7 +176,7 @@ void InertialDomainBox::learnVoxel( const vector<float> & rot,
 
 void InertialDomainBox::learnTalVoxel( double x2, double y2, double z2 )
 {
-  // Repère d'inertie
+  // Repï¿½re d'inertie
   changeRef( x2, y2, z2 );
 
   if( _npoints == 0 )
@@ -206,7 +207,7 @@ void InertialDomainBox::diagonalize()
   AimsEigen<float>	eigen;
   //eigen.setSymmetricMatrix();
   _eigenValues = eigen.doit( _rotation );
-  // vérifier que le repère est direct
+  // vï¿½rifier que le repï¿½re est direct
   AimsData<float>	pvec(3);
   pvec[0] = _rotation( 1, 0 ) *  _rotation( 2, 1 ) 
     - _rotation( 2, 0 ) *  _rotation( 1, 1 );
@@ -218,7 +219,7 @@ void InertialDomainBox::diagonalize()
       || fabs( pvec[1] - _rotation( 1, 2 ) ) > 1e-5 
       || fabs( pvec[2] - _rotation( 2, 2 ) ) > 1e-5 )
     {
-      cout << "repère indirect\n";
+      cout << "repï¿½re indirect\n";
       if( fabs( pvec[0] + _rotation( 0, 2 ) ) > 1e-5 
 	  || fabs( pvec[1] + _rotation( 1, 2 ) ) > 1e-5 
 	  || fabs( pvec[2] + _rotation( 2, 2 ) ) > 1e-5 )
@@ -241,13 +242,13 @@ void InertialDomainBox::diagonalize()
 	  t = _rotation( 2, 0 );
 	  _rotation( 2, 0 ) = _rotation( 2, 2 );
 	  _rotation( 2, 2 ) = t;
-	  //	et des valeurs propres associées
+	  //	et des valeurs propres associï¿½es
 	  t = _eigenValues[0];
 	  _eigenValues[0] = _eigenValues[2];
 	  _eigenValues[2] = t;
 	}
     }
-  else cout << "bon repère direct comme il faut\n";
+  else cout << "bon repï¿½re direct comme il faut\n";
 
   if( _npoints )
     {

@@ -28,6 +28,7 @@
 #include <aims/bucket/bucket.h>
 #include <aims/data/pheader.h>
 #include <graph/graph/graph.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/smart/rcptr.h>
 #include <cartobase/plugin/plugin.h>
 #include <fstream>
@@ -149,12 +150,12 @@ int main( int argc, char** argv )
   //
   cout << "reading volume info\n";
   Finder	f;
-  assert( f.check( volfile ) );
+  ASSERT( f.check( volfile ) );
   const PythonHeader	*hd 
   = dynamic_cast<const PythonHeader *>( f.header() );
-  assert( hd );
+  ASSERT( hd );
   vector<int>   bb;
-  assert( hd->getProperty( "volume_dimension", bb ) );
+  ASSERT( hd->getProperty( "volume_dimension", bb ) );
   
  
   
@@ -188,7 +189,7 @@ int main( int argc, char** argv )
       cout << "graph read\n";
 
       fg.getProperty( "anterior_commissure", CA );
-      assert( fg.getProperty( "voxel_size", vsz ) );
+      ASSERT( fg.getProperty( "voxel_size", vsz ) );
       bottom_vol.setSizeXYZT( vsz[0], vsz[1], vsz[2], 1. );
       bottom_vol = 0;
       bottom_vol.fillBorder(0);
@@ -272,7 +273,7 @@ int main( int argc, char** argv )
       Vertex::const_iterator ie, fe;
       for( iv=fg.begin(); iv!=fv; ++iv )
 	{
-	  assert( (*iv)->getProperty( "name", name ) );
+	  ASSERT( (*iv)->getProperty( "name", name ) );
 	  i = trans[name];
 	  if( i != 0 )
 	    {
@@ -311,7 +312,7 @@ int main( int argc, char** argv )
       surface_vol = bottom_vol.clone();
       for( iv=fg.begin(); iv!=fv; ++iv )
 	{
-	  assert( (*iv)->getProperty( "name", name ) );
+	  ASSERT( (*iv)->getProperty( "name", name ) );
 	  i = trans[name];
 	  if( i != 0 )
 	    {
@@ -348,7 +349,7 @@ int main( int argc, char** argv )
 
       for( iv=fg.begin(); iv!=fv; ++iv )
 	{
-	  assert( (*iv)->getProperty( "name", name ) );
+	  ASSERT( (*iv)->getProperty( "name", name ) );
 	  i = trans[name];
 	  if( i != 0 )
 	    {

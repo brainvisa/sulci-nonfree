@@ -19,6 +19,7 @@
 #include <si/fold/interFoldCache.h>
 #include <si/fold/fattrib.h>
 #include <aims/selection/selection.h>
+#include <cartobase/exception/assert.h>
 #include <iostream>
 #include <iomanip>
 
@@ -50,7 +51,7 @@ AttributedObject* FoldFinder::selectModel( const Clique* cl )
       return( (*ic).second );
     }
 
-  assert( cl->getProperty( SIA_MODEL_TYPE, mt ) );  // doit être pré-calculé
+  ASSERT( cl->getProperty( SIA_MODEL_TYPE, mt ) );  // doit être pré-calculé
   if( mt == SIV_RANDOM_VERTEX )
     {
       string	str;
@@ -242,7 +243,7 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
 	  cl1 = (*imc).second;
 	  cl1->getProperty( SIA_LABEL, label1 );
 	  sv = _mgraph.getVerticesWith( SIA_LABEL, label1 );
-	  assert( sv.size() == 1 );
+	  ASSERT( sv.size() == 1 );
 	  rv1 = *sv.begin();		//	random vertex de label label1
 
 	  for( jmc=imc; jmc!=fmc; ++jmc )
@@ -250,7 +251,7 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
 	      cl2 = (*jmc).second;
 	      cl2->getProperty( SIA_LABEL, label2 );
 	      sv = _mgraph.getVerticesWith( SIA_LABEL, label2 );
-	      assert( sv.size() == 1 );
+	      ASSERT( sv.size() == 1 );
 	      rv2 = *sv.begin();	//	random vertex de label label2
 	      se = rv1->edgesTo( rv2 );	//	relation existante ?
 

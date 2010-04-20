@@ -6,6 +6,7 @@
 #include <si/model/adaptive.h>
 #include <si/domain/adapDomain.h>
 #include <si/graph/attrib.h>
+#include <cartobase/exception/assert.h>
 #include <cartobase/stream/fileutil.h>
 #include <iostream>
 #include <stdio.h>
@@ -360,9 +361,9 @@ void MGraph::removeEdgesToVoid()
       //cout << i << "  ";
       iv = (*ie)->begin();
       remove = false;
-      assert( (*iv)->getProperty( SIA_LABEL, label1 ) );
+      ASSERT( (*iv)->getProperty( SIA_LABEL, label1 ) );
       ++iv;
-      assert( (*iv)->getProperty( SIA_LABEL, label2 ) );
+      ASSERT( (*iv)->getProperty( SIA_LABEL, label2 ) );
       if ( label1 == voidl )
 	remove = true;
       else
