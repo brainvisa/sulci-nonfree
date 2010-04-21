@@ -2,11 +2,11 @@ import os, numpy
 from soma import aims
 from sulci.common import io
 
-class Transformation(object): pass
+#class Transformation(object): pass
 
-class RigidTransformation(Transformation):
+class RigidTransformation(aims.Transformation3d):
 	def __init__(self, R, t):
-		Transformation.__init__(self)
+		aims.Transformation3d.__init__(self)
 		self._R = R
 		self._t = t
 
@@ -21,9 +21,9 @@ class RigidTransformation(Transformation):
 		motion = self.to_motion()
 		aims.Writer().write(motion, filename)
 
-class LocalRigidTransformations(Transformation):
+class LocalRigidTransformations(aims.Transformation3d):
 	def __init__(self, transformations):
-		Transformation.__init__(self)
+		aims.Transformation3d.__init__(self)
 		trs = []
 		for i, trans in enumerate(transformations):
 			if isinstance(trans, tuple):
@@ -41,9 +41,9 @@ class LocalRigidTransformations(Transformation):
 			filename = filenames[i]
 			trans.write(filename)
 
-class SulcusWiseRigidTransformations(Transformation):
+class SulcusWiseRigidTransformations(aims.Transformation3d):
 	def __init__(self, transformations=None):
-		Transformation.__init__(self)
+		aims.Transformation3d.__init__(self)
 		self._transformations = {}
 		if not transformations: return
 		for sulcus, trans in transformations.items():
