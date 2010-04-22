@@ -3,7 +3,7 @@ BRAINVISA_COPY_AND_INSTALL_HEADERS( _headers pysigraph headersTarget )
 add_library( pysigraph SHARED ${_sources} )
 add_dependencies( pysigraph ${headersTarget} )
 set_property( TARGET pysigraph PROPERTY VERSION ${${PROJECT_NAME}_VERSION} )
-target_link_libraries( pysigraph sigraph )
+target_link_libraries( pysigraph sigraph ${AIMS_PYAIMS_LIBRARIES} )
 BRAINVISA_INSTALL( TARGETS pysigraph
               DESTINATION lib
               COMPONENT ${PROJECT_NAME} )
