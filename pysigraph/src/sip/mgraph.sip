@@ -115,7 +115,7 @@ public:
   virtual ~MGWriter();
   virtual void write( const Graph & );
   virtual std::string dataDirectory( const Graph & ao ) const;
-  virtual void parseModel(const GraphObject &,
+  virtual void parseModel(const GraphObject & /NoCopy/,
 		const std::string & = "model_file",
 		const std::string & = "model");
 %MethodCode
