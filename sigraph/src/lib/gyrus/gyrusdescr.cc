@@ -45,18 +45,29 @@ bool GyrusDescr::makeVectorElements( const Clique* cl, vector<double> & vec,
   if( vcl->size() != 1 )
     {
       cerr << "Gyrus cliques should have 1 vertex, " << vcl->size() 
-           << " found here" << endl;
-      return false;
+           << " found here." << endl;
+      string label;
+      vcl->getProperty( "label", label );
+      cerr << "clique label: " << label << endl;
     }
 
-  Vertex	*v = *vcl->begin();
+  Vertex	*v;
 
   //	filling vector
 
-  float	area = 0, size = 0;
-  v->getProperty( "surface_area", area );
+  float	area = 0, size = 0, a, s;
+  VertexClique::const_iterator iv, ev = vcl->end();
+  for( iv=vcl->begin(); iv!=ev; ++iv )
+  {
+    v = *iv;
+    a = 0;
+    s = 0;
+    v->getProperty( "surface_area", a );
+    v->getProperty( "size", s );
+    area += a;
+    size += s;
+  }
   vec.push_back( area );
-  v->getProperty( "size", size );
   vec.push_back( size );
   vec.push_back( size / area );
 
