@@ -15,7 +15,7 @@
 #include <aims/io/io_g.h>
 #include <aims/math/math_g.h>
 #include <iomanip>
-#include <aims/getopt/getopt.h>
+#include <aims/getopt/getopt2.h>
 #include <aims/vector/vector.h>
 #include <aims/mesh/texture.h>
 #include <aims/io/reader.h>
@@ -41,96 +41,90 @@ using namespace aims::meshdistance;
 using namespace sigraph;
 using namespace carto;
 using namespace std;
- 
-typedef float float3[3];
 
-BEGIN_USAGE(usage)
-  "-------------------------------------------------------------------------",
-  "siParcellation   -i[nput] <grey/white mesh>                              ",
-  "                  -s[sulci] <input_texture>                              ",
-  "                  -g[raph] <output_gyri_graph>                           ",
-  "                  -m[odel] <gyri model >                                 ",
-  "                  -b[rain] <brain mesh >                                 ",
-  "                  -o[utput] <output_gyri_texture>                        ",
-  "                  -p[arcelvol] <output_gyri_volume>                      ",
-  "                  [-v[alue] <grey value in input_grey_white vol>]        ",
-  "                  [-V[olume] <input_grey_white volume>]                  ",
-  "                  [-T[ime] <input sulci texture time> default = 0]       ",
-  "                  [-t[raduction] <traduction_file>  ]                    ",
- "                   [--connexity ]                                         ",
- "                   [--3D ]                                                ",
-  "                  [-h[elp]]                                              ",
-  "-------------------------------------------------------------------------",
-  " Compute parcellation in sulci regions and gyri                          ",
-  " The input sulci texture must be defined by siMeshSulciProjection        ",
-  "-------------------------------------------------------------------------",
-  "     meshfilein          : input *.tri or *.mesh file                    ",
-  "     input_texture       : definition of the sulci texture (given by siMeshSulciProjection",
-  "	gyri model          : Choice of the sulcus/sulcus relations ('gyri.gyr')",
-  "     traduction_file     : correspondance label string->short_label      ",
-  "                           required by siParcellation.		    ",
-  "     connexity           : connexity or geodesic euclidean distance      ",
-  "     3D                  : compute 3D cortical ribbon gyrus graph            ",
-  "     output_vor_texture : output timetexture file (sulci and gyri texture)   ",
-  "     0: sulci, 1 : sulci regions, 2: gyri, 3: gyri & sulci  ", 
-  "-------------------------------------------------------------------------",
-END_USAGE
 
-  
-//
-// Usage
-//
-void Usage( void )
+int main( int argc, const char** argv )
 {
-  AimsUsage( usage );
-}
-
-
-int main( int argc, char** argv )
-{
-  char	*brainfile=0,*parcelvolfile=0,
-    *volfile=0, *graphfile = 0, 
-    *meshfile = 0, *intexfile = 0, 
-    *outtexfile = 0, *model=0,
-    *gyritraductionfile  = (char*)"gyritraduction.txt";
+  Reader<AimsSurfaceTriangle> triR;
+  Reader<AimsSurfaceTriangle> triB;
+  Reader<TimeTexture<short> > texR;
+  Writer<Graph> agw2;
+  Writer<TimeTexture<short> > texW;
+  Writer<AimsData<short> > imaW;
+  string model;
+  Reader<AimsData<short> > triGV;
   float dist = FLT_MAX;
-  map< set<short>,set<unsigned>,SetCompare<short> > 		label_sulci_Vert;
+  map< set<short>,set<unsigned>,SetCompare<short> > label_sulci_Vert;
   bool connexity = false, graph=false;
   unsigned	time=0;
-  char	*sulcitraductionfile = (char*)"sulcitraduction.txt";
+  string sulcitraductionfile = "sulcitraduction.txt";
+  string gyritraductionfile = "gyritraduction.txt";
   int val_domain = 100;
 
-  PluginLoader::load();
+  AimsApplication app( argc, argv, "Compute parcellation in sulci regions and "
+    "gyri. The input sulci texture must be defined by siMeshSulciProjection" );
 
-  //
-  // Parser of options
-  //
-  AimsOption opt[] = {
-    { 'h',"help"         ,AIMS_OPT_FLAG  ,( void* )Usage           ,AIMS_OPT_CALLFUNC,0},
-    { 'i',"input"        ,AIMS_OPT_STRING,&meshfile       ,0                ,1},
-    { 'b',"brain"        ,AIMS_OPT_STRING,&brainfile       ,0               ,0},
-    { 'o',"output"       ,AIMS_OPT_STRING,&outtexfile     ,0                ,1},
-    { 'g',"graph"        ,AIMS_OPT_STRING,&graphfile      ,0                ,1},
-    { 's',"sulci"        ,AIMS_OPT_STRING,&intexfile      ,0                ,1},
-    { 'p',"parcelvol"    ,AIMS_OPT_STRING,&parcelvolfile  ,0                ,0},
-    { 'v',"valdomain"    ,AIMS_OPT_INT   ,&val_domain     ,0                ,0},
-    { 'V',"volume"       ,AIMS_OPT_STRING,&volfile        ,0                ,0},
-    { 'm',"model"        ,AIMS_OPT_STRING,&model          ,0                ,1},
-    { ' ',"sulcitraduction"   ,AIMS_OPT_STRING,&sulcitraductionfile ,0                ,1},
-    { 'T',"Time"         ,AIMS_OPT_INT   ,&time           ,0                ,0},
-    { ' ',"connexity"    ,AIMS_OPT_FLAG  ,&connexity      ,0                ,0},    
-    { ' ',"gyritraduction"      ,AIMS_OPT_STRING,&gyritraductionfile   ,0                ,1},    
-    { ' ',"3D"       	 ,AIMS_OPT_FLAG  ,&graph          ,0                ,0},    
-    { 0  ,0              ,AIMS_OPT_END   ,0               ,0                ,0}};
+  app.addOption( triR, "-i", "grey/white mesh" );
+  app.alias( "--input", "-i" );
+  app.addOption( texR, "-s", "input_texture: definition of the sulci texture "
+    "(given by siMeshSulciProjection" );
+  app.alias( "--sulci", "-s" );
+  app.addOption( agw2, "-g", "output gyri graph" );
+  app.alias( "--graph", "-g" );
+  app.addOption( model, "-m", "gyri model: Choice of the sulcus/sulcus "
+    "relations ('gyri.gyr')" );
+  app.alias( "--model", "-m" );
+  app.addOption( texW, "-o", "output timetexture file (sulci and gyri "
+    "texture): 0: sulci, 1 : sulci regions, 2: gyri, 3: gyri & sulci" );
+  app.alias( "--output", "-o" );
+  app.addOption( triB, "-b", "brain mesh [used and required in 3D mode only]",
+                 true );
+  app.alias( "--brain", "-b" );
+  app.addOption( imaW, "-p", "output gyri volume [used in 3D mode only]",
+                 true );
+  app.alias( "--parcelvol", "-p" );
+  app.addOption( val_domain, "-v", "grey value in input_grey_white vol "
+    "[default: 100]", true );
+  app.alias( "--value", "-v" );
+  app.addOption( triGV, "-V", "input grey white volume [used and required in "
+    "3D mode only]", true );
+  app.alias( "--Volume", "-V" );
+  app.addOption( time, "-T", "input sulci texture time [default: 0]", true );
+  app.alias( "--Time", "-T" );
+  app.addOption( sulcitraductionfile, "--sulcitranslation", "sulci translation "
+    "file: correspondance label string->short_label "
+    "[default:\"sulcitraduction.txt\"]", true );
+  app.alias( "--sulcitraduction", "--sulcitranslation" );
+  app.addOption( gyritraductionfile, "--gyritranslation", "output gyri "
+    "translation file: correspondance label string->short_label. This file "
+    "will be written or completed if it already exists "
+    "[default:\"gyritraduction.txt\"]", true );
+  app.alias( "--gyritraduction", "--gyritranslation" );
+  app.addOption( connexity, "--connectivity", "use connectivity (true) or "
+    "geodesic euclidean distance (false) [default: false]", true );
+  app.alias( "--connexity", "--connectivity" );
+  app.addOption( graph, "--3D", "compute 3D cortical ribbon gyrus graph "
+    "[default: false]", true );
 
-  AimsParseOptions( &argc, argv, opt, usage );
+  try
+  {
+    app.initialize();
+  }
+  catch( user_interruption & )
+  {
+    return 0;
+  }
+  catch( exception & e )
+  {
+    cerr << e.what() << endl;
+    return 1;
+  }
 
   //
   // read triangulation
   //
   cout << "reading white triangulation   : " << flush;
   AimsSurfaceTriangle surface;
-  Reader<AimsSurfaceTriangle> triR( meshfile );
   triR >> surface;
   cout << "done" << endl;
  
@@ -139,7 +133,6 @@ int main( int argc, char** argv )
   //
   cout << "reading texture   : " << flush;
   TimeTexture<short>	inpTex; // objects def (labels >0)
-  Reader<TimeTexture<short> > texR( intexfile );
   texR >> inpTex; 
   cout << "done" << endl;
 
@@ -155,7 +148,7 @@ int main( int argc, char** argv )
   
   // read translation file
   cout << "Read translation file \n";
-  ifstream 	tf(sulcitraductionfile);
+  ifstream 	tf(sulcitraductionfile.c_str());
   if (!tf)
     {
       cout << "File " << (string)sulcitraductionfile << " missing. Please first use siMeshSulciProjection...\n";
@@ -180,7 +173,7 @@ int main( int argc, char** argv )
   cout << "Read gyri model file \n";
   set<set<short> > AllowedLabel;
   map<string,set<string> > GyriAndSulci;
-  GyriAndSulci = GyrusModel2GyriAndSulci(model);
+  GyriAndSulci = GyrusModel2GyriAndSulci(model.c_str());
   AllowedLabel = GyrusModel2SetOfSetOfSulci(GyriAndSulci,trans);
  
 
@@ -256,7 +249,6 @@ int main( int argc, char** argv )
   otex[2] = outTex[4];
   otex[3] = outTex[5];
   otex[4] =  outTex[3];
-  Writer<TimeTexture<short> >	texW( outtexfile );
   texW <<  otex ;
   cout << "done" << endl;
 
@@ -293,10 +285,10 @@ int main( int argc, char** argv )
   //Writing map betwen gyri label and gyr name
   
   std::map<short,string>::iterator iG,eG;
-  ofstream	namefile( gyritraductionfile );
+  ofstream	namefile( gyritraductionfile.c_str() );
   for( iG = GyriLabel2GyriName.begin(), eG = GyriLabel2GyriName.end() ; iG !=eG ; ++iG )
     namefile << iG->first << "\t" << iG->second << endl;
-  cout << "Write " << (string)gyritraductionfile << " file\n";
+  cout << "Write " << gyritraductionfile << " file\n";
     
   
 
@@ -306,29 +298,24 @@ int main( int argc, char** argv )
   Graph::iterator igr,egr;
   string name;
   std::map<string,float>::iterator ig, eg;
- 
-  string	base2( graphfile );
-  string::size_type	pos2 = base2.rfind( '/' );
-  if( pos2 != string::npos )
-    base2.erase( 0, pos2+1 );
-  pos2 = base2.rfind( '.' );
-  if( pos2 != string::npos )
-    base2.erase( pos2, base2.length() - pos2 );
-      base2 += ".data";
-      
+
+
   //3D gyri parcellation 
   if (graph)
     {
+      if( triB.fileName().empty() )
+        throw runtime_error( "--brain option is required in 3D mode" );
+      if( triGV.fileName().empty() )
+        throw runtime_error( "--Volume option is required in 3D mode" );
+
       TimeTexture<short> braintex;
 
-      cout << "Reading cortex volume   : " << volfile << endl;
+      cout << "Reading cortex volume   : " << triGV.fileName() << endl;
       AimsData<short> greyVol;
-      Reader<AimsData<short> > triGV( volfile );
       triGV >> greyVol;
 
       cout << "reading brain triangulation   : " << flush;
       AimsSurfaceTriangle brain;
-      Reader<AimsSurfaceTriangle> triB( brainfile );
       triB >> brain;
       cout << "done" << endl;
 
@@ -339,7 +326,7 @@ int main( int argc, char** argv )
       braintex[0] = VolumeParcellation2MeshParcellation(gyriVol,brain[0],0);
       t2g2.makeGraph(k,brain,braintex[0],GyriLabel2GyriName);
 
-      cout << "Computing the volumic gyrus graph " << graphfile << "\n";
+      cout << "Computing the volumic gyrus graph " << agw2.fileName() << "\n";
       Graph		*h = GraphManip::graphFromVolume(gyriVol,(short)0, &GyriLabel2GyriName);
       GraphManip::volume2Buckets(*h);
 
@@ -364,18 +351,17 @@ int main( int argc, char** argv )
             }
           else
             cerr << "Could not find the name of a gyrus \n " ; 
-	  
+
         }
-      
+
       string key = "name";
-      Graph *m = GraphManip::mergeGraph(key,g,k,true,true);
+      Graph *m = GraphManip::mergeGraph( key,g,k,true,false );
       m = GraphManip::mergeGraph(key,*m,*h);
-      m->setProperty( "filename_base", base2 );
+      m->setProperty( "filename_base", "*" );
 
       cout << "Write cortex ribbon gyri graph \n";
       try
         {
-          Writer<Graph>	agw2( graphfile  );
           agw2.write( *m );
         }
       catch( exception & e )
@@ -384,19 +370,20 @@ int main( int argc, char** argv )
           throw( e );
         } 
 
-      cout << "Write gyri volume\n";
-      Writer<AimsData<short> >	imaW( parcelvolfile );
-      imaW <<  gyriVol ;   
-  
+      if( !imaW.fileName().empty() )
+      {
+        cout << "Write gyri volume\n";
+        imaW <<  gyriVol ;
+      }
+
     }
   else
     {
-      Writer<Graph>	agw2( graphfile  );
       try
         {
             Graph *m;
             m = &g;
-            m->setProperty( "filename_base", base2 );
+            m->setProperty( "filename_base", "*" );
             agw2.write( *m );
         }
       catch( exception & e )
