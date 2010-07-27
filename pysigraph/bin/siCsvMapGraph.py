@@ -5,7 +5,12 @@ import anatomist.cpp as cpp
 from soma import aims
 import datamind.io.old_csvIO as io
 import os, sys, exceptions, numpy
-import qt
+if sys.modules.has_key( 'PyQt4' ):
+  USE_QT4=True
+  import PyQt4.QtCore as qt
+else:
+  USE_QT4=False
+  import qt
 from optparse import OptionParser
 
 
@@ -193,6 +198,9 @@ def main():
 	c.UnselectAllWindows()
 
 	# qt loop
-	qt.qApp.exec_loop()
+        if USE_QT4:
+          qt.qApp.exec_()
+        else:
+	  qt.qApp.exec_loop()
 
 if __name__ == '__main__' : main()
