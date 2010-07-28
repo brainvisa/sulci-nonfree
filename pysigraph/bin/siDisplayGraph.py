@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os, sys, exceptions, numpy
-import qt, glob, re
+import glob, re
 from scipy.interpolate.fitpack2 import BivariateSpline, dfitpack
 from collections import defaultdict
 from optparse import OptionParser
@@ -14,6 +14,12 @@ try:
 	import datamind.io.old_csvIO as csv_io
 except ImportError:
 	print "import failed: disable datamind"
+if sys.modules.has_key( 'PyQt4' ):
+  USE_QT4=True
+  import PyQt4.QtCore as qt
+else:
+  USE_QT4=False
+  import qt
 
 
 ################################################################################
@@ -1070,6 +1076,9 @@ def main():
 		disp = CenterDistCorticalDisplay(options.write,
 				selected_sulci, graphs)
 	disp.display()
-	qt.qApp.exec_loop()
+        if USE_QT4:
+          qt.qApp.exec_()
+        else:
+	  qt.qApp.exec_loop()
 
 if __name__ == '__main__' : main()

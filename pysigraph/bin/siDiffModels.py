@@ -90,8 +90,13 @@ def anatomist_plot(models, md, options, cmp_mode):
 	ag.setColorMode(ag.PropertyMap)
 	ag.setColorProperty('diff')
 	ag.notifyObservers()
-	import sys, qt
-	qt.qApp.exec_loop()
+	import sys
+        if sys.modules.has_key( 'PyQt4' ):
+          import PyQt4.QtCore as qt
+          qt.qApp.exec_()
+        else:
+          import qt
+          qt.qApp.exec_loop()
 
 	
 
