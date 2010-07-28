@@ -42,7 +42,10 @@ class GuiObserver(Observer):
 	def init(self, tagger):
 		import anatomist.cpp as cpp
 		import brainvisa.quaternion as quaternion
-		import qt
+                if sys.modules.has_key( 'PyQt4' ):
+                  import PyQt4.QtCore as qt
+                else:
+                  import qt
 		self._ag = self._a.toAObject(tagger.graph())
 		m = aims.Reader().read('/home/mp210984/ccrt/base2008/mesh_white/Lammon_white.tri')
 		self._white = self._a.toAObject(m)
@@ -87,7 +90,10 @@ class GuiObserver(Observer):
 		# mencoder "mf://*.jpg" -mf fps=5 -ovc lavc -o plop.avi
 
 	def after_pass(self, tagger):
-		import qt
+                if sys.modules.has_key( 'PyQt4' ):
+                  import PyQt4.QtGui as qt
+                else:
+                  import qt
 		for s in tagger._segments:
 			id = s['index']
 			tag_label = tagger._taglabels[id]
@@ -113,7 +119,10 @@ class GuiLabelsObserver(GuiObserver):
 		self._ag.setChanged()
 
 	def after_pass(self, tagger):
-		import qt
+                if sys.modules.has_key( 'PyQt4' ):
+                  import PyQt4.QtGui as qt
+                else:
+                  import qt
 		for s in tagger._segments:
 			id = s['index']
 			tag_label = tagger._taglabels[id]
@@ -138,7 +147,10 @@ class GuiNrjObserver(GuiObserver):
 		self._ag.setChanged()
 
 	def after_pass(self, tagger):
-		import qt
+                if sys.modules.has_key( 'PyQt4' ):
+                  import PyQt4.QtGui as qt
+                else:
+                  import qt
 		for s in tagger._segments:
 			id = s['index']
 			if tagger._changes[id] or self._n == 0:
@@ -188,7 +200,10 @@ class GuiChangesObserver(GuiObserver):
 		self._ag.setChanged()
 
 	def after_pass(self, tagger):
-		import qt
+                if sys.modules.has_key( 'PyQt4' ):
+                  import PyQt4.QtGui as qt
+                else:
+                  import qt
 		for s in tagger._segments:
 			id = s['index']
 			s['changes'] = tagger._changes[id]
