@@ -7,7 +7,7 @@ import datamind.io.old_csvIO as io
 import os, sys, exceptions, numpy
 if sys.modules.has_key( 'PyQt4' ):
   USE_QT4=True
-  import PyQt4.QtCore as qt
+  import PyQt4.QtGui as qt
 else:
   USE_QT4=False
   import qt
