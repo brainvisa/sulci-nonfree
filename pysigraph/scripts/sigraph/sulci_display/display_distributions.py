@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, sys, exceptions, numpy, qt
+import os, sys, exceptions, numpy
 from optparse import OptionParser
 import sigraph
 import anatomist.direct.api as anatomist
@@ -12,6 +12,12 @@ try:
   import fff.GMM
 except:
   print 'warning, fff is not here or does not work. GMM will not be usable'
+if sys.modules.has_key( 'PyQt4' ):
+	qt4=True
+	import PyQt4.QtGui as qt
+else:
+	qt4=False
+	import qt
 
 a = anatomist.Anatomist()
 inf = numpy.inf
@@ -465,7 +471,10 @@ def main():
 	elif model_type in ['spam', 'depth_weighted_spam']:
 		d = SpamDisplay(*args)
 	d.display()
-	qt.qApp.exec_loop()
+	if qt4:
+		qt.qApp.exec_()
+	else:
+		qt.qApp.exec_loop()
 	
 
 if __name__ == '__main__' : main()

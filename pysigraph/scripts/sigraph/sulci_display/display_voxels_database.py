@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, sys, exceptions, numpy, qt
+import os, sys, exceptions, numpy
 from optparse import OptionParser
 import sigraph
 import anatomist.direct.api as anatomist
@@ -8,6 +8,12 @@ import fff.GMM
 import datamind.io.old_csvIO as datamind_io
 from datamind.tools import *
 from sulci.common import io
+if sys.modules.has_key( 'PyQt4' ):
+	qt4=True
+	import PyQt4.QtGui as qt
+else:
+	qt4=False
+	import qt
 
 a = anatomist.Anatomist()
 
@@ -71,7 +77,11 @@ def main():
 
 	awin = a.createWindow('3D')
 	a.addObjects(aobjects, [awin])
-	qt.qApp.exec_loop()
+	if qt4:
+		qt.qApp.exec_()
+	else:
+		qt.qApp.exec_loop()
+
 	
 
 if __name__ == '__main__' : main()
