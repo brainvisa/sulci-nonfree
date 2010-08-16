@@ -21,6 +21,8 @@ InterFoldDescr5::~InterFoldDescr5()
 void InterFoldDescr5::buildTree( Tree & t )
 {
   t.setSyntax( SIA_INTER_FOLD_DESCRIPTOR5 );
+  if( outputInertia() )
+    t.setProperty( SIA_OUTPUT_INERTIA, int(1) );
 }
 
 
@@ -43,6 +45,15 @@ vector<string> InterFoldDescr5::descriptorsNames() const
       names.push_back( "moment_inv9" );
       names.push_back( "moment_inv10" );
       names.push_back( "moment_inv11" );
+      if( outputInertia() )
+      {
+        names.push_back( "inertia_0" );
+        names.push_back( "inertia_1" );
+        names.push_back( "inertia_2" );
+        names.push_back( "inertia_3" );
+        names.push_back( "inertia_4" );
+        names.push_back( "inertia_5" );
+      }
     }
   return names;
 }
@@ -58,7 +69,10 @@ bool InterFoldDescr5::makeVectorElements( const Clique* cl,
                                           vector<double> & vec, 
                                           GenericObject* ao )
 {
-  vec.reserve( END );
+  if( outputInertia() )
+    vec.reserve( END );
+  else
+    vec.reserve( INERTIA_0 );
   InterFoldDescr4::makeVectorElements( cl, vec, ao );
 
   if( vec[0] == 0 ) // not valid
@@ -75,6 +89,15 @@ bool InterFoldDescr5::makeVectorElements( const Clique* cl,
       vec.push_back( 0 );
       vec.push_back( 0 );
       vec.push_back( 0 );
+      if( outputInertia() )
+      {
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+      }
 
       return false;
     }
@@ -179,6 +202,16 @@ bool InterFoldDescr5::makeVectorElements( const Clique* cl,
   vec.push_back( vmomi[9] );
   vec.push_back( vmomi[10] );
   vec.push_back( vmomi[11] );
+
+  if( outputInertia() )
+  {
+    vec.push_back( mom.m2()[0] );
+    vec.push_back( mom.m2()[1] );
+    vec.push_back( mom.m2()[2] );
+    vec.push_back( mom.m2()[3] );
+    vec.push_back( mom.m2()[4] );
+    vec.push_back( mom.m2()[5] );
+  }
 
   return true;
 }

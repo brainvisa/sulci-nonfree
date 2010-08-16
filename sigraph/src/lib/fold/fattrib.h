@@ -141,6 +141,7 @@
 #define	SIA_NSTATS_DIR			"nstats_dir"
 #define	SIA_DIRECTION			"direction"
 #define SIA_NORMALIZED_OUTPUT           "normalized_output"
+#define SIA_OUTPUT_INERTIA              "output_inertia"
 
 
 //	Domaines
