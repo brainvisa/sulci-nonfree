@@ -38,9 +38,11 @@ void MGWriter::parseModel( const GraphObject & ao, const string & mfile,
   if( ao.hasProperty( mfile ) && ao.hasProperty( mstr ) )
     {
       string	nm, file = FileUtil::dirname( name() );
-      Model	*ad;
+      Model	*ad = 0;
       ao.getProperty( mfile, nm );
-      ao.getProperty( mstr, ad );
+      if( !ao.getProperty( mstr, ad ) )
+        throw runtime_error( "MGWriter: Vertex model property cannot " \
+          "be read" );
 
       if( !file.empty() )
         file += FileUtil::separator();
