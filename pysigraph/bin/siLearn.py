@@ -114,10 +114,20 @@ def sig_crash( sig, stack ):
   exit( 1 )
 
 def initCliques(rg, par, learn, test):
-	print 'Init cliques...'
-	mf = rg.modelFinder()
-	for x in learn:	mf.initCliques(x, par.verbose, True)
-	for x in test:	mf.initCliques(x, par.verbose, True)
+  print 'Init cliques...'
+  mf = rg.modelFinder()
+  if par.labelsMap != '':
+    tr = sigraph.FoldLabelsTranslator(rg, par.labelsMap)
+  else:
+    tr = sigraph.FoldLabelsTranslator(rg, '')
+  for x in learn:
+    if par.labelsMap != '':
+      tr.translate( x, 'name', 'label' )
+    mf.initCliques(x, par.verbose, True)
+  for x in test:
+    if par.labelsMap != '':
+      tr.translate( x, 'name', 'label' )
+    mf.initCliques(x, par.verbose, True)
  
 def setSignalHandlers(): 
 	signal.signal(signal.SIGINT, sig_break)
