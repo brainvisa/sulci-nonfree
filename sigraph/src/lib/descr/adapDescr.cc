@@ -47,7 +47,10 @@ void	AdapDescr::updateSiDBLearnable(void)
 
 
 	size = _generated_vectors.size();
-	dimX = (*(_generated_vectors.begin()))->getVector().size();
+        if( _generated_vectors.empty() )
+          dimX = 0;
+        else
+          dimX = (*(_generated_vectors.begin()))->getVector().size();
 	X = new double[dimX * size];
 	Y = new double[2 * size];
 	INF = new char[32 * size];
