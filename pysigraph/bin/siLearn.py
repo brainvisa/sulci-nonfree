@@ -81,19 +81,19 @@ def sig_break(sig, stack):
 	sys.stdout.flush()
 	c = sys.stdin.readline()
 	if c == 'o' or c == 'O' or c == 'y' or c == 'Y':
-		saveModel()
+		saveModel(options.labels_filter, options.filter_mode)
 	exit(0)
 
 def sig_saveAndCont(sig, stack):
 	signal(signal.SIGUSR1, sig_saveAndCont)
 	print '--- Saving ... ---'
-	saveModel()
+	saveModel(options.labels_filter, options.filter_mode)
 	print '--- Continuing... ---'
 
 def sig_term( sig, stack ):
 	print '*** Reveived signal SIGTERM ***'
 	print 'Saving before stoping...'
-	saveModel()
+	saveModel(options.labels_filter, options.filter_mode)
 	exit(2)
 
 def sig_crash( sig, stack ):
@@ -110,7 +110,7 @@ def sig_crash( sig, stack ):
   else:	print sig
   print 'python stack:'
   print stack
-  saveModel()
+  saveModel(options.labels_filter, options.filter_mode)
   exit( 1 )
 
 def initCliques(rg, par, learn, test):
