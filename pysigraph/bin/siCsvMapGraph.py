@@ -47,16 +47,17 @@ def print_csv_format():
 	'''
 	print format
 
-def read_csv(csvfilename, column=None):
+def read_csv(csvfilename, columns=[], operator='mean'):
 	fd = open(csvfilename)
 	lines = fd.readlines()
 	delim = '\t'
-	labels = lines[0].rstrip('\n').rstrip('\r').split( delim )
+	labels = lines[0].rstrip('\n').rstrip('\r').strip().split( delim )
 	if len( labels ) == 1:
 	  delim = ' '
-          labels = lines[0].rstrip('\n').rstrip('\r').split( delim )
+          labels = lines[0].rstrip('\n').rstrip('\r').strip().split( delim )
 	fd.close()
 	header_minf = { 'Y' : [], 'labels' : labels }
+	print 'labels:', labels
 	labels2 = [ x.lower() for x in labels ]
 	subjectcol = None
 	labelcol = None
@@ -64,26 +65,35 @@ def read_csv(csvfilename, column=None):
 	  if sl in labels2:
 	    subjectcol = labels2.index( sl )
 	    break
-	for sl in ( 'sulci', 'nodes', 'label' ):
+	for sl in ( 'sulci', 'nodes', 'label', 'name' ):
 	  if sl in labels2:
 	    labelcol = labels2.index( sl )
 	if subjectcol is not None and labelcol is not None:
-		header_minf['X'] = range(labelcol+1, len(labels))
+		header_minf['X'] = range(len(labels))
+		header_minf['X'].remove(labelcol)
+		header_minf['X'].remove(subjectcol)
 		header_minf['INF'] = [subjectcol, labelcol]
 		mode = labels2[labelcol]
 		olabels = labels[labelcol+1:]
 	elif subjectcol is not None:
-		header_minf['X'] = range(labelcol+1, len(labels))
+		# header_minf['X'] = range(labelcol+1, len(labels))
+		header_minf['X'] = range(len(labels))
+		header_minf['X'].remove(subjectcol)
 		header_minf['INF'] = [labelcol]
 		mode = labels2[labelcol]
 		olabels = labels[labelcol+1:]
 	else:
 		print "bad csv format"
 		sys.exit(1)
-	if column is not None:
-	  header_minf['X'] = [ column ]
-	  header_minf['INF'] = range( column ) + range( column+1, len(labels) )
-	  olabels = [ labels[ column ] ]
+	if len( columns ) != 0:
+	  header_minf['X'] = columns
+	  header_minf['INF'] = \
+	    [ i for i in xrange( len( labels ) ) if i not in columns ]
+	  if labelcol is not None:
+	    # label column at end
+	    header_minf['INF'].remove( labelcol )
+	    header_minf['INF'].append( labelcol )
+	  olabels = [ labels[ i ] for i in columns ]
 	db, header = io.ReaderHeaderCsv().read(csvfilename,header_minf, 
 	  sep=delim)
 	X = db.getX()
@@ -92,7 +102,7 @@ def read_csv(csvfilename, column=None):
 	sulci_data = {}
 	for s in uniq_sulci:
 		X2 = X[(sulci == s)]
-		X2m = X2.mean(axis=0)
+		X2m = getattr(X2, operator)(axis=0)
 		X2s = X2.std(axis=0)
 		X2sum = X2.sum(axis=0)
 		if s.startswith( "'" ) and s.endswith( "'" ):
@@ -154,8 +164,13 @@ def parseOpts(argv):
 	parser.add_option('--log', dest='log',
 		metavar = 'FILE', action='store_true', default=False,
 		help='add log of mean values read in the input csv')
-	# parser.add_option('-c', '--column', dest='column', default=None,
-	#         type='int', help='column number to be used in the csv file')
+	parser.add_option('-c', '--column', dest='columns', action='append',
+	        type='int', help='column number to be used in the csv file')
+	parser.add_option('-o', '--operator', dest='operator', default='mean',
+		type='string', action='store',
+		help='operator to apply to summarize multiple values on the ' \
+		'same sulcus. The default is "mean", but could be "min" or '
+		'"max"')
 	return parser, parser.parse_args(argv)
 
 def getdata( sulci_data, label ):
@@ -183,8 +198,8 @@ def main():
 	# read
 	ft = sigraph.FoldLabelsTranslator(options.transfile)
 	sigraph.si().setLabelsTranslPath(options.transfile)
-	labels, sulci_data, mode = read_csv(options.csvfilename ) #, 
-	  # options.column)
+	labels, sulci_data, mode = read_csv(options.csvfilename, 
+	  options.columns, operator=options.operator)
 	if options.summarycsvfilename:
 		write_summary_csv(options.summarycsvfilename,
 					labels, sulci_data, mode)
@@ -203,7 +218,7 @@ def main():
 
 	for v in g.vertices():
 		if v.getSyntax() != 'fold': continue
-		if mode in ( 'sulci', 'label' ):
+		if mode in ( 'sulci', 'label', 'name' ):
 			try: 
 			  l = v[options.label_attribute]
 			  data = getdata( sulci_data, 
