@@ -20,6 +20,7 @@ public:
   sigraph::Adaptive* adaptive();
   int cycles() const;
   int testCycles() const;
+  int count() const;
 };
 
 

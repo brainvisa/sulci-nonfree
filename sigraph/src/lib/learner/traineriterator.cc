@@ -156,3 +156,9 @@ int TrainerIterator::testCycles() const
 }
 
 
+int TrainerIterator::count() const
+{
+  return d->models->size();
+}
+
+

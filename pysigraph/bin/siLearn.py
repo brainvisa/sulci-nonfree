@@ -344,16 +344,21 @@ def main():
     tr = sigraph.Trainer( rg, learner )
   tr.init(par.mode )
   tit = tr.trainIterator( learn, test, par.cycles, par.cycles_tst )
+  niter = tit.count()
+  citer = 0
   while tit.isValid():
+    citer += 1
     ad = tit.adaptive()
     if not ad :
       tit.next()
       continue
     labels = [l for l in ad.significantLabels() if l != 'unknown']
     if not filtred(labels, options.labels_filter, options.filter_mode):
+      print 'learning model', citer, '/', niter
+      sys.stdout.flush()
       tit.train(aims.Object(par))
     tit.next()
-  
+
   # close learning models
   if par.closeLearning:
     rg.closeLearning()
