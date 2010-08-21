@@ -183,7 +183,7 @@ void FDParser::buildFDescr4( AttributedObject* parent, Tree* t,
 void FDParser::buildFDescr5( AttributedObject* parent, Tree* t, 
 			     const string & )
 {
-  FoldDescr4	*fd = new FoldDescr5;
+  FoldDescr5	*fd = new FoldDescr5;
   t->setProperty( SIA_POINTER, (CliqueDescr *) fd );
 
   int		nnorm;
@@ -213,6 +213,10 @@ void FDParser::buildFDescr5( AttributedObject* parent, Tree* t,
     fd->setNormalizedMode( FoldDescr2::Normalized );
   else
     fd->setNormalizedMode( FoldDescr2::NormalizedNone );
+
+  int inertia = 0;
+  t->getProperty( SIA_OUTPUT_INERTIA, inertia );
+  fd->setOutputInertia( bool( inertia ) );
 
   DescrParser::parseDescr( parent, t, fd );
 }
@@ -269,6 +273,11 @@ void FDParser::buildIFDescr5( AttributedObject* parent, Tree* t,
     fd->setNormalizedMode( InterFoldDescr2::Normalized );
   else
     fd->setNormalizedMode( InterFoldDescr2::NormalizedNone );
+
+  int inertia = 0;
+  t->getProperty( SIA_OUTPUT_INERTIA, inertia );
+  fd->setOutputInertia( bool( inertia ) );
+
   parseDescr( parent, t, fd );
 }
 

@@ -7,7 +7,7 @@ import datamind.io.old_csvIO as io
 import os, sys, exceptions, numpy
 if sys.modules.has_key( 'PyQt4' ):
   USE_QT4=True
-  import PyQt4.QtCore as qt
+  import PyQt4.QtGui as qt
 else:
   USE_QT4=False
   import qt
@@ -47,35 +47,66 @@ def print_csv_format():
 	'''
 	print format
 
-def read_csv(csvfilename):
+def read_csv(csvfilename, columns=[], operator='mean'):
 	fd = open(csvfilename)
 	lines = fd.readlines()
-	labels = lines[0].rstrip('\n').split('\t')
+	delim = '\t'
+	labels = lines[0].rstrip('\n').rstrip('\r').strip().split( delim )
+	if len( labels ) == 1:
+	  delim = ' '
+          labels = lines[0].rstrip('\n').rstrip('\r').strip().split( delim )
 	fd.close()
 	header_minf = { 'Y' : [], 'labels' : labels }
-	if labels[0] == 'subjects' and labels[1] in ['sulci', 'nodes']:
-		header_minf['X'] = range(2, len(labels))
-		header_minf['INF'] = [0, 1]
-		mode = labels[1]
-		labels = labels[2:]
-	elif labels[0] in ['sulci', 'nodes']:
-		header_minf['X'] = range(1, len(labels))
-		header_minf['INF'] = [0]
-		mode = labels[0]
-		labels = labels[1:]
+	print 'labels:', labels
+	labels2 = [ x.lower() for x in labels ]
+	subjectcol = None
+	labelcol = None
+	for sl in ( 'subjects', 'subject' ):
+	  if sl in labels2:
+	    subjectcol = labels2.index( sl )
+	    break
+	for sl in ( 'sulci', 'nodes', 'label', 'name' ):
+	  if sl in labels2:
+	    labelcol = labels2.index( sl )
+	if subjectcol is not None and labelcol is not None:
+		header_minf['X'] = range(len(labels))
+		header_minf['X'].remove(labelcol)
+		header_minf['X'].remove(subjectcol)
+		header_minf['INF'] = [subjectcol, labelcol]
+		mode = labels2[labelcol]
+		olabels = labels[labelcol+1:]
+	elif subjectcol is not None:
+		# header_minf['X'] = range(labelcol+1, len(labels))
+		header_minf['X'] = range(len(labels))
+		header_minf['X'].remove(subjectcol)
+		header_minf['INF'] = [labelcol]
+		mode = labels2[labelcol]
+		olabels = labels[labelcol+1:]
 	else:
 		print "bad csv format"
 		sys.exit(1)
-	db, header = io.ReaderHeaderCsv().read(csvfilename,header_minf)
+	if len( columns ) != 0:
+	  header_minf['X'] = columns
+	  header_minf['INF'] = \
+	    [ i for i in xrange( len( labels ) ) if i not in columns ]
+	  if labelcol is not None:
+	    # label column at end
+	    header_minf['INF'].remove( labelcol )
+	    header_minf['INF'].append( labelcol )
+	  olabels = [ labels[ i ] for i in columns ]
+	db, header = io.ReaderHeaderCsv().read(csvfilename,header_minf, 
+	  sep=delim)
 	X = db.getX()
 	sulci = db.getINF()[:, -1]
 	uniq_sulci = numpy.unique1d(sulci)
 	sulci_data = {}
 	for s in uniq_sulci:
 		X2 = X[(sulci == s)]
-		X2m = X2.mean(axis=0)
+		X2m = getattr(X2, operator)(axis=0)
 		X2s = X2.std(axis=0)
 		X2sum = X2.sum(axis=0)
+		if s.startswith( "'" ) and s.endswith( "'" ):
+		  s = s[1:-1]
 		sulci_data[s] = X2m, X2s, X2sum
 	X3 = numpy.vstack([data[0] for data in sulci_data.values()])
 	X4 = numpy.vstack([data[2] for data in sulci_data.values()])
@@ -85,7 +116,7 @@ def read_csv(csvfilename):
 	print "global mean over sulci :", Xm
 	print "global std over sulci : ", Xs
 	print "global sum over sulci :", Xsum
-	return labels, sulci_data, mode
+	return olabels, sulci_data, mode
 
 def write_summary_csv(csvfilename, labels, sulci_data, mode):
 	from datamind.ml.database import DbNumpy
@@ -128,12 +159,33 @@ def parseOpts(argv):
 		help='print csv format')
 	parser.add_option('-t', '--translation', dest='transfile',
 		metavar = 'FILE', action='store', default = transfile,
-		help='translation file (default : %default)')
+		help='translation file (.trl), or nomenclature file (.hie), ' \
+		'or selection file (.sel) (default : %default)')
 	parser.add_option('--log', dest='log',
 		metavar = 'FILE', action='store_true', default=False,
 		help='add log of mean values read in the input csv')
+	parser.add_option('-c', '--column', dest='columns', action='append',
+	        type='int', help='column number to be used in the csv file')
+	parser.add_option('-o', '--operator', dest='operator', default='mean',
+		type='string', action='store',
+		help='operator to apply to summarize multiple values on the ' \
+		'same sulcus. The default is "mean", but could be "min" or '
+		'"max"')
 	return parser, parser.parse_args(argv)
 
+def getdata( sulci_data, label ):
+  try:
+    data = sulci_data[ label ]
+    return data
+  except:
+    if label.endswith( '_left' ):
+      label = label[:-5]
+    elif label.endswith( '_right' ):
+      label = label[:-6]
+    else:
+      raise
+    data = sulci_data[ label ]
+    return data
 
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
@@ -146,7 +198,8 @@ def main():
 	# read
 	ft = sigraph.FoldLabelsTranslator(options.transfile)
 	sigraph.si().setLabelsTranslPath(options.transfile)
-	labels, sulci_data, mode = read_csv(options.csvfilename)
+	labels, sulci_data, mode = read_csv(options.csvfilename, 
+	  options.columns, operator=options.operator)
 	if options.summarycsvfilename:
 		write_summary_csv(options.summarycsvfilename,
 					labels, sulci_data, mode)
@@ -156,7 +209,7 @@ def main():
 	from soma import aims
 	r = aims.Reader(options = {'subobjectsfilter' : 1})
 	g = r.read(options.graphname)
-	ft.translate(g)
+	ft.translate(g, options.label_attribute, options.label_attribute)
 
 	# mesh
 	if options.meshname:
@@ -165,11 +218,15 @@ def main():
 
 	for v in g.vertices():
 		if v.getSyntax() != 'fold': continue
-		if mode == 'sulci':
-			try: data = sulci_data[v[options.label_attribute]]
-			except exceptions.KeyError: continue
+		if mode in ( 'sulci', 'label', 'name' ):
+			try: 
+			  l = v[options.label_attribute]
+			  data = getdata( sulci_data, 
+			    v[options.label_attribute] )
+			except exceptions.KeyError: 
+			  continue
 		elif mode == 'nodes':
-			try: data = sulci_data[str(int(v['index']))]
+			try: data = getdata( sulci_data, str(int(v['index'])) )
 			except exceptions.KeyError: continue
 		for i, h in enumerate(labels):
 			v['csv_mean_' + h] = data[0][i]
@@ -179,6 +236,7 @@ def main():
 			if data[1][i]: v['csv_std_' + h] = data[1][i]
 			v['csv_sum_' + h] = data[2][i]
 
+	app = qt.QApplication( sys.argv )
 	a = anatomist.Anatomist()
 	ag = a.toAObject(g)
 	ag.setColorMode(ag.PropertyMap)

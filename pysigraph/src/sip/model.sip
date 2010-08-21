@@ -48,6 +48,8 @@ public:
 %MethodCode
   sipRes = sipCpp->graphObject();
 %End
+  virtual void setBaseName( const std::string & basename );
+
 
   static sigraph::Model* fromObject( carto::GenericObject );
 %MethodCode
@@ -64,10 +66,17 @@ public:
 %End
 
   // conversion to Object
+  carto::Object toObject();
+%MethodCode
+  sipRes = new carto::Object( carto::Object::value( sipCpp  ) );
+%End
+
+  // conversion to Object
   carto::Object ptrToObject();
 %MethodCode
   sipRes = new carto::Object( carto::Object::value( sipCpp  ) );
 %End
+
 
 };
 

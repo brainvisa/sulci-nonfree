@@ -17,11 +17,12 @@ using namespace carto;
 using namespace std;
 
 
-FoldDescr5::FoldDescr5() : FoldDescr4()
+FoldDescr5::FoldDescr5() : FoldDescr4(), _outputInertia( false )
 {
 }
 
-FoldDescr5::FoldDescr5( const FoldDescr5 & f )  : FoldDescr4( f )
+FoldDescr5::FoldDescr5( const FoldDescr5 & f )
+  : FoldDescr4( f ), _outputInertia( f._outputInertia )
 {
 }
 
@@ -32,7 +33,10 @@ FoldDescr5::~FoldDescr5()
 bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec, 
                                      GenericObject* ao )
 {
-  vec.reserve( END );
+  if( outputInertia() )
+    vec.reserve( END );
+  else
+    vec.reserve( INERTIA_0 );
   FoldDescr4::makeVectorElements( cl, vec, ao );
 
   if( vec[0] == 0 ) // not valid
@@ -49,6 +53,16 @@ bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec,
       vec.push_back( 0 );
       vec.push_back( 0 );
       vec.push_back( 0 );
+      if( outputInertia() )
+      {
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+      }
+
       return false;
     }
 
@@ -163,6 +177,16 @@ bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec,
   vec.push_back( vmomi[10] );
   vec.push_back( vmomi[11] );
 
+  if( outputInertia() )
+  {
+    vec.push_back( mom.m2()[0] );
+    vec.push_back( mom.m2()[1] );
+    vec.push_back( mom.m2()[2] );
+    vec.push_back( mom.m2()[3] );
+    vec.push_back( mom.m2()[4] );
+    vec.push_back( mom.m2()[5] );
+  }
+
   return true;
 }
 
@@ -171,6 +195,8 @@ void FoldDescr5::buildTree( Tree & t )
 {
   FoldDescr4::buildTree( t );
   t.setSyntax( SIA_FOLD_DESCRIPTOR5 );
+  if( outputInertia() )
+    t.setProperty( SIA_OUTPUT_INERTIA, int(1) );
 }
 
 
@@ -193,6 +219,15 @@ vector<string> FoldDescr5::descriptorsNames() const
       names.push_back( "moment_inv9" );
       names.push_back( "moment_inv10" );
       names.push_back( "moment_inv11" );
+      if( outputInertia() )
+      {
+        names.push_back( "inertia_0" );
+        names.push_back( "inertia_1" );
+        names.push_back( "inertia_2" );
+        names.push_back( "inertia_3" );
+        names.push_back( "inertia_4" );
+        names.push_back( "inertia_5" );
+      }
     }
   return names;
 }

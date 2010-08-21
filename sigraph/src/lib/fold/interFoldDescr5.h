@@ -11,7 +11,7 @@ namespace sigraph
   class InterFoldDescr5 : public InterFoldDescr4
   {
   public:
-    ///	Liste des entrées
+    ///	Inputs list
     enum Inputs
       {
 	VEC_VALID, 
@@ -56,7 +56,14 @@ namespace sigraph
         MOMENT_INV10, 
         MOMENT_INV11, 
 
-	END
+        INERTIA_0,
+        INERTIA_1,
+        INERTIA_2,
+        INERTIA_3,
+        INERTIA_4,
+        INERTIA_5,
+
+        END
       };
 
     InterFoldDescr5();
@@ -67,23 +74,28 @@ namespace sigraph
     virtual void buildTree( Tree & t );
     virtual std::vector<std::string> descriptorsNames() const;
     virtual std::string name() const;
+    bool outputInertia() const { return _outputInertia; }
+    void setOutputInertia( bool x ) { _outputInertia = x; }
 
   protected:
     virtual bool makeVectorElements( const Clique* cl, 
                                      std::vector<double> & vec, 
                                      carto::GenericObject* model = 0 );
+
+    private:
+      bool _outputInertia;
   };
 
   //	inline
 
   inline InterFoldDescr5::InterFoldDescr5() 
-    : InterFoldDescr4()
+    : InterFoldDescr4(), _outputInertia( false )
   {
   }
 
 
   inline InterFoldDescr5::InterFoldDescr5( const InterFoldDescr5 & ifd )
-    : InterFoldDescr4( ifd )
+    : InterFoldDescr4( ifd ), _outputInertia( ifd.outputInertia() )
   {
   }
 

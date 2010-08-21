@@ -40,6 +40,8 @@ namespace sigraph
     CliquesModelMap* testBase();
     int cycles() const;
     int testCycles() const;
+    /// total number of iterations
+    int count() const;
 
   private:
     friend class Trainer;

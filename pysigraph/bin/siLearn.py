@@ -81,19 +81,19 @@ def sig_break(sig, stack):
 	sys.stdout.flush()
 	c = sys.stdin.readline()
 	if c == 'o' or c == 'O' or c == 'y' or c == 'Y':
-		saveModel()
+		saveModel(options.labels_filter, options.filter_mode)
 	exit(0)
 
 def sig_saveAndCont(sig, stack):
 	signal(signal.SIGUSR1, sig_saveAndCont)
 	print '--- Saving ... ---'
-	saveModel()
+	saveModel(options.labels_filter, options.filter_mode)
 	print '--- Continuing... ---'
 
 def sig_term( sig, stack ):
 	print '*** Reveived signal SIGTERM ***'
 	print 'Saving before stoping...'
-	saveModel()
+	saveModel(options.labels_filter, options.filter_mode)
 	exit(2)
 
 def sig_crash( sig, stack ):
@@ -110,14 +110,24 @@ def sig_crash( sig, stack ):
   else:	print sig
   print 'python stack:'
   print stack
-  saveModel()
+  saveModel(options.labels_filter, options.filter_mode)
   exit( 1 )
 
 def initCliques(rg, par, learn, test):
-	print 'Init cliques...'
-	mf = rg.modelFinder()
-	for x in learn:	mf.initCliques(x, par.verbose, True)
-	for x in test:	mf.initCliques(x, par.verbose, True)
+  print 'Init cliques...'
+  mf = rg.modelFinder()
+  if par.labelsMap != '':
+    tr = sigraph.FoldLabelsTranslator(rg, par.labelsMap)
+  else:
+    tr = sigraph.FoldLabelsTranslator(rg, '')
+  for x in learn:
+    if par.labelsMap != '':
+      tr.translate( x, 'name', 'label' )
+    mf.initCliques(x, par.verbose, True)
+  for x in test:
+    if par.labelsMap != '':
+      tr.translate( x, 'name', 'label' )
+    mf.initCliques(x, par.verbose, True)
  
 def setSignalHandlers(): 
 	signal.signal(signal.SIGINT, sig_break)
@@ -334,16 +344,21 @@ def main():
     tr = sigraph.Trainer( rg, learner )
   tr.init(par.mode )
   tit = tr.trainIterator( learn, test, par.cycles, par.cycles_tst )
+  niter = tit.count()
+  citer = 0
   while tit.isValid():
+    citer += 1
     ad = tit.adaptive()
     if not ad :
       tit.next()
       continue
     labels = [l for l in ad.significantLabels() if l != 'unknown']
     if not filtred(labels, options.labels_filter, options.filter_mode):
+      print 'learning model', citer, '/', niter
+      sys.stdout.flush()
       tit.train(aims.Object(par))
     tit.next()
-  
+
   # close learning models
   if par.closeLearning:
     rg.closeLearning()

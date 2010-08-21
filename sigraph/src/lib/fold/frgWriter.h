@@ -4,6 +4,7 @@
 
 
 #include <si/graph/mgWriter.h>
+#include <aims/io/argW.h>
 
 
 namespace sigraph
@@ -21,6 +22,16 @@ namespace sigraph
 
   private:
 
+  };
+
+
+  class LowLevelFRGArgWriter : public aims::LowLevelArgWriter
+  {
+    public:
+      LowLevelFRGArgWriter();
+      virtual ~LowLevelFRGArgWriter();
+      virtual void write( const std::string & filename, Graph & graph,
+                          bool forceglobal = false );
   };
 
 }

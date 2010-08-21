@@ -66,7 +66,14 @@ namespace sigraph
         MOMENT_INV10, 
         MOMENT_INV11, 
 
-	END
+        INERTIA_0,
+        INERTIA_1,
+        INERTIA_2,
+        INERTIA_3,
+        INERTIA_4,
+        INERTIA_5,
+
+        END
       };
 
     FoldDescr5();
@@ -77,11 +84,16 @@ namespace sigraph
     virtual void buildTree( Tree & t );
     virtual std::vector<std::string> descriptorsNames() const;
     virtual std::string name() const;
+    bool outputInertia() const { return _outputInertia; }
+    void setOutputInertia( bool x ) { _outputInertia = x; }
 
   protected:
     virtual bool makeVectorElements( const Clique* cl, 
                                      std::vector<double> & vec, 
                                      carto::GenericObject* model = 0 );
+
+  private:
+    bool _outputInertia;
   };
 
 

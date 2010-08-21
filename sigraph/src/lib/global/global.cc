@@ -16,6 +16,7 @@
 #include <aims/def/path.h>
 #include <si/fold/foldReader.h>
 #include <si/fold/frgReader.h>
+#include <si/fold/frgWriter.h>
 #include <si/global/siInfo.h>
 #include <si/fold/domainBox2.h>
 #include <si/fold/domainRbf.h>
@@ -40,6 +41,8 @@ namespace
     ArgReader::registerReader( SIA_GRAPH_SYNTAX, new LowLevelFoldArgReader );
     ArgReader::registerReader( SIA_MODEL_GRAPH_SYNTAX, 
 			       new LowLevelFRGArgReader );
+    ArgWriter::registerWriter( SIA_MODEL_GRAPH_SYNTAX,
+                               new LowLevelFRGArgWriter );
 
     DomReader::registerBuilder( SIA_DOMAIN_BOX, &DomainBox::buildDomBox );
     DomReader::registerBuilder( SIA_DOMAIN_BOX2, &DomainBox2::buildDomBox2 );
