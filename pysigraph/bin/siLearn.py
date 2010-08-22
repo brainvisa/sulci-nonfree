@@ -357,6 +357,10 @@ def main():
       print 'learning model', citer, '/', niter
       sys.stdout.flush()
       tit.train(aims.Object(par))
+      # save the model once it is trained
+      w = sigraph.FrgWriter( par.model )
+      w.dataDirectory( rg )
+      w.parseModel( tit.model().parentAO() )
     tit.next()
 
   # close learning models
