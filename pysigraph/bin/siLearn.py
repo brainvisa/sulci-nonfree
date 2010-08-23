@@ -129,7 +129,8 @@ def initCliques(rg, par, learn, test):
       tr.translate( x, 'name', 'label' )
     mf.initCliques(x, par.verbose, True)
  
-def setSignalHandlers(): 
+def setSignalHandlers():
+        return
 	signal.signal(signal.SIGINT, sig_break)
 	signal.signal(signal.SIGSEGV, sig_crash)
 	signal.signal(signal.SIGILL, sig_crash)
@@ -358,6 +359,7 @@ def main():
       sys.stdout.flush()
       tit.train(aims.Object(par))
       # save the model once it is trained
+      print 'saving model', citer, '/', niter
       w = sigraph.FrgWriter( par.model )
       w.dataDirectory( rg )
       w.parseModel( tit.model().parentAO() )
