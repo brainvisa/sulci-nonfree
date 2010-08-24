@@ -26,7 +26,13 @@ namespace sigraph
     //@{
     ///	Filtre
     virtual void setPattern(const std::string &patt);
-    virtual void setFiltAttributes(const std::set<std::string> &atts);
+    /* If mixedatts is true, a single string will be built from all the
+       given attributes found in a clique, and the regex will work on this
+       string, so it can deal with combinations.
+       The sting will be a concatenation of "attr=value;".
+    */
+    virtual void setFiltAttributes(const std::set<std::string> &atts, bool
+        mixedatts = false );
     //@}
     virtual void init(TrainerMode mode, unsigned pass = 0);
 
@@ -49,6 +55,7 @@ namespace sigraph
   private:
     std::set<Adaptive*>		_usedAdap;
     std::set<std::string>	_atts;
+    bool                        _mixedAtts;
     regex_t			_pattern;
   };
 
