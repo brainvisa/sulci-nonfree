@@ -61,6 +61,8 @@ def read_csv(csvfilename, columns=[], operator='mean'):
 	labels2 = [ x.lower() for x in labels ]
 	subjectcol = None
 	labelcol = None
+        sidecol = None
+        infsidecol = None
 	for sl in ( 'subjects', 'subject' ):
 	  if sl in labels2:
 	    subjectcol = labels2.index( sl )
@@ -68,13 +70,18 @@ def read_csv(csvfilename, columns=[], operator='mean'):
 	for sl in ( 'sulci', 'nodes', 'label', 'name' ):
 	  if sl in labels2:
 	    labelcol = labels2.index( sl )
+	if 'side' in labels2:
+          sidecol = labels2.index( 'side' )
 	if subjectcol is not None and labelcol is not None:
 		header_minf['X'] = range(len(labels))
 		header_minf['X'].remove(labelcol)
 		header_minf['X'].remove(subjectcol)
 		header_minf['INF'] = [subjectcol, labelcol]
 		mode = labels2[labelcol]
-		olabels = labels[labelcol+1:]
+                if sidecol:
+                  infsidecol = 1
+                  header_minf['INF'].insert( 1, sidecol )
+                  header_minf['X'].remove( sidecol )
 	elif subjectcol is not None:
 		# header_minf['X'] = range(labelcol+1, len(labels))
 		header_minf['X'] = range(len(labels))
@@ -82,6 +89,11 @@ def read_csv(csvfilename, columns=[], operator='mean'):
 		header_minf['INF'] = [labelcol]
 		mode = labels2[labelcol]
 		olabels = labels[labelcol+1:]
+                if sidecol:
+                  header_minf['INF'].insert( 0, sidecol )
+                  header_minf['X'].remove( sidecol )
+                  olabels.remove( labels[sidecol] )
+                  infsidecol = 0
 	else:
 		print "bad csv format"
 		sys.exit(1)
@@ -94,10 +106,20 @@ def read_csv(csvfilename, columns=[], operator='mean'):
 	    header_minf['INF'].remove( labelcol )
 	    header_minf['INF'].append( labelcol )
 	  olabels = [ labels[ i ] for i in columns ]
-	db, header = io.ReaderHeaderCsv().read(csvfilename,header_minf, 
+          if sidecol:
+            header_minf['INF'].insert( 0, sidecol )
+            infsidecol = 0
+        olabels = [ labels[x] for x in header_minf['X'] ]
+	db, header = io.ReaderHeaderCsv().read(csvfilename,header_minf,
 	  sep=delim)
 	X = db.getX()
 	sulci = db.getINF()[:, -1]
+        if sidecol:
+          for i, s in enumerate( sulci ):
+            side = db.getINF()[i, infsidecol]
+            if side and side != 'both':
+              s += '_' + side
+              sulci[i] = s
 	uniq_sulci = numpy.unique1d(sulci)
 	sulci_data = {}
 	for s in uniq_sulci:
@@ -116,6 +138,7 @@ def read_csv(csvfilename, columns=[], operator='mean'):
 	print "global mean over sulci :", Xm
 	print "global std over sulci : ", Xs
 	print "global sum over sulci :", Xsum
+        print olabels
 	return olabels, sulci_data, mode
 
 def write_summary_csv(csvfilename, labels, sulci_data, mode):
@@ -165,7 +188,8 @@ def parseOpts(argv):
 		metavar = 'FILE', action='store_true', default=False,
 		help='add log of mean values read in the input csv')
 	parser.add_option('-c', '--column', dest='columns', action='append',
-	        type='int', help='column number to be used in the csv file')
+                default=[], type='int',
+                help='column number to be used in the csv file')
 	parser.add_option('-o', '--operator', dest='operator', default='mean',
 		type='string', action='store',
 		help='operator to apply to summarize multiple values on the ' \
@@ -236,7 +260,12 @@ def main():
 			if data[1][i]: v['csv_std_' + h] = data[1][i]
 			v['csv_sum_' + h] = data[2][i]
 
-	app = qt.QApplication( sys.argv )
+        if USE_QT4:
+          if not qt.QApplication.instance():
+            app = qt.QApplication( sys.argv )
+        else:
+          if qt.QApplication.startingUp():
+            app = qt.QApplication( sys.argv )
 	a = anatomist.Anatomist()
 	ag = a.toAObject(g)
 	ag.setColorMode(ag.PropertyMap)
@@ -257,8 +286,10 @@ def main():
 
 	# qt loop
         if USE_QT4:
-          qt.qApp.exec_()
+          if not qt.QApplication.instance():
+            qt.qApp.exec_()
         else:
-	  qt.qApp.exec_loop()
+          if qt.QApplication.startingUp():
+            qt.qApp.exec_loop()
 
 if __name__ == '__main__' : main()
