@@ -22,51 +22,55 @@ nmodfile = options.nodemodel
 rmodfile = options.relmodel
 
 mgraph = aims.read( mgfile )
-nmodel = sigraph.MReader( nmodfile ).readModel()
-rmodel = sigraph.MReader( rmodfile ).readModel()
+if nmodfile:
+  nmodel = sigraph.MReader( nmodfile ).readModel()
+if rmodfile:
+  rmodel = sigraph.MReader( rmodfile ).readModel()
 
-for vertex in mgraph.vertices():
-  if vertex.has_key( 'model' ):
-    oldm = vertex[ 'model' ]
-    otm = oldm.topModel()
-    if otm is not None:
-      m = nmodel.clone()
-      sip.transferto( m, None )
-      vertex[ 'model' ] = m
-      sip.transferback( otm )
-      sl = m.significantLabels()
-      for l in list( sl ):
-        sl.remove( l )
-      for l in otm.significantLabels():
-        sl.add( l )
-      m.setVoidLabel( 'unknown' )
-      label = vertex[ 'label' ]
-      m.setBaseName( label )
-del vertex, m, otm, oldm
+if nmodfile:
+  for vertex in mgraph.vertices():
+    if vertex.has_key( 'model' ):
+      oldm = vertex[ 'model' ]
+      otm = oldm.topModel()
+      if otm is not None:
+        m = nmodel.clone()
+        sip.transferto( m, None )
+        vertex[ 'model' ] = m
+        sip.transferback( otm )
+        sl = m.significantLabels()
+        for l in list( sl ):
+          sl.remove( l )
+        for l in otm.significantLabels():
+          sl.add( l )
+        m.setVoidLabel( 'unknown' )
+        label = vertex[ 'label' ]
+        m.setBaseName( label )
+  del vertex, m, otm, oldm
 
-voidl = 'unknown'
-if mgraph.has_key( 'void_label' ):
-  voidl = mgraph[ 'void_label' ]
+if rmodfile:
+  voidl = 'unknown'
+  if mgraph.has_key( 'void_label' ):
+    voidl = mgraph[ 'void_label' ]
 
-for edge in mgraph.edges():
-  if edge.has_key( 'model' ):
-    oldm = edge[ 'model' ]
-    otm = oldm.topModel()
-    if otm is not None:
-      m = rmodel.clone()
-      sip.transferto( m, None )
-      edge[ 'model' ] = m
-      sip.transferback( otm )
-      sl = m.significantLabels()
-      for l in list( sl ):
-        sl.remove( l )
-      for l in otm.significantLabels():
-        sl.add( l )
-      m.setVoidLabel( 'unknown' )
-      label1 = edge[ 'label1' ]
-      label2 = edge[ 'label2' ]
-      m.setBaseName( label1 + '-' + label2 )
-      m.setVoidLabel( voidl )
+  for edge in mgraph.edges():
+    if edge.has_key( 'model' ):
+      oldm = edge[ 'model' ]
+      otm = oldm.topModel()
+      if otm is not None:
+        m = rmodel.clone()
+        sip.transferto( m, None )
+        edge[ 'model' ] = m
+        sip.transferback( otm )
+        sl = m.significantLabels()
+        for l in list( sl ):
+          sl.remove( l )
+        for l in otm.significantLabels():
+          sl.add( l )
+        m.setVoidLabel( 'unknown' )
+        label1 = edge[ 'label1' ]
+        label2 = edge[ 'label2' ]
+        m.setBaseName( label1 + '-' + label2 )
+        m.setVoidLabel( voidl )
 
 aims.write( mgraph, omgfile )
 
