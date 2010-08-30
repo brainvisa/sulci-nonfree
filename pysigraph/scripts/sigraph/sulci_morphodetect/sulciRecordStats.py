@@ -24,15 +24,11 @@ def sulciRecordStats( inputs, modelfile, output ):
     an = sigraph.Anneal( gr, model )
     p = an.processAllPotentials()
     del an
-    print 'gogo1'
     cl = gr.cliques()
-    print 'gogo2'
     totstats_persubject = {}
     for c in cl:
-      print 'clique'
       if c.has_key( 'label' ):
         label = c[ 'label' ]
-        print 'label:', label
         cs = nodecliquestats.get( label )
         if cs is None:
           cs = { 'number' : 0, 'sum' : 0., 'squaresum' : 0. }
@@ -47,7 +43,6 @@ def sulciRecordStats( inputs, modelfile, output ):
         else:
           totstats_persubject[ label ] += p
       elif c.has_key( 'label1' ):
-        print 'rel'
         l = [ c[ 'label1' ], c['label2'] ]
         l.sort()
         l = tuple( l )
@@ -71,7 +66,6 @@ def sulciRecordStats( inputs, modelfile, output ):
           totstats_persubject[ label2 ] = p
         else:
           totstats_persubject[ label2 ] += p
-    print 'gogo2.1'
     for label, p in totstats_persubject.items():
       cs = totalstats.get( label )
       if cs is None:
@@ -80,7 +74,6 @@ def sulciRecordStats( inputs, modelfile, output ):
       cs[ 'number' ] += 1
       cs[ 'sum' ] += p
       cs[ 'squaresum' ] += p * p
-    print 'gogo3'
     del c
     del cl
     subjectspotentials[ subj ] = totstats_persubject
