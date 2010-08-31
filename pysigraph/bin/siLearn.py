@@ -68,6 +68,7 @@ class Param:
 		self.cycles_tst = 0
 		self.atts = []
 		self.pattern = ''
+                self.mixed_filter_attributes = False
 		self.verbose = 1
 		self.stopDelay = 2000
 		self.maxAppError = 0.25
@@ -129,7 +130,8 @@ def initCliques(rg, par, learn, test):
       tr.translate( x, 'name', 'label' )
     mf.initCliques(x, par.verbose, True)
  
-def setSignalHandlers(): 
+def setSignalHandlers():
+        return
 	signal.signal(signal.SIGINT, sig_break)
 	signal.signal(signal.SIGSEGV, sig_crash)
 	signal.signal(signal.SIGILL, sig_crash)
@@ -247,6 +249,8 @@ def main():
     par.atts = conf[ 'filter_attributes' ].split()
   if 'filter_pattern' in ca:
     par.pattern = conf[ 'filter_pattern' ]
+  if 'mixed_filter_attributes' in ca:
+    par.mixed_filter_attributes = bool( conf[ 'mixed_filter_attributes' ] )
   if 'verbose' in ca:
     par.verbose = conf[ 'verbose' ]
   if 'stop_delay' in ca:
@@ -339,7 +343,7 @@ def main():
   if len( par.atts ) != 0 and par.pattern != '':
     print 'SelectiveTrainer'
     tr = sigraph.SelectiveTrainer( rg, learner, par.pattern )
-    tr.setFiltAttributes( par.atts )
+    tr.setFiltAttributes( par.atts, par.mixed_filter_attributes )
   else:
     tr = sigraph.Trainer( rg, learner )
   tr.init(par.mode )
@@ -357,6 +361,11 @@ def main():
       print 'learning model', citer, '/', niter
       sys.stdout.flush()
       tit.train(aims.Object(par))
+      # save the model once it is trained
+      print 'saving model', citer, '/', niter
+      w = sigraph.FrgWriter( par.model )
+      w.dataDirectory( rg )
+      w.parseModel( tit.model().parentAO() )
     tit.next()
 
   # close learning models

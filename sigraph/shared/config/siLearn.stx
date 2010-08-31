@@ -18,6 +18,7 @@ cycles			int
 cycles_tst		int
 filter_attributes	string
 filter_pattern		string
+mixed_filter_attributes int
 stop_delay		int
 max_app_error		float
 close_learning		int

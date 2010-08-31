@@ -14,9 +14,9 @@ using namespace std;
 
 SelectiveTrainer::SelectiveTrainer(MGraph & mg, Learner *learner,
 				    const string & pattern )
-  : Trainer( mg, learner)
+  : Trainer( mg, learner), _mixedAtts( false )
 {
-	ASSERT(!regcomp(&_pattern, pattern.c_str(), REG_NOSUB | REG_EXTENDED));
+  ASSERT(!regcomp(&_pattern, pattern.c_str(), REG_NOSUB | REG_EXTENDED));
 }
 
 
@@ -26,9 +26,11 @@ SelectiveTrainer::~SelectiveTrainer()
 }
 
 
-void SelectiveTrainer::setFiltAttributes(const set<string> &atts)
+void SelectiveTrainer::setFiltAttributes(const set<string> &atts,
+                                         bool mixedatts )
 {
-	_atts = atts;
+  _atts = atts;
+  _mixedAtts = mixedatts;
 }
 
 
@@ -49,7 +51,7 @@ SelectiveTrainer::dataBaseToCliquesModelMap(const set<CGraph *> &lrn)
   Adaptive				*adap = NULL;
   ModelFinder   			&mf = _mgraph.modelFinder();
 
-  //Regrouper les cliques selon leur mod�le
+  //Regroup cliques according to their model
   for (ig = lrn.begin(); ig != fg; ++ig)
   {
     const CGraph::CliqueSet		&cs = (**ig).cliques();
@@ -121,18 +123,32 @@ std::set<Model *>	*SelectiveTrainer::modelsFromCliquesModelMap(
 
 bool SelectiveTrainer::checkAdap( AttributedObject* ao, Adaptive* adap )
 {
-	set<string>::const_iterator	ia, fa=_atts.end();
-	string				str;
+  set<string>::const_iterator	ia, fa=_atts.end();
+  string				str;
 
-	for(ia=_atts.begin(); ia!=fa; ++ia)
-	if(ao->getProperty(*ia, str) &&
-		!regexec( &_pattern, str.c_str(), 0, 0, 0 ) )
-	{
-		cout << "Train model attribute " << *ia << " = " << str << endl;
-		_usedAdap.insert( adap );
-		return( true );
-	}
-	return( false );
+  if( _mixedAtts )
+  {
+    string s;
+    for(ia=_atts.begin(); ia!=fa; ++ia)
+      if( ao->getProperty(*ia, str) )
+        s += *ia + "=" + str + ";";
+    if( !regexec( &_pattern, s.c_str(), 0, 0, 0 ) )
+    {
+      cout << "Train model " << s << endl << flush;
+      _usedAdap.insert( adap );
+      return( true );
+    }
+  }
+  else
+    for(ia=_atts.begin(); ia!=fa; ++ia)
+      if( ao->getProperty(*ia, str) &&
+          !regexec( &_pattern, str.c_str(), 0, 0, 0 ) )
+      {
+        cout << "Train model attribute " << *ia << " = " << str << endl;
+        _usedAdap.insert( adap );
+        return( true );
+      }
+  return( false );
 }
 
 
