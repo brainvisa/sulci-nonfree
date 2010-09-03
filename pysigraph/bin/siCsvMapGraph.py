@@ -222,18 +222,45 @@ def getdata( sulci_data, label ):
     data = sulci_data[ label ]
     return data
 
-def main():
-  parser, (options, args) = parseOpts(sys.argv)
-  if options.format is True:
-    print_csv_format()
-    sys.exit(1)
-  if options.csvfilename is None:
+def csvMapGraph( options, agraph=None, window=None, displayProp=None,
+  palette=None, propPrefix=None, csvfilename=None ):
+  '''csvMapGraph( options, agraph=None, window=None, displayProp=None,
+  palette=None, propPrefix=None, csvfilename=None )
+  
+  read a CSV-like file, extract numeric figures on sulci from it and map it
+  on a sulci graph displayed in anatomist.
+ 
+  Paramters:
+   
+  options: command-line parsing options of siCsvMapGraph (see the help of this 
+    command)
+  agraph: existing anatomist graph on which to map data. If not specified, a 
+    graph is read from the options.graphname parameter.
+  window: existing anatomist window in which the sulci graph will be displayed.
+    If not specified, a new window will be opened.
+  displayProp: when several data are read at the same time, specifies which 
+    one will be currently displayed. If not specified, the first data column
+    will be used.
+  palette: color palette to apply to the graph display. May be either an 
+    anatomist palette object, or a parameters dictionary, corresponding to the 
+    parameters of the SetObjectPalette command (see 
+    http://brainvisa.info/doc/anatomist-4.0/html/fr/programmation/commands.html#SetObjectPalette)
+  propPrefix: data read from the CSV file are stored in the graph nodes as 
+    properties. The prefix is used in the properties names. If not specified, 
+    'csv' is used
+  csvfilename: if specified, overrides options.csvfilename for convenience
+  
+  Return values: aobjects, awindows
+  '''
+  if csvfilename is None:
+    csvfilename = options.csvfilename
+  if csvfilename is None:
     parser.print_help()
     sys.exit(1)
   # read
   ft = sigraph.FoldLabelsTranslator(options.transfile)
   sigraph.si().setLabelsTranslPath(options.transfile)
-  labels, sulci_data, mode = read_csv(options.csvfilename,
+  labels, sulci_data, mode = read_csv(csvfilename,
     options.columns, operator=options.operator)
   if options.summarycsvfilename:
     write_summary_csv(options.summarycsvfilename,
@@ -242,14 +269,20 @@ def main():
   # graph
   if not options.graphname: return
   from soma import aims
-  r = aims.Reader(options = {'subobjectsfilter' : 1})
-  g = r.read(options.graphname)
-  ft.translate(g, options.label_attribute, options.label_attribute)
+  if agraph:
+    g = agraph.graph()
+    ag = agraph
+  else:
+    r = aims.Reader(options = {'subobjectsfilter' : 1})
+    g = r.read(options.graphname)
+    ft.translate(g, options.label_attribute, options.label_attribute)
 
   # mesh
   if options.meshname:
-    m = aims.Reader().read(options.meshname)
+    m = aims.read(options.meshname)
   else:	m = None
+  if propPrefix is None:
+    propPrefix='csv'
 
   for v in g.vertices():
     if v.getSyntax() != 'fold': continue
@@ -264,12 +297,47 @@ def main():
       try: data = getdata( sulci_data, str(int(v['index'])) )
       except exceptions.KeyError: continue
     for i, h in enumerate(labels):
-      v['csv_mean_' + h] = data[0][i]
+      v[propPrefix + '_mean_' + h] = data[0][i]
       if options.log and data[0][i] != 0:
-        v['csv_log_mean_' + h] = numpy.log(data[0][i])
+        v[ propPrefix + '_log_mean_' + h] = numpy.log(data[0][i])
       # add only no-null std
-      if data[1][i]: v['csv_std_' + h] = data[1][i]
-      v['csv_sum_' + h] = data[2][i]
+      if data[1][i]: v[ propPrefix + '_std_' + h] = data[1][i]
+      v[ propPrefix + '_sum_' + h] = data[2][i]
+
+  a = anatomist.Anatomist()
+  aobjects = []
+  if agraph is None:
+    ag = a.toAObject(g)
+    aobjects = [ag]
+  ag.setColorMode(ag.PropertyMap)
+  if displayProp is None:
+    displayProp = propPrefix + '_mean_' + labels[0]
+  ag.setColorProperty(displayProp)
+  if palette is not None:
+    if isinstance( palette, a.APalette ):
+      ag.setPalette( palette )
+    else: # dict
+      a.execute( 'SetObjectPalette', objects=[ag], **palette )
+  ag.notifyObservers()
+  if m:
+    am = a.toAObject(m)
+    aobjects.append(am)
+  if window is not None:
+    win = window
+    wins = []
+  else:
+    win = a.createWindow(wintype='3D')
+    wins = [ win ]
+  win.setHasCursor(0)
+  win.addObjects(aobjects, add_graph_nodes=True)
+  return aobjects, wins
+
+
+def main():
+  parser, (options, args) = parseOpts(sys.argv)
+  if options.format is True:
+    print_csv_format()
+    sys.exit(1)
 
   start_qt_loop = False
   if USE_QT4:
@@ -280,23 +348,8 @@ def main():
     if qt.QApplication.startingUp():
       app = qt.QApplication( sys.argv )
       start_qt_loop = True
-  a = anatomist.Anatomist()
-  ag = a.toAObject(g)
-  ag.setColorMode(ag.PropertyMap)
-  ag.setColorProperty('csv_mean_' + labels[0])
-  ag.notifyObservers()
-  aobjects = [ag]
-  if m:
-    am = a.toAObject(m)
-    aobjects.append(am)
-  win = a.createWindow(wintype='3D')
-  win.setHasCursor(0)
-  a.addObjects(aobjects, [win])
-  c = a.getControlWindow()
-  c.SelectWindow(win.internalRep)
-  cpp.ObjectActions.displayGraphChildrenMenuCallback().doit(\
-    [ag.internalRep])
-  c.UnselectAllWindows()
+
+  aobjects, wins = csvMapGraph( options )
 
   # qt loop
   if start_qt_loop:
@@ -306,3 +359,4 @@ def main():
       qt.qApp.exec_loop()
 
 if __name__ == '__main__' : main()
+
