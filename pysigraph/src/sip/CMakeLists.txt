@@ -2,14 +2,14 @@ BRAINVISA_GET_FILE_LIST_FROM_PRO( "${CMAKE_CURRENT_SOURCE_DIR}/sip.pro" "HEADERS
 BRAINVISA_COPY_AND_INSTALL_HEADERS( _headers pysigraph headersTarget )
 
 file( GLOB _sipTemplates RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/*.tpl" )
-BRAINVISA_COPY_FILES( ${PROJECT_NAME}-devel
+BRAINVISA_COPY_FILES( ${PROJECT_NAME}-dev
                       typessub.py ${_sipTemplates}
                       SOURCE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                       DESTINATION "${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
                       IMMEDIATE )
 
 file( GLOB _sipSources "${CMAKE_CURRENT_SOURCE_DIR}/*.sip" )
-BRAINVISA_COPY_FILES( ${PROJECT_NAME}-devel
+BRAINVISA_COPY_FILES( ${PROJECT_NAME}-dev
                       ${_sipSources}
                       SOURCE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                       DESTINATION "${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
