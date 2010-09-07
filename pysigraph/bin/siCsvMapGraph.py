@@ -173,14 +173,14 @@ def parseOpts(argv):
   description = 'Map csv values onto sulci.'
   parser = OptionParser(description)
   parser.add_option('-g', '--graph', dest='graphname',
-    metavar = 'FILE', action='store', default = None,
+    metavar = 'FILE', action='append', default = [],
     help='data graph')
   parser.add_option('--label-attribute', dest='label_attribute',
     metavar = 'STR', type='choice', choices=('name', 'label'),
     action='store', default='name',
     help="'name' or 'label' (default: %default)")
   parser.add_option('-m', '--mesh', dest='meshname',
-    metavar = 'FILE', action='store', default = None,
+    metavar = 'FILE', action='append', default = [],
     help='grey/white mesh in the same space of the input graph')
   parser.add_option('--csv', dest='csvfilename',
     metavar = 'FILE', action='store', default = None,
@@ -222,34 +222,34 @@ def getdata( sulci_data, label ):
     data = sulci_data[ label ]
     return data
 
-def csvMapGraph( options, agraph=None, window=None, displayProp=None,
+def csvMapGraph( options, agraphs=None, window=None, displayProp=None,
   palette=None, propPrefix=None, csvfilename=None ):
-  '''csvMapGraph( options, agraph=None, window=None, displayProp=None,
+  '''csvMapGraph( options, agraphs=None, window=None, displayProp=None,
   palette=None, propPrefix=None, csvfilename=None )
-  
+
   read a CSV-like file, extract numeric figures on sulci from it and map it
   on a sulci graph displayed in anatomist.
- 
+
   Paramters:
-   
-  options: command-line parsing options of siCsvMapGraph (see the help of this 
+
+  options: command-line parsing options of siCsvMapGraph (see the help of this
     command)
-  agraph: existing anatomist graph on which to map data. If not specified, a 
+  agraphs: existing anatomist graph(s) on which to map data. If not specified, a
     graph is read from the options.graphname parameter.
   window: existing anatomist window in which the sulci graph will be displayed.
     If not specified, a new window will be opened.
-  displayProp: when several data are read at the same time, specifies which 
+  displayProp: when several data are read at the same time, specifies which
     one will be currently displayed. If not specified, the first data column
     will be used.
-  palette: color palette to apply to the graph display. May be either an 
-    anatomist palette object, or a parameters dictionary, corresponding to the 
-    parameters of the SetObjectPalette command (see 
+  palette: color palette to apply to the graph display. May be either an
+    anatomist palette object, or a parameters dictionary, corresponding to the
+    parameters of the SetObjectPalette command (see
     http://brainvisa.info/doc/anatomist-4.0/html/fr/programmation/commands.html#SetObjectPalette)
-  propPrefix: data read from the CSV file are stored in the graph nodes as 
-    properties. The prefix is used in the properties names. If not specified, 
+  propPrefix: data read from the CSV file are stored in the graph nodes as
+    properties. The prefix is used in the properties names. If not specified,
     'csv' is used
   csvfilename: if specified, overrides options.csvfilename for convenience
-  
+
   Return values: aobjects, awindows
   '''
   if csvfilename is None:
@@ -269,59 +269,64 @@ def csvMapGraph( options, agraph=None, window=None, displayProp=None,
   # graph
   if not options.graphname: return
   from soma import aims
-  if agraph:
-    g = agraph.graph()
-    ag = agraph
+  graphs = []
+  if agraphs:
+    if isinstance( agraphs, anatomist.Anatomist.AGraph ):
+      agraphs = [ agraphs ]
+    graphs = [ x.graph() for x in agraphs ]
   else:
     r = aims.Reader(options = {'subobjectsfilter' : 1})
-    g = r.read(options.graphname)
-    ft.translate(g, options.label_attribute, options.label_attribute)
+    graphs = [ r.read( f ) for f in options.graphname ]
+    for g in graphs:
+      ft.translate(g, options.label_attribute, options.label_attribute)
 
   # mesh
-  if options.meshname:
-    m = aims.read(options.meshname)
+  for mfile in options.meshname:
+    m = aims.read( mfile )
   else:	m = None
   if propPrefix is None:
     propPrefix='csv'
 
-  for v in g.vertices():
-    if v.getSyntax() != 'fold': continue
-    if mode in ( 'sulci', 'label', 'name' ):
-      try:
-        l = v[options.label_attribute]
-        data = getdata( sulci_data,
-          v[options.label_attribute] )
-      except exceptions.KeyError:
-        continue
-    elif mode == 'nodes':
-      try: data = getdata( sulci_data, str(int(v['index'])) )
-      except exceptions.KeyError: continue
-    for i, h in enumerate(labels):
-      v[propPrefix + '_mean_' + h] = data[0][i]
-      if options.log and data[0][i] != 0:
-        v[ propPrefix + '_log_mean_' + h] = numpy.log(data[0][i])
-      # add only no-null std
-      if data[1][i]: v[ propPrefix + '_std_' + h] = data[1][i]
-      v[ propPrefix + '_sum_' + h] = data[2][i]
+  for g in graphs:
+    for v in g.vertices():
+      if v.getSyntax() != 'fold': continue
+      if mode in ( 'sulci', 'label', 'name' ):
+        try:
+          l = v[options.label_attribute]
+          data = getdata( sulci_data,
+            v[options.label_attribute] )
+        except exceptions.KeyError:
+          continue
+      elif mode == 'nodes':
+        try: data = getdata( sulci_data, str(int(v['index'])) )
+        except exceptions.KeyError: continue
+      for i, h in enumerate(labels):
+        v[propPrefix + '_mean_' + h] = data[0][i]
+        if options.log and data[0][i] != 0:
+          v[ propPrefix + '_log_mean_' + h] = numpy.log(data[0][i])
+        # add only no-null std
+        if data[1][i]: v[ propPrefix + '_std_' + h] = data[1][i]
+        v[ propPrefix + '_sum_' + h] = data[2][i]
 
   a = anatomist.Anatomist()
   aobjects = []
-  if agraph is None:
-    ag = a.toAObject(g)
-    aobjects = [ag]
-  ag.setColorMode(ag.PropertyMap)
+  if not agraphs:
+    agraphs = [ a.toAObject( g ) for g in graphs ]
+    aobjects = agraphs
   if displayProp is None:
     displayProp = propPrefix + '_mean_' + labels[0]
-  ag.setColorProperty(displayProp)
-  if palette is not None:
-    if isinstance( palette, a.APalette ):
-      ag.setPalette( palette )
-    else: # dict
-      a.execute( 'SetObjectPalette', objects=[ag], **palette )
-  ag.notifyObservers()
-  if m:
-    am = a.toAObject(m)
-    aobjects.append(am)
+  for ag in agraphs:
+    ag.setColorMode(ag.PropertyMap)
+    ag.setColorProperty(displayProp)
+    if palette is not None:
+      if isinstance( palette, a.APalette ):
+        ag.setPalette( palette )
+      else: # dict
+        a.execute( 'SetObjectPalette', objects=[ag], **palette )
+    ag.notifyObservers()
+    if m:
+      am = a.toAObject(m)
+      aobjects.append(am)
   if window is not None:
     win = window
     wins = []
