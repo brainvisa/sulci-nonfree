@@ -81,7 +81,7 @@ if outputcsv:
   csvfile = open( outputcsv, 'w' )
   if subject:
     print >> csvfile, 'subject',
-  print >> csvfile, 'label side distance distance_points'
+  print >> csvfile, 'label side distance distance_points touching'
 else:
   csvfile = None
 
@@ -106,7 +106,7 @@ for graphfile in graphfiles:
       continue
     dist = distances.get( label, None )
     if dist is None:
-      dist = { 'dist' : 0., 'ndist' : 0 }
+      dist = { 'dist' : 0., 'ndist' : 0, 'touching' : 0 }
       distances[ label ] = dist
     for bucket in ( 'aims_ss', 'aims_bottom', 'aims_other' ):
       try:
@@ -118,6 +118,8 @@ for graphfile in graphfiles:
                         # has not reached
               dist[ 'dist' ] += darr[ voxel[0], voxel[1], voxel[2], 0 ]
               dist[ 'ndist' ] += 1
+              if d == 0:
+                dist[ 'touching' ] = 1
       except:
         pass
   for label, dist in distances.iteritems():
@@ -135,6 +137,7 @@ for graphfile in graphfiles:
         ulabel = label
       if subject:
         print >> csvfile, subject,
-      print >> csvfile, ulabel, side, dist[ 'dist' ], dist[ 'ndist' ]
+      print >> csvfile, ulabel, side, dist[ 'dist' ], dist[ 'ndist' ], \
+        dist[ 'touching' ]
 
 

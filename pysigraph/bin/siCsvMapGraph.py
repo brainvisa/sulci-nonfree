@@ -47,17 +47,18 @@ def print_csv_format():
   '''
   print format
 
-def read_csv(csvfilename, columns=[], operator='mean'):
+def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
+  filterExpr=None):
   fd = open(csvfilename)
-  lines = fd.readlines()
+  line = fd.readline()
   delim = '\t'
-  labels = lines[0].rstrip('\n').rstrip('\r').strip().split( delim )
+  labels = line.rstrip('\n').rstrip('\r').strip().split( delim )
   if len( labels ) == 1:
     delim = ' '
-    labels = lines[0].rstrip('\n').rstrip('\r').strip().split( delim )
+    labels = line.rstrip('\n').rstrip('\r').strip().split( delim )
   fd.close()
   header_minf = { 'Y' : [], 'labels' : labels }
-  print 'labels:', labels
+  # print 'labels:', labels
   labels2 = [ x.lower() for x in labels ]
   subjectcol = None
   labelcol = None
@@ -124,10 +125,17 @@ def read_csv(csvfilename, columns=[], operator='mean'):
   db, header = io.ReaderHeaderCsv().read(csvfilename,header_minf,
     sep=delim)
   X = db.getX()
-  sulci = db.getINF()[:, -1]
+  inf = db.getINF()
+  if filterCol is not None and filterExpr is not None:
+    fcol = labels.index( filterCol )
+    fcol = header_minf['INF'].index( fcol )
+    filt = eval('numpy.where(inf[:,fcol]' + filterExpr + ')' )
+    X = X[ filt ]
+    inf = inf[ filt ]
+  sulci = inf[:, -1]
   if sidecol:
     for i, s in enumerate( sulci ):
-      side = db.getINF()[i, infsidecol]
+      side = inf[i, infsidecol]
       if side and side != 'both':
         s += '_' + side
         sulci[i] = s
@@ -223,7 +231,8 @@ def getdata( sulci_data, label ):
     return data
 
 def csvMapGraph( options, agraphs=None, window=None, displayProp=None,
-  palette=None, propPrefix=None, csvfilename=None ):
+  palette=None, propPrefix=None, csvfilename=None, filterCol=None,
+  filterExpr=None ):
   '''csvMapGraph( options, agraphs=None, window=None, displayProp=None,
   palette=None, propPrefix=None, csvfilename=None )
 
@@ -261,7 +270,8 @@ def csvMapGraph( options, agraphs=None, window=None, displayProp=None,
   ft = sigraph.FoldLabelsTranslator(options.transfile)
   sigraph.si().setLabelsTranslPath(options.transfile)
   labels, sulci_data, mode = read_csv(csvfilename,
-    options.columns, operator=options.operator)
+    options.columns, operator=options.operator, filterCol=filterCol,
+    filterExpr=filterExpr)
   if options.summarycsvfilename:
     write_summary_csv(options.summarycsvfilename,
       labels, sulci_data, mode)
