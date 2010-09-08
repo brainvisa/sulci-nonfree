@@ -255,7 +255,7 @@ def csvMapGraph( options, agraphs=None, window=None, displayProp=None,
   if csvfilename is None:
     csvfilename = options.csvfilename
   if csvfilename is None:
-    parser.print_help()
+    parseOpts( [ sys.argv[0], '-h' ] )
     sys.exit(1)
   # read
   ft = sigraph.FoldLabelsTranslator(options.transfile)
