@@ -8,18 +8,20 @@ import sigraph
 
 parser = optparse.OptionParser( description='calculates a distance map from ' \
   'a lesion in the brain, and mean distance from the lesion to all sulci' )
-parser.add_option( '-l', '--lesion', dest='lesionfile', 
+parser.add_option( '-l', '--lesion', dest='lesionfile',
   help='input lesion mask' )
-parser.add_option( '-b', '--brain', dest='brainfile', 
+parser.add_option( '-b', '--brain', dest='brainfile',
   help='brain mask' )
-parser.add_option( '-o', '--output', dest='outputcsv', 
+parser.add_option( '-o', '--output', dest='outputcsv',
   help='output CSV file' )
 parser.add_option( '-g', '--graph', dest='graphs', action='append',
   help='sulci graph files, several can be specified (generally left and ' \
   'right hemispheres)' )
-parser.add_option( '-d', '--distance', dest='distfile', 
+parser.add_option( '--indistance', dest='indistfile',
+  help='input distance map image, recalculated if not specified' )
+parser.add_option( '-d', '--distance', dest='distfile',
   help='output distance map image, not written if not specified' )
-parser.add_option( '--labelatt', dest='label', 
+parser.add_option( '--labelatt', dest='label',
   help='label attribute (label or name), default: guessed if specified in ' \
   'graphs, or take label' )
 parser.add_option( '-s', '--subject', dest='subject',
@@ -40,6 +42,7 @@ brainfile = options.brainfile
 lesionfile = options.lesionfile
 outputcsv = options.outputcsv
 graphfiles = options.graphs
+indistfile = options.indistfile
 distfile = options.distfile
 labelatt = options.label
 subject = options.subject
@@ -50,20 +53,24 @@ if not brainfile or not lesionfile:
   parser.parse_args( [ '-h' ] )
 
 brain = aims.read( brainfile )
-lesion = aims.read( lesionfile )
-
-# mask lesion to allow only parts in the brain mask
 barr = numpy.array( brain, copy=False )
-larr = numpy.array( lesion, copy=False )
-larr[ barr != 255 ] = 0
-# put the lesion inside the brain
-barr[ larr == 4095 ] = 1
 
-fm = aims.FastMarching()
-dist = fm.doit( brain, [ 255 ], [ 1 ] )
+if indistfile:
+  dist = aims.read( indistfile )
+else:
+  lesion = aims.read( lesionfile )
 
-if distfile:
-  aims.write( dist, distfile )
+  # mask lesion to allow only parts in the brain mask
+  larr = numpy.array( lesion, copy=False )
+  larr[ barr != 255 ] = 0
+  # put the lesion inside the brain
+  barr[ larr == 4095 ] = 1
+
+  fm = aims.FastMarching()
+  dist = fm.doit( brain, [ 255 ], [ 1 ] )
+
+  if distfile:
+    aims.write( dist, distfile )
 darr = numpy.array( dist, copy=False )
 
 if not graphfiles:
@@ -114,7 +121,7 @@ for graphfile in graphfiles:
         for voxel in bck[0].keys():
           if barr[ voxel[0], voxel[1], voxel[2], 0 ] != 0:
             d = darr[ voxel[0], voxel[1], voxel[2], 0 ]
-            if d < 1e4: # avoid disconnected zones where the distance map 
+            if d < 1e4: # avoid disconnected zones where the distance map
                         # has not reached
               dist[ 'dist' ] += darr[ voxel[0], voxel[1], voxel[2], 0 ]
               dist[ 'ndist' ] += 1
