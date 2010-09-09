@@ -53,6 +53,10 @@ vector<string> InterFoldDescr5::descriptorsNames() const
         names.push_back( "inertia_3" );
         names.push_back( "inertia_4" );
         names.push_back( "inertia_5" );
+
+        names.push_back( "inertia_eigenvalue_0" );
+        names.push_back( "inertia_eigenvalue_1" );
+        names.push_back( "inertia_eigenvalue_2" );
       }
     }
   return names;
@@ -65,8 +69,8 @@ string InterFoldDescr5::name() const
 }
 
 
-bool InterFoldDescr5::makeVectorElements( const Clique* cl, 
-                                          vector<double> & vec, 
+bool InterFoldDescr5::makeVectorElements( const Clique* cl,
+                                          vector<double> & vec,
                                           GenericObject* ao )
 {
   if( outputInertia() )
@@ -94,6 +98,10 @@ bool InterFoldDescr5::makeVectorElements( const Clique* cl,
         vec.push_back( 0 );
         vec.push_back( 0 );
         vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+
         vec.push_back( 0 );
         vec.push_back( 0 );
         vec.push_back( 0 );
@@ -211,6 +219,14 @@ bool InterFoldDescr5::makeVectorElements( const Clique* cl,
     vec.push_back( mom.m2()[3] );
     vec.push_back( mom.m2()[4] );
     vec.push_back( mom.m2()[5] );
+
+    mom.orientation();
+
+    AimsData<double> eigenValues = mom.eigenValue();
+
+    vec.push_back( eigenValues( 0, 0 ) );
+    vec.push_back( eigenValues( 1, 1 ) );
+    vec.push_back( eigenValues( 2, 2 ) );
   }
 
   return true;

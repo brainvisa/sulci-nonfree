@@ -16,7 +16,7 @@ using namespace std;
 
 
 InertialDomainBox::InertialDomainBox()
-  : DomainBox(), _inertia( 3, 3 ), _gravity( 3 ), _rotation( 3, 3 ), 
+  : DomainBox(), _inertia( 3, 3 ), _gravity( 3 ), _rotation( 3, 3 ),
     _eigenValues( 3 ), _npoints( 0 ), _transfUpToDate( false ), _tolMargin( 0 )
 {
   _inertia = 0;
@@ -62,9 +62,9 @@ bool InertialDomainBox::canBeFound( const Vertex* v, const Graph* )
   for( ie=v->begin(); ie!=fe; ++ie )
     if( (e=*ie)->getSyntax() == SIA_HULLJUNCTION_SYNTAX )
       {
-	if( e->getProperty( SIA_REFEXTREMITY1, e1 ) 
+	if( e->getProperty( SIA_REFEXTREMITY1, e1 )
 	    && e->getProperty( SIA_REFEXTREMITY2, e2 ) )
-	  if( !canBeFound( e1[0], e1[1], e1[2] ) 
+	  if( !canBeFound( e1[0], e1[1], e1[2] )
 	      || !canBeFound( e2[0], e2[1], e2[2] ) )
 	    return( false );
 	break;
@@ -115,9 +115,9 @@ void InertialDomainBox::learnBucket( const Vertex* v, const Graph* g )
   BucketMap<Void>::Bucket::const_iterator	ib, fb;
   vector<float>					rot, scale, transl, vsz;
 
-  if( !g || !g->getProperty( SIA_TALAIRACH_ROTATION, rot ) 
-      || !g->getProperty( SIA_TALAIRACH_SCALE, scale ) 
-      || !g->getProperty( SIA_TALAIRACH_TRANSLATION, transl ) 
+  if( !g || !g->getProperty( SIA_TALAIRACH_ROTATION, rot )
+      || !g->getProperty( SIA_TALAIRACH_SCALE, scale )
+      || !g->getProperty( SIA_TALAIRACH_TRANSLATION, transl )
       || !g->getProperty( SIA_VOXEL_SIZE, vsz ) )
     return;
   if( !v->getProperty( SIA_SS_BUCKET, ssbck ) )
@@ -143,7 +143,7 @@ void InertialDomainBox::learnBucket( const Vertex* v, const Graph* g )
   for( ie=v->begin(); ie!=fe; ++ie )
     if( (e=*ie)->getSyntax() == SIA_HULLJUNCTION_SYNTAX )
       {
-	if( e->getProperty( SIA_REFEXTREMITY1, e1 ) 
+	if( e->getProperty( SIA_REFEXTREMITY1, e1 )
 	    && e->getProperty( SIA_REFEXTREMITY2, e2 ) )
 	  {
 	    learnTalVoxel( e1[0], e1[1], e1[2] );
@@ -156,10 +156,10 @@ void InertialDomainBox::learnBucket( const Vertex* v, const Graph* g )
 }
 
 
-void InertialDomainBox::learnVoxel( const vector<float> & rot, 
-				    const vector<float> & scale, 
-				    const vector<float> & transl, 
-				    const vector<float> & vsz, 
+void InertialDomainBox::learnVoxel( const vector<float> & rot,
+				    const vector<float> & scale,
+				    const vector<float> & transl,
+				    const vector<float> & vsz,
 				    const AimsVector<short, 3> & pt )
 {
   // Talairach
@@ -180,7 +180,7 @@ void InertialDomainBox::learnTalVoxel( double x2, double y2, double z2 )
   changeRef( x2, y2, z2 );
 
   if( _npoints == 0 )
-    setDims( x2 - _tolMargin, y2 - _tolMargin, z2 - _tolMargin, 
+    setDims( x2 - _tolMargin, y2 - _tolMargin, z2 - _tolMargin,
 	     x2 + _tolMargin, y2 + _tolMargin, z2 + _tolMargin );
   else
     {
@@ -206,49 +206,53 @@ void InertialDomainBox::diagonalize()
   _rotation = _inertia.clone();
   AimsEigen<float>	eigen;
   //eigen.setSymmetricMatrix();
-  _eigenValues = eigen.doit( _rotation );
-  // v�rifier que le rep�re est direct
+  AimsData<float> m_eigenValues = eigen.doit( _rotation );
+  _eigenValues = AimsData<float>( 3 );
+  _eigenValues(0) = m_eigenValues(0,0);
+  _eigenValues(1) = m_eigenValues(1,1);
+  _eigenValues(2) = m_eigenValues(2,2);
+  // check that the referential is direct
   AimsData<float>	pvec(3);
-  pvec[0] = _rotation( 1, 0 ) *  _rotation( 2, 1 ) 
+  pvec[0] = _rotation( 1, 0 ) *  _rotation( 2, 1 )
     - _rotation( 2, 0 ) *  _rotation( 1, 1 );
-  pvec[1] = _rotation( 2, 0 ) * _rotation( 0, 1 ) 
+  pvec[1] = _rotation( 2, 0 ) * _rotation( 0, 1 )
     - _rotation( 0, 0 ) * _rotation( 2, 1 );
-  pvec[2] = _rotation( 0, 0 ) * _rotation( 1, 1 ) 
+  pvec[2] = _rotation( 0, 0 ) * _rotation( 1, 1 )
     - _rotation( 1, 0 ) * _rotation( 0, 1 );
-  if( fabs( pvec[0] - _rotation( 0, 2 ) ) > 1e-5 
-      || fabs( pvec[1] - _rotation( 1, 2 ) ) > 1e-5 
+  if( fabs( pvec[0] - _rotation( 0, 2 ) ) > 1e-5
+      || fabs( pvec[1] - _rotation( 1, 2 ) ) > 1e-5
       || fabs( pvec[2] - _rotation( 2, 2 ) ) > 1e-5 )
+  {
+    cout << "indirect referential\n";
+    if( fabs( pvec[0] + _rotation( 0, 2 ) ) > 1e-5
+      || fabs( pvec[1] + _rotation( 1, 2 ) ) > 1e-5
+      || fabs( pvec[2] + _rotation( 2, 2 ) ) > 1e-5 )
+      cout << "La transformation ne marche pas : " << _rotation( 0, 2 )
+        << ", " << _rotation( 1, 2 ) << ", " << _rotation( 2, 2 )
+        << " au lieu de " << pvec[0] << ", " << pvec[1] << ", "
+        << pvec[2] << ".\n";
+    else
     {
-      cout << "rep�re indirect\n";
-      if( fabs( pvec[0] + _rotation( 0, 2 ) ) > 1e-5 
-	  || fabs( pvec[1] + _rotation( 1, 2 ) ) > 1e-5 
-	  || fabs( pvec[2] + _rotation( 2, 2 ) ) > 1e-5 )
-	cout << "La transformation ne marche pas : " << _rotation( 0, 2 ) 
-	     << ", " << _rotation( 1, 2 ) << ", " << _rotation( 2, 2 ) 
-	     << " au lieu de " << pvec[0] << ", " << pvec[1] << ", " 
-	     << pvec[2] << ".\n";
-      else
-	{
-	  /*_rotation( 0, 2 ) *= -1;
-	  _rotation( 1, 2 ) *= -1;
-	  _rotation( 2, 2 ) *= -1;*/
-	  // swap de vecteurs
-	  float	t = _rotation( 0, 0 );
-	  _rotation( 0, 0 ) = _rotation( 0, 2 );
-	  _rotation( 0, 2 ) = t;
-	  t = _rotation( 1, 0 );
-	  _rotation( 1, 0 ) = _rotation( 1, 2 );
-	  _rotation( 1, 2 ) = t;
-	  t = _rotation( 2, 0 );
-	  _rotation( 2, 0 ) = _rotation( 2, 2 );
-	  _rotation( 2, 2 ) = t;
-	  //	et des valeurs propres associ�es
-	  t = _eigenValues[0];
-	  _eigenValues[0] = _eigenValues[2];
-	  _eigenValues[2] = t;
-	}
+      /*_rotation( 0, 2 ) *= -1;
+      _rotation( 1, 2 ) *= -1;
+      _rotation( 2, 2 ) *= -1;*/
+      // swap de vecteurs
+      float	t = _rotation( 0, 0 );
+      _rotation( 0, 0 ) = _rotation( 0, 2 );
+      _rotation( 0, 2 ) = t;
+      t = _rotation( 1, 0 );
+      _rotation( 1, 0 ) = _rotation( 1, 2 );
+      _rotation( 1, 2 ) = t;
+      t = _rotation( 2, 0 );
+      _rotation( 2, 0 ) = _rotation( 2, 2 );
+      _rotation( 2, 2 ) = t;
+      //	et des valeurs propres associ�es
+      t = _eigenValues(0);
+      _eigenValues(0) = _eigenValues(2);
+      _eigenValues(2) = t;
     }
-  else cout << "bon rep�re direct comme il faut\n";
+  }
+  else cout << "direct referential\n";
 
   if( _npoints )
     {
@@ -418,134 +422,134 @@ void InertialDomainBox::cubeTalairach( vector<vector<double> > & pts ) const
   vector<double>	pt;
 
   pts.erase( pts.begin(), pts.end() );
-  pt.push_back( _rotation( 0, 0 ) * _xmin + _rotation( 0, 1 ) * _ymin 
+  pt.push_back( _rotation( 0, 0 ) * _xmin + _rotation( 0, 1 ) * _ymin
 		+ _rotation( 0, 2 ) * _zmin + _gravity[0] );
-  pt.push_back( _rotation( 1, 0 ) * _xmin + _rotation( 1, 1 ) * _ymin 
+  pt.push_back( _rotation( 1, 0 ) * _xmin + _rotation( 1, 1 ) * _ymin
 		+ _rotation( 1, 2 ) * _zmin + _gravity[1] );
-  pt.push_back( _rotation( 2, 0 ) * _xmin + _rotation( 2, 1 ) * _ymin 
+  pt.push_back( _rotation( 2, 0 ) * _xmin + _rotation( 2, 1 ) * _ymin
 		+ _rotation( 2, 2 ) * _zmin + _gravity[2] );
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 0, 1 ) * _ymin 
+  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 0, 1 ) * _ymin
     + _rotation( 0, 2 ) * _zmin + _gravity[0];
-  pt[1] = _rotation( 1, 0 ) * _xmax + _rotation( 1, 1 ) * _ymin 
+  pt[1] = _rotation( 1, 0 ) * _xmax + _rotation( 1, 1 ) * _ymin
     + _rotation( 1, 2 ) * _zmin + _gravity[1];
-  pt[2] = _rotation( 2, 0 ) * _xmax + _rotation( 2, 1 ) * _ymin 
+  pt[2] = _rotation( 2, 0 ) * _xmax + _rotation( 2, 1 ) * _ymin
     + _rotation( 2, 2 ) * _zmin + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 0, 1 ) * _ymin 
+  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 0, 1 ) * _ymin
     + _rotation( 0, 2 ) * _zmax + _gravity[0];
-  pt[1] = _rotation( 1, 0 ) * _xmax + _rotation( 1, 1 ) * _ymin 
+  pt[1] = _rotation( 1, 0 ) * _xmax + _rotation( 1, 1 ) * _ymin
     + _rotation( 1, 2 ) * _zmax + _gravity[1];
-  pt[2] = _rotation( 2, 0 ) * _xmax + _rotation( 2, 1 ) * _ymin 
+  pt[2] = _rotation( 2, 0 ) * _xmax + _rotation( 2, 1 ) * _ymin
     + _rotation( 2, 2 ) * _zmax + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 0, 1 ) * _ymin 
+  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 0, 1 ) * _ymin
     + _rotation( 0, 2 ) * _zmax + _gravity[0];
-  pt[1] = _rotation( 1, 0 ) * _xmin + _rotation( 1, 1 ) * _ymin 
+  pt[1] = _rotation( 1, 0 ) * _xmin + _rotation( 1, 1 ) * _ymin
     + _rotation( 1, 2 ) * _zmax + _gravity[1];
-  pt[2] = _rotation( 2, 0 ) * _xmin + _rotation( 2, 1 ) * _ymin 
+  pt[2] = _rotation( 2, 0 ) * _xmin + _rotation( 2, 1 ) * _ymin
     + _rotation( 2, 2 ) * _zmax + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 0, 1 ) * _ymax 
+  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 0, 1 ) * _ymax
     + _rotation( 0, 2 ) * _zmax + _gravity[0];
-  pt[1] = _rotation( 1, 0 ) * _xmin + _rotation( 1, 1 ) * _ymax 
+  pt[1] = _rotation( 1, 0 ) * _xmin + _rotation( 1, 1 ) * _ymax
     + _rotation( 1, 2 ) * _zmax + _gravity[1];
-  pt[2] = _rotation( 2, 0 ) * _xmin + _rotation( 2, 1 ) * _ymax 
+  pt[2] = _rotation( 2, 0 ) * _xmin + _rotation( 2, 1 ) * _ymax
     + _rotation( 2, 2 ) * _zmax + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 0, 1 ) * _ymax 
+  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 0, 1 ) * _ymax
     + _rotation( 0, 2 ) * _zmin + _gravity[0];
-  pt[1] = _rotation( 1, 0 ) * _xmin + _rotation( 1, 1 ) * _ymax 
+  pt[1] = _rotation( 1, 0 ) * _xmin + _rotation( 1, 1 ) * _ymax
     + _rotation( 1, 2 ) * _zmin + _gravity[1];
-  pt[2] = _rotation( 2, 0 ) * _xmin + _rotation( 2, 1 ) * _ymax 
+  pt[2] = _rotation( 2, 0 ) * _xmin + _rotation( 2, 1 ) * _ymax
     + _rotation( 2, 2 ) * _zmin + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 0, 1 ) * _ymax 
+  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 0, 1 ) * _ymax
     + _rotation( 0, 2 ) * _zmin + _gravity[0];
-  pt[1] = _rotation( 1, 0 ) * _xmax + _rotation( 1, 1 ) * _ymax 
+  pt[1] = _rotation( 1, 0 ) * _xmax + _rotation( 1, 1 ) * _ymax
     + _rotation( 1, 2 ) * _zmin + _gravity[1];
-  pt[2] = _rotation( 2, 0 ) * _xmax + _rotation( 2, 1 ) * _ymax 
+  pt[2] = _rotation( 2, 0 ) * _xmax + _rotation( 2, 1 ) * _ymax
     + _rotation( 2, 2 ) * _zmin + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 0, 1 ) * _ymax 
+  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 0, 1 ) * _ymax
     + _rotation( 0, 2 ) * _zmax + _gravity[0];
-  pt[1] = _rotation( 1, 0 ) * _xmax + _rotation( 1, 1 ) * _ymax 
+  pt[1] = _rotation( 1, 0 ) * _xmax + _rotation( 1, 1 ) * _ymax
     + _rotation( 1, 2 ) * _zmax + _gravity[1];
-  pt[2] = _rotation( 2, 0 ) * _xmax + _rotation( 2, 1 ) * _ymax 
+  pt[2] = _rotation( 2, 0 ) * _xmax + _rotation( 2, 1 ) * _ymax
     + _rotation( 2, 2 ) * _zmax + _gravity[2];
     pts.push_back( pt );
 
 
 
     /*  pts.erase( pts.begin(), pts.end() );
-  pt.push_back( _rotation( 0, 0 ) * _xmin + _rotation( 1, 0 ) * _ymin 
+  pt.push_back( _rotation( 0, 0 ) * _xmin + _rotation( 1, 0 ) * _ymin
 		+ _rotation( 2, 0 ) * _zmin + _gravity[0] );
-  pt.push_back( _rotation( 0, 1 ) * _xmin + _rotation( 1, 1 ) * _ymin 
+  pt.push_back( _rotation( 0, 1 ) * _xmin + _rotation( 1, 1 ) * _ymin
 		+ _rotation( 2, 1 ) * _zmin + _gravity[1] );
-  pt.push_back( _rotation( 0, 2 ) * _xmin + _rotation( 1, 2 ) * _ymin 
+  pt.push_back( _rotation( 0, 2 ) * _xmin + _rotation( 1, 2 ) * _ymin
 		+ _rotation( 2, 2 ) * _zmin + _gravity[2] );
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 1, 0 ) * _ymin 
+  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 1, 0 ) * _ymin
     + _rotation( 2, 0 ) * _zmin + _gravity[0];
-  pt[1] = _rotation( 0, 1 ) * _xmax + _rotation( 1, 1 ) * _ymin 
+  pt[1] = _rotation( 0, 1 ) * _xmax + _rotation( 1, 1 ) * _ymin
     + _rotation( 2, 1 ) * _zmin + _gravity[1];
-  pt[2] = _rotation( 0, 2 ) * _xmax + _rotation( 1, 2 ) * _ymin 
+  pt[2] = _rotation( 0, 2 ) * _xmax + _rotation( 1, 2 ) * _ymin
     + _rotation( 2, 2 ) * _zmin + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 1, 0 ) * _ymin 
+  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 1, 0 ) * _ymin
     + _rotation( 2, 0 ) * _zmax + _gravity[0];
-  pt[1] = _rotation( 0, 1 ) * _xmax + _rotation( 1, 1 ) * _ymin 
+  pt[1] = _rotation( 0, 1 ) * _xmax + _rotation( 1, 1 ) * _ymin
     + _rotation( 2, 1 ) * _zmax + _gravity[1];
-  pt[2] = _rotation( 0, 2 ) * _xmax + _rotation( 1, 2 ) * _ymin 
+  pt[2] = _rotation( 0, 2 ) * _xmax + _rotation( 1, 2 ) * _ymin
     + _rotation( 2, 2 ) * _zmax + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 1, 0 ) * _ymin 
+  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 1, 0 ) * _ymin
     + _rotation( 2, 0 ) * _zmax + _gravity[0];
-  pt[1] = _rotation( 0, 1 ) * _xmin + _rotation( 1, 1 ) * _ymin 
+  pt[1] = _rotation( 0, 1 ) * _xmin + _rotation( 1, 1 ) * _ymin
     + _rotation( 2, 1 ) * _zmax + _gravity[1];
-  pt[2] = _rotation( 0, 2 ) * _xmin + _rotation( 1, 2 ) * _ymin 
+  pt[2] = _rotation( 0, 2 ) * _xmin + _rotation( 1, 2 ) * _ymin
     + _rotation( 2, 2 ) * _zmax + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 1, 0 ) * _ymax 
+  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 1, 0 ) * _ymax
     + _rotation( 2, 0 ) * _zmax + _gravity[0];
-  pt[1] = _rotation( 0, 1 ) * _xmin + _rotation( 1, 1 ) * _ymax 
+  pt[1] = _rotation( 0, 1 ) * _xmin + _rotation( 1, 1 ) * _ymax
     + _rotation( 2, 1 ) * _zmax + _gravity[1];
-  pt[2] = _rotation( 0, 2 ) * _xmin + _rotation( 1, 2 ) * _ymax 
+  pt[2] = _rotation( 0, 2 ) * _xmin + _rotation( 1, 2 ) * _ymax
     + _rotation( 2, 2 ) * _zmax + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 1, 0 ) * _ymax 
+  pt[0] = _rotation( 0, 0 ) * _xmin + _rotation( 1, 0 ) * _ymax
     + _rotation( 2, 0 ) * _zmin + _gravity[0];
-  pt[1] = _rotation( 0, 1 ) * _xmin + _rotation( 1, 1 ) * _ymax 
+  pt[1] = _rotation( 0, 1 ) * _xmin + _rotation( 1, 1 ) * _ymax
     + _rotation( 2, 1 ) * _zmin + _gravity[1];
-  pt[2] = _rotation( 0, 2 ) * _xmin + _rotation( 1, 2 ) * _ymax 
+  pt[2] = _rotation( 0, 2 ) * _xmin + _rotation( 1, 2 ) * _ymax
     + _rotation( 2, 2 ) * _zmin + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 1, 0 ) * _ymax 
+  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 1, 0 ) * _ymax
     + _rotation( 2, 0 ) * _zmin + _gravity[0];
-  pt[1] = _rotation( 0, 1 ) * _xmax + _rotation( 1, 1 ) * _ymax 
+  pt[1] = _rotation( 0, 1 ) * _xmax + _rotation( 1, 1 ) * _ymax
     + _rotation( 2, 1 ) * _zmin + _gravity[1];
-  pt[2] = _rotation( 0, 2 ) * _xmax + _rotation( 1, 2 ) * _ymax 
+  pt[2] = _rotation( 0, 2 ) * _xmax + _rotation( 1, 2 ) * _ymax
     + _rotation( 2, 2 ) * _zmin + _gravity[2];
   pts.push_back( pt );
 
-  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 1, 0 ) * _ymax 
+  pt[0] = _rotation( 0, 0 ) * _xmax + _rotation( 1, 0 ) * _ymax
     + _rotation( 2, 0 ) * _zmax + _gravity[0];
-  pt[1] = _rotation( 0, 1 ) * _xmax + _rotation( 1, 1 ) * _ymax 
+  pt[1] = _rotation( 0, 1 ) * _xmax + _rotation( 1, 1 ) * _ymax
     + _rotation( 2, 1 ) * _zmax + _gravity[1];
-  pt[2] = _rotation( 0, 2 ) * _xmax + _rotation( 1, 2 ) * _ymax 
+  pt[2] = _rotation( 0, 2 ) * _xmax + _rotation( 1, 2 ) * _ymax
     + _rotation( 2, 2 ) * _zmax + _gravity[2];
     pts.push_back( pt );*/
 }

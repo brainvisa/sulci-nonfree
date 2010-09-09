@@ -13,58 +13,62 @@ namespace sigraph
   public:
     ///	Inputs list
     enum Inputs
-      {
-	VEC_VALID, 
+    {
+      VEC_VALID,
 
-	SIZE_S1, 
-	NCC_S1, 
-	NCC_S1_REL, 
+      SIZE_S1,
+      NCC_S1,
+      NCC_S1_REL,
 
-	SIZE_S2, 
-	NCC_S2, 
-	NCC_S2_REL, 
+      SIZE_S2,
+      NCC_S2,
+      NCC_S2_REL,
 
-	SIZE_CORT, 
-	DIST_MIN, 
-	DIRX, 
-	DIRY, 
-	DIRZ, 
-	DIST_EXTR_MIN1, 
-	DIST_EXTR_MIN2, 
-	GRELX, 
-	GRELY, 
-	GRELZ, 
-	PSCAL_CORT, 
+      SIZE_CORT,
+      DIST_MIN,
+      DIRX,
+      DIRY,
+      DIRZ,
+      DIST_EXTR_MIN1,
+      DIST_EXTR_MIN2,
+      GRELX,
+      GRELY,
+      GRELZ,
+      PSCAL_CORT,
 
-	NJONC, 
-	MINDEPTH_JONC, 
-	SIZE_JONC, 
+      NJONC,
+      MINDEPTH_JONC,
+      SIZE_JONC,
 
-	NPP, 
-	MAXDEPTH_PP, 
+      NPP,
+      MAXDEPTH_PP,
 
-        MOMENT_INV0, 
-        MOMENT_INV1, 
-        MOMENT_INV2, 
-        MOMENT_INV3, 
-        MOMENT_INV4, 
-        MOMENT_INV5, 
-        MOMENT_INV6, 
-        MOMENT_INV7, 
-        MOMENT_INV8, 
-        MOMENT_INV9, 
-        MOMENT_INV10, 
-        MOMENT_INV11, 
+      MOMENT_INV0,
+      MOMENT_INV1,
+      MOMENT_INV2,
+      MOMENT_INV3,
+      MOMENT_INV4,
+      MOMENT_INV5,
+      MOMENT_INV6,
+      MOMENT_INV7,
+      MOMENT_INV8,
+      MOMENT_INV9,
+      MOMENT_INV10,
+      MOMENT_INV11,
 
-        INERTIA_0,
-        INERTIA_1,
-        INERTIA_2,
-        INERTIA_3,
-        INERTIA_4,
-        INERTIA_5,
+      INERTIA_0,
+      INERTIA_1,
+      INERTIA_2,
+      INERTIA_3,
+      INERTIA_4,
+      INERTIA_5,
 
-        END
-      };
+      INERTIA_EIGENVALUE_0,
+      INERTIA_EIGENVALUE_1,
+      INERTIA_EIGENVALUE_2,
+
+      END
+    };
 
     InterFoldDescr5();
     InterFoldDescr5( const InterFoldDescr5 & ifd );
@@ -78,8 +82,8 @@ namespace sigraph
     void setOutputInertia( bool x ) { _outputInertia = x; }
 
   protected:
-    virtual bool makeVectorElements( const Clique* cl, 
-                                     std::vector<double> & vec, 
+    virtual bool makeVectorElements( const Clique* cl,
+                                     std::vector<double> & vec,
                                      carto::GenericObject* model = 0 );
 
     private:
@@ -88,7 +92,7 @@ namespace sigraph
 
   //	inline
 
-  inline InterFoldDescr5::InterFoldDescr5() 
+  inline InterFoldDescr5::InterFoldDescr5()
     : InterFoldDescr4(), _outputInertia( false )
   {
   }

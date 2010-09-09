@@ -24,73 +24,75 @@ using namespace carto;
 using namespace std;
 
 
-void SvmSAParser::buildSubSvm( AttributedObject* parent, Tree* ao, 
+void SvmSAParser::buildSubSvm( AttributedObject* parent, Tree* ao,
                                const string & filename )
 {
+  // cout << "SvmSAParser::buildSubSvm\n";
   if( ao->size() != 0 )
-    {
-      cerr << "warning : SubAdSvm with children (" << ao->size() << ")\n";
-    }
+  {
+    cerr << "warning : SubAdSvm with children (" << ao->size() << ")\n";
+  }
 
   if( parent )
+  {
+    if( parent->getSyntax() == "ad_leaf" )
     {
-      if( parent->getSyntax() == "ad_leaf" )
-	{
-	  if( parent->hasProperty( "pointer" ) )
-	    {
-	      Model		*mod;
-	      AdaptiveLeaf	*adp;
-	      string		wrk, evl, name;
-	      parent->getProperty( "pointer", mod );
-	      ASSERT( adp = dynamic_cast<AdaptiveLeaf*>( mod ) );
-	      parent->getProperty( SIA_WORK, wrk );
-	      parent->getProperty( SIA_EVAL, evl );
-	      ao->getProperty( "name", name );
-	      if( name != wrk && name != evl )
-		{
-		  cerr << "sub_ad_svm does not correspond to a work or eval "
-		       << "part of the parent leaf!\n";
-		}
-	      else
-		{
-		  string	str;
+      if( parent->hasProperty( "pointer" ) )
+      {
+        Model		*mod;
+        AdaptiveLeaf	*adp;
+        string		wrk, evl, name;
+        parent->getProperty( "pointer", mod );
+        adp = dynamic_cast<AdaptiveLeaf*>( mod );
+        ASSERT( adp );
+        parent->getProperty( SIA_WORK, wrk );
+        parent->getProperty( SIA_EVAL, evl );
+        ao->getProperty( "name", name );
+        if( name != wrk && name != evl )
+        {
+          cerr << "sub_ad_svm does not correspond to a work or eval "
+              << "part of the parent leaf!\n";
+        }
+        else
+        {
+          string	str;
 
-		  //	R�seau
-		  ao->getProperty( "net", str );
-		  //	nom du fichier r�seau
-		  string	file = FileUtil::dirname( filename );
-                  if( !file.empty() )
-                    file += FileUtil::separator();
-                  file += str;
+          //	network
+          ao->getProperty( "net", str );
+          //	name of SVM
+          string	file = FileUtil::dirname( filename );
+          if( !file.empty() )
+            file += FileUtil::separator();
+          file += str;
 
-		  SubAdSvm	sad( name, str, file );
+          SubAdSvm	sad( name, str, file );
 
-		  parseSubSvm( parent, ao, sad );
+          parseSubSvm( parent, ao, sad );
 
-		  if( name == wrk )
-		    {
-		      adp->setWork( sad );
-		    }
-		  else if( name == evl )
-		    {
-		      adp->setEval( sad );
-		    }
-		}
-	    }
-	  else
-	    {
-	      cerr << "sub_ad_svm parent has no pointer!\n";
-	    }
-	}
+          if( name == wrk )
+          {
+            adp->setWork( sad );
+          }
+          else if( name == evl )
+          {
+            adp->setEval( sad );
+          }
+        }
+      }
       else
-	{
-	  cerr << "sub_ad_svm parent is NOT a ad_leaf!\n";
-	}
+      {
+        cerr << "sub_ad_svm parent has no pointer!\n";
+      }
     }
-  else
+    else
     {
-      cerr << "sub_ad_svm without a parent!\n";
+      cerr << "sub_ad_svm parent is NOT a ad_leaf!\n";
     }
+  }
+  else
+  {
+    cerr << "sub_ad_svm without a parent!\n";
+  }
 }
 
 

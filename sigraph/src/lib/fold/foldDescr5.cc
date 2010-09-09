@@ -30,7 +30,7 @@ FoldDescr5::~FoldDescr5()
 {
 }
 
-bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec, 
+bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec,
                                      GenericObject* ao )
 {
   if( outputInertia() )
@@ -58,6 +58,10 @@ bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec,
         vec.push_back( 0 );
         vec.push_back( 0 );
         vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+        vec.push_back( 0 );
+
         vec.push_back( 0 );
         vec.push_back( 0 );
         vec.push_back( 0 );
@@ -150,13 +154,13 @@ bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec,
     }
 
   /*
-  cout << "moments for " << label << ": " << mom.m0() << "; " << mom.m1()[0] 
-       << ", " << mom.m1()[1] << ", " << mom.m1()[2] << "; " << mom.m2()[0] 
-       << ", " << mom.m2()[1] << ", " << mom.m2()[2] << ", " << mom.m2()[3] 
-       << ", " << mom.m2()[4] << ", " << mom.m2()[5] << "; " << mom.m3()[0] 
-       << ", " << mom.m3()[1] << ", " << mom.m3()[2] << ", " << mom.m3()[3] 
-       << ", " << mom.m3()[4] << ", " << mom.m3()[5] << ", " << mom.m3()[6] 
-       << ", " << mom.m3()[7] << ", " << mom.m3()[8] << ", " << mom.m3()[9] 
+  cout << "moments for " << label << ": " << mom.m0() << "; " << mom.m1()[0]
+       << ", " << mom.m1()[1] << ", " << mom.m1()[2] << "; " << mom.m2()[0]
+       << ", " << mom.m2()[1] << ", " << mom.m2()[2] << ", " << mom.m2()[3]
+       << ", " << mom.m2()[4] << ", " << mom.m2()[5] << "; " << mom.m3()[0]
+       << ", " << mom.m3()[1] << ", " << mom.m3()[2] << ", " << mom.m3()[3]
+       << ", " << mom.m3()[4] << ", " << mom.m3()[5] << ", " << mom.m3()[6]
+       << ", " << mom.m3()[7] << ", " << mom.m3()[8] << ", " << mom.m3()[9]
        << endl;
   */
 
@@ -185,6 +189,14 @@ bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec,
     vec.push_back( mom.m2()[3] );
     vec.push_back( mom.m2()[4] );
     vec.push_back( mom.m2()[5] );
+
+    mom.orientation();
+
+    AimsData<double> eigenValues = mom.eigenValue();
+
+    vec.push_back( eigenValues( 0, 0 ) );
+    vec.push_back( eigenValues( 1, 1 ) );
+    vec.push_back( eigenValues( 2, 2 ) );
   }
 
   return true;
@@ -227,6 +239,10 @@ vector<string> FoldDescr5::descriptorsNames() const
         names.push_back( "inertia_3" );
         names.push_back( "inertia_4" );
         names.push_back( "inertia_5" );
+
+        names.push_back( "inertia_eigenvalue_0" );
+        names.push_back( "inertia_eigenvalue_1" );
+        names.push_back( "inertia_eigenvalue_2" );
       }
     }
   return names;
