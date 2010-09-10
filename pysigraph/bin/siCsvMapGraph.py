@@ -205,7 +205,10 @@ def parseOpts(argv):
     'or selection file (.sel) (default : %default)')
   parser.add_option('--log', dest='log',
     metavar = 'FILE', action='store_true', default=False,
-    help='add log of mean values read in the input csv')
+    help='add log (neperian) of mean values read in the input csv')
+  parser.add_option('--log10', dest='log10',
+    metavar = 'FILE', action='store_true', default=False,
+    help='add log10 of mean values read in the input csv')
   parser.add_option('-c', '--column', dest='columns', action='append',
     default=[], type='int',
     help='column number to be used in the csv file')
@@ -314,6 +317,8 @@ def csvMapGraph( options, agraphs=None, window=None, displayProp=None,
         v[propPrefix + '_mean_' + h] = data[0][i]
         if options.log and data[0][i] != 0:
           v[ propPrefix + '_log_mean_' + h] = numpy.log(data[0][i])
+        elif options.log10 and data[0][i] != 0:
+          v[ propPrefix + '_log_mean_' + h] = numpy.log10(data[0][i])
         # add only no-null std
         if data[1][i]: v[ propPrefix + '_std_' + h] = data[1][i]
         v[ propPrefix + '_sum_' + h] = data[2][i]
