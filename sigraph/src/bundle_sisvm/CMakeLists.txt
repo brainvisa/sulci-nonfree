@@ -1,9 +1,9 @@
 
 ADD_LIBRARY(bundle_sigraphsvm MODULE
-bundle/sisvmbundle.cc
+  bundle/sisvmbundle.cc
 )
 
-TARGET_LINK_LIBRARIES(bundle_sigraphsvm sisvm )
+TARGET_LINK_LIBRARIES( bundle_sigraphsvm sigraphsvm )
 
 BRAINVISA_INSTALL( TARGETS bundle_sigraphsvm
                    DESTINATION lib
