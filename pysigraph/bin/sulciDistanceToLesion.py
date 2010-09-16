@@ -125,13 +125,13 @@ for graphfile in graphfiles:
             if d < 1e4: # avoid disconnected zones where the distance map
                         # has not reached
               dist[ 'dist' ] += darr[ voxel[0], voxel[1], voxel[2], 0 ]
-              dist[ 'ndist' ] += 1
-              if d == 0:
-                dist[ 'touching' ] = 1
               if dist[ 'ndist' ] == 0:
                 dist[ 'mindist' ] = d
               elif d < dist[ 'mindist' ]:
                 dist[ 'mindist' ] = d
+              dist[ 'ndist' ] += 1
+              if d == 0:
+                dist[ 'touching' ] = 1
       except:
         pass
   for label, dist in distances.iteritems():
@@ -150,6 +150,6 @@ for graphfile in graphfiles:
       if subject:
         print >> csvfile, subject,
       print >> csvfile, ulabel, side, dist[ 'dist' ], dist[ 'ndist' ], \
-        dist[ 'touching' ]
+        dist[ 'touching' ], dist[ 'mindist' ]
 
 
