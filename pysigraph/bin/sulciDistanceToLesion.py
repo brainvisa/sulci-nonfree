@@ -88,7 +88,8 @@ if outputcsv:
   csvfile = open( outputcsv, 'w' )
   if subject:
     print >> csvfile, 'subject',
-  print >> csvfile, 'label side distance distance_points touching'
+  print >> csvfile, 'label side distance distance_points touching ' \
+    'min_lesion_distance'
 else:
   csvfile = None
 
@@ -113,7 +114,7 @@ for graphfile in graphfiles:
       continue
     dist = distances.get( label, None )
     if dist is None:
-      dist = { 'dist' : 0., 'ndist' : 0, 'touching' : 0 }
+      dist = { 'dist' : 0., 'ndist' : 0, 'touching' : 0, 'mindist' : 0. }
       distances[ label ] = dist
     for bucket in ( 'aims_ss', 'aims_bottom', 'aims_other' ):
       try:
@@ -127,6 +128,10 @@ for graphfile in graphfiles:
               dist[ 'ndist' ] += 1
               if d == 0:
                 dist[ 'touching' ] = 1
+              if dist[ 'ndist' ] == 0:
+                dist[ 'mindist' ] = d
+              elif d < dist[ 'mindist' ]:
+                dist[ 'mindist' ] = d
       except:
         pass
   for label, dist in distances.iteritems():
