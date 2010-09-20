@@ -7,7 +7,9 @@ import optparse
 import sigraph
 
 parser = optparse.OptionParser( description='calculates a distance map from ' \
-  'a lesion in the brain, and mean distance from the lesion to all sulci' )
+  'a lesion in the brain, and mean distance from the lesion to all sulci. ' \
+  'If the distance map is already calcualted, it can be specified as input ' \
+  'using the --indistance parameter, instead of the lesionfile and brainfile.' )
 parser.add_option( '-l', '--lesion', dest='lesionfile',
   help='input lesion mask' )
 parser.add_option( '-b', '--brain', dest='brainfile',
@@ -49,15 +51,14 @@ subject = options.subject
 translation = options.translation
 modeltranslation = options.modeltranslation
 
-if not brainfile or not lesionfile:
+if ( not brainfile or not lesionfile ) and not indistfile:
   parser.parse_args( [ '-h' ] )
-
-brain = aims.read( brainfile )
-barr = numpy.array( brain, copy=False )
 
 if indistfile:
   dist = aims.read( indistfile )
 else:
+  brain = aims.read( brainfile )
+  barr = numpy.array( brain, copy=False )
   lesion = aims.read( lesionfile )
 
   # mask lesion to allow only parts in the brain mask
@@ -120,18 +121,17 @@ for graphfile in graphfiles:
       try:
         bck = v[ bucket ]
         for voxel in bck[0].keys():
-          if barr[ voxel[0], voxel[1], voxel[2], 0 ] != 0:
-            d = darr[ voxel[0], voxel[1], voxel[2], 0 ]
-            if d < 1e4: # avoid disconnected zones where the distance map
-                        # has not reached
-              dist[ 'dist' ] += darr[ voxel[0], voxel[1], voxel[2], 0 ]
-              if dist[ 'ndist' ] == 0:
-                dist[ 'mindist' ] = d
-              elif d < dist[ 'mindist' ]:
-                dist[ 'mindist' ] = d
-              dist[ 'ndist' ] += 1
-              if d == 0:
-                dist[ 'touching' ] = 1
+          d = darr[ voxel[0], voxel[1], voxel[2], 0 ]
+          if d < 1e4: # avoid disconnected zones where the distance map
+                      # has not reached
+            dist[ 'dist' ] += darr[ voxel[0], voxel[1], voxel[2], 0 ]
+            if dist[ 'ndist' ] == 0:
+              dist[ 'mindist' ] = d
+            elif d < dist[ 'mindist' ]:
+              dist[ 'mindist' ] = d
+            dist[ 'ndist' ] += 1
+            if d == 0:
+              dist[ 'touching' ] = 1
       except:
         pass
   for label, dist in distances.iteritems():
