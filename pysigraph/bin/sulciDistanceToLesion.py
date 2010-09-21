@@ -13,11 +13,18 @@ parser = optparse.OptionParser( description='calculates a distance map from ' \
   'using the --indistance parameter, instead of the lesionfile and brainfile.' )
 parser.add_option( '-l', '--lesion', dest='lesionfile',
   help='input lesion mask' )
-parser.add_option( '-b', '--brain', dest='brainfile',
-  help='brain mask' )
+parser.add_option( '-L', '--lgreywhite', dest='lgw',
+  help='left grey/white mask' )
+parser.add_option( '-R', '--rgreywhite', dest='rgw',
+  help='right grey/white mask' )
+parser.add_option( '--lsk', dest='lsk',
+  help='left sulci skeleton (optional) used to avoid crossing sulci' )
+parser.add_option( '--rsk', dest='rsk',
+  help='right sulci skeleton (optional) used to avoid crossing sulci' )
 parser.add_option( '-o', '--output', dest='outputcsv',
   help='output CSV file' )
 parser.add_option( '-g', '--graph', dest='graphs', action='append',
+  default=[],
   help='sulci graph files, several can be specified (generally left and ' \
   'right hemispheres)' )
 parser.add_option( '--indistance', dest='indistfile',
@@ -41,7 +48,10 @@ parser.add_option( '--modeltrans', dest='modeltranslation',
 
 options, args = parser.parse_args()
 
-brainfile = options.brainfile
+lgwfile = options.lgw
+rgwfile = options.rgw
+lskfil = options.lsk
+rskfil = options.rsk
 lesionfile = options.lesionfile
 outputcsv = options.outputcsv
 graphfiles = options.graphs
@@ -52,28 +62,68 @@ subject = options.subject
 translation = options.translation
 modeltranslation = options.modeltranslation
 
-if ( not brainfile or not lesionfile ) and not indistfile:
+if ( not lgwfile or not rgwfile or not lesionfile ) and not indistfile:
   parser.parse_args( [ '-h' ] )
 
+graphs = []
 if indistfile:
   dist = aims.read( indistfile )
 else:
-  brain = aims.read( brainfile )
-  barr = numpy.array( brain, copy=False )
+  lgw = aims.read( lgwfile, 1 )
+  rgw = aims.read( rgwfile, 1 )
   lesion = aims.read( lesionfile )
+
+  for graphfile in graphfiles:
+    graphs.append( aims.read( graphfile ) )
+
+  wh = aims.AimsData_S16( lgw + rgw, 1 )
+  dh = dict( lgw.header() )
+  for x in [ 'volume_dimension', 'sizeX', 'sizeY', 'sizeZ', 'sizeT' ]:
+    if dh.has_key( x ):
+      del dh[x]
+  wh.header().update( dh )
+  wharr = numpy.array( wh.volume(), copy=False )
+  wharr[ wharr == 100 ] = 0 # erase grey matter
+  # close WM one voxel to link both hemispheres
+  wh = aimsalgo.AimsMorphoClosing( wh, wh.header()['voxel_size'][0] )
+  wharr = numpy.array( wh.volume(), copy=False )
+
+  # erode GM a bit on each hemisphere so that they avoid touching from one
+  # hemisphere to the other
+  ler = aimsalgo.AimsMorphoErosion( lgw, 1 )
+  rer = aimsalgo.AimsMorphoErosion( rgw, 1 )
+  eroded = ler + rer
+  del ler, rer
+  barr = numpy.array( eroded.volume(), copy=False )
+  # merge with connected WM
+  barr[ numpy.where( wharr != 0 ) ] = 32767
 
   # mask lesion to allow only parts in the brain mask
   larr = numpy.array( lesion, copy=False )
-  larr[ barr != 255 ] = 0
+  barr = barr[ 1:-1, 1:-1, 1:-1, : ] # remove border
+  larr[ barr == 0 ] = 0
   # put the lesion inside the brain
   barr[ larr == 4095 ] = 1
 
+  # avoid propagating in the sulci
+  for graph in graphs:
+    for v in graph.vertices():
+      for bucket in ( 'aims_ss', 'aims_bottom', 'aims_other' ):
+        try:
+          bck = v[ bucket ]
+          barr[ numpy.column_stack( [ bck[0].keys(),
+            numpy.zeros( ( bck[0].size(), 1 ) ) ] ) ] = 0
+        except:
+          pass
+
   fm = aims.FastMarching()
-  dist = fm.doit( brain, [ 255 ], [ 1 ] )
+  dist = fm.doit( eroded.volume(), [ 32767 ], [ 1 ] )
 
   # remove FLT_MAX values
   darr = numpy.array( dist, copy=False )
   darr[ numpy.where( darr > 1e4 ) ] = -1
+  # set lesion to distance 0
+  darr[ larr != 0 ] = 0
 
   tmpf = tempfile.mkstemp( suffix='.nii', prefix='aims_dist' )
   os.close( tmpf[0] )
@@ -119,9 +169,12 @@ if outputcsv:
 else:
   csvfile = None
 
-for graphfile in graphfiles:
+for gnum, graphfile in enumerate( graphfiles ):
   distances = {}
-  graph = aims.read( graphfile )
+  if len( graphs ) > gnum:
+    graph = graphs[ gnum ]
+  else:
+    graph = aims.read( graphfile )
   labelatt2 = labelatt
   if labelatt is None:
     if graph.has_key( 'label_property' ):
