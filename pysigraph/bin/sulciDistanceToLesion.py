@@ -5,6 +5,7 @@ from soma import aims, aimsalgo
 import numpy
 import optparse
 import sigraph
+import tempfile, subprocess
 
 parser = optparse.OptionParser( description='calculates a distance map from ' \
   'a lesion in the brain, and mean distance from the lesion to all sulci. ' \
@@ -70,6 +71,30 @@ else:
   fm = aims.FastMarching()
   dist = fm.doit( brain, [ 255 ], [ 1 ] )
 
+  # remove FLT_MAX values
+  darr = numpy.array( dist, copy=False )
+  darr[ numpy.where( darr > 1e4 ) ] = -1
+
+  tmpf = tempfile.mkstemp( suffix='.nii', prefix='aims_dist' )
+  os.close( tmpf[0] )
+  aims.write( dist, tmpf[1] )
+
+  if distfile:
+    outdist = distfile
+  else:
+    tmpf2 = tempfile.mkstemp( suffix='.nii', prefix='aims_closedist' )
+    outdist = tmpf2[1]
+    os.close( outdist[0] )
+
+  print 'closing the distance map...'
+  subprocess.call( [ 'AimsMorphoMath', '-i', tmpf[1], '-o', outdist, '-r', '3',
+    '-m', 'clo' ] )
+  os.unlink( tmpf[1] )
+  del darr, dist
+  dist = aims.read( outdist )
+  if not distfile:
+    os.unlink( outdist )
+
   if distfile:
     aims.write( dist, distfile )
 darr = numpy.array( dist, copy=False )
@@ -122,8 +147,8 @@ for graphfile in graphfiles:
         bck = v[ bucket ]
         for voxel in bck[0].keys():
           d = darr[ voxel[0], voxel[1], voxel[2], 0 ]
-          if d < 1e4: # avoid disconnected zones where the distance map
-                      # has not reached
+          if d < 1e4 and d >= 0: # avoid disconnected zones where the distance
+                      # map has not reached
             dist[ 'dist' ] += darr[ voxel[0], voxel[1], voxel[2], 0 ]
             if dist[ 'ndist' ] == 0:
               dist[ 'mindist' ] = d
