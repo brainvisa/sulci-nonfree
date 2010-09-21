@@ -140,13 +140,13 @@ else:
   subprocess.call( [ 'AimsMorphoMath', '-i', tmpf[1], '-o', outdist, '-r', '3',
     '-m', 'clo' ] )
   os.unlink( tmpf[1] )
+  os.unlink( tmpf[1] + '.minf' )
   del darr, dist
   dist = aims.read( outdist )
   if not distfile:
     os.unlink( outdist )
+    os.unlink( outdist + '.minf' )
 
-  if distfile:
-    aims.write( dist, distfile )
 darr = numpy.array( dist, copy=False )
 
 if not graphfiles:
