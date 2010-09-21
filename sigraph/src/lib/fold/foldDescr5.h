@@ -41,7 +41,7 @@ namespace sigraph
       SIZE,
       DEPTH,
       MINDEPTH,
-            MEANDEPTH,
+      MEANDEPTH,
 
       NCC,
       NCC_NOT_CORTICAL,
@@ -74,8 +74,8 @@ namespace sigraph
       INERTIA_5,
 
       INERTIA_EIGENVALUE_0,
-      INERTIA_EIGENVALUE_1,
-      INERTIA_EIGENVALUE_2,
+      INERTIA_EIGENVALUE_1_RATIO,
+      INERTIA_EIGENVALUE_2_RATIO,
 
       END
     };

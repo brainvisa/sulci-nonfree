@@ -195,8 +195,8 @@ bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec,
     AimsData<double> eigenValues = mom.eigenValue();
 
     vec.push_back( eigenValues( 0, 0 ) );
-    vec.push_back( eigenValues( 1, 1 ) );
-    vec.push_back( eigenValues( 2, 2 ) );
+    vec.push_back( eigenValues( 1, 1 ) / eigenValues( 0, 0 ) );
+    vec.push_back( eigenValues( 2, 2 ) / eigenValues( 0, 0 ) );
   }
 
   return true;
@@ -241,8 +241,8 @@ vector<string> FoldDescr5::descriptorsNames() const
         names.push_back( "inertia_5" );
 
         names.push_back( "inertia_eigenvalue_0" );
-        names.push_back( "inertia_eigenvalue_1" );
-        names.push_back( "inertia_eigenvalue_2" );
+        names.push_back( "inertia_eigenvalue_1_ratio" );
+        names.push_back( "inertia_eigenvalue_2_ratio" );
       }
     }
   return names;
