@@ -17,64 +17,68 @@ namespace sigraph
   public:
     ///	Descriptors list
     enum Inputs
-      {
-	VEC_VALID,
-	E1E2_VALID, 
-	E1X, 
-	E1Y, 
-	E1Z, 
-	E2X, 
-	E2Y, 
-	E2Z, 
-	GX, 
-	GY, 
-	GZ, 
+    {
+      VEC_VALID,
+      E1E2_VALID,
+      E1X,
+      E1Y,
+      E1Z,
+      E2X,
+      E2Y,
+      E2Z,
+      GX,
+      GY,
+      GZ,
 
-	NVALID, 
-	NX, 
-	NY, 
-	NZ, 
-	DIRX, 
-	DIRY, 
-	DIRZ, 
+      NVALID,
+      NX,
+      NY,
+      NZ,
+      DIRX,
+      DIRY,
+      DIRZ,
 
-	SIZE, 
-	DEPTH, 
-	MINDEPTH, 
-        MEANDEPTH, 
+      SIZE,
+      DEPTH,
+      MINDEPTH,
+      MEANDEPTH,
 
-	NCC, 
-	NCC_NOT_CORTICAL, 
-	NCORT, 
-	DISTMAX_CC, 
-	NPLIS, 
-	SIZE_HULLJUNC, 
+      NCC,
+      NCC_NOT_CORTICAL,
+      NCORT,
+      DISTMAX_CC,
+      NPLIS,
+      SIZE_HULLJUNC,
 
-        GM_THICKNESS,
-        FOLD_OPENING,
+      GM_THICKNESS,
+      FOLD_OPENING,
 
-        MOMENT_INV0,
-        MOMENT_INV1, 
-        MOMENT_INV2, 
-        MOMENT_INV3, 
-        MOMENT_INV4, 
-        MOMENT_INV5, 
-        MOMENT_INV6, 
-        MOMENT_INV7, 
-        MOMENT_INV8, 
-        MOMENT_INV9, 
-        MOMENT_INV10, 
-        MOMENT_INV11, 
+      MOMENT_INV0,
+      MOMENT_INV1,
+      MOMENT_INV2,
+      MOMENT_INV3,
+      MOMENT_INV4,
+      MOMENT_INV5,
+      MOMENT_INV6,
+      MOMENT_INV7,
+      MOMENT_INV8,
+      MOMENT_INV9,
+      MOMENT_INV10,
+      MOMENT_INV11,
 
-        INERTIA_0,
-        INERTIA_1,
-        INERTIA_2,
-        INERTIA_3,
-        INERTIA_4,
-        INERTIA_5,
+      INERTIA_0,
+      INERTIA_1,
+      INERTIA_2,
+      INERTIA_3,
+      INERTIA_4,
+      INERTIA_5,
 
-        END
-      };
+      INERTIA_EIGENVALUE_0,
+      INERTIA_EIGENVALUE_1_RATIO,
+      INERTIA_EIGENVALUE_2_RATIO,
+
+      END
+    };
 
     FoldDescr5();
     FoldDescr5( const FoldDescr5 & f );
@@ -88,8 +92,8 @@ namespace sigraph
     void setOutputInertia( bool x ) { _outputInertia = x; }
 
   protected:
-    virtual bool makeVectorElements( const Clique* cl, 
-                                     std::vector<double> & vec, 
+    virtual bool makeVectorElements( const Clique* cl,
+                                     std::vector<double> & vec,
                                      carto::GenericObject* model = 0 );
 
   private:
