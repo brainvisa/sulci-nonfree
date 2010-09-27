@@ -1,4 +1,4 @@
-include_directories( ${SVM_INCLUDE_DIR} )
+include_directories( ${SVM_INCLUDE_DIRS} )
 
 BRAINVISA_GET_FILE_LIST_FROM_PRO( "${CMAKE_CURRENT_SOURCE_DIR}/sipsvm.pro" "HEADERS" _headers "SOURCES" _sources )
 # BRAINVISA_COPY_AND_INSTALL_HEADERS( _headers pysigraph headersTarget )
