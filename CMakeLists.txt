@@ -8,6 +8,8 @@ include( "${AIMS-FREE_USE_FILE}" )
 BRAINVISA_FIND_PACKAGE( datamind )
 find_package( SVM )
 
+find_package( Doxygen )
+
 set( SIGRAPH_RELATIVE_SIP_DIRECTORY
      "share/sulci-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}/sip" )
 

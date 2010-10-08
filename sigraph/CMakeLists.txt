@@ -3,4 +3,5 @@ BRAINVISA_COPY_DIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/shared
   ${PROJECT_NAME} )
 
 add_subdirectory( src )
+add_subdirectory( doxygen )
 
