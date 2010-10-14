@@ -194,9 +194,13 @@ bool FoldDescr5::makeVectorElements( const Clique* cl, vector<double> & vec,
 
     AimsData<double> eigenValues = mom.eigenValue();
 
-    vec.push_back( eigenValues( 0, 0 ) );
-    vec.push_back( eigenValues( 1, 1 ) / eigenValues( 0, 0 ) );
-    vec.push_back( eigenValues( 2, 2 ) / eigenValues( 0, 0 ) );
+    double sd0 = sqrt( eigenValues( 0, 0 ) / ( mom.sum() - 1 ) );
+    //   (divide by n-1 to get variance then stdev)
+    vec.push_back( sd0 );
+    vec.push_back( sqrt( eigenValues( 1, 1 ) / eigenValues( 0, 0 ) ) );
+    vec.push_back( sqrt( eigenValues( 2, 2 ) / eigenValues( 0, 0 ) ) );
+    /* vec.push_back( sqrt( eigenValues( 1, 1 ) / ( mom.sum() - 1 ) ) );
+    vec.push_back( sqrt( eigenValues( 2, 2 ) / ( mom.sum() - 1 ) ) ); */
   }
 
   return true;
