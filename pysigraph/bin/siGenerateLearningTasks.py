@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from soma import aims
 from sigraph import *
@@ -58,12 +59,13 @@ def cmd_LSF(labels, options, user_data):
     fd.close()
     user_data['n'] += 1
 
-def cmd_somajobs(labels, options, user_data):
+def cmd_somaworkflow(labels, options, user_data):
     cmd = get_cmd2(labels, options, user_data) + '\n'
     user_data['output_fd'].write(cmd)
 
 commands = {'grid' : cmd_grid, 'duch' : cmd_duch,
-            'cath' : cmd_cath, 'LSF' : cmd_LSF, 'somajobs' : cmd_somajobs }
+            'cath' : cmd_cath, 'LSF' : cmd_LSF,
+            'somaworkflow' : cmd_somaworkflow }
 
 
 # Find user email thanks to his login and then his name / family name.
@@ -146,7 +148,7 @@ def main():
     data = {'options' : options,
             'cmd' : commands[options.parallelmode]}
 
-    if options.parallelmode in ['grid', 'duch', 'somajobs'] :
+    if options.parallelmode in ['grid', 'duch', 'somaworkflow'] :
         fd = open(options.output, 'w')
         data['output_fd'] = fd
     elif options.parallelmode in ['cath', 'LSF']:
@@ -166,7 +168,7 @@ def main():
 
 
     cover(model, fundict, data, options.labels_filter, options.filter_mode)
-    if options.parallelmode in ['duch', 'grid', 'somajobs'] :
+    if options.parallelmode in ['duch', 'grid', 'somaworkflow'] :
         data['output_fd'].close()
 
 
