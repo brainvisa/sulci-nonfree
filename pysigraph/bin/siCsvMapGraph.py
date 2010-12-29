@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sigraph
 import anatomist.direct.api as anatomist
-import anatomist.cpp as cpp
 from soma import aims
 import datamind.io.old_csvIO as io
 import os, sys, exceptions, numpy
@@ -176,7 +175,7 @@ def write_summary_csv(csvfilename, labels, sulci_data, mode):
 
 def parseOpts(argv):
   transfile = os.path.join(aims.carto.Paths.shfjShared(), 'nomenclature',
-    'translation', 'sulci_model_noroots.trl')
+    'translation', 'sulci_model_2008.trl')
 
   description = 'Map csv values onto sulci.'
   parser = OptionParser(description)
