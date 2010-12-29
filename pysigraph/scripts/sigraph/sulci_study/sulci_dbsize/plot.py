@@ -39,6 +39,9 @@ def parseOpts(argv):
 		metavar = 'LIST', action='store', default = None,
 		help="comma separated list, len much match number " + \
 		"of csv columns divided by 3 (default: use csv header)")
+	parser.add_option('--no-std-error', dest='no_stderr',
+		action='store_true', default=False,
+		help="do not display error bars")
 
 	return parser, parser.parse_args(argv)
 
@@ -83,7 +86,9 @@ def main():
 	lines = []
 	for i in range(n):
 		size, error, std = x[:, 0], x[:, 3 * i + 1], x[:, 3 * i + 2]
-		lines.append(pylab.errorbar(size, error, std)[0])
+		if options.no_stderr:
+			lines.append(pylab.plot(size, error)[0])
+		else:	lines.append(pylab.errorbar(size, error, std)[0])
 	pylab.xticks([1, 10, 20, 30, 40, 50, 62])
 	pylab.xlim(-10, 70)
 	if options.lang == 'eng':
