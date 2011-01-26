@@ -8,4 +8,5 @@ IF ( DOXYGEN_FOUND )
 
   BRAINVISA_GENERATE_DOXYGEN_DOC( _doxygenInput  head_${component_name}.html ${component_name}.gif
                                   COMPONENT ${component_name} )
+  add_dependencies( ${component_name}-doxygen aimsalgo-doxygen aimsdata-doxygen graph-doxygen cartobase-doxygen cartodata-doxygen neuron-doxygen )
 ENDIF ( DOXYGEN_FOUND )
