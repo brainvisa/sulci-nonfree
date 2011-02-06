@@ -34,7 +34,7 @@ endif( NOT _returnValue EQUAL 0 )
 
 BRAINVISA_ADD_SIP_PYTHON_MODULE( sigraphsip
   sigraph 
-  "${CMAKE_CURRENT_SOURCE_DIR}/sigraph.sip"
+  "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}/sigraph.sip"
   SIP_SOURCES ${_generatedSipFileList} ${_sipSources}
   SIP_INCLUDE "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
     "${AIMS-FREE_SIP_DIRECTORY}" )
