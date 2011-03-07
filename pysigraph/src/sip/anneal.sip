@@ -102,11 +102,11 @@ public:
   AnnealConfigurator();
   virtual ~AnnealConfigurator();
 
-%If (SIP_THROW_BUG)
+%If (SIPTHROW_BUG)
   virtual bool loadConfig( const std::string & filename )
     throw ( );
 %End
-%If (!SIP_THROW_BUG)
+%If (!SIPTHROW_BUG)
   virtual bool loadConfig( const std::string & filename )
     throw ( std::exception, carto::io_error );
 %End
