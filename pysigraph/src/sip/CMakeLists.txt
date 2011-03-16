@@ -9,11 +9,6 @@ BRAINVISA_COPY_FILES( ${PROJECT_NAME}-dev
                       IMMEDIATE )
 
 file( GLOB _sipSources "${CMAKE_CURRENT_SOURCE_DIR}/*.sip" )
-BRAINVISA_COPY_FILES( ${PROJECT_NAME}-dev
-                      ${_sipSources}
-                      SOURCE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                      DESTINATION "${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
-                      IMMEDIATE )
 
 file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}" )
 exec_program( "${PYTHON_EXECUTABLE}"
@@ -34,7 +29,7 @@ endif( NOT _returnValue EQUAL 0 )
 
 BRAINVISA_ADD_SIP_PYTHON_MODULE( sigraphsip
   sigraph 
-  "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}/sigraph.sip"
+  "${CMAKE_CURRENT_SOURCE_DIR}/sigraph.sip"
   SIP_SOURCES ${_generatedSipFileList} ${_sipSources}
   SIP_INCLUDE "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}"
     "${AIMS-FREE_SIP_DIRECTORY}" )
