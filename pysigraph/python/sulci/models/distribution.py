@@ -64,6 +64,16 @@ class Distribution(object):
 
 	def read(self, filename):
 		'''read distribution from disk'''
+		# WORKAROUND a module naming problem: one module triggered
+		# by the pickle loading has moved inside numpy !
+		import numpy
+		nv = [ int(x) for x in numpy.version.version.split( '.' )[:2] ]
+		if nv[0]*0x100 + nv[1] >= 0x105:
+                    import numpy.matrixlib.defmatrix
+                    import numpy.core
+                    import sys
+                    numpy.core.defmatrix = numpy.matrixlib.defmatrix
+                    sys.modules[ 'numpy.core.defmatrix' ] = numpy.core.defmatrix
 		fd = open(filename, 'r')
 		obj = pickle.load(fd)
 		try:	self.fromTuple(obj)
