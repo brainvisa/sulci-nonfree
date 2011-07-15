@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os, sys, re
 from soma import aims, aimsalgo
 import numpy, optparse, tempfile, subprocess
 import sigraph
+import time, tempfile, errno
 
 
 # --- config variables
@@ -20,16 +22,16 @@ otheratt = 'aims_other'
 nullvalue = 0.
 
 # --- args
-parser = optparse.OptionParser( 
+parser = optparse.OptionParser(
   description='calculate sulcuswise curvature maps and averages by sulcus' )
 parser.add_option( '-i', '--input', dest='graph', help='labelled sulci graph' )
 parser.add_option( '-o', '--output', dest='csvfile', help='output CSV curvature stats file' )
-parser.add_option( '-m', '--meshdir', dest='meshdir', 
+parser.add_option( '-m', '--meshdir', dest='meshdir',
   help='output directory for meshes and curvature textures ' \
   '(default: don\'t write them)' )
 parser.add_option( '-c', '--curv', dest='curv', default='fem',
   help='curvature calculation method: fem, barycenter, boix, boixgaussian' )
-parser.add_option( '-l', '--labelatt', dest='label', 
+parser.add_option( '-l', '--labelatt', dest='label',
   help='label attribute (label or name), default: guessed if specified in ' \
   'graph, or take label' )
 parser.add_option( '-n', '--nodewise', dest='nodewise', action='store_true',
@@ -49,6 +51,11 @@ parser.add_option( '--modeltrans', dest='modeltranslation',
   'translation file, especially if the latter is a nomenclature. Wen using a' \
   'selection, the model graph sould not be specified, and when using a .trl ' \
   'translation, it is generally not so useful.' )
+parser.add_option( '-a', '--append', dest='append', action='store_true',
+  help='append output to a possibly existing CSV file. The output file will ' \
+  'be locked using a <output>.lock directory to avoid concurrent access by ' \
+  'multiple instances of sulciCurvature, and the CSV header will be ' \
+  'written only if the CSV file does not exist or is empty.' )
 
 
 (options, args) = parser.parse_args()
@@ -63,6 +70,7 @@ subject = options.subject
 labelsfilter = options.labelsfilter
 translation = options.translation
 modeltranslation = options.modeltranslation
+appendmode = options.append
 
 if not graphfile:
   parser.parse_args( [ '-h' ] )
@@ -210,19 +218,24 @@ for v in graph.vertices():
           gav[ 'nav' ] += nav
           average /= nav
 	if meshdir:
-          mfile = os.path.join( meshdir, 
+          mfile = os.path.join( meshdir,
 	    'node_' + label + '_' + str( node ) + '.gii' )
-          tfile = os.path.join( meshdir, 
+          tfile = os.path.join( meshdir,
 	    'node_' + label + '_curv_' + str( node ) + '.gii' )
           mesh.header().update( { 'texture_filenames' : \
 	    [ os.path.basename( tfile ) ] } )
           aims.write( mesh, mfile )
           aims.write( tex, tfile )
-          aims.write( bck, os.path.join( meshdir, 
+          aims.write( bck, os.path.join( meshdir,
 	    'node_' + label + '_bck_' + str( node ) + '.bck' ) )
       node += 1
 
 if csvfile:
+  if appendmode:
+    globalcsvfile = csvfile
+    x = tempfile.mkstemp()
+    os.close( x[0] )
+    csvfile = x[1]
   csv = open( csvfile, 'w' )
   if subject:
     csv.write( 'subject ' )
@@ -298,4 +311,29 @@ for label, globval in globaverage.iteritems():
       csv.write( ' ' + str( globval[ 'average' ] ) + ' ' + str( globval[ 'nav' ] ) )
     csv.write( '\n' )
 
+if csvfile and appendmode:
+  # lock the output CSV
+  success = False
+  lockdir = os.path.join( globalcsvfile + '.lock' )
+  while not success:
+    try:
+      os.mkdir( lockdir )
+      success = True
+    except OSError, e:
+      if e.errno != errno.EEXIST:
+        raise
+      time.sleep( 0.5 ) # wait a little bit
+
+  csv = open( globalcsvfile, 'a' )
+  csvin = open( csvfile )
+  if csv.tell() != 0:
+    # copy header only if at start of file
+    l = csvin.readline()
+    l[:-1] # force using iterator
+  csv.write( csvin.read() )
+  csv.close()
+  csvin.close()
+  os.unlink( csvfile )
+  # unlock the global CSV
+  os.rmdir( lockdir )
 
