@@ -82,8 +82,12 @@ SubAdSvm::SubAdSvm(const std::string name, const std::string filename,
 
 SubAdSvm::~SubAdSvm()
 {
-	if (_svm) svm_destroy_model(_svm);
+#if LIBSVM_VERSION >= 300
+  if (_svm) svm_free_and_destroy_model(&_svm);
+#else
+  if (_svm) svm_destroy_model(_svm);
 	//svm_destroy_param(&_svm_param); //FIXME
+#endif
 }
 
 void	SubAdSvm::prepare(const std::vector<double> &v)
@@ -153,7 +157,11 @@ struct svm_problem	*SubAdSvm::prepare(const SiDBLearnable &db)
 
 double SubAdSvm::learn(const SiDBLearnable &train)
 {
-	if (_svm) svm_destroy_model(_svm);
+#if LIBSVM_VERSION >= 300
+  if (_svm) svm_free_and_destroy_model(&_svm);
+#else
+  if (_svm) svm_destroy_model(_svm);
+#endif
 	struct svm_problem	*svm_prob = prepare(train);
 	struct svm_node		*tmp = NULL;
 	const char		*error_msg;
