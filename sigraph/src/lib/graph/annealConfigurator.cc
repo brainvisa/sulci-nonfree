@@ -74,6 +74,7 @@ void AnnealConfigurator::init()
   allowThreads = 0;
   maxIterations = 0;
   mpmUnrecordedIterations = 0;
+  forbidVoidLabel = 0;
 }
 
 
@@ -98,6 +99,9 @@ bool AnnealConfigurator::loadConfig( const string & filename )
     output = graphFile;
   t.getProperty( "labelsMapFile", labelsMapFile );
   t.getProperty( "initflg", initMode );
+  if( t.hasProperty( "initflg" ) )
+    cerr << "Warning: the obsolete and unused 'initflg' config parameter has "
+      "been used, it may not be doing what you expect...\n";
   t.getProperty( "save", save );
   t.getProperty( "temp", temp );
   t.getProperty( "mode", mode );
@@ -124,6 +128,7 @@ bool AnnealConfigurator::loadConfig( const string & filename )
   t.getProperty( "allowThreads", allowThreads );
   t.getProperty( "maxIterations", maxIterations );
   t.getProperty( "MPMUnrecordedIterations", mpmUnrecordedIterations );
+  t.getProperty( "forbidVoidLabel", forbidVoidLabel );
 
   return processParams();
 }
@@ -191,6 +196,8 @@ void AnnealConfigurator::saveConfig( const string & filename )
     t.setProperty( "maxIterations", maxIterations );
   if( mpmUnrecordedIterations != 0 )
     t.setProperty( "MPMUnrecordedIterations", mpmUnrecordedIterations );
+  if( forbidVoidLabel != 0 )
+    t.setProperty( "forbidVoidLabel", forbidVoidLabel );
 
   tw << t;
 }
@@ -396,6 +403,31 @@ void AnnealConfigurator::loadGraphs( MGraph & rg, CGraph & fg )
   if( labelsMapFile != "" )
     si().setLabelsTranslPath( labelsMapFile );
   rg.modelFinder().initCliques( fg );
+
+  /* forbidVoidLabel option forbids to use the "unknown" label.
+     It is useful only in very specific situations.
+   */
+  if( forbidVoidLabel )
+  {
+    cout << "Forbid label " << voidLabel << "." << endl;
+    vector<string> *pl = 0;
+    Graph::iterator iv, ev = fg.end();
+    string label;
+    for( iv=fg.begin(); iv!=ev; ++iv )
+      if( (*iv)->getProperty( "possible_labels", pl ) )
+      {
+        vector<string>::iterator ip = find( pl->begin(), pl->end(),
+                                            voidLabel );
+        if( ip != pl->end() )
+        {
+          pl->erase( ip );
+          // remove the unknown label on the vertex label right now.
+          if( (*iv)->getProperty( SIA_LABEL, label ) && label == voidLabel
+            && !pl->empty() )
+            (*iv)->setProperty( SIA_LABEL, *pl->begin() );
+        }
+      }
+  }
 }
 
 

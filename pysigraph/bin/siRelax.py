@@ -48,6 +48,8 @@ class NoneWeightsModifier(WeightsModifier):
 
 	def modify(self): pass
 	
+        def isTimeChanging(self):
+                return False
 
 class VerticesWeightsModifier(WeightsModifier):
 	def __init__(self, mgraph, cgraph):
@@ -415,17 +417,17 @@ def main():
 	cfg.loadGraphs(rg, fg)
 	an = sigraph.Anneal(fg, rg)
 	Modifier = weightsModifierFactory(options.modifier)
+	modifier = Modifier(an.rGraph(), an.cGraph())
 	cfg.initAnneal(an, cfg.plotFile)
 
-	sigraph.AnnealExtension(an)
+	#sigraph.AnnealExtension(an)
 
 	# set weights
 	# define extension if needed
-	if Modifier.isTimeChanging():
+	if modifier.isTimeChanging():
 		ae = WeightedAnnealExtension(an, Modifier)
 		an.addExtension(ae, 1)
 	else:
-		modifier = Modifier(an.rGraph(), an.cGraph())
 		if options.modifier in ['ratio', 'threshold']:
 			modifier.setLambda(float(options._lambda))
 		modifier.modify()
