@@ -9,7 +9,7 @@
 namespace sigraph
 {
 
-class MGraph : Graph /Abstract/
+class MGraph : Graph
 {
 %TypeHeaderCode
 #include <si/fold/frgraph.h>
@@ -73,7 +73,7 @@ public:
   virtual void setWeights( double factor = 1 );
   virtual void removeWeights();
 
-protected:
+private:
   MGraph( const std::string & );
 };
 
@@ -100,6 +100,12 @@ public:
   FRGraph( const std::string & = "", const std::string & = "standard1" );
   virtual ~FRGraph();
 
+  virtual VersionCheck checkCompatibility( const Graph & ) const;
+  sigraph::ModelFinder & modelFinder();
+  virtual void initAdap();
+  virtual void initDomain();
+  virtual void initStats();
+  virtual void closeLearning();
 };
 
 
