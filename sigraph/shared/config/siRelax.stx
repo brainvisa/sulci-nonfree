@@ -28,5 +28,6 @@ niterBelowStopProp	int
 allowThreads            int
 maxIterations           int
 MPMUnrecordedIterations int
+forbidVoidLabel         int
 
 *END

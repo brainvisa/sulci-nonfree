@@ -66,6 +66,7 @@ namespace sigraph
     int                         allowThreads;
     int                         maxIterations;
     int                         mpmUnrecordedIterations;
+    int                         forbidVoidLabel;
   protected:
 
   private:
