@@ -264,14 +264,14 @@ bool AnnealConfigurator::processParams()
 
 void AnnealConfigurator::loadGraphs( MGraph & rg, CGraph & fg )
 {
-  //	Lecture graphe modèle
+  //	Read model graph
 
   FrgReader	rr( modelFile );
 
   try
     {
       rr >> rg;
-      cout << "Lecture FRGraph OK." << endl;
+      cout << "FRGraph read OK." << endl;
     }
   catch( parse_error & e )
     {
@@ -294,7 +294,7 @@ void AnnealConfigurator::loadGraphs( MGraph & rg, CGraph & fg )
   rg.getProperty( SIA_VOID_LABEL, voidLabel );
 
 
-  //	Lecture graphe exemple
+  //	Read data graph
 
   string::size_type pos = graphFile.find( '|' );
   string::size_type pos2 = 0;
@@ -331,9 +331,9 @@ void AnnealConfigurator::loadGraphs( MGraph & rg, CGraph & fg )
 
       try
         {
-          cout << "Lecture du graphe sillons " << graphFile << endl;
+          cout << "Reading data graph " << graphFile << endl;
           fr >> fg;
-          cout << "Lecture FGraph OK." << endl;
+          cout << "FGraph read OK." << endl;
         }
       catch( parse_error & e )
         {
@@ -358,10 +358,10 @@ void AnnealConfigurator::loadGraphs( MGraph & rg, CGraph & fg )
 
           try
             {
-              cout << "Lecture du graphe " << *i << endl;
+              cout << "Reading graph " << *i << endl;
               FGraph	graph;
               fr >> graph;
-              cout << "Lecture FGraph OK.\n";
+              cout << "FGraph read OK.\n";
 
               vg[0] = &graph;
               concatenateGraphs( vg, fg, "sujet" ); // -----*****
@@ -380,12 +380,12 @@ void AnnealConfigurator::loadGraphs( MGraph & rg, CGraph & fg )
         }
     }
 
-  //	Enlevage des relations avec unknown
+  //	Remove relations to unknown
 
   if( removeVoid )
     rg.removeEdgesToVoid();
 
-  //	Fixation des poids des modèles
+  //	Set models weights
 
   cout << "setWeights : " << setWeights << endl;
   if( setWeights > 0 )
@@ -396,7 +396,7 @@ void AnnealConfigurator::loadGraphs( MGraph & rg, CGraph & fg )
       rg.removeWeights();
     }
 
-  //	Préparation des cliques
+  //	Initialize cliques
 
   cout << "Init cliques..." << endl;
 

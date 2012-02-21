@@ -11,7 +11,7 @@ namespace sigraph
 {
 
   /**	Lecture de fichiers de params de recuit (syntaxe siRelax.stx).
-	Les données sont publiques parce que c'est un truc vite fait, et c'est 
+	Les donnÃ©es sont publiques parce que c'est un truc vite fait, et c'est 
 	plus une structure qu'une classe
   */
   class AnnealConfigurator
@@ -23,11 +23,11 @@ namespace sigraph
     /// ne lit pas les graphes
     virtual bool loadConfig( const std::string & filename );
     virtual void saveConfig( const std::string & filename );
-    /// ne s'occupe pas des "plotfiles" (il doit être ouvert avant)
+    /// ne s'occupe pas des "plotfiles" (il doit Ãªtre ouvert avant)
     virtual void initAnneal( Anneal &ann, std::ofstream *plotf = 0 ) const;
-    /// remet tout à zéro (config par défaut)
+    /// remet tout Ã  zÃ©ro (config par dÃ©faut)
     virtual void init();
-    /// appelée par loadConfig()
+    /// appelÃ©e par loadConfig()
     virtual bool processParams();
     virtual void loadGraphs( MGraph & rg, CGraph & fg );
 
