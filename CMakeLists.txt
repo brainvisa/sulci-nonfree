@@ -22,6 +22,13 @@ else()
   message( "WARNING: pysigraph will not be built due to a missing dependency from aims-free: AIMS_PYAIMS_LIBRARY=\"${AIMS_PYAIMS_LIBRARY}\"" )
 endif()
 
+BRAINVISA_FIND_PACKAGE( anatomist-free )
+BRAINVISA_FIND_PACKAGE( sulci-private )
+if( anatomist-free_FOUND AND sulci-private_FOUND )
+    include( "${ANATOMIST-FREE_USE_FILE}" )
+    include( "${SULCI-PRIVATE_USE_FILE}" )
+    add_subdirectory( anafold )
+endif()
 
 BRAINVISA_CREATE_CMAKE_CONFIG_FILES()
 
