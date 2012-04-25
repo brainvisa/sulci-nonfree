@@ -22,6 +22,10 @@ def get_cmd2(labels, options, user_data):
         ','.join(labels) + "' '" + options.cfg +"'"
     return 'bash -c "%s"' % cmd
 
+def get_cmd_raw(labels, options, user_data):
+    return [ options.bin, "--filtermode", 'strict', "--labelsfilter",
+        ','.join(labels), options.cfg ]
+
 def cmd_grid(labels, options, user_data):
     dir = user_data['output_dir']
     log = get_logfile(dir, labels)
@@ -60,8 +64,13 @@ def cmd_LSF(labels, options, user_data):
     user_data['n'] += 1
 
 def cmd_somaworkflow(labels, options, user_data):
-    cmd = get_cmd2(labels, options, user_data) + '\n'
-    user_data['output_fd'].write(cmd)
+    cmd = get_cmd_raw(labels, options, user_data)
+    print cmd
+    #user_data['output_fd'].write(cmd)
+    from soma.workflow import client as swf
+    job = swf.Job( cmd, name=str(labels) )
+    jobs = user_data.setdefault( 'jobs', [] )
+    jobs.append( job )
 
 commands = {'grid' : cmd_grid, 'duch' : cmd_duch,
             'cath' : cmd_cath, 'LSF' : cmd_LSF,
@@ -168,6 +177,13 @@ def main():
 
 
     cover(model, fundict, data, options.labels_filter, options.filter_mode)
+
+    if options.parallelmode == 'somaworkflow':
+      from soma.workflow import client as swf
+      wf = swf.Workflow( data[ 'jobs' ] )
+      import pickle
+      pickle.dump( wf, data['output_fd'] )
+
     if options.parallelmode in ['duch', 'grid', 'somaworkflow'] :
         data['output_fd'].close()
 
