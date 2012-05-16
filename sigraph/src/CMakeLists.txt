@@ -9,7 +9,7 @@ if( DATAMIND_FOUND AND SVM_FOUND )
     ADD_SUBDIRECTORY(bundle_sisvm)
   ENDIF()
 else()
-  message( "WARNING: libsigraphsvm will not be build beacause of dependencies: datamind_FOUND=\"${datamind_FOUND}\" AND SVM_FOUND=\"${SVM_FOUND}\"" )
+  message( "WARNING: libsigraphsvm will not be build beacause of dependencies: DATAMIND_FOUND=\"${DATAMIND_FOUND}\" AND SVM_FOUND=\"${SVM_FOUND}\"" )
 endif()
 
 #------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 ADD_SUBDIRECTORY(libpysigraph)
 ADD_SUBDIRECTORY(sip)
-if(SVM_FOUND)
+if(SVM_FOUND AND DATAMIND_FOUND)
   ADD_SUBDIRECTORY(sip_svm)
 else()
   message( "WARNING: sip_svm wil not be built because of dependencies: SVM_FOUND=\"${SVM_FOUND}\"" )
