@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import sigraph
 import anatomist.direct.api as anatomist
 from soma import aims
@@ -50,11 +51,11 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
   filterExpr=None):
   fd = open(csvfilename)
   line = fd.readline()
-  delim = '\t'
-  labels = line.rstrip('\n').rstrip('\r').strip().split( delim )
-  if len( labels ) == 1:
-    delim = ' '
+  delims = [ ',\t', ', ', '\t', ' ' ]
+  for delim in delims:
     labels = line.rstrip('\n').rstrip('\r').strip().split( delim )
+    if len( labels ) != 1:
+      break
   fd.close()
   header_minf = { 'Y' : [], 'labels' : labels }
   # print 'labels:', labels
