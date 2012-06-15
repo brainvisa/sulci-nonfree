@@ -17,7 +17,7 @@ foreach( _command
     foreach( _f ${_proSources} )
       set( _sources ${_sources} ${_command}/${_f} )
     endforeach( _f ${_proSources} )
-    add_executable( ${_target} ${_sources} )
+    brainvisa_add_executable( ${_target} ${_sources} )
     target_link_libraries( ${_target} neuron )
     BRAINVISA_INSTALL( TARGETS ${_target}
     DESTINATION bin
