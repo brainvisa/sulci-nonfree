@@ -796,7 +796,7 @@ void QAnnealParams::saveConfig()
   QString filter = tr( "Annealing configuration" );
   filter += " (*.cfg)";
   QFileDialog	& fd = fileDialog();
-  fd.selectFilter( filter );
+  fd.setNameFilter( filter );
   fd.setCaption( tr( "Save annealing config file" ) );
   fd.setFileMode( QFileDialog::AnyFile );
   if( !fd.exec() )
