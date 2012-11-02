@@ -8,8 +8,12 @@ from sulci.common import io as sulci_io, add_translation_option_to_parser
 
 ################################################################################
 def compute_local(X1, X2, test):
-	subjects = numpy.unique1d(list(X1[:, 0]))
-	sulci = numpy.unique1d(list(X1[:, 1]))
+        if hasattr( numpy, 'unique1d' ):
+                subjects = numpy.unique1d(list(X1[:, 0]))
+                sulci = numpy.unique1d(list(X1[:, 1]))
+        else:
+                subjects = numpy.unique(list(X1[:, 0]))
+                sulci = numpy.unique(list(X1[:, 1]))
 	sulci_n = len(sulci)
 	res = {}
 	for sulcus in sulci:

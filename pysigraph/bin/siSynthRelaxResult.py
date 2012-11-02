@@ -377,7 +377,10 @@ def compute_correlations(db):
 def min_each_subject(db):
 	ind = db[:, 0]
 	all_subjects = ind.tolist()
-	all_subjects = numpy.unique1d(all_subjects).tolist()
+	if hasattr( numpy, 'unique1d' ):
+                all_subjects = numpy.unique1d(all_subjects).tolist()
+        else:
+                all_subjects = numpy.unique(all_subjects).tolist()
 	mins = []
 	for s in all_subjects:
 		s_db = db[db[:, 0] == datamind.core.DataFrame.code(s)]
@@ -392,7 +395,10 @@ def min_each_subject(db):
 def mean_each_subject(db):
 	ind = db[:, 0]
 	all_subjects = ind.tolist()
-	all_subjects = numpy.unique1d(all_subjects).tolist()
+        if hasattr( numpy, 'unique1d' ):
+                all_subjects = numpy.unique1d(all_subjects).tolist()
+        else:
+                all_subjects = numpy.unique(all_subjects).tolist()
 	means = []
 	for s in all_subjects:
 		s_db = db[db[:, 0] == datamind.core.DataFrame.code(s)]
