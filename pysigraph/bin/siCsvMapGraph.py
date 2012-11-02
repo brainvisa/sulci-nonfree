@@ -139,7 +139,10 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
       if side and side != 'both':
         s += '_' + side
         sulci[i] = s
-  uniq_sulci = numpy.unique1d(sulci)
+  if hasattr( numpy, 'unique1d' ):
+    uniq_sulci = numpy.unique1d(sulci)
+  else:
+    uniq_sulci = numpy.unique(sulci)
   sulci_data = {}
   for s in uniq_sulci:
     X2 = X[(sulci == s)]

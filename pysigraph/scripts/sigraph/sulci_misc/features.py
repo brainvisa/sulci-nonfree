@@ -82,7 +82,10 @@ def compute_components_number(h):
 		for id, v in enumerate(vertices):
 			tag_neighbours(v, idmap, id, \
 				['junction', 'plidepassage'])
-		n[sulcus] = len(numpy.unique1d(idmap.values()))
+                if hasattr( numpy, 'unique1d' ):
+                        n[sulcus] = len(numpy.unique1d(idmap.values()))
+                else:
+                        n[sulcus] = len(numpy.unique(idmap.values()))
 	return n
 
 

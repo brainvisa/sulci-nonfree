@@ -914,7 +914,10 @@ def adaptiveleaf_learn_mixgaussian(self, prefix, train, test, opt):
 	data_scaled = numpy.asmatrix(scaled_train.getX())
 
 	Y = scaled_train.getY()
-	classes = numpy.unique1d(Y)
+	if hasattr( numpy, 'unique1d' ):
+                classes = numpy.unique1d(Y)
+        else:
+                classes = numpy.unique(Y)
 	for c in classes :
 		ind = (Y == c).ravel()
 		db = database.DbNumpy(train.getX()[ind], train.getY()[ind])
