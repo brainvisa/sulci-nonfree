@@ -121,10 +121,10 @@ class Distribution(object):
 				s = numpy.sort(weights)[::-1]
 				wth = s[s.cumsum() > (th * wsum)][0]
 				if wth == s[0]:
-                                        if hasattr( numpy, 'unique1d' ):
-                                                s = numpy.unique1d(s)[::-1]
-                                        else:
-                                                s = numpy.unique(s)[::-1]
+					if hasattr( numpy, 'unique1d' ):
+						s = numpy.unique1d(s)[::-1]
+					else:
+						s = numpy.unique(s)[::-1]
 					try: wth = s[1]
 					except KeyError: pass
 					except IndexError: wth = 0.
@@ -2299,9 +2299,9 @@ class Gmm(Distribution):
 		self._dim = C.shape[1]
 		# some clusters may be missing
 		if hasattr( numpy, 'unique1d' ):
-                        ind = numpy.unique1d(labels)
-                else:
-                        ind = numpy.unique(labels)
+			ind = numpy.unique1d(labels)
+		else:
+			ind = numpy.unique(labels)
 		C = C[ind]
 		self._k = len(ind)
 		P = [((labels == i) + 0.) for i in ind]

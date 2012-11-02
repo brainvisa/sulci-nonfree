@@ -31,9 +31,9 @@ def subjects_global_error(dir):
 		errors.append(get_global_errors(file))
 	errors = numpy.vstack(errors)
 	if hasattr( numpy, 'unique1d' ):
-                subjects = numpy.unique1d(errors[:, 0])
-        else:
-                subjects = numpy.unique(errors[:, 0])
+		subjects = numpy.unique1d(errors[:, 0])
+	else:
+		subjects = numpy.unique(errors[:, 0])
 	se = numpy.array([errors[errors[:, 0] == s, 1].mean() \
 					for s in subjects])
 	if numpy.isnan(se).any():
@@ -53,10 +53,10 @@ def get_sulcuswise_local_errors(filename):
 	r = csvIO.ReaderCsv()
 	a = r.read(filename)
 	# list of sulci may change from one database sample to another
-        if hasattr( numpy, 'unique1d' ):
-                sulci = numpy.unique1d(a[:, 'sulci'].tolist()).tolist()
-        else:
-                sulci = numpy.unique(a[:, 'sulci'].tolist()).tolist()
+	if hasattr( numpy, 'unique1d' ):
+		sulci = numpy.unique1d(a[:, 'sulci'].tolist()).tolist()
+	else:
+		sulci = numpy.unique(a[:, 'sulci'].tolist()).tolist()
 	res = {}
 	sulci_col = a[:, 'sulci']
 	for sulcus in sulci:
@@ -93,12 +93,12 @@ def subjects_local_error(dir):
 	code = errors[0].code
 	decode = errors[0].decode
 	errors = numpy.vstack(errors)
-        if hasattr( numpy, 'unique1d' ):
-                subjects = numpy.unique1d(errors[:, 0])
-                sulci = map(decode, numpy.unique1d(errors[:, 1]))
-        else:
-                subjects = numpy.unique(errors[:, 0])
-                sulci = map(decode, numpy.unique(errors[:, 1]))
+	if hasattr( numpy, 'unique1d' ):
+		subjects = numpy.unique1d(errors[:, 0])
+		sulci = map(decode, numpy.unique1d(errors[:, 1]))
+	else:
+		subjects = numpy.unique(errors[:, 0])
+		sulci = map(decode, numpy.unique(errors[:, 1]))
 	res = {}
 	sulci_col = errors[:, 1]
 	for subject in subjects:
