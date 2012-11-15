@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright CEA (2000-2006)
 #
 #  This software and supporting documentation were developed by
@@ -143,7 +144,7 @@ class SvmSi(WrapperSi):
 
 	def cv(self, train, nbfolds) :
 		e = self._adaptiveleaf.workEl()
-		res = e.crossvalidation(self._convert(train), nbfolds)
+		res = e.crossvalidation(self._convert(train), int(nbfolds))
 		return self._getResult(res)
 
 
