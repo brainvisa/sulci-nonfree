@@ -435,32 +435,36 @@ class OptimizedFakeSvm(OptimizedSvm):
 
 
 def adaptiveleaf_learn_svm(self, prefix, train, test, opt):
-	subadaptive = self.workEl()
-	models = { 'classifier' : OptimizedCsvc,
-		'oneclass' : OptimizedSvmOneClass,
-		'regression' : OptimizedEsvr,
-		'quality' : OptimizedFakeSvm, # FIXME
-		'decision' : OptimizedFakeSvm } # FIXME
-	
-	dim = train.getX().shape[1]
-	nbfolds = opt['nbfolds']
-	model_class = models[subadaptive.getSvmMode()]
-	groups = train.getGroups()
-	s0, s1 = (groups == 0).sum(), (groups == 1).sum()
-	if (not s0) or (not s1):
-		msg.error("training database : empty class : " + \
-			"C0 : %d items, C1 : %d items" % (s0, s1))
-		exit(1)
-	w0, w1 = 1. / (2. * s0), 1. / (2. * s1)
-	weights = { 0 : w0, 1 : w1 }
+    subadaptive = self.workEl()
+    models = { 'classifier' : OptimizedCsvc,
+            'oneclass' : OptimizedSvmOneClass,
+            'regression' : OptimizedEsvr,
+            'quality' : OptimizedFakeSvm, # FIXME
+            'decision' : OptimizedFakeSvm } # FIXME
 
-	model = model_class(self, prefix, nbfolds, dim, weights)
-	model.fit(train)
-	if opt['predict_train']:
-		msg.write_list([' ', ('train', 'red'), ' : \n'])
-		model.predict(train)
-	msg.write_list([' ', ('test', 'red'), ' : \n'])
-	return model.predict(test)
+    dim = train.getX().shape[1]
+    nbfolds = opt['nbfolds']
+    model_class = models[subadaptive.getSvmMode()]
+    groups = train.getGroups()
+    s0, s1 = (groups == 0).sum(), (groups == 1).sum()
+    if (not s0) or (not s1):
+        msg.error("training database : empty class : " + \
+                "C0 : %d items, C1 : %d items" % (s0, s1))
+        exit(1)
+    w0, w1 = 1. / (2. * s0), 1. / (2. * s1)
+    weights = { 0 : w0, 1 : w1 }
+
+    model = model_class(self, prefix, nbfolds, dim, weights)
+    model.fit(train)
+    if opt['predict_train']:
+        msg.write_list([' ', ('train', 'red'), ' : \n'])
+        if len( train.getX() ) != 0:
+            model.predict(train)
+    msg.write_list([' ', ('test', 'red'), ' : \n'])
+    if len( test.getX() ) != 0:
+        return model.predict(test)
+    else:
+        return 0.
 
 
 
