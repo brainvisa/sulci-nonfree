@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright CEA (2000-2006)
 #
 #  This software and supporting documentation were developed by
@@ -1726,21 +1727,24 @@ def ForwardBackwardOptimizedDim(model, train, test, opt):
 
 ################################################################################
 def setStandardScaling(model, train, test):
-	'''
-    Scaling based on train and test class 0 elements. Set parameters on model.
-	'''
-	train_classes = train.getGroups()
-	test_classes = test.getGroups()
-	train0 = train.getX()[train_classes == 0]
-	test0 = test.getX()[test_classes == 0]
-	data = numpy.concatenate((train0, test0))
-	mean = data.mean(axis=0)
-	std = data.std(axis=0)
-	mean_aims = aims.vector_DOUBLE(mean)
-	std_aims = aims.vector_DOUBLE(std)
-	model.workEl().setStats(mean_aims, std_aims)
-	model.setDimReductor(None)
-	return data, mean, std
+    '''
+Scaling based on train and test class 0 elements. Set parameters on model.
+    '''
+    train_classes = train.getGroups()
+    test_classes = test.getGroups()
+    train0 = train.getX()[train_classes == 0]
+    if test.getX().shape[0] != 0:
+        test0 = test.getX()[test_classes == 0]
+    else:
+        test0 = numpy.array( [] ).reshape( ( 0, 30 ) )
+    data = numpy.concatenate((train0, test0))
+    mean = data.mean(axis=0)
+    std = data.std(axis=0)
+    mean_aims = aims.vector_DOUBLE(mean)
+    std_aims = aims.vector_DOUBLE(std)
+    model.workEl().setStats(mean_aims, std_aims)
+    model.setDimReductor(None)
+    return data, mean, std
 
 
 
