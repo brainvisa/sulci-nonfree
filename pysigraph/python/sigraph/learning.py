@@ -1740,7 +1740,7 @@ Scaling based on train and test class 0 elements. Set parameters on model.
     if test.getX().shape[0] != 0:
         test0 = test.getX()[test_classes == 0]
     else:
-        test0 = numpy.array( [] ).reshape( ( 0, 30 ) )
+        test0 = numpy.array( [] ).reshape( ( 0, train0.shape[1] ) )
     data = numpy.concatenate((train0, test0))
     mean = data.mean(axis=0)
     std = data.std(axis=0)
