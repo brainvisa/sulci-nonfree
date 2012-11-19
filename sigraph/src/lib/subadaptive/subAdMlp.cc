@@ -14,6 +14,7 @@
 #include <si/model/adaptiveLeaf.h>
 #include <si/model/mWriter.h>
 #include <graph/tree/tree.h>
+#include <aims/vector/vector.h>
 #include <cartobase/stream/fileutil.h>
 #include <cartobase/stream/directory.h>
 #include <stdio.h>
@@ -48,7 +49,7 @@ namespace
 
 
 SubAdMlp::SubAdMlp( const string name ) : IncrementalSubAdaptive( name ), 
-  _net( "SubAdMlp", 2, (int[2]) {1, 1} ), _eta( 0.1 )
+  _net( "SubAdMlp", 2, &AimsVector<int,2>( 1,1 )[0] /*(int[2]) {1, 1}*/ ), _eta( 0.1 )
 {
   MWriter::registerParser( &mwriterParseMlp );
 }
