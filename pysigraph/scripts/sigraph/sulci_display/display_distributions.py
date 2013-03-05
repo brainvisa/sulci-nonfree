@@ -1,26 +1,27 @@
 #!/usr/bin/env python
 import os, sys, exceptions, numpy
 from optparse import OptionParser
+
+import PyQt4.QtGui as qt
+qt4 = True
+
 import sigraph
 import anatomist.direct.api as anatomist
 from soma import aims, aimsalgo
-from sulci.common import io
-from sulci.models import check_same_distribution, distribution, \
-				distribution_aims, distribution_fff
 from datamind.tools import *
 try:
   import fff.GMM
 except:
   print 'warning, fff is not here or does not work. GMM will not be usable'
-if sys.modules.has_key( 'PyQt4' ):
-	qt4=True
-	import PyQt4.QtGui as qt
-else:
-	qt4=False
-	import qt
 
+from sulci.common import io
+from sulci.models import check_same_distribution, distribution, \
+				distribution_aims, distribution_fff
+
+qApp = qt.QApplication(sys.argv)
 a = anatomist.Anatomist()
 inf = numpy.inf
+
 
 def distributionArray3DToMeshes(mesher, bb_talairach_offset,
 				img_density, array, prob):
