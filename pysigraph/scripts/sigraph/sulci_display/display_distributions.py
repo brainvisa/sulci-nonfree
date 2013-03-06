@@ -55,6 +55,8 @@ def distributionArray3DToMeshes(mesher, bb_talairach_offset,
 		transformation = numpy.identity(4)
 		transformation = numpy.asarray(transformation).flatten()
 		motion = aims.Motion(transformation)
+		voxel_size = img_density.header()['voxel_size'][:3]
+		motion.scale(voxel_size, [1] * 3)
 		off3df = aims.Point3df(bb_talairach_offset)
 		motion.setTranslation(off3df)
 		aims.SurfaceManip.meshTransform(mesh, motion)
