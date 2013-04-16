@@ -109,7 +109,7 @@ def main():
 
 	try:	os.mkdir(options.dbdir)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % dbdir
+		print "warning: directory '%s' allready exists" % options.dbdir
 
 	graphs = io.load_graphs(options.transfile, graphnames)
 
