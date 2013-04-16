@@ -37,7 +37,8 @@ def compute_descriptors(mf, graphs, sulcus):
 	for i, g in enumerate(graphs):
 		sys.stdout.write("%d/%d\r" % (i + 1, size))
 		sys.stdout.flush()
-		for cl in g.cliques():
+		for rcptr_cl in g.cliques():
+			cl = rcptr_cl.get()
 			model_type = cl['model_type']
 			if sulcus is not None and \
 				(model_type != 'random_vertex' or
