@@ -52,6 +52,7 @@ struct Params
   int			nameDescr;
   string		labelatt;
   int			printLabels;
+  int			oneFile;
   string		subjectRegex;
   map<string,string>	descrAlias;
   string		selection;
@@ -228,6 +229,35 @@ void loadParams( const string & paramFile, const char* name, Params & par )
 }
 
 
+void init_file_with_header(ofstream *& fp, const std::string &filename,
+			int printsubjects,
+			const CGraph::CliqueSet::iterator &ic)
+{
+	vector<string>		names;
+	string			descname;
+	bool			naming = (bool) par.nameDescr;
+	unsigned		j;
+
+	fp = new ofstream( filename.c_str() );
+	if( !*fp )
+		cerr << "could not write file "
+			<< filename << endl;
+	if( naming && (*ic)->getProperty( SIA_DESCRIPTOR_NAMES,
+				names ) )
+	{
+		if( printsubjects )
+			*fp << "subject ";
+		if( par.printLabels )
+			*fp << "label side ";// split label in 2 : label side
+		for( j=0; j<names.size(); ++j )
+			*fp << names[j] << " ";
+		if( (*ic)->getProperty( SIA_DESCRIPTOR, descname ) )
+			*fp << descname << "_output";
+		*fp << endl;
+	}
+}
+
+
 int main( int argc, const char** argv )
 {
   try
@@ -239,6 +269,7 @@ int main( int argc, const char** argv )
       par.prefix = "siMorpho_";
       par.nameDescr = 0;
       par.printLabels = 0;
+      par.oneFile = 0;
 
       AimsApplication	app( argc, argv, 
 			     "Writes morphometry figures to disk files " 
@@ -286,6 +317,17 @@ int main( int argc, const char** argv )
 		     "to get labels from: usually \"label\" or \"name\", " 
 		     "\"auto\" means try first label, and if no label is " 
 		     "present, take name [default:auto]", true );
+      app.addOption( par.printLabels, "--print-labels",
+			"add labels/side column", true );
+      app.addOption( par.nameDescr, "--name-descriptors",
+			"add header", true );
+      app.addOption( par.oneFile, "--one-file",
+			"one uniq output file (default: one file per sulci)",
+			true );
+      app.addOption( par.atts, "--filter-attributes",
+		"label, label1 label2, label label1 label2 (default)",
+			true );
+
 
       app.initialize();
 
@@ -309,6 +351,17 @@ int main( int argc, const char** argv )
 		attrs.insert( str );
 	    }
 	}
+      if (attrs.size() == 3)
+        {
+          if (par.oneFile) 
+          {
+             std::cerr <<
+               "--oneFile option can't be used with heterogeneous descriptors\n"
+               "(bad option value for --filter-attributes option)" << std::endl;
+             exit(1);
+          }
+        }
+	
 
       //	Lecture graphe mod�le
 
@@ -369,11 +422,11 @@ int main( int argc, const char** argv )
       Model			*mod;
       vector<double>		potv;
       string			modname, name2;
+      string			filename;
       double			outp;
       map<string, ofstream *>	files;
+      ofstream			*fp = NULL;
       unsigned			j;
-      vector<string>		names;
-      string			descname;
       int			printsubjects = 0;
       regex_t			subjregex;
       regmatch_t		subjmatch[2];
@@ -460,31 +513,19 @@ int main( int argc, const char** argv )
                 outp = mod->printDescription( ic->get(), naming );
                 if( (*ic)->getProperty( SIA_POT_VECTOR, potv ) )
                   {
-                    ofstream	*& fp = files[ modname ];
-                    if( !fp )	// new file
-                      {
-                        fp = new ofstream( (par.prefix + modname
-                                            + ".dat").c_str() );
-                        if( !*fp )
-                          cerr << "could not write file "
-                                << par.prefix + modname + ".dat" << endl;
-                        if( naming
-                            && (*ic)->getProperty( SIA_DESCRIPTOR_NAMES,
-                                                    names ) )
-                          {
-                            if( printsubjects )
-                              *fp << "subject ";
-                            if( par.printLabels )
-                              *fp << "label side ";// split label in 2 : label side
-                              //*fp << "label ";
-                            for( j=0; j<names.size(); ++j )
-                              *fp << names[j] << " ";
-                            if( (*ic)->getProperty( SIA_DESCRIPTOR,
-                                                      descname ) )
-                              *fp << descname << "_output";
-                            *fp << endl;
-                          }
-                      }
+      		    if (not par.oneFile)
+		    {
+                      filename = par.prefix + modname + ".dat";
+                      fp = files[ modname ];
+		    }
+                    else
+                    { 
+                      filename = par.prefix + ".dat";
+		    }
+                    ofstream	*& fp_ref = fp;
+		    if (not fp_ref) // new file
+                        init_file_with_header(fp_ref, filename,
+				printsubjects, ic);
                     ofstream	& f = *fp;
                     switch( printsubjects )
                       {
