@@ -435,8 +435,12 @@ class PySpam(Distribution):
 		header = img.header()
 		self._bb_talairach_size = img.dimX(), img.dimY(), img.dimZ()
 		self._img_density = img
-		l = header['bb_talairach_offset']
-		self._bb_talairach_offset = l[0], l[1], l[2]
+		try:
+			l = header['bb_talairach_offset']
+		except KeyError:
+			self._bb_talairach_offset = 0, 0, 0
+		else:
+			self._bb_talairach_offset = l[0], l[1], l[2]
 		try:
 			self._missing_energy = header['missing_energy']
 		except KeyError:
