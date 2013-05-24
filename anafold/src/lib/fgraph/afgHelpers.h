@@ -13,9 +13,9 @@
 
 
 #include <cartobase/object/attributed.h>
-#include <aims/qtcompat/qlistview.h>
 
 class QObjectBrowserWidget;
+class QTreeWidgetItem;
 
 namespace anatomist
 {
@@ -33,17 +33,17 @@ namespace anatomist
 				const std::string &, std::string & );
     static void printDomain( QObjectBrowserWidget*, 
 			     const carto::GenericObject &, 
-			     const std::string &, Q3ListViewItem *, 
+			     const std::string &, QTreeWidgetItem *, 
 			     const anatomist::AttDescr*, 
 			     bool );
     static void printModel( QObjectBrowserWidget*, 
 			    const carto::GenericObject &, 
-			    const std::string &, Q3ListViewItem *, 
+			    const std::string &, QTreeWidgetItem *, 
 			    const anatomist::AttDescr*, 
 			    bool);
     static void describeAFGraph( QObjectBrowserWidget*, 
 				 AObject* obj, 
-				 Q3ListViewItem * );
+				 QTreeWidgetItem * );
   };
 
 }

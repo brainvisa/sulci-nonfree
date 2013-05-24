@@ -114,78 +114,82 @@ void AFGHelpers::printCliqueSet( QObjectBrowserWidget*,
 
 
 void AFGHelpers::printDomain( QObjectBrowserWidget* br, 
-			      const GenericObject & ao, 
-			      const string & semantic, Q3ListViewItem *parent, 
-			      const AttDescr* ad, bool regist )
+                              const GenericObject & ao, 
+                              const string & semantic, QTreeWidgetItem *parent, 
+                              const AttDescr* ad, bool regist )
 {
   Domain	*val;
 
   if( !ao.getProperty( semantic, val ) )
     AttDescr::printError( parent, semantic.c_str() );
   else
-    {
-      Q3ListViewItem	*item;
-      Tree		tr;
+  {
+    QTreeWidgetItem	*item;
+    Tree		tr;
 
-      val->buildTree( tr );
-      item = br->itemFor( parent, QObjectBrowserWidget::ATTRIBUTE, semantic, 
-			  regist );
-      if( !item )
-	{
-	  item = new Q3ListViewItem( parent, semantic.c_str(), "domain_p", 
-				    tr.getSyntax().c_str() );
-	  if( regist )
-	    br->registerAttribute( item );
-	}
-      else
-	{
-	  item->setText( 0, semantic.c_str() );
-	  item->setText( 1, "domain_p" );
-	  item->setText( 2, tr.getSyntax().c_str() );
-	}
-      ad->describeTreeInside( br, &tr, item, false );
+    val->buildTree( tr );
+    item = br->itemFor( parent, QObjectBrowserWidget::ATTRIBUTE, semantic, 
+                        regist );
+    if( !item )
+    {
+      item = new QTreeWidgetItem( parent );
+      item->setText( 0, semantic.c_str() );
+      item->setText( 1, "domain_p" );
+      item->setText( 2, tr.getSyntax().c_str() );
+      if( regist )
+        br->registerAttribute( item );
     }
+    else
+    {
+      item->setText( 0, semantic.c_str() );
+      item->setText( 1, "domain_p" );
+      item->setText( 2, tr.getSyntax().c_str() );
+    }
+    ad->describeTreeInside( br, &tr, item, false );
+  }
 }
 
 
 void AFGHelpers::printModel( QObjectBrowserWidget* br, 
-			     const GenericObject & ao, 
-			     const string & semantic, Q3ListViewItem *parent, 
-			     const AttDescr* ad, bool regist )
+                             const GenericObject & ao, 
+                             const string & semantic, QTreeWidgetItem *parent, 
+                             const AttDescr* ad, bool regist )
 {
   Model	*val;
 
   if( !ao.getProperty( semantic, val ) )
     AttDescr::printError( parent, semantic.c_str() );
   else
+  {
+    QTreeWidgetItem	*item;
+
+    Tree	tr;
+    val->buildTree( tr );
+
+    item = br->itemFor( parent, QObjectBrowserWidget::ATTRIBUTE, semantic, 
+                        regist);
+    if( !item )
     {
-      Q3ListViewItem	*item;
-
-      Tree	tr;
-      val->buildTree( tr );
-
-      item = br->itemFor( parent, QObjectBrowserWidget::ATTRIBUTE, semantic, 
-			  regist);
-      if( !item )
-	{
-	  item = new Q3ListViewItem( parent, semantic.c_str(), "model_p", 
-				    tr.getSyntax().c_str() );
-	  if( regist )
-	    br->registerAttribute( item );
-	}
-      else
-	{
-	  item->setText( 0, semantic.c_str() );
-	  item->setText( 1, "model_p" );
-	  item->setText( 2, tr.getSyntax().c_str() );
-	}
-      ad->describeTreeInside( br, &tr, item, false );
+      item = new QTreeWidgetItem( parent );
+      item->setText( 0, semantic.c_str() );
+      item->setText( 1, "model_p" );
+      item->setText( 2, tr.getSyntax().c_str() );
+      if( regist )
+        br->registerAttribute( item );
     }
+    else
+    {
+      item->setText( 0, semantic.c_str() );
+      item->setText( 1, "model_p" );
+      item->setText( 2, tr.getSyntax().c_str() );
+    }
+    ad->describeTreeInside( br, &tr, item, false );
+  }
 }
 
 
 void AFGHelpers::describeAFGraph( QObjectBrowserWidget* br, AObject* obj, 
-				  Q3ListViewItem *parent )
+				  QTreeWidgetItem *parent )
 {
   AFGraph	*fg = dynamic_cast<AFGraph *>( obj );
 
@@ -202,16 +206,21 @@ void AFGHelpers::describeAFGraph( QObjectBrowserWidget* br, AObject* obj,
 
   sprintf( id, "%u", (unsigned) cl.size() );
 
-  Q3ListViewItem	*cliques = br->itemFor( parent, "Cliques" );
+  QTreeWidgetItem	*cliques = br->itemFor( parent, "Cliques" );
   if( !cliques )
-    cliques = new Q3ListViewItem( parent, "Cliques", 0, id );
+  {
+    cliques = new QTreeWidgetItem( parent );
+    cliques->setText( 0, "Cliques" );
+    cliques->setText( 1, 0 );
+    cliques->setText( 2, id );
+  }
   else
-    {
-      cliques->setText( 1, 0 );
-      cliques->setText( 2, id );
-    }
+  {
+    cliques->setText( 1, 0 );
+    cliques->setText( 2, id );
+  }
 
-  Q3ListViewItem	*item, *subitem, *citem;
+  QTreeWidgetItem	*item, *subitem, *citem;
   Clique	*c;
   string	name, str, synt, potential;
   AttDescr	*descr = AttDescr::descr();
@@ -221,75 +230,84 @@ void AFGHelpers::describeAFGraph( QObjectBrowserWidget* br, AObject* obj,
   bool		newgo;
 
   for( ic=cl.begin(); ic!=fc; ++ic )
+  {
+    c = ic->get();
+    if( !c->getProperty( "label", name ) )
     {
-      c = ic->get();
-      if( !c->getProperty( "label", name ) )
+      if( c->getProperty( "label1", name ) 
+          && c->getProperty( "label2", str ) )
       {
-	if( c->getProperty( "label1", name ) 
-	    && c->getProperty( "label2", str ) )
-	  {
-	    name = string( "edge " ) + name + " - " + str;
-	  }
-	else
-	  name = "unnamed";
+        name = string( "edge " ) + name + " - " + str;
       }
-
-      synt = c->getSyntax();
-      if( ( !fg->isMapWeighted() 
-	  && c->getProperty( "potential_unweighted", pot ) ) 
-	  || c->getProperty( "potential", pot ) )
-	{
-	  sprintf( id, "%f", pot );
-	  potential = id;
-	}
-      else potential = "";
-      citem = br->itemFor( cliques, c, true );
-      if( !citem )
-	{
-	  citem = new Q3ListViewItem( cliques, name.c_str(), synt.c_str(), 
-				     potential.c_str() );
-	  br->registerGObject( citem, c );
-	  newgo = true;
-	}
       else
-	{
-	  /*cout << "item found : " << citem << " for " << c << ", " << name 
-	    << ", " << synt << ", " << potential << endl;*/
-	  citem->setText( 0, name.c_str() );
-	  citem->setText( 1, synt.c_str() );
-	  citem->setText( 2, potential.c_str() );
-	  newgo = false;
-	}
-      descr->describeAttributes( br, citem, c, true );
-
-      sprintf( id, "Size : %lu", ((const VertexClique *) c)->size() );
-      if( !newgo )
-	item = br->itemFor( citem, "Nodes" );
-      else
-	item = 0;
-      if( !item )
-	{
-	  item = new Q3ListViewItem( citem, "Nodes", 0, id );
-	  newgo = true;
-	}
-
-      if( newgo )
-	for( iv=((const VertexClique*) c)->begin(), 
-	       fv=((const VertexClique*) c)->end(); iv!=fv; ++iv )
-	  {
-	    v = *iv;
-	    if( !v->getProperty( "name", name ) )
-	      name = "unnamed";
-	    if( !v->getProperty( "label", str ) )
-	      str = "";
-	    subitem = br->itemFor( item, name );
-	    if( !subitem )
-	      subitem = new Q3ListViewItem( item, name.c_str(), 
-					    v->getSyntax().c_str(), 0, 
-					    str.c_str() );
-	    //describeAttributes( subitem, v );
-	  }
+        name = "unnamed";
     }
+
+    synt = c->getSyntax();
+    if( ( !fg->isMapWeighted() 
+        && c->getProperty( "potential_unweighted", pot ) ) 
+        || c->getProperty( "potential", pot ) )
+    {
+      sprintf( id, "%f", pot );
+      potential = id;
+    }
+    else potential = "";
+    citem = br->itemFor( cliques, c, true );
+    if( !citem )
+    {
+      citem = new QTreeWidgetItem( cliques );
+      citem->setText( 0, name.c_str() );
+      citem->setText( 1, synt.c_str() );
+      citem->setText( 2, potential.c_str() );
+      br->registerGObject( citem, c );
+      newgo = true;
+    }
+    else
+    {
+      /*cout << "item found : " << citem << " for " << c << ", " << name 
+        << ", " << synt << ", " << potential << endl;*/
+      citem->setText( 0, name.c_str() );
+      citem->setText( 1, synt.c_str() );
+      citem->setText( 2, potential.c_str() );
+      newgo = false;
+    }
+    descr->describeAttributes( br, citem, c, true );
+
+    sprintf( id, "Size : %lu", ((const VertexClique *) c)->size() );
+    if( !newgo )
+      item = br->itemFor( citem, "Nodes" );
+    else
+      item = 0;
+    if( !item )
+    {
+      item = new QTreeWidgetItem( citem );
+      item->setText( 0, "Nodes" );
+      item->setText( 1, 0 );
+      item->setText( 2, id );
+      newgo = true;
+    }
+
+    if( newgo )
+      for( iv=((const VertexClique*) c)->begin(), 
+              fv=((const VertexClique*) c)->end(); iv!=fv; ++iv )
+      {
+        v = *iv;
+        if( !v->getProperty( "name", name ) )
+          name = "unnamed";
+        if( !v->getProperty( "label", str ) )
+          str = "";
+        subitem = br->itemFor( item, name );
+        if( !subitem )
+        {
+          subitem = new QTreeWidgetItem( item );
+          subitem->setText( 0, name.c_str() );
+          subitem->setText( 1, v->getSyntax().c_str() );
+          subitem->setText( 2, 0 );
+          subitem->setText( 3, str.c_str() );
+        }
+        //describeAttributes( subitem, v );
+      }
+  }
 }
 
 
