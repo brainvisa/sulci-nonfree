@@ -23,7 +23,6 @@ else()
 endif()
 
 BRAINVISA_FIND_PACKAGE( anatomist-free )
-BRAINVISA_FIND_PACKAGE( sulci-private )
 if( anatomist-free_FOUND AND sulci-private_FOUND )
     include( "${ANATOMIST-FREE_USE_FILE}" )
     include( "${SULCI-PRIVATE_USE_FILE}" )
