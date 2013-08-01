@@ -23,9 +23,8 @@ else()
 endif()
 
 BRAINVISA_FIND_PACKAGE( anatomist-free )
-if( anatomist-free_FOUND AND sulci-private_FOUND )
+if( anatomist-free_FOUND )
     include( "${ANATOMIST-FREE_USE_FILE}" )
-    include( "${SULCI-PRIVATE_USE_FILE}" )
     add_subdirectory( anafold )
 endif()
 
