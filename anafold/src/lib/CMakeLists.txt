@@ -9,7 +9,7 @@ if( APPLE )
 else()
   set_property( TARGET anafold PROPERTY VERSION ${${PROJECT_NAME}_VERSION} )
 endif()
-target_link_libraries( anafold ${ANATOMIST-FREE_LIBRARIES} ${SULCI-PRIVATE_LIBRARIES} )
+target_link_libraries( anafold ${ANATOMIST-FREE_LIBRARIES} sigraph )
 BRAINVISA_INSTALL( TARGETS anafold
                    DESTINATION lib
                    COMPONENT ${PROJECT_NAME} )
