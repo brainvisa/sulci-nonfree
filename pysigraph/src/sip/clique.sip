@@ -19,7 +19,7 @@ class Clique : carto::GenericObject /Abstract/
 public:
   virtual ~Clique();
   virtual void clear();
-  virtual void deepCopy() const = 0;
+  virtual sigraph::Clique* deepCopy() const = 0;
 
   static set_CliquePtr * fromSetPtrObject( carto::GenericObject );
 %MethodCode
