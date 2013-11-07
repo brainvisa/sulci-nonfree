@@ -4,7 +4,8 @@ import pickle, numpy, scipy.stats, scipy.special
 try:
   import fff.GMM
 except:
-  print 'warning, fff is not here or does not work. GMM will not be usable'
+  # print 'warning, fff is not here or does not work. GMM will not be usable'
+  pass
 from distribution import Distribution, distribution_map
 
 
