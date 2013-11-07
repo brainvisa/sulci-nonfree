@@ -46,7 +46,8 @@ class NoMessage(object):
 try:
 	grid = import_from('grid.py')
 except ImportError, e:
-	print "warning: can't load grid module '%s'" %e
+	#print "warning: can't load grid module '%s'" %e
+	pass
 else:
 	grid.msg = NoMessage()
 
