@@ -274,6 +274,14 @@ def parseOpts(argv):
 		metavar = 'FILE', action='store',
 		default = 'posterior_independent.arg',
 		help='output tagged graph (default : %default)')
+	parser.add_option('--mode', dest='mode', metavar = 'MODE',
+		action='store', default = 'global', help="registration " + \
+		"mode : 'global' (one rotation+translation)  or 'local' " + \
+		"(one rotation+translation by sulcus)")
+	parser.add_option('--affine', dest='is_affine',
+		action='store_true', default = False,
+		help="if not specified: rigid transformation." + \
+		" if specified: affine transformation")
 	parser.add_option('--input-motion', dest='input_motion',
 		metavar = 'FILE', action='store', default = None,
 		help='motion file (.trm) from Talairach to the ' + \
@@ -284,56 +292,21 @@ def parseOpts(argv):
 		'data on model. In local mode, it is the directory which '  + \
 		'will contains individual sulcus-wise transformations '     + \
 		'expressed in the default referential (i.e: not local ones).')
+	parser.add_option('--no-talairach', dest='no_tal',
+		action='store_true', default = False,
+		help="if not specified the internal transformation from " + \
+		"subject to Talairach is used before any other given " + \
+		"transformation.")
+
 	parser.add_option('-d', '--distrib', dest='distribname',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')
 	parser.add_option('--distrib-gaussians', dest='distrib_gaussians_name',
 		metavar = 'FILE', action='store', default = None,
 		help='distribution models')
-	parser.add_option('-c', '--csv', dest='csvname',
-		metavar = 'FILE', action='store',
-		default = 'posterior_independent.csv',
-		help='csv storing posterior probabilities (default : %default)')
-	parser.add_option('-s', '--sulci', dest='sulci',
-		metavar = 'LIST', action='store', default = None,
-		help='tag only specified manually tagged sulci.')
-	parser.add_option('-n', '--node', dest='node_index',
-		metavar = 'INDEX', action='store', default = None,
-		help='tag only one specified node')
 	parser.add_option('-p', '--prior', dest='priorname',
 		metavar = 'FILE', action='store', default = None,
 		help='prior file (default : no prior)')
-	parser.add_option('--input-labels', dest='input_labelsfile',
-		metavar = 'FILE', action='store', default = None,
-		help='file storing available labels for each sulci node')
-	parser.add_option('-l', '--output-labels', dest='output_labelsfile',
-		metavar = 'FILE', action='store',
-		default = 'posterior_independent_labels.dat',
-		help='file storing available labels for each sulci node')
-	parser.add_option('--vtk', dest='vtk', action='store_true',
-		default = False, help='display with vtk')
-	parser.add_option('-v', '--verbose', dest='verbose',
-		metavar = 'FILE', action='store', default = '0',
-		help='verbosity level : 0 no verbosity, 1, 2... more verbosity')
-	parser.add_option('-e', '--eps', dest='eps', metavar = 'FLOAT',
-		action='store', default = 1., type='float',
-		help='precision to stop EM')
-	parser.add_option('--maxiter', dest='maxiter', metavar = 'INT',
-		action='store', default = numpy.inf, type='int',
-		help="max iterations number of optimization process")
-	parser.add_option('--mode', dest='mode', metavar = 'MODE',
-		action='store', default = 'global', help="registration " + \
-		"mode : 'global' (one rotation+translation)  or 'local' " + \
-		"(one rotation+translation by sulcus)")
-	parser.add_option('--no-talairach', dest='no_tal',
-		action='store_true', default = False,
-		help="if not specified the internal transformation from " + \
-		"subject to Talairach is used before any other given " + \
-		"transformation.")
-	parser.add_option('--affine', dest='is_affine',
-		action='store_true', default = False,
-		help="if not specified: rigid transformation." + \
-		" if specified: affine transformation")
 	parser.add_option('--translation-prior', dest='translation_prior',
 		metavar = 'FILE', action='store', default=None,
 		help="translation prior (see learn_transformation_prior.py)")
@@ -343,6 +316,39 @@ def parseOpts(argv):
 	parser.add_option('--angle-prior', dest='angle_prior',
 		metavar = 'FILE', action='store', default=None,
 		help="angle prior (see learn_transformation_prior.py)")
+
+	parser.add_option('-c', '--csv', dest='csvname',
+		metavar = 'FILE', action='store',
+		default = 'posterior_independent.csv',
+		help='csv storing posterior probabilities (default : %default)')
+
+	parser.add_option('-s', '--sulci', dest='sulci',
+		metavar = 'LIST', action='store', default = None,
+		help='tag only specified manually tagged sulci.')
+	parser.add_option('-n', '--node', dest='node_index',
+		metavar = 'INDEX', action='store', default = None,
+		help='tag only one specified node')
+
+	parser.add_option('--input-labels', dest='input_labelsfile',
+		metavar = 'FILE', action='store', default = None,
+		help='file storing available labels for each sulci node')
+	parser.add_option('-l', '--output-labels', dest='output_labelsfile',
+		metavar = 'FILE', action='store',
+		default = 'posterior_independent_labels.dat',
+		help='file storing available labels for each sulci node')
+
+	parser.add_option('--vtk', dest='vtk', action='store_true',
+		default = False, help='display with vtk')
+	parser.add_option('-v', '--verbose', dest='verbose',
+		metavar = 'FILE', action='store', default = '0',
+		help='verbosity level : 0 no verbosity, 1, 2... more verbosity')
+
+	parser.add_option('-e', '--eps', dest='eps', metavar = 'FLOAT',
+		action='store', default = 1., type='float',
+		help='precision to stop EM')
+	parser.add_option('--maxiter', dest='maxiter', metavar = 'INT',
+		action='store', default = numpy.inf, type='int',
+		help="max iterations number of optimization process")
 
 	return parser, parser.parse_args(argv)
 
