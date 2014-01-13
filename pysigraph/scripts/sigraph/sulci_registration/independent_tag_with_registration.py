@@ -77,7 +77,7 @@ class Tagger(object):
 		# available labels
 		if available_labels:
 			self._available_labels = \
-			self.get_avalaible_labels_matrix(available_labels)
+			self.get_available_labels_matrix(available_labels)
 		else:	self._available_labels = None
 
 	def _not_selected(self, xi):
@@ -120,7 +120,7 @@ class Tagger(object):
 		else:	priors = UniformFrequency(self._states_n).frequencies()
 		return numpy.ravel(numpy.asarray(priors))
 
-	def get_avalaible_labels_matrix(self, available_labels):
+	def get_available_labels_matrix(self, available_labels):
 		L = []
 		for xi in self._graph_data.vertices():
 			if xi.getSyntax() != 'fold' : continue
@@ -372,9 +372,9 @@ def main():
 
 	print "read..."
 	if options.input_labelsfile:
-		availablelabels = io.read_availablelabels(
+		input_available_labels = io.read_available_labels(
 				options.input_labelsfile)
-	else:	availablelabels = None
+	else:	input_available_labels = None
 	if options.sulci is None:
 		selected_sulci = None
 	else:	selected_sulci = options.sulci.split(',')
@@ -428,7 +428,7 @@ def main():
 		input_motion = aims.Reader().read(options.input_motion)
 	else:	input_motion = None
 	tagger_opt = [sulcimodel, gaussians_distrib, descriptor, graph,
-		input_motion, availablelabels, options.csvname, selected_sulci, 
+		input_motion, input_available_labels, options.csvname, selected_sulci, 
 		node_index, options.no_tal, options.is_affine,
 		int(options.verbose)]
 	if model_type == 'gaussian' : d = GaussianTagger(*tagger_opt)
@@ -438,9 +438,9 @@ def main():
 
 	# tag/registration + write outputs
 	if options.vtk:
-		trans, available_labels = d.vtk_tag(mode, options.eps,
+		trans, output_available_labels = d.vtk_tag(mode, options.eps,
 							options.maxiter)
-	else:	trans, available_labels = d.tag(mode, options.eps,
+	else:	trans, output_available_labels = d.tag(mode, options.eps,
 							options.maxiter)
 	if options.motion:
 		if mode == 'global': trans.write(options.motion)
@@ -459,7 +459,7 @@ def main():
 				print e
 				sys.exit(1)
 
-	print_available_labels(options.output_labelsfile, available_labels)
+	print_available_labels(options.output_labelsfile, output_available_labels)
 	graph['filename_base'] = '*'
 	w = sigraph.FoldWriter(options.output_graphname)
 	w.write(graph)
