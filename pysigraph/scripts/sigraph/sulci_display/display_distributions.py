@@ -31,7 +31,8 @@ def distributionArray3DToMeshes(mesher, bb_talairach_offset,
 	array_sort = numpy.sort(array.flatten())[::-1]
 	array_cum = array_sort.cumsum()
 	mesher.setVerbose(False)
-	mesher.setSmoothing(180.0, 5, 0.4, 0.2, 0.2)
+	# WARNING FIXME CHECK...
+	# mesher.setSmoothing(180.0, 5, 0.4, 0.2, 0.2)
 	mesher.setDecimation(100.0, 5, 3, 180.)
 	mesher.setMinFacetNumber(50)
 	for i in range(3):
@@ -209,26 +210,37 @@ class BlocGaussianDisplay(Display):
 def addBorder(img_in, width=1, border_value=0., aims_border=False):
 	# init
 	dim_in = [img_in.dimX(), img_in.dimY(), img_in.dimZ()]
-	if aims_border:
-		dim_out = dim_in + [1, width]
-	else:	dim_out = [(d + width * 2) for d in dim_in]
-	img_out = img_in.__class__(*dim_out)
-	a_in = img_in.volume().get().arraydata()
-	a_out = img_out.volume().get().arraydata()
+        outvol = aims.Volume_S16(dim_in[0] + width * 2, dim_in[1] + width * 2, dim_in[2] + width * 2, 1 )
+        outvol.arraydata()[:] = border_value
+        outvol2 = aims.Volume_S16( aims.rc_ptr_Volume_S16( outvol ), aims.Volume_S16.Position4Di( width, width, width, 0 ), aims.Volume_S16.Position4Di( *dim_in ) )
+        outvol2.arraydata()[:] = img_in.volume().arraydata()
+        return aims.AimsData_S16( outvol2 )
+	#print 'dim_in:', dim_in, ', width:', width
+	#if aims_border:
+		#dim_out = dim_in + [1, width]
+	#else:	dim_out = [(d + width * 2) for d in dim_in]
+	#print 'dim_out:', dim_out
+	## call Aims constructor with border (5th param)
+	#img_out = img_in.__class__(*dim_out)
+	#a_in = img_in.volume().get().arraydata()
+	#a_out = img_out.volume().get().arraydata()
 	
-	# create mask
-	mask = numpy.zeros(a_out.shape, dtype='bool')
-	mask[:] = True
-	r1 = numpy.arange(width)
-	r2 = -numpy.arange(width) - 1
-	mask[0, r1, :, :] = mask[0, r2, :, :] = \
-		mask[0, :, r1, :] = mask[0, :, r2, :] = \
-		mask[0, :, :, r1] = mask[0, :, :, r2] = 0
-	# apply
-	a_out[mask] = a_in.flatten()
-	a_out[mask == 0] = border_value
+	## create mask
+	#mask = numpy.zeros(a_out.shape, dtype='bool')
+	#mask[:] = True
+	#r1 = numpy.arange(width)
+	#r2 = -numpy.arange(width) - 1
+	#mask[0, r1, :, :] = mask[0, r2, :, :] = \
+		#mask[0, :, r1, :] = mask[0, :, r2, :] = \
+		#mask[0, :, :, r1] = mask[0, :, :, r2] = 0
+	## apply
+	#print 'a_in:', a_in.shape, a_in.flatten().shape
+	#print 'mask:', mask.shape
+	#print 'a_out:', a_out.shape, a_out[mask].shape
+	#a_out[mask] = a_in.flatten()
+	#a_out[mask == 0] = border_value
 
-	return img_out
+	#return img_out
 
 # Old Gmm display
 #class GmmDisplay(Display):
@@ -402,7 +414,7 @@ def parseOpts(argv):
 	parser = OptionParser(description)
 	parser.add_option('-d', '--distrib', dest='distribname',
 		metavar = 'FILE', action='store', default = None,
-		help='distribution models')
+		help='input distribution models')
 	parser.add_option('--hierarchy', dest='hierarchy',
 		metavar = 'FILE', action='store', default = hierarchy,
 		help='hierarchy (links between names and colors), ' + \

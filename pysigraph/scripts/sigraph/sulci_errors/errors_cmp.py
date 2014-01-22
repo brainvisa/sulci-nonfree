@@ -74,10 +74,10 @@ def parseOpts(argv):
 	parser = OptionParser(description)
 	parser.add_option('-1', '--data1', dest='data1',
 		metavar = 'FILE', action='store', default = None,
-		help='first input data')
+		help='first input CSV data')
 	parser.add_option('-2', '--data2', dest='data2',
 		metavar = 'FILE', action='store', default = None,
-		help='second input data')
+		help='second input CSV data')
 	parser.add_option('-o', '--output', dest='output',
 		metavar = 'FILE', action='store', default = None,
 		help='csv output file')

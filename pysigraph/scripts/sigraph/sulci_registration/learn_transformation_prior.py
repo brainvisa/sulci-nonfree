@@ -12,9 +12,9 @@ from sulci.models import distribution, distribution_aims
 ################################################################################
 def parseOpts(argv):
 	description = 'Learn sulcuswise transformation prior from output ' + \
-	'data of command learn_transformation_prior.py in ' + \
+	'data of command learn_registered_spams_distributions.py in ' + \
 	'local mode \n' \
-	'learn_spams_distributions.py [OPTIONS] trans1.dat trans2.dat...'
+	'learn_transformation_prior.py [OPTIONS] trans1.dat trans2.dat...'
 	parser = OptionParser(description)
 	for s in ['translation', 'direction', 'angle']:
 		parser.add_option('--%s-distribdir' %s,

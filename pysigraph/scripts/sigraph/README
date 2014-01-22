@@ -1,0 +1,86 @@
+sulci_registration/learn_registred_spams_distributions.py: SPAMs avec recalage, global ET local (en 2 passes)
+learn_transformation_prior.py: app distrib des params de recalage (priors pour la labelisation)
+
+
+
+graphes individuels
+# 1. SPAMS sans recalage: learn_spams_distributions.py
+#   input: graphes individuels
+#   output: 1 image SPAM par label
+
+1. SPAM avec recalage global: fait en 1 commande recal + SPAM
+  learn_registred_spams_distributions.py
+    mode: global
+    input: graphes individuels
+    output: SPAMS recalés en global
+      transformation par sujet, dans le répertoire des spams
+
+2. SPAM avec recalage local
+  learn_registred_spams_distributions.py aussi
+  mode: local
+  input: graphes individuels + transfos issus de l'étape 1
+  output: SPAMS (-d)
+    centres de gravité: --distrib-gaussians
+    transfos par sujet et par label, dans des sous-répertoires des spams
+
+3. learn_transformation_prior.py
+  input: transfos locales (.dat) sorties par 2
+  output: priors translation, direction, angle pour la reconnaissance
+
+4. learn_labels_priors.py: labels priors
+  input: graphes individuels
+  output: label_priors pour chaque sillon
+
+5. Reconnaissance
+  input: modèles SPAM
+    tous les priors
+
+6. Markov:
+  learn_relations.py
+  input: graphes individuels, transfos
+    --model-type=gamma_exponential_mixture
+    --data-type=min_distance
+  output: directory
+
+  data_type possibles: voir sulci/features/descriptors.py, mais voir compatibilité model-type/data-type...
+
+7. Reconnaissance Markovienne: annealing_tag (cf BV)
+  input: resultat de 6...
+
+
+Note: beaucoup de commandes ont une option leave-one-out
+bayesian-relax.py: ISBI (Dépend de create_graphmodel.py, clean_graphmodel.py)
+independent_tag.py: reconnaissance SPAM sans recalage
+learn_gaussians_distributions.py: apprend modèles gaussiens à la place des spams
+propagation_tag.py: loopy belief propagation
+display_distributions.py: maillages des SPAMS
+sulci_make_spam_mesh_graph.py: maillages + graphes de SPAMS (visu modèle)
+errors_cmp.py: compare indices d'erreur (cf figures papier). input: CSV from bin/siError.py
+sulci_misc/spams_to_atlas.py: atlas BSA
+Données transfos vers MNI:
+/neurospin/lnao/Panabase/data_sulci/base2008/models/segments/test_affine/spm/
+
+
+
+TODO
+réparer mesher, sulci_display/display_distributions.py
+
+regarder learn_orientation_prior.py -> apprentissage pour les modèles Markoviens ? Non. Est-ce qu'il sert encore à quelque chose ?
+Dépend de create_graphmodel.py, clean_graphmodel.py
+
+learn_registred_spams_distributions.py, local: utilisation ou non de --dir-priors ? En 2e passe ? A-t-il été utilisé dans les modèles qu'on utilise ?
+
+bayesian-relax.py: marche-t-il encore ?
+compare_spam_distributions.py
+create_segment_databases.py
+create_voxels_databases.py
+learn_gaussians_priors.py
+learn_spam_blur.py
+learn_supervised_sulci.py
+learn_unsupervised_sulci.py
+learn_voxels_distributions.py
+display_local_distributions.py
+display_sulci_orientations.py
+display_voxels_database.py
+show_database.py
+posterior_correlations.py -> diverses mesures d'erreur: à voir

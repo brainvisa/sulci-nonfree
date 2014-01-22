@@ -3,7 +3,7 @@ import os, sys, numpy, pprint, re, glob, pickle
 from optparse import OptionParser
 try:
 	import matplotlib
-	matplotlib.use('QtAgg')
+	matplotlib.use('Qt4Agg')
 	import pylab
 except IOError, e:
 	print "can't import matplotlib : ", e
@@ -128,7 +128,8 @@ def parseOpts(argv):
 	description = 'Compute relations models from a list of graphs.\n' \
 	'learn_relations.py [OPTIONS] graph1.arg graph2.arg...\n' \
 	'learn_relations.py [OPTIONS] graph1.arg graph2.arg... ==\n' \
-	'motion1.trm motion2.trm...\n'
+	'input_motion1.trm input_motion2.trm...\n' \
+	'input motions may be the output of global SPAM learning\n'
 	parser = OptionParser(description)
 	add_translation_option_to_parser(parser)
 	parser.add_option('-d', '--distribdir', dest='distribdir',

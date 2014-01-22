@@ -177,7 +177,7 @@ def parseOpts(argv):
 		'GeneralizedDirchlet(alpha, beta)')
 	parser.add_option('-o', '--output', dest='output',
 		metavar = 'FILE', action='store', default = 'bayesian_prior',
-		help='output learned prior filename')
+		help='output learned prior directory')
 	parser.add_option('-l', '--compute-likelihoods',
 		dest='compute_likelihoods',action='store_true', default = False,
 		help='print likelihoods of input graphs with computed prior')

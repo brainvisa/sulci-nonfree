@@ -284,7 +284,7 @@ def parseOpts(argv):
 	parser.add_option('-k', '--knn', dest='k',
 		metavar = 'INT', action='store', default = None,
 		help='enable knn estimation with a specified number of ' + \
-		'neighbours (default : disable)')
+		'neighbours (default : disable). Alternative methods for kernel density estimation - do not use in routine...')
 	parser.add_option('--mode', dest='mode',
 		metavar = 'FILE', action='store', default = 'normal',
 		help="'normal' : compute spams on given graphs, 'loo' : " + \

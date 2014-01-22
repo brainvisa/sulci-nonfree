@@ -590,9 +590,9 @@ def parseOpts(argv):
 	description = 'Compute Spam from a list of graphs.\n' \
 	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg...\n' \
 	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... == ' \
-	'motion1.trm motion2.trm...\n'
+	'input_motion1.trm input_motion2.trm...\n' \
 	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... == '\
-	'motion1.trm motion2.trm... === posterior1.csv posterior2.csv...\n'
+	'input_motion1.trm input_motion2.trm... === posterior1.csv posterior2.csv...\n'
 	'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... === '\
 	'posterior1.csv posterior2.csv...\n'
 	"use 'None' as csv filename to ignore the segments weights"
@@ -606,10 +606,10 @@ def parseOpts(argv):
 			'labels/databases links.')
 	parser.add_option('--distrib-gaussians', dest='distrib_gaussians',
 		metavar = 'DIR', action='store', default = None,
-		help='output distrib model of gravity centers')
+		help='output distrib model of gravity centers. Local mode only.')
 	parser.add_option('--dir-priors', dest='dir_priorsname',
 		metavar = 'FILE', action='store', default = None,
-		help='von mises Fisher prior on sulcuswise rotation directions')
+		help='input von mises Fisher prior on sulcuswise rotation directions')
 	parser.add_option('-s', '--sulci', dest='sulci',
 		metavar = 'LIST', action='store', default = None,
 		help='tag only specified manually tagged sulci.')
@@ -673,6 +673,11 @@ def parseOpts(argv):
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
 
+	if options.distrib_gaussians is None:
+            print >> sys.stderr, '--dir-gaussians option is mandatory'
+            parser.print_help()
+            sys.exit( 1 )
+
 	# read inputs
 	inputs = args[1:]
 	if len(inputs) == 0:
@@ -734,7 +739,8 @@ def main():
 	prefix = options.distribdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % prefix
+		print "warning: directory '%s' could not be created" % prefix
+		print e
 
 	# learn
 	if options.mode == 'global':
@@ -781,7 +787,7 @@ def main():
 			transformation.write(filename)
 		elif options.mode == 'local':
 			local_trans, global_trans = transformation
-			dir = os.path.join(base)
+			dir = os.path.join(prefix, base)
 			local_trans.write(dir + '_local', dir + '_local.dat')
 			global_trans.write(dir + '_global', dir + '_global.dat')
 	if options.mode == 'local':
