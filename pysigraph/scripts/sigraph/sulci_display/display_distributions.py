@@ -209,11 +209,15 @@ class BlocGaussianDisplay(Display):
 
 def addBorder(img_in, width=1, border_value=0., aims_border=False):
 	# init
-	dim_in = [img_in.dimX(), img_in.dimY(), img_in.dimZ()]
-        outvol = aims.Volume_S16(dim_in[0] + width * 2, dim_in[1] + width * 2, dim_in[2] + width * 2, 1 )
-        outvol.arraydata()[:] = border_value
-        outvol2 = aims.Volume_S16( aims.rc_ptr_Volume_S16( outvol ), aims.Volume_S16.Position4Di( width, width, width, 0 ), aims.Volume_S16.Position4Di( *dim_in ) )
-        outvol2.arraydata()[:] = img_in.volume().arraydata()
+	dim_in = [img_in.dimX(), img_in.dimY(), img_in.dimZ(), 1]
+        outvol = aims.Volume(numpy.asarray(vol).dtype.type,
+                dim_in[0] + width * 2, dim_in[1] + width * 2,
+                dim_in[2] + width * 2, 1)
+        numpy.asarray( outvol )[:] = border_value
+        outvol2 = outvol.__class__(aims.rc_ptr_Volume_S16(outvol),
+                aims.Volume_S16.Position4Di(width, width, width, 0),
+                aims.Volume_S16.Position4Di(*dim_in))
+        numpy.asarray(outvol2)[:] = numpy.asarray(img_in.volume())
         return aims.AimsData_S16( outvol2 )
 	#print 'dim_in:', dim_in, ', width:', width
 	#if aims_border:
