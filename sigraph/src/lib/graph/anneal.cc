@@ -856,7 +856,7 @@ void Anneal::processConfig( const set<Vertex *> & ver,
             {
               cout << "new threaded loop for " << rint( 1 * cpuCount() ) 
                    << " threads\n";
-              d->threadloop = new ThreadedLoop( d->potcontext, 1, 0, n, 1 );
+              d->threadloop = new ThreadedLoop( d->potcontext, 0, n );
               d->threadloop->setEndThreadsWhenDone( false );
             }
           else
