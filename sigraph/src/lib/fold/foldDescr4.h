@@ -16,44 +16,45 @@ namespace sigraph
   public:
     ///	Descriptors list
     enum Inputs
-      {
-	VEC_VALID,
-	E1E2_VALID, 
-	E1X, 
-	E1Y, 
-	E1Z, 
-	E2X, 
-	E2Y, 
-	E2Z, 
-	GX, 
-	GY, 
-	GZ, 
+    {
+      VEC_VALID,
+      E1E2_VALID,
+      E1X,
+      E1Y,
+      E1Z,
+      E2X,
+      E2Y,
+      E2Z,
+      GX,
+      GY,
+      GZ,
 
-	NVALID, 
-	NX, 
-	NY, 
-	NZ, 
-	DIRX, 
-	DIRY, 
-	DIRZ, 
+      NVALID,
+      NX,
+      NY,
+      NZ,
+      DIRX,
+      DIRY,
+      DIRZ,
 
-	SIZE, 
-	DEPTH, 
-	MINDEPTH, 
-        MEANDEPTH, 
+      SIZE,
+      DEPTH,
+      MINDEPTH,
+      MEANDEPTH,
 
-	NCC, 
-	NCC_NOT_CORTICAL, 
-	NCORT, 
-	DISTMAX_CC, 
-	NPLIS, 
-	SIZE_HULLJUNC, 
-	
-	GM_THICKNESS,
-	FOLD_OPENING,
+      NCC,
+      NCC_NOT_CORTICAL,
+      NCORT,
+      DISTMAX_CC,
+      NPLIS,
+      SIZE_HULLJUNC,
 
-	END
-      };
+      GM_THICKNESS,
+      FOLD_OPENING_HALF,
+      FOLD_OPENING,
+
+      END
+    };
 
     FoldDescr4();
     FoldDescr4( const FoldDescr4 & f );

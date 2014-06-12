@@ -52,8 +52,8 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
 
 //     FOLD_OPENING
     float                       surface_area = vec[SIZE];
-    float                       LCR_volume_clique = 0;
-    float                       LCR_volume_vertex;
+    float                       CSF_volume_clique = 0;
+    float                       CSF_volume_vertex;
     float                       fold_opening;
     float                       area;
 
@@ -67,15 +67,15 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
       v->getProperty( SIA_LABEL, labelV );
       if( label == labelV )
       {
-        if( v->getProperty("LCR_volume",LCR_volume_vertex) )
+        if( v->getProperty("CSF_volume",CSF_volume_vertex) )
         {
-          LCR_volume_clique += LCR_volume_vertex;
+          CSF_volume_clique += CSF_volume_vertex;
           // in normalize mode we have to recalculate the unnormalized
           // surface
           if( normd && v->getProperty("surface_area", area ) )
             surface_area += area;
         }
-        // else cout << "no LCR_volume in node\n";
+        // else cout << "no CSF_volume in node\n";
         if( v->getProperty("mid_interface_voxels",mid_inter_voxels_vertex) )
         {
           mid_inter_voxels_clique += mid_inter_voxels_vertex;
@@ -88,7 +88,7 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
     }
     if(surface_area != 0)
     {
-      fold_opening = LCR_volume_clique/surface_area;
+      fold_opening = CSF_volume_clique/surface_area;
     }
 
     else
@@ -102,6 +102,7 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
 
     vec.push_back(thickness);
     vec.push_back(fold_opening);
+    vec.push_back(fold_opening * 2);
 
   }
   else
@@ -137,6 +138,7 @@ vector<string> FoldDescr4::descriptorsNames() const
       names[ SIZE_HULLJUNC ] = "hullJunctionsLength";
       names.push_back("GM_thickness");
       names.push_back("fold_opening");
+      names.push_back("fold_opening_full");
     }
   return names;
 }

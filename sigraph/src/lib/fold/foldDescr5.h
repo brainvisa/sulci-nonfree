@@ -51,6 +51,7 @@ namespace sigraph
       SIZE_HULLJUNC,
 
       GM_THICKNESS,
+      FOLD_OPENING_HALF,
       FOLD_OPENING,
 
       MOMENT_INV0,
