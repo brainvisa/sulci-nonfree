@@ -110,6 +110,7 @@ bool FoldDescr4::makeVectorElements( const Clique* cl, vector<double> & vec,
     // invalid vector
     vec.push_back( 0. );
     vec.push_back( 0. );
+    vec.push_back( 0. );
   }
 
   return vec_valid;
