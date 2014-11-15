@@ -212,11 +212,11 @@ int main( int argc, const char** argv )
   //of the  neigbouring labelled area  
   Texture<set<short> > TexFrontSet,TexVor2Set,TexVor2Set2,SKIZ; 
   cout << "Extracting the boundaries of the sulci regions and select the gyrus seeds" << endl;
-  SKIZ = MeshFrontiereVoronoi<short>(surface[0],outTex[2],setBack,setFor);
+  SKIZ = MeshBorderVoronoi<short>(surface[0],outTex[2],setBack,setFor);
   TexFrontSet = gyrusSeedDefinition<short>(surface[0],outTex[2],setBack,setFor,AllowedLabel);
   //cout << "Dilate the gyrus seed in the SKIZ \n";
   //TexFrontSet = gyrusSeedDilationInSKIZ<std::set<short> >(surface[0],TexFrontSet,SKIZ,setBack,setFor);
-  outTex[3] = Frontiere2Texture<short>( TexFrontSet , surface[0],setBack,setFor);
+  outTex[3] = border2Texture<short>( TexFrontSet , surface[0],setBack,setFor);
 
   
   //2nd voronoi
