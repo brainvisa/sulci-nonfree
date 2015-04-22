@@ -133,7 +133,7 @@ bool FoldDescr2::makeVectorElements( const Clique* cl, vector<double> & vec,
 
   const VertexClique	*vcl = (const VertexClique *) cl;
 
-  //cout << "FoldDescr2::makeVector\n";
+  // cout << "FoldDescr2::makeVector\n";
 
   // Calcul des "attributs synthétisés"
 
@@ -220,7 +220,7 @@ bool FoldDescr2::makeVectorElements( const Clique* cl, vector<double> & vec,
 
   //cout << "avant passe sur les noeuds\n";
   cl->getProperty( SIA_LABEL, label );
-  //cout << "clique: " << vcl->size() << " nodes\n";
+  // cout << "clique: " << vcl->size() << " nodes, label: " << label << "\n";
   for( iv=vcl->begin(); iv!=fv; ++iv )
     {
 #ifdef SI_USE_BUILTIN_FOLD
@@ -237,8 +237,8 @@ bool FoldDescr2::makeVectorElements( const Clique* cl, vector<double> & vec,
       if( label == labelV && v->getProperty( surfaceatt, s ) )
 #endif
 	{
-	  /*cout << "vertex " << v << ", synt: " << v->getSyntax() 
-	    << ", label: " << labelV << endl;*/
+	  /* cout << "vertex " << v << ", synt: " << v->getSyntax()
+	    << ", label: " << labelV << endl; */
 	  vertices.insert( v );
 	  vec_valid = 1;
 
