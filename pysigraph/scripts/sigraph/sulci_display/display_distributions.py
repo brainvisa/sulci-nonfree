@@ -137,7 +137,7 @@ class GaussianDisplay(Display):
 		for i in range(len(self._ratio)):
 			color2 = list(color) + [self._alpha[i]]
 			cov = eigvect * (d * self._ratio[i]) * eigvect.I
-			mesh = aims.AimsTimeSurface_3(self._unit_sphere)
+			mesh = aims.AimsTimeSurface_3_VOID(self._unit_sphere)
 			transformation = numpy.identity(4)
 			transformation[:3, :3] = cov
 			flattrans = numpy.asarray(transformation).flatten()

@@ -57,9 +57,9 @@ def main():
 			continue
 		db, header = datamind_io.ReaderMinfCsv().read(minfname)
 		color = hie.find_color(sulcus)
-		all_mesh = aims.AimsTimeSurface_3()
+		all_mesh = aims.AimsTimeSurface_3_VOID()
 		for x in db.getX():
-			mesh = aims.AimsTimeSurface_3(unit_sphere)
+			mesh = aims.AimsTimeSurface_3_VOID(unit_sphere)
 			motion = aims.Motion()
 			r = numpy.random.normal(0, 0.5)
 			motion.setTranslation(x + r)

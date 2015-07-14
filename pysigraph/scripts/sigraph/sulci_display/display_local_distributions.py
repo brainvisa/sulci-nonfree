@@ -103,8 +103,8 @@ class RelationsDisplay(GlobalModelDisplay):
 		dir = numpy.hstack((ld.GetMeanDirection(), 0))
 		plane1 = tuple(-dir)
 		plane2 = tuple(dir)
-		borderline1 = aims.AimsTimeSurface_2()
-		borderline2 = aims.AimsTimeSurface_2()
+		borderline1 = aims.AimsTimeSurface_2_VOID()
+		borderline2 = aims.AimsTimeSurface_2_VOID()
 		mesh1 = aims.AimsSurfaceTriangle()
 		mesh2 = aims.AimsSurfaceTriangle()
 		for m in meshes:
@@ -173,7 +173,7 @@ class OrientationMesher(LocalModelMesher):
 		LocalModelMesher.__init__(self, *args, **kwargs)
 
 	def mesh(self, scale, size, s):
-		mesh = aims.AimsTimeSurface_3(self._unit_sphere)
+		mesh = aims.AimsTimeSurface_3_VOID(self._unit_sphere)
 		for v in mesh.vertex():
 			logli, li = self._ld.likelihood(v * s)
 			v += li * v / scale
@@ -200,7 +200,7 @@ class MatrixBinghamMesher(LocalModelMesher):
 
 	def create_marginal_mesh(self, i):
 		n = 100
-		mesh = aims.AimsTimeSurface_3(self._unit_sphere)
+		mesh = aims.AimsTimeSurface_3_VOID(self._unit_sphere)
 		for v in mesh.vertex():
 			lis = 0.
 			vx = v.arraydata()
@@ -281,7 +281,7 @@ class GaussianMesher(LocalModelMesher):
 		for i in range(3):
 			color2 = list(self._color) + [self._alpha[i]]
 			cov = eigvect * (d * self._ratio[i]) * eigvect.I
-			mesh = aims.AimsTimeSurface_3(self._unit_sphere)
+			mesh = aims.AimsTimeSurface_3_VOID(self._unit_sphere)
 			transformation = numpy.identity(4)
 			transformation[:3, :3] = cov
 			flattrans = numpy.asarray(transformation).flatten()
