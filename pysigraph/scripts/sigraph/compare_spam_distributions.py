@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 import os, sys, numpy
 import matplotlib
-matplotlib.use('QtAgg')
+matplotlib.use('Qt4Agg')
 import pylab
 from optparse import OptionParser
 from sulci.common import io
 from sulci.models import distribution, distribution_aims
-from soma.gui.api import chooseMatplotlibBackend
-chooseMatplotlibBackend()
+from soma.qt_gui import qt_backend
+qt_backend.init_matplotlib_backend()
 
 thresholds = [0.2, 0.5, 0.75, 0.9, 0.95, 0.99]
 
