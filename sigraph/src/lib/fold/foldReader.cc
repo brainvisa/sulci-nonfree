@@ -4,7 +4,7 @@
 #include <graph/graph/graph.h>
 #include <aims/bucket/bucket_g.h>
 #include <aims/def/general.h>
-#include <aims/def/path.h>
+#include <cartobase/config/paths.h>
 #include <si/fold/fattrib.h>
 #include <cartobase/smart/rcptr.h>
 #include <cartobase/exception/file.h>
@@ -23,7 +23,8 @@ FoldReader::FoldReader( const string & filename )
   : ExoticGraphReader( filename, FoldReader::syntax )
 {
   if( syntax.empty() )
-    syntax = initSyntax( Path::singleton().syntax() + "/graph.stx" );
+    syntax = initSyntax( Paths::findResourceFile(
+      "nomenclature/syntax/graph.stx", "aims" ) );
   if( syntaxSet().empty() )
     setSyntax( syntax );
 }

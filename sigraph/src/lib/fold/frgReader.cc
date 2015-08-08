@@ -31,7 +31,7 @@
 #include <si/sulcalSketch_Arnaud/arnaudattrib.h>
 #include <si/sulcalSketch_Arnaud/arnaudfinderparser.h>
 #include <si/sulcalSketch_Arnaud/arnaudmodel.h>
-#include <aims/def/path.h>
+#include <cartobase/config/paths.h>
 #include <cartobase/stream/fileutil.h>
 #include <iostream>
 
@@ -43,9 +43,8 @@ using namespace std;
 
 SyntaxSet & FrgReader::syntax()
 {
-  static SyntaxSet	synt( initSyntax( Path::singleton().syntax() + 
-                                          FileUtil::separator() + 
-                                          "mgraph.stx" ) );
+  static SyntaxSet	synt( initSyntax( Paths::findResourceFile(
+    "nomenclature/syntax/mgraph.stx", "aims" ) ) );
   return synt;
 }
 
