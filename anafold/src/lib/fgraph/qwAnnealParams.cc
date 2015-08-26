@@ -17,9 +17,6 @@
 #include <cartobase/thread/thread.h>
 #include <cartobase/thread/semaphore.h>
 #include <qlayout.h>
-#include <aims/qtcompat/qhbox.h>
-#include <aims/qtcompat/qvbox.h>
-#include <aims/qtcompat/qgrid.h>
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qcombobox.h>
@@ -37,6 +34,20 @@ using namespace sigraph;
 using namespace aims;
 using namespace carto;
 using namespace std;
+
+
+namespace
+{
+
+  class ThreadBridgeEvent : public QEvent
+  {
+  public:
+    ThreadBridgeEvent() : QEvent( QEvent::Type( QEvent::User + 103 ) ) {}
+    virtual ~ThreadBridgeEvent() {}
+  };
+
+}
+
 
 class QAnnealParams::AnnealPThread : public Thread
 {
@@ -98,220 +109,300 @@ struct QAnnealParams::PrivateData
 
 QAnnealParams::QAnnealParams( QWidget* parent, const char*,
 			      AFGraph* fusion )
-  : QWidget( parent, "QAnnealParams", Qt::WDestructiveClose ),
+  : QWidget( parent ),
   _fusion( fusion ), pdat( new QAnnealParams::PrivateData( this ) )
 {
   _conf = new AnnealConfigurator;
   fusion->addObserver( this );
 
-  setCaption( tr( "Annealing" ) + " : " + fusion->name().c_str() );
+  setAttribute( Qt::WA_DeleteOnClose );
+  setObjectName( "QAnnealParams" );
+  setWindowTitle( tr( "Annealing" ) + " : " + fusion->name().c_str() );
 
-  QVBoxLayout	*lay1 = new QVBoxLayout( this, 10, -1, "QAnnealParamsLay1" );
-  QHBox		*iobox = new QHBox( this );
-  iobox->setSpacing( 10 );
+  QVBoxLayout	*lay1 = new QVBoxLayout; //( this, 10, -1, "QAnnealParamsLay1" );
+  setLayout( lay1 );
+  lay1->setMargin( 10 );
+  lay1->setMargin( 5 );
+  QWidget	*iobox = new QWidget( this );
+  QHBoxLayout *iolay = new QHBoxLayout;
+  iobox->setLayout( iolay );
+  iolay->setSpacing( 10 );
+  iolay->setMargin( 5 );
   QPushButton	*loadBtn = new QPushButton( tr( "Load config" ), iobox );
   QPushButton	*saveBtn = new QPushButton( tr( "Save config" ), iobox );
+  iolay->addWidget( loadBtn );
+  iolay->addWidget( saveBtn );
 
   QCheckBox	*thrBox = new QCheckBox( tr( "Threaded interface" ), this );
-  QToolTip::add( thrBox, tr( "Using threads allows to keep Anatomist user\n"
-			     "interface active during the several-hours\n"
-			     "long annealing process, and allows to stop it\n"
-			     "but it's more subject to bugs, so don't play\n"
-			     "too much with Anatomist during the process,\n"
-			     "it can easily crash.\n"
-			     "If not threaded, you won't be able to use\n"
-			     "this Anatomist until the relaxation is \n"
-			     "finished (hope 2-4 hours...)\n"
-			     "(expect ~400 passes for a complete "
-			     "recognition)" ) );
+  thrBox->setToolTip( tr( "Using threads allows to keep Anatomist user\n"
+                          "interface active during the several-hours\n"
+                          "long annealing process, and allows to stop it\n"
+                          "but it's more subject to bugs, so don't play\n"
+                          "too much with Anatomist during the process,\n"
+                          "it can easily crash.\n"
+                          "If not threaded, you won't be able to use\n"
+                          "this Anatomist until the relaxation is \n"
+                          "finished (hope 2-4 hours...)\n"
+                          "(expect ~400 passes for a complete "
+                          "recognition)" ) );
   thrBox->setChecked( pdat->threaded );
   connect( thrBox, SIGNAL( toggled( bool ) ), this,
 	   SLOT( setThreaded( bool ) ) );
 
   //	params
-  QGrid		*parbox = new QGrid( 2, this );
-  parbox->setSpacing( 5 );
+  QWidget *parbox = new QWidget( this );
+  QGridLayout *parlay = new QGridLayout;
+  parbox->setLayout( parlay );
+  parlay->setSpacing( 3 );
+  parlay->setMargin( 0 );
+  int row = 0;
   QLabel	*l = new QLabel( tr( "Initialize annealing :" ), parbox );
-  QToolTip::add( l, tr( "If not set, annealing will not be initialized\n"
-			"(labels will be left unchanged, to continue "
-			"an interrupted relaxation for instance)" ) );
-  pdat->init = new QComboBox( parbox, "init" );
-  pdat->init->insertItem( tr( "yes" ) );
-  pdat->init->insertItem( tr( "no" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "If not set, annealing will not be initialized\n"
+                     "(labels will be left unchanged, to continue "
+                    "an interrupted relaxation for instance)" ) );
+  pdat->init = new QComboBox( parbox );
+  pdat->init->setObjectName( "init" );
+  parlay->addWidget( pdat->init, row++, 1 );
+  pdat->init->addItem( tr( "yes" ) );
+  pdat->init->addItem( tr( "no" ) );
   l = new QLabel( tr( "Mode :" ), parbox );
-  QToolTip::add( l, tr( "Annealing transition accept/reject mode :\n"
-			"Gibbs sampler, Metropolis or ICM (deterministic)" ) );
-  pdat->mode = new QComboBox( parbox, "mode" );
-  pdat->mode->insertItem( "gibbs" );
-  pdat->mode->insertItem( "metro" );
-  pdat->mode->insertItem( "icm" );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Annealing transition accept/reject mode :\n"
+                    "Gibbs sampler, Metropolis or ICM (deterministic)" ) );
+  pdat->mode = new QComboBox( parbox );
+  pdat->mode->setObjectName( "mode" );
+  parlay->addWidget( pdat->mode, row++, 1 );
+  pdat->mode->addItem( "gibbs" );
+  pdat->mode->addItem( "metro" );
+  pdat->mode->addItem( "icm" );
   l = new QLabel( tr( "Iteration mode :" ), parbox );
-  QToolTip::add( l, tr( "Transitions iterate mode\n"
-			"don't select CLIQUE - it's useless !" ) );
-  pdat->iter = new QComboBox( parbox, "iter" );
-  pdat->iter->insertItem( "VERTEX" );
-  pdat->iter->insertItem( "CLIQUE" );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Transitions iterate mode\n"
+                    "don't select CLIQUE - it's useless !" ) );
+  pdat->iter = new QComboBox( parbox );
+  parlay->addWidget( pdat->iter, row++, 1 );
+  pdat->iter->setObjectName( "iter" );
+  pdat->iter->addItem( "VERTEX" );
+  pdat->iter->addItem( "CLIQUE" );
   l = new QLabel( tr( "Translation file :" ), parbox );
-  QToolTip::add( l, tr( "Labels translation file\n"
-			 "Tells how to translate elements names\n"
-			 "from one nomenclature to the model one.\n"
-			 "If none, the default one is used\n"
-			 "(see SiGraph library for details)" ) );
-  QHBox	*tb = new QHBox( parbox );
-  tb->setSpacing( 5 );
-  pdat->transl = new QComboBox( tb, "transl" );
-  pdat->transl->insertItem( tr( "<default>" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Labels translation file\n"
+                     "Tells how to translate elements names\n"
+                     "from one nomenclature to the model one.\n"
+                     "If none, the default one is used\n"
+                     "(see SiGraph library for details)" ) );
+  QWidget	*tb = new QWidget( parbox );
+  parlay->addWidget( tb, row++, 1 );
+  QHBoxLayout *tblay = new QHBoxLayout;
+  tb->setLayout( tblay );
+  tblay->setSpacing( 5 );
+  pdat->transl = new QComboBox( tb );
+  pdat->transl->setObjectName( "transl" );
+  pdat->transl->addItem( tr( "<default>" ) );
   QPushButton	*trbtn = new QPushButton( "...", tb );
+  tblay->addWidget( pdat->transl );
+  tblay->addWidget( trbtn );
   trbtn->setFixedHeight( pdat->transl->sizeHint().height() );
   trbtn->setFixedWidth( trbtn->sizeHint().width() );
   l = new QLabel( tr( "Temperature :" ), parbox );
-  QToolTip::add( l, tr( "Starting annealing temperature, will decrease "
-			 "during the process" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip(tr( "Starting annealing temperature, will decrease "
+                    "during the process" ) );
   pdat->temp = new QLineEdit( "50", parbox );
+  parlay->addWidget( pdat->temp, row++, 1 );
   l = new QLabel( tr( "Rate :" ), parbox );
-  QToolTip::add( l, tr( "Temperature decreasing rate - at each pass\n"
-			 "the temperature will be multiplied by "
-			 "this factor" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Temperature decreasing rate - at each pass\n"
+                     "the temperature will be multiplied by "
+                     "this factor" ) );
   pdat->rate = new QLineEdit( "0.98", parbox );
+  parlay->addWidget( pdat->rate, row++, 1 );
   l = new QLabel( tr( "ICM switching temp :" ), parbox );
-  QToolTip::add( l, tr( "When the temperature gets lower than this\n"
-			 "threshold, annealing automatically switches\n"
-			 "to ICM deterministic mode.\n"
-			 "If left to 0, ICM is used only after a whole pass\n"
-			 "with no changes" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "When the temperature gets lower than this\n"
+                     "threshold, annealing automatically switches\n"
+                     "to ICM deterministic mode.\n"
+                     "If left to 0, ICM is used only after a whole pass\n"
+                     "with no changes" ) );
   pdat->tempicm = new QLineEdit( "0", parbox );
+  parlay->addWidget( pdat->tempicm, row++, 1 );
   l = new QLabel( tr( "Stop rate :" ), parbox );
-  QToolTip::add( l, tr( "% of accepted transitions below which the "
-			"annealing stops" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "% of accepted transitions below which the "
+                     "annealing stops" ) );
   pdat->stoprate = new QLineEdit( "0.01", parbox );
+  parlay->addWidget( pdat->stoprate, row++, 1 );
   l = new QLabel( tr( "Verbose :" ), parbox );
-  QToolTip::add( l, tr( "If set, verbose mode prints lots of counters\n"
-			"to keep you awaken during relaxation" ) );
-  pdat->verbose = new QComboBox( parbox, "verbose" );
-  pdat->verbose->insertItem( tr( "yes" ) );
-  pdat->verbose->insertItem( tr( "no" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "If set, verbose mode prints lots of counters\n"
+                     "to keep you awaken during relaxation" ) );
+  pdat->verbose = new QComboBox( parbox );
+  pdat->verbose->setObjectName( "verbose" );
+  parlay->addWidget( pdat->verbose, row++, 1 );
+  pdat->verbose->addItem( tr( "yes" ) );
+  pdat->verbose->addItem( tr( "no" ) );
   l = new QLabel( tr( "Gibbs nodes changes :" ), parbox );
-  QToolTip::add( l, tr( "Number of nodes allowed to change simultaneously "
-			"to form a Gibbs transition\n"
-			"LEAVE IT TO 1 FOR FOLDS RECOGNITION, or annealing "
-			"will last for months..." ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Number of nodes allowed to change simultaneously "
+                     "to form a Gibbs transition\n"
+                     "LEAVE IT TO 1 FOR FOLDS RECOGNITION, or annealing "
+                     "will last for months..." ) );
   pdat->gibbschange = new QLineEdit( "1", parbox );
+  parlay->addWidget( pdat->gibbschange, row++, 1 );
   l = new QLabel( tr( "Remove brain :" ), parbox );
-  QToolTip::add( l, tr( "Removes possible 'brain' nodes in graph -\n"
-			"this shouldn't happen in newer graphs, but it's "
-			"recommended to leave 'yes'" ) );
-  pdat->removebrain = new QComboBox( parbox, "removebrain" );
-  pdat->removebrain->insertItem( tr( "yes" ) );
-  pdat->removebrain->insertItem( tr( "no" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Removes possible 'brain' nodes in graph -\n"
+                     "this shouldn't happen in newer graphs, but it's "
+                     "recommended to leave 'yes'" ) );
+  pdat->removebrain = new QComboBox( parbox );
+  parlay->addWidget( pdat->removebrain, row++, 1 );
+  pdat->removebrain->setObjectName( "removebrain" );
+  pdat->removebrain->addItem( tr( "yes" ) );
+  pdat->removebrain->addItem( tr( "no" ) );
   l = new QLabel( tr( "Set weights :" ), parbox );
-  QToolTip::add( l, tr( "Allows to set weights on each model element :\n"
-			"  0 : don't set anything (leaves it as in the "
-			"model file)\n"
-			" -1 : explicitly unsets the weights (RECOMMENDED)\n"
-			"t>0 : sets nodes weights to t x num of relations" ) );
-  pdat->setweight = new QLineEdit( "-1", parbox, "setweight" );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Allows to set weights on each model element :\n"
+                     "  0 : don't set anything (leaves it as in the "
+                     "model file)\n"
+                     " -1 : explicitly unsets the weights (RECOMMENDED)\n"
+                     "t>0 : sets nodes weights to t x num of relations" ) );
+  pdat->setweight = new QLineEdit( "-1", parbox );
+  parlay->addWidget( pdat->setweight, row++, 1 );
+  pdat->setweight->setObjectName( "setweight" );
   l = new QLabel( tr( "Output plot file :" ), parbox );
-  QToolTip::add( l, tr( "If a file is specified here, a 'plot file' will\n"
-			"be written during relaxation, with a line for \n"
-			"each pass, containing temperatures, numbers of\n"
-			"accepted transitions, energies, etc.\n"
-			"- Can be viewed with gnuplot for instance" ) );
-  QHBox	*opb = new QHBox( parbox );
-  opb->setSpacing( 5 );
-  pdat->outplot = new QComboBox( opb, "outplot" );
-  pdat->outplot->insertItem( tr( "<none>" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "If a file is specified here, a 'plot file' will\n"
+                     "be written during relaxation, with a line for \n"
+                     "each pass, containing temperatures, numbers of\n"
+                     "accepted transitions, energies, etc.\n"
+                     "- Can be viewed with gnuplot for instance" ) );
+  QWidget *opb = new QWidget( parbox );
+  parlay->addWidget( opb, row++, 1 );
+  QHBoxLayout *opblay = new QHBoxLayout;
+  opb->setLayout( opblay );
+  opblay->setSpacing( 5 );
+  pdat->outplot = new QComboBox( opb );
+  pdat->outplot->setObjectName( "outplot" );
+  pdat->outplot->addItem( tr( "<none>" ) );
   QPushButton	*outbtn = new QPushButton( "...", opb );
+  opblay->addWidget( pdat->outplot );
+  opblay->addWidget( outbtn );
   outbtn->setFixedHeight( pdat->outplot->sizeHint().height() );
   outbtn->setFixedWidth( outbtn->sizeHint().width() );
   l= new QLabel( tr( "Initial labels :" ), parbox );
-  QToolTip::add( l, tr( "if VOID, all labels are initialized to the void "
-			"(unrecognized) value (see below)\n"
-			"If NONE, labels are not initialized "
-			"(left unchanged)\n"
-			"if RANDOM, labels are randomized: each node gets one "
-			"of its possible labels") );
-  pdat->initlabels = new QComboBox( parbox, "initlabels" );
-  pdat->initlabels->insertItem( "VOID" );
-  pdat->initlabels->insertItem( "NONE" );
-  pdat->initlabels->insertItem( "RANDOM" );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "if VOID, all labels are initialized to the void "
+                     "(unrecognized) value (see below)\n"
+                     "If NONE, labels are not initialized "
+                     "(left unchanged)\n"
+                     "if RANDOM, labels are randomized: each node gets one "
+                     "of its possible labels") );
+  pdat->initlabels = new QComboBox( parbox );
+  parlay->addWidget( pdat->initlabels, row++, 1 );
+  pdat->initlabels->setObjectName( "initlabels" );
+  pdat->initlabels->addItem( "VOID" );
+  pdat->initlabels->addItem( "NONE" );
+  pdat->initlabels->addItem( "RANDOM" );
   l = new QLabel( tr( "Void label :" ), parbox );
-  QToolTip::add( l, tr( "Label used for unrecognized nodes" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Label used for unrecognized nodes" ) );
   pdat->voidlabel = new QLineEdit( "unknown", parbox );
+  parlay->addWidget( pdat->voidlabel, row++, 1 );
   l = new QLabel( tr( "Void pass mode :" ), parbox );
-  QToolTip::add( l, tr( "Void pass is a special relaxation pass wich can\n"
-			"occur from time to time to increase annealing "
-			"performance :\n"
-			"it consists in trying to 'remove' a whole fold\n"
-			"in a single transition to avoid aberrant labels "
-			"distributions to persist\n\n"
-			"NONE : don't perform such special passes\n"
-			"REGULAR : perform them regularly, with occurency "
-			"given below\n"
-			"STOCHASTIC : perform them irregularly on a "
-			"mean probability\n based on the occurency below" ) );
-  pdat->voidmode = new QComboBox( parbox, "voidmode" );
-  pdat->voidmode->insertItem( "NONE" );
-  pdat->voidmode->insertItem( "REGULAR" );
-  pdat->voidmode->insertItem( "STOCHASTIC" );
-  //pdat->voidmode->setCurrentItem( 1 );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Void pass is a special relaxation pass wich can\n"
+                     "occur from time to time to increase annealing "
+                     "performance :\n"
+                     "it consists in trying to 'remove' a whole fold\n"
+                     "in a single transition to avoid aberrant labels "
+                     "distributions to persist\n\n"
+                     "NONE : don't perform such special passes\n"
+                     "REGULAR : perform them regularly, with occurency "
+                     "given below\n"
+                     "STOCHASTIC : perform them irregularly on a "
+                     "mean probability\n based on the occurency below" ) );
+  pdat->voidmode = new QComboBox( parbox );
+  parlay->addWidget( pdat->voidmode, row++, 1 );
+  pdat->voidmode->setObjectName( "voidmode" );
+  pdat->voidmode->addItem( "NONE" );
+  pdat->voidmode->addItem( "REGULAR" );
+  pdat->voidmode->addItem( "STOCHASTIC" );
+  //pdat->voidmode->setCurrentIndex( 1 );
   l = new QLabel( tr( "Void pass occurency :" ), parbox );
-  QToolTip::add( l, tr( "Occurency (1 out of n) or mean inverse probability\n"
-			"of Void passes (if used)" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Occurency (1 out of n) or mean inverse probability\n"
+                     "of Void passes (if used)" ) );
   pdat->voidoccur = new QLineEdit( "20", parbox );
+  parlay->addWidget( pdat->voidoccur, row++, 1 );
   l = new QLabel( tr( "Extension mode :" ), parbox );
-  QToolTip::add( l, tr( "List of extended passes used during relaxation\n"
-			"Extended passes are plug-ins that can be inserted\n"
-			"in the annealing process.\n"
-			"Up to now 2 extensions exist :\n\n"
-			"CONNECT_VOID is similar to Void passes, but only\n"
-			" tries to remove one connected component of\n"
-			" a fold at e time\n"
-			"CONNECT inversely tries to mute a connected \n"
-			" component of void label nodes to the same fold "
-			"label\n"
-			" - useful after VOID and/or CONNECT_VOID  passes\n\n"
-			"Both CONNECT_VOID and CONNECT passes seem to\n"
-			"significantly improve the recognition, so you\n"
-			"should certainly use them" ) );
-  pdat->extmode = new QComboBox( parbox, "extmode" );
-  pdat->extmode->insertItem( "" );
-  pdat->extmode->insertItem( "CONNECT" );
-  pdat->extmode->insertItem( "CONNECT_VOID" );
-  pdat->extmode->insertItem( "CONNECT_VOID CONNECT" );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "List of extended passes used during relaxation\n"
+                     "Extended passes are plug-ins that can be inserted\n"
+                     "in the annealing process.\n"
+                     "Up to now 2 extensions exist :\n\n"
+                     "CONNECT_VOID is similar to Void passes, but only\n"
+                     " tries to remove one connected component of\n"
+                     " a fold at e time\n"
+                     "CONNECT inversely tries to mute a connected \n"
+                     " component of void label nodes to the same fold "
+                     "label\n"
+                     " - useful after VOID and/or CONNECT_VOID  passes\n\n"
+                     "Both CONNECT_VOID and CONNECT passes seem to\n"
+                     "significantly improve the recognition, so you\n"
+                     "should certainly use them" ) );
+  pdat->extmode = new QComboBox( parbox );
+  parlay->addWidget( pdat->extmode, row++, 1 );
+  pdat->extmode->setObjectName( "extmode" );
+  pdat->extmode->addItem( "" );
+  pdat->extmode->addItem( "CONNECT" );
+  pdat->extmode->addItem( "CONNECT_VOID" );
+  pdat->extmode->addItem( "CONNECT_VOID CONNECT" );
   pdat->extmode->setEditable( true );
-  //pdat->extmode->setCurrentItem( 3 );
+  //pdat->extmode->setCurrentIndex( 3 );
   l = new QLabel( tr( "Extension pass occurency :" ), parbox );
-  QToolTip::add( l, tr( "Occurency (1 out of n) of extended passes\n"
-			"Up to now they happen regularly in their given\n"
-			"order; if occurency is the same as Void passes,\n"
-			"Void pass always happens first, then immediately\n"
-			"followed by extended passes" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Occurency (1 out of n) of extended passes\n"
+                     "Up to now they happen regularly in their given\n"
+                     "order; if occurency is the same as Void passes,\n"
+                     "Void pass always happens first, then immediately\n"
+                     "followed by extended passes" ) );
   pdat->extoccur = new QLineEdit( "10", parbox );
+  parlay->addWidget( pdat->extoccur, row++, 1 );
   l = new QLabel( tr( "Double drawing lots :" ), parbox );
-  QToolTip::add( l, tr( "Performs 2 drawing lots before accepting a "
-			"transition\n(if my memory is good enough...)\n"
-			"This leads to accept only transitions with a high\n"
-			"probability, or no change at all.\n"
-			"NOT RECOMMENDED - it seems to give bad results\n"
-			"and it's theoretically an heresy..." ) );
-  pdat->ddrawlots = new QComboBox( parbox, "ddrawlots" );
-  pdat->ddrawlots->insertItem( tr( "yes" ) );
-  pdat->ddrawlots->insertItem( tr( "no" ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Performs 2 drawing lots before accepting a "
+                     "transition\n(if my memory is good enough...)\n"
+                     "This leads to accept only transitions with a high\n"
+                     "probability, or no change at all.\n"
+                     "NOT RECOMMENDED - it seems to give bad results\n"
+                     "and it's theoretically an heresy..." ) );
+  pdat->ddrawlots = new QComboBox( parbox );
+  parlay->addWidget( pdat->ddrawlots, row++, 1 );
+  pdat->ddrawlots->setObjectName( "ddrawlots" );
+  pdat->ddrawlots->addItem( tr( "yes" ) );
+  pdat->ddrawlots->addItem( tr( "no" ) );
   l = new QLabel( tr( "Number of stable passes before stopping :" ), parbox );
-  QToolTip::add( l, tr( "Stopping when the number of changes just drops "
-                        "can sometimes be a bit too unstable,\n"
-                        "so specifying a number of consecutive passes "
-                        "below this level before stopping can avoid\n"
-                        "too abrupt stops." ) );
+  parlay->addWidget( l, row, 0 );
+  l->setToolTip( tr( "Stopping when the number of changes just drops "
+                     "can sometimes be a bit too unstable,\n"
+                     "so specifying a number of consecutive passes "
+                     "below this level before stopping can avoid\n"
+                     "too abrupt stops." ) );
   pdat->stoppass = new QLineEdit( "1", parbox );
+  parlay->addWidget( pdat->stoppass, row++, 1 );
   pdat->stoppass->setValidator( new QIntValidator( 0, 10000, parbox ) );
-  //pdat->ddrawlots->setCurrentItem( 1 );
+  //pdat->ddrawlots->setCurrentIndex( 1 );
 
-  QHBox		*btnbox = new QHBox( this );
-  btnbox->setSpacing( 10 );
+  QWidget	*btnbox = new QWidget( this );
+  QHBoxLayout *btnboxlay = new QHBoxLayout;
+  btnbox->setLayout( btnboxlay );
+  btnboxlay->setSpacing( 10 );
   QPushButton	*startBtn = new QPushButton( tr( "Start relaxation" ),
 					     btnbox );
   QPushButton	*stopBtn = new QPushButton( tr( "Stop" ), btnbox );
+  btnboxlay->addWidget( startBtn );
+  btnboxlay->addWidget( stopBtn );
 
   lay1->addWidget( iobox );
   lay1->addWidget( thrBox );
@@ -372,16 +463,16 @@ void QAnnealParams::loadConfig()
   filter += " (*.cfg)";
   QFileDialog	& fd = fileDialog();
   fd.selectFilter( filter );
-  fd.setCaption( tr( "Open annealing configuration" ) );
+  fd.setWindowTitle( tr( "Open annealing configuration" ) );
   fd.setFileMode( QFileDialog::ExistingFile );
   if( !fd.exec() )
     return;
 
-  QString	fname = fd.selectedFile();
+  QString	fname = fd.selectedFiles()[0];
   if( !fname.isEmpty() )
     {
-      cout << "load config" << fname.utf8().data() << "\n";
-      _conf->loadConfig( string( fname.utf8().data() ) );
+      cout << "load config" << fname.toStdString() << "\n";
+      _conf->loadConfig( string( fname.toStdString() ) );
       updateBoxes();
     }
 }
@@ -454,7 +545,7 @@ void QAnnealParams::annealThread()
     if( pdat->threaded )
     {
       // envoie le signal au thread de l'interface pour faire un refresh
-      QApplication::postEvent( this, new QCustomEvent( QEvent::User + 103 ) );
+      QApplication::postEvent( this, new ThreadBridgeEvent );
       // attendre que ce soit fait pour continuer
       pdat->interfaceSem.wait();
     }
@@ -474,7 +565,7 @@ void QAnnealParams::annealThread()
     {
       /* déclencher un dernier signal pour arrêter tout du côté du thread
       interface */
-      QApplication::postEvent( this, new QCustomEvent( QEvent::User + 103 ) );
+      QApplication::postEvent( this, new ThreadBridgeEvent );
     }
 }
 
@@ -553,26 +644,26 @@ void QAnnealParams::setThreaded( bool t )
 void QAnnealParams::selectTranslationFile()
 {
   QString	init;
-  if( pdat->transl->currentItem() != 0 )
+  if( pdat->transl->currentIndex() != 0 )
     init = pdat->transl->currentText();
 
   QString filter = tr( "Translation file" );
   filter += " (*.def)";
   QFileDialog	& fd = fileDialog();
   fd.selectFilter( filter );
-  fd.setCaption( tr( "Open translation file" ) );
+  fd.setWindowTitle( tr( "Open translation file" ) );
   fd.setFileMode( QFileDialog::ExistingFile );
   if( !fd.exec() )
     return;
 
-  QString	fname = fd.selectedFile();
+  QString	fname = fd.selectedFiles()[0];
   if( !fname.isNull() && !fname.isEmpty() )
     {
       unsigned	i, n = pdat->transl->count();
-      for( i=1; i<n && pdat->transl->text( i )!=fname; ++i ) {}
+      for( i=1; i<n && pdat->transl->itemText( i )!=fname; ++i ) {}
       if( i == n )
-        pdat->transl->insertItem( fname );
-      pdat->transl->setCurrentItem( i );
+        pdat->transl->addItem( fname );
+      pdat->transl->setCurrentIndex( i );
     }
 }
 
@@ -580,26 +671,26 @@ void QAnnealParams::selectTranslationFile()
 void QAnnealParams::selectPlotFile()
 {
   QString	init;
-  if( pdat->outplot->currentItem() != 0 )
+  if( pdat->outplot->currentIndex() != 0 )
     init = pdat->outplot->currentText();
 
   QString filter = tr( "Output plot file" );
   filter += " (*.dat)";
   QFileDialog	& fd = fileDialog();
   fd.selectFilter( filter );
-  fd.setCaption( tr( "Select output plot file" ) );
+  fd.setWindowTitle( tr( "Select output plot file" ) );
   fd.setFileMode( QFileDialog::AnyFile );
   if( !fd.exec() )
     return;
 
-  QString	fname = fd.selectedFile();
+  QString	fname = fd.selectedFiles()[0];
   if( !fname.isNull() && !fname.isEmpty() )
     {
       unsigned	i, n = pdat->outplot->count();
-      for( i=1; i<n && pdat->outplot->text( i )!=fname; ++i ) {}
+      for( i=1; i<n && pdat->outplot->itemText( i )!=fname; ++i ) {}
       if( i == n )
-        pdat->outplot->insertItem( fname );
-      pdat->outplot->setCurrentItem( i );
+        pdat->outplot->addItem( fname );
+      pdat->outplot->setCurrentIndex( i );
     }
 }
 
@@ -607,19 +698,19 @@ void QAnnealParams::selectPlotFile()
 void QAnnealParams::updateConfig()
 {
   //	init
-  _conf->initMode = 1 - pdat->init->currentItem();
+  _conf->initMode = 1 - pdat->init->currentIndex();
 
   //	mode
-  _conf->mode = pdat->mode->currentText().utf8().data();
+  _conf->mode = pdat->mode->currentText().toStdString();
 
   //	iteration mode
-  _conf->iterType = pdat->iter->currentText().utf8().data();
+  _conf->iterType = pdat->iter->currentText().toStdString();
 
   //	translation
-  if( pdat->transl->currentItem() == 0 )
+  if( pdat->transl->currentIndex() == 0 )
     _conf->labelsMapFile = "";
   else
-    _conf->labelsMapFile = pdat->transl->currentText().utf8().data();
+    _conf->labelsMapFile = pdat->transl->currentText().toStdString();
 
   //	temp
   _conf->temp = pdat->temp->text().toFloat();
@@ -634,43 +725,43 @@ void QAnnealParams::updateConfig()
   _conf->stopRate = pdat->stoprate->text().toFloat();
 
   //	verbose
-  _conf->verbose = 1 - pdat->verbose->currentItem();
+  _conf->verbose = 1 - pdat->verbose->currentIndex();
 
   //	gibbs changes
   _conf->gibbsChange = pdat->gibbschange->text().toInt();
 
   //	remove brain
-  _conf->removeVoid = 1 - pdat->removebrain->currentItem();
+  _conf->removeVoid = 1 - pdat->removebrain->currentIndex();
 
   //	set weights
   _conf->setWeights = pdat->setweight->text().toFloat();
 
   //	ouput plot file
-  if( pdat->outplot->currentItem() == 0 )
+  if( pdat->outplot->currentIndex() == 0 )
     _conf->plotFile = "";
   else
-    _conf->plotFile = pdat->outplot->currentText().utf8().data();
+    _conf->plotFile = pdat->outplot->currentText().toStdString();
 
   //	init labels
-  _conf->initLabelTypeString = pdat->initlabels->currentText().utf8().data();
+  _conf->initLabelTypeString = pdat->initlabels->currentText().toStdString();
 
   //	void label
-  _conf->voidLabel = pdat->voidlabel->text().utf8().data();
+  _conf->voidLabel = pdat->voidlabel->text().toStdString();
 
   //	void pass mode
-  _conf->voidMode = pdat->voidmode->currentText().utf8().data();
+  _conf->voidMode = pdat->voidmode->currentText().toStdString();
 
   //	void pass occurency
   _conf->voidOccurency = pdat->voidoccur->text().toInt();
 
   //	extension mode
-  _conf->extensionMode = pdat->extmode->currentText().utf8().data();
+  _conf->extensionMode = pdat->extmode->currentText().toStdString();
 
   //	extension pass occurency
   _conf->extPassOccurency = pdat->extoccur->text().toInt();
 
   //	double drawing lots
-  _conf->doubleDrawingLots = 1 - pdat->ddrawlots->currentItem();
+  _conf->doubleDrawingLots = 1 - pdat->ddrawlots->currentIndex();
 
   //	stop steps
   _conf->niterBelowStopProp = pdat->stoppass->text().toInt();
@@ -684,34 +775,34 @@ void QAnnealParams::updateBoxes()
   unsigned	i, n;
 
   //	init
-  pdat->init->setCurrentItem( 1 - _conf->initMode );
+  pdat->init->setCurrentIndex( 1 - _conf->initMode );
 
   //	mode
   n = pdat->mode->count();
-  for( i=0; i<n && pdat->mode->text( i )!=_conf->mode.c_str(); ++i ) {}
+  for( i=0; i<n && pdat->mode->itemText( i )!=_conf->mode.c_str(); ++i ) {}
   if( i == n )
-    pdat->mode->insertItem( _conf->mode.c_str() );
-  pdat->mode->setCurrentItem( i );
+    pdat->mode->addItem( _conf->mode.c_str() );
+  pdat->mode->setCurrentIndex( i );
 
   //	iteration mode
   n = pdat->iter->count();
-  for( i=0; i<n && pdat->iter->text( i )!=_conf->iterType.c_str(); ++i ) {}
+  for( i=0; i<n && pdat->iter->itemText( i )!=_conf->iterType.c_str(); ++i ) {}
   if( i == n )
-    pdat->iter->insertItem( _conf->iterType.c_str() );
-  pdat->iter->setCurrentItem( i );
+    pdat->iter->addItem( _conf->iterType.c_str() );
+  pdat->iter->setCurrentIndex( i );
 
   //	translation
   if( !_conf->labelsMapFile.empty() )
     {
       n = pdat->transl->count();
-      for( i=1; i<n && pdat->transl->text( i )!=_conf->labelsMapFile.c_str();
+      for( i=1; i<n && pdat->transl->itemText( i )!=_conf->labelsMapFile.c_str();
            ++i ) {}
       if( i == n )
-        pdat->transl->insertItem( _conf->labelsMapFile.c_str() );
-      pdat->transl->setCurrentItem( i );
+        pdat->transl->addItem( _conf->labelsMapFile.c_str() );
+      pdat->transl->setCurrentIndex( i );
     }
   else
-    pdat->transl->setCurrentItem( 0 );
+    pdat->transl->setCurrentIndex( 0 );
 
   //	temp
   pdat->temp->setText( QString::number( _conf->temp ) );
@@ -726,13 +817,13 @@ void QAnnealParams::updateBoxes()
   pdat->stoprate->setText( QString::number( _conf->stopRate ) );
 
   //	verbose
-  pdat->verbose->setCurrentItem( 1 - _conf->verbose );
+  pdat->verbose->setCurrentIndex( 1 - _conf->verbose );
 
   //	gibbs changes
   pdat->gibbschange->setText( QString::number( _conf->gibbsChange ) );
 
   //	remove brain
-  pdat->removebrain->setCurrentItem( 1 - _conf->removeVoid );
+  pdat->removebrain->setCurrentIndex( 1 - _conf->removeVoid );
 
   //	set weights
   pdat->setweight->setText( QString::number( _conf->setWeights ) );
@@ -741,50 +832,50 @@ void QAnnealParams::updateBoxes()
   if( !_conf->plotFile.empty() )
     {
       n = pdat->outplot->count();
-      for( i=1; i<n && pdat->outplot->text( i )!=_conf->plotFile.c_str();
+      for( i=1; i<n && pdat->outplot->itemText( i )!=_conf->plotFile.c_str();
            ++i ) {}
       if( i == n )
-        pdat->outplot->insertItem( _conf->plotFile.c_str() );
-      pdat->outplot->setCurrentItem( i );
+        pdat->outplot->addItem( _conf->plotFile.c_str() );
+      pdat->outplot->setCurrentIndex( i );
     }
   else
-    pdat->outplot->setCurrentItem( 0 );
+    pdat->outplot->setCurrentIndex( 0 );
 
   //	init labels
   n = pdat->initlabels->count();
   for( i=0; i<n
-       && pdat->initlabels->text( i )!=_conf->initLabelTypeString.c_str();
+       && pdat->initlabels->itemText( i )!=_conf->initLabelTypeString.c_str();
        ++i ) {}
   if( i == n )
-    pdat->initlabels->insertItem( _conf->initLabelTypeString.c_str() );
-  pdat->initlabels->setCurrentItem( i );
+    pdat->initlabels->addItem( _conf->initLabelTypeString.c_str() );
+  pdat->initlabels->setCurrentIndex( i );
 
   //	void label
   pdat->voidlabel->setText( _conf->voidLabel.c_str() );
 
   //	void pass mode
   n = pdat->voidmode->count();
-  for( i=0; i<n && pdat->voidmode->text( i )!=_conf->voidMode.c_str(); ++i ) {}
+  for( i=0; i<n && pdat->voidmode->itemText( i )!=_conf->voidMode.c_str(); ++i ) {}
   if( i == n )
-    pdat->voidmode->insertItem( _conf->voidMode.c_str() );
-  pdat->voidmode->setCurrentItem( i );
+    pdat->voidmode->addItem( _conf->voidMode.c_str() );
+  pdat->voidmode->setCurrentIndex( i );
 
   //	void pass occurency
   pdat->voidoccur->setText( QString::number( _conf->voidOccurency ) );
 
   //	extension mode
   n = pdat->extmode->count();
-  for( i=0; i<n && pdat->extmode->text( i )!=_conf->extensionMode.c_str();
+  for( i=0; i<n && pdat->extmode->itemText( i )!=_conf->extensionMode.c_str();
        ++i ) {}
   if( i == n )
-    pdat->extmode->insertItem( _conf->extensionMode.c_str() );
-  pdat->extmode->setCurrentItem( i );
+    pdat->extmode->addItem( _conf->extensionMode.c_str() );
+  pdat->extmode->setCurrentIndex( i );
 
   //	extension pass occurency
   pdat->extoccur->setText( QString::number( _conf->extPassOccurency ) );
 
   //	double drawing lots
-  pdat->ddrawlots->setCurrentItem( 1 - _conf->doubleDrawingLots );
+  pdat->ddrawlots->setCurrentIndex( 1 - _conf->doubleDrawingLots );
 
   //	stop steps
   pdat->stoppass->setText( QString::number( _conf->niterBelowStopProp ) );
@@ -797,19 +888,19 @@ void QAnnealParams::saveConfig()
   filter += " (*.cfg)";
   QFileDialog	& fd = fileDialog();
   fd.setNameFilter( filter );
-  fd.setCaption( tr( "Save annealing config file" ) );
+  fd.setWindowTitle( tr( "Save annealing config file" ) );
   fd.setFileMode( QFileDialog::AnyFile );
   if( !fd.exec() )
     return;
 
-  QString	fname = fd.selectedFile();
+  QString	fname = fd.selectedFiles()[0];
   if( !fname.isNull() && !fname.isEmpty() )
     {
       updateConfig();
       _conf->modelFile = _fusion->model()->fileName();
       _conf->graphFile = _fusion->folds()->fileName();
       _conf->save = 1;
-      _conf->saveConfig( fname.utf8().data() );
+      _conf->saveConfig( fname.toStdString() );
     }
 }
 

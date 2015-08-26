@@ -653,8 +653,9 @@ void AFGraph::fusionControl( const set<AObject *> & obj )
       return;
     }
   QFFoldCtrl	*wfc = 
-    new QFFoldCtrl( 0, QFFoldCtrl::tr( "Fold Fusion control" ), 
-		    (AFGraph *) *obj.begin() );
+    new QFFoldCtrl(
+      0, QFFoldCtrl::tr( "Fold Fusion control" ).toStdString().c_str(),
+      (AFGraph *) *obj.begin() );
   wfc->show();
 }
 

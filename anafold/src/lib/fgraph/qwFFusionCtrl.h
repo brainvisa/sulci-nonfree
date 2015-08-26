@@ -4,8 +4,9 @@
 
 
 #include <anatomist/observer/Observer.h>
-#include <aims/qtcompat/qbuttongroup.h>
 
+#include <QWidget>
+class QButtonGroup;
 class QCheckBox;
 class QPushButton;
 class QLineEdit;
@@ -41,7 +42,7 @@ public slots:
 
 protected:
   anatomist::AFGraph	*_fusion;
-  Q3ButtonGroup		*_groupBox;
+  QButtonGroup		*_groupBox;
   QCheckBox		*_rpBtn;
   QCheckBox		*_wtBtn;
   QCheckBox		*_midBtn;
