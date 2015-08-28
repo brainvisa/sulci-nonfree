@@ -17,6 +17,7 @@
 #include <cartobase/object/sreader.h>
 #include <cartobase/plugin/plugin.h>
 #include <aims/def/path.h>
+#include <cartobase/config/paths.h>
 #include <iostream>
 
 using namespace sigraph;
@@ -43,11 +44,12 @@ int main( int argc, char** argv )
   if( argc != 3 && argc != 4 )
     usage( argv[0] );
 
-  string	sname = Path::singleton().syntax() + "/graph.stx";
+  string	sname = Paths::findResourceFile(
+    "nomenclature/syntax/graph.stx", "aims" );
 
   try
     {
-      
+
       SyntaxReader	sr( sname );
       SyntaxSet	syntax;
 

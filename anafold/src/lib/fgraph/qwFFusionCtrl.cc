@@ -12,6 +12,8 @@
 #include <anatomist/application/Anatomist.h>
 #include <anatomist/dialogs/colorDialog.h>
 #include <anatomist/color/objectPalette.h>
+#include <QButtonGroup>
+#include <QGroupBox>
 
 #include <iostream>
 
@@ -21,32 +23,43 @@ using namespace std;
 
 
 QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
-  : QWidget( parent, name, Qt::WDestructiveClose ), _fusion( fusion ), 
-    _updating( false )
+  : QWidget( parent ), _fusion( fusion ), _updating( false )
 {
+  setAttribute( Qt::WA_DeleteOnClose );
+  setObjectName( name );
+
   const unsigned	pixsize = 12;
 
   fusion->addObserver( this );
-  setCaption( ( string( name ) + " : " + fusion->name() ).c_str() );
-  QHBoxLayout	*lay1 = new QHBoxLayout( this, 10, -1, "QFFoldCtrlLay1" );
+  setWindowTitle( ( string( name ) + " : " + fusion->name() ).c_str() );
+  QHBoxLayout	*lay1 = new QHBoxLayout( this );
+  lay1->setMargin( 10 );
 
   // left panel
 
-  QFrame	*fr1 = new QFrame( this, "frame1" );
+  QFrame	*fr1 = new QFrame( this );
+  fr1->setObjectName( "frame1" );
   fr1->setFrameStyle( QFrame::NoFrame );
-  QVBoxLayout	*lay4 = new QVBoxLayout( fr1, 0, -1, "QFFoldCtrlLay4" );
-#if QT_VERSION >= 0x040000
+  QVBoxLayout	*lay4 = new QVBoxLayout( fr1 );
+  lay4->setMargin( 0 );
   setLayout( lay1 );
-#endif
-  _groupBox = new Q3ButtonGroup( tr( "Node mapping mode" ), fr1, "btngroup" );
-  QVBoxLayout	*lay2 = new QVBoxLayout( _groupBox, 10, 10, "QFFoldCtrlLay2" );
-  QRadioButton	*np = new QRadioButton( tr( "Node potentials" ), _groupBox );
-  QRadioButton	*tp = new QRadioButton( tr( "Total potentials" ), _groupBox );
-  QRadioButton	*la = new QRadioButton( tr( "Labels" ), _groupBox );
-  QRadioButton	*wt = new QRadioButton( tr( "Weights only (nodes)" ), 
-                                        _groupBox );
-  QRadioButton	*wtt = new QRadioButton( tr( "Weights only (total)" ), 
-                                         _groupBox );
+  QGroupBox *bg = new QGroupBox( tr( "Node mapping mode" ), fr1 );
+  QGroupBox *groupbox = bg;
+  bg->setObjectName( "btngroup" );
+  QVBoxLayout	*lay2 = new QVBoxLayout( bg );
+  lay2->setMargin( 10 );
+  lay2->setSpacing( 10 );
+  _groupBox = new QButtonGroup( bg );
+  QRadioButton	*np = new QRadioButton( tr( "Node potentials" ), bg );
+  QRadioButton	*tp = new QRadioButton( tr( "Total potentials" ), bg );
+  QRadioButton	*la = new QRadioButton( tr( "Labels" ), bg );
+  QRadioButton	*wt = new QRadioButton( tr( "Weights only (nodes)" ), bg );
+  QRadioButton	*wtt = new QRadioButton( tr( "Weights only (total)" ), bg );
+  _groupBox->addButton( np, 0 );
+  _groupBox->addButton( tp, 1 );
+  _groupBox->addButton( la, 2 );
+  _groupBox->addButton( wt, 3 );
+//   _groupBox->addButton( wtt, 4 );
 
   np->setFixedSize( np->sizeHint() );
   tp->setFixedSize( tp->sizeHint() );
@@ -54,57 +67,74 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   wt->setFixedSize( wt->sizeHint() );
   wtt->setFixedSize( wtt->sizeHint() );
 
-  Q3ButtonGroup	*relgroup = new Q3ButtonGroup( tr( "Edge mapping" ), fr1, 
-					      "relgroup" );
-  QVBoxLayout	*lay5 = new QVBoxLayout( relgroup, 10, 10, "QFFoldCtrlLay5" );
-  _rpBtn = new QCheckBox( tr( "Show edge potentials" ), relgroup, "relpot" );
+  bg = new QGroupBox( tr( "Edge mapping" ), fr1 );
+  QGroupBox *relgb = bg;
+  bg->setObjectName( "relgroup" );
+  QVBoxLayout	*lay5 = new QVBoxLayout( bg );
+  lay5->setMargin( 10 );
+  lay5->setSpacing( 10 );
+  QButtonGroup *relgroup = new QButtonGroup( bg );
+  _rpBtn = new QCheckBox( tr( "Show edge potentials" ), bg );
+  _rpBtn->setObjectName( "relpot" );
   _rpBtn->setFixedSize( _rpBtn->sizeHint() );
+  relgroup->addButton( _rpBtn );
 
   // right panel
 
-  QFrame	*frrgt = new QFrame( this, "rightPan" );
-  QVBoxLayout	*lfrrgt = new QVBoxLayout( frrgt, 0, -1, "rightLay" );
+  QFrame	*frrgt = new QFrame( this );
+  frrgt->setObjectName( "rightPan" );
+  QVBoxLayout	*lfrrgt = new QVBoxLayout( frrgt );
+  lfrrgt->setMargin( 0 );
 
-  Q3ButtonGroup	*group2 = new Q3ButtonGroup( tr( "Modifiers" ), frrgt, 
-					    "btngroup2" );
-  Q3ButtonGroup	*grgtbtm = new Q3ButtonGroup( tr( "Model" ), frrgt,
-                                              "grgtbtm" );
+  QGroupBox *group2 = new QGroupBox( tr( "Modifiers" ), frrgt );
+  group2->setObjectName( "btngroup2" );
+  QGroupBox *grgtbtm = new QGroupBox( tr( "Model" ), frrgt );
+  grgtbtm->setObjectName( "grgtbtm" );
   lfrrgt->addWidget( group2 );
   lfrrgt->addWidget( grgtbtm );
 
   // right upper group : modifiers
 
-  QVBoxLayout	*lay3 = new QVBoxLayout( group2, 10, 10, "QFFoldCtrlLay3" );
-  _wtBtn = new QCheckBox( tr( "Weighted potentials" ), group2, "wtpot" );
+  QVBoxLayout	*lay3 = new QVBoxLayout( group2 );
+  lay3->setMargin( 10 );
+  lay3->setSpacing( 10 );
+  _wtBtn = new QCheckBox( tr( "Weighted potentials" ), group2 );
+  _wtBtn->setObjectName( "wtpot" );
   _wtBtn->setFixedSize( _wtBtn->sizeHint() );
-  _midBtn = new QCheckBox( tr( "0 potential at mid-colormap" ), group2, 
-			   "mid" );
+  _midBtn = new QCheckBox( tr( "0 potential at mid-colormap" ), group2 );
+  _midBtn->setObjectName( "mid" );
   _midBtn->setFixedSize( _midBtn->sizeHint() );
 
-  QFrame	*fr2 = new QFrame( group2, "fr2" );
+  QFrame	*fr2 = new QFrame( group2 );
+  fr2->setObjectName( "fr2" );
   fr2->setFrameStyle( QFrame::NoFrame );
-  QHBoxLayout	*lay6 = new QHBoxLayout( fr2, 0, -1, "lay6" );
-  _p0Btn = new QCheckBox( tr( "0 potential with different color : " ), fr2, 
-			  "pot0" );
+  QHBoxLayout	*lay6 = new QHBoxLayout( fr2 );
+  lay6->setMargin( 0 );
+  _p0Btn = new QCheckBox( tr( "0 potential with different color : " ), fr2);
+  _p0Btn->setObjectName( "pot0" );
   _p0Btn->setFixedSize( _p0Btn->sizeHint() );
-  _p0col = new QPushButton( fr2, "pot0col" );
+  _p0col = new QPushButton( fr2 );
+  fr2->setObjectName( "pot0col" );
   QPixmap	pix( pixsize, pixsize );
   pix.fill( QColor( 255, 255, 0 ) );
-  _p0col->setPixmap( pix );
+  _p0col->setIcon( pix );
   _p0col->setFixedSize( _p0col->sizeHint() );
   lay6->addWidget( _p0Btn );
   lay6->addWidget( _p0col, 0, Qt::AlignRight );
 
-  QFrame	*fr3 = new QFrame( group2, "fr3" );
+  QFrame	*fr3 = new QFrame( group2 );
+  fr3->setObjectName( "fr3" );
   fr3->setFrameStyle( QFrame::NoFrame );
-  QHBoxLayout	*lay7 = new QHBoxLayout( fr3, 0, -1, "lay7" );
-  QLabel	*lab1 = new QLabel( tr( "No potential color : " ), fr3, 
-				    "lab1" );
+  QHBoxLayout	*lay7 = new QHBoxLayout( fr3 );
+  lay7->setMargin( 0 );
+  QLabel	*lab1 = new QLabel( tr( "No potential color : " ), fr3);
+  lab1->setObjectName( "lab1" );
   lab1->setFixedSize( lab1->sizeHint() );
-  _nopotCol = new QPushButton( fr3, "nopotcol" );
+  _nopotCol = new QPushButton( fr3 );
+  _nopotCol->setObjectName( "nopotcol" );
   QPixmap	pix2( pixsize, pixsize );
   pix2.fill( QColor( 0, 255, 0 ) );
-  _nopotCol->setPixmap( pix2 );
+  _nopotCol->setIcon( pix2 );
   _nopotCol->setFixedSize( _nopotCol->sizeHint() );
   lay7->addWidget( lab1 );
   lay7->addStretch();
@@ -119,21 +149,28 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
 
   // right lower panel : model
 
-  QVBoxLayout	*lmod = new QVBoxLayout( grgtbtm, 10, 10, "lmod" );
-  QFrame	*frmodwt = new QFrame( grgtbtm, "frmodwt" );
+  QVBoxLayout	*lmod = new QVBoxLayout( grgtbtm );
+  lmod->setMargin( 10 );
+  lmod->setSpacing( 10 );
+  QFrame	*frmodwt = new QFrame( grgtbtm );
+  frmodwt->setObjectName( "frmodwt" );
 
   lmod->addSpacing( 10 );
   lmod->addWidget( frmodwt );
 
-  QHBoxLayout	*lmodwt = new QHBoxLayout( frmodwt, 0, 10, "lmodwt" );
+  QHBoxLayout	*lmodwt = new QHBoxLayout( frmodwt );
+  lmodwt->setMargin( 0 );
+  lmodwt->setSpacing( 10 );
 
   QLabel	*lbmodwt = new QLabel( tr( "Contribution of edge numbers" ), 
-				       frmodwt, "lbmodwt" );
-  _modWeightEdit = new QLineEdit( "0", frmodwt, "emodwt" );
-  QPushButton	*bmodwt = new QPushButton( tr( "Update model" ), frmodwt, 
-					   "bmodwt" );
+                                       frmodwt );
+  lbmodwt->setObjectName( "lbmodwt" );
+  _modWeightEdit = new QLineEdit( "0", frmodwt );
+  _modWeightEdit->setObjectName( "emodwt" );
+  QPushButton	*bmodwt = new QPushButton( tr( "Update model" ), frmodwt );
+  bmodwt->setObjectName( "bmodwt" );
   QDoubleValidator	*vmodwt = new QDoubleValidator( -1, 1000, 5, 
-							_modWeightEdit );
+                                                        _modWeightEdit );
 
   _modWeightEdit->setValidator( vmodwt );
 
@@ -147,22 +184,17 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
 
   // general size setup
 
-  _groupBox->setMinimumSize( _groupBox->sizeHint() );
-
   lay5->addSpacing( 10 );
   lay5->addWidget( _rpBtn, 0, Qt::AlignLeft );
-  relgroup->setMinimumSize( relgroup->sizeHint() );
 
   lay3->addSpacing( 10 );
   lay3->addWidget( _wtBtn, 0, Qt::AlignLeft );
   lay3->addWidget( _midBtn, 0, Qt::AlignLeft );
   lay3->addWidget( fr2, 0, Qt::AlignLeft );
   lay3->addWidget( fr3, 0, Qt::AlignLeft );
-  group2->setMinimumSize( group2->sizeHint() );
 
-  lay4->addWidget( _groupBox );
-  lay4->addWidget( relgroup );
-  fr1->setMinimumSize( fr1->sizeHint() );
+  lay4->addWidget( groupbox );
+  lay4->addWidget( relgb );
 
   lay1->addWidget( fr1 );
   lay1->addWidget( frrgt );
@@ -200,7 +232,7 @@ void QFFoldCtrl::update( const Observable*, void* )
       const unsigned	pixsize = 12;
 
       _updating = true;
-      _groupBox->setButton( _fusion->mapMode() );
+      _groupBox->button( _fusion->mapMode() )->setChecked( true );
       _rpBtn->setChecked( _fusion->isRelPotentials() );
       _wtBtn->setChecked( _fusion->isMapWeighted() );
       _midBtn->setChecked( _fusion->isPot0Centered() );
@@ -210,16 +242,16 @@ void QFFoldCtrl::update( const Observable*, void* )
       pix.fill( QColor( (int) (_fusion->pot0Red() * 256),
                         (int) (_fusion->pot0Green() * 256),
                         (int) (_fusion->pot0Blue() * 256) ) );
-      _p0col->setPixmap( pix );
+      _p0col->setIcon( pix );
       pix = QPixmap( pixsize, pixsize );
       pix.fill( QColor( (int) (_fusion->noPotRed() * 256),
                         (int) (_fusion->noPotGreen() * 256),
                         (int) (_fusion->noPotBlue() * 256) ) );
-      _nopotCol->setPixmap( pix );
+      _nopotCol->setIcon( pix );
       _updating = false;
     }
   else
-    close( true );
+    close();
 }
 
 
@@ -228,22 +260,22 @@ void QFFoldCtrl::btnClick( int btn )
   if( _updating )
     return;
   if( theAnatomist->hasObject( _fusion ) )
+  {
+    if( _fusion->mapMode() != btn )
     {
-      if( _fusion->mapMode() != btn )
-	{
-	  _updating = true;
-	  _fusion->setMapMode( (AFGraph::Mode) btn );
-	  _fusion->getOrCreatePalette();
-	  AObjectPalette	*pal = _fusion->palette();
-	  pal->setMin1( 0 );
-	  pal->setMax1( 1 );
-	  _fusion->setColors();
-	  _fusion->notifyObservers( this );
-	  _updating = false;
-	}
+      _updating = true;
+      _fusion->setMapMode( (AFGraph::Mode) btn );
+      _fusion->getOrCreatePalette();
+      AObjectPalette	*pal = _fusion->palette();
+      pal->setMin1( 0 );
+      pal->setMax1( 1 );
+      _fusion->setColors();
+      _fusion->notifyObservers( this );
+      _updating = false;
     }
+  }
   else
-    close( true );
+    close();
 }
 
 
@@ -267,7 +299,7 @@ void QFFoldCtrl::weightButtonClicked()
 	}
     }
   else
-    close( true );
+    close();
 }
 
 
@@ -291,7 +323,7 @@ void QFFoldCtrl::relPotBtnClicked()
 	}
     }
   else
-    close( true );
+    close();
 }
 
 
@@ -315,7 +347,7 @@ void QFFoldCtrl::midBtnClicked()
 	}
     }
   else
-    close( true );
+    close();
 }
 
 
@@ -335,7 +367,7 @@ void QFFoldCtrl::pot0BtnClicked()
 	}
     }
   else
-    close( true );
+    close();
 }
 
 
@@ -347,12 +379,12 @@ void QFFoldCtrl::setPot0Color()
     {
       int alpha = int( _fusion->pot0Alpha() * 256 );
       bool neutr = !_fusion->pot0AlphaUsed();
-      QColor 
-	col = QAColorDialog::getColor
-	( QColor( (int) ( _fusion->pot0Red() * 256 ), 
-		  (int) ( _fusion->pot0Green() * 256 ), 
-		  (int) ( _fusion->pot0Blue() * 256 ) ), 
-	  0, tr( "Potential 0 color" ), &alpha, &neutr );
+      QColor col
+        = QAColorDialog::getColor(
+          QColor( (int) ( _fusion->pot0Red() * 256 ),
+                  (int) ( _fusion->pot0Green() * 256 ),
+                  (int) ( _fusion->pot0Blue() * 256 ) ),
+          0, tr( "Potential 0 color" ).toStdString().c_str(), &alpha, &neutr );
       cout << "getColor done\n";
       if( col.isValid() )
 	{
@@ -366,14 +398,14 @@ void QFFoldCtrl::setPot0Color()
 	  pix.fill( QColor( (int) ( _fusion->pot0Red() * 256 ), 
 			    (int) ( _fusion->pot0Green() * 256 ), 
 			    (int) ( _fusion->pot0Blue() * 256 ) ) );
-	  _p0col->setPixmap( pix );
+	  _p0col->setIcon( pix );
 	  _fusion->setColors();
 	  _fusion->notifyObservers( this );
 	  _updating = false;
 	}
     }
   else
-    close( true );
+    close();
 }
 
 
@@ -385,12 +417,13 @@ void QFFoldCtrl::setNoPotColor()
     {
       int alpha = int( _fusion->noPotAlpha() * 256 );
       bool neutr = !_fusion->noPotAlphaUsed();
-      QColor
-	col = QAColorDialog::getColor
-	( QColor( (int) ( _fusion->noPotRed() * 256 ), 
-		  (int) (_fusion->noPotGreen() * 256 ), 
-		  (int) (_fusion->noPotBlue() * 256 ) ), 
-	  0, tr( "Color for 'no potential'" ), &alpha, &neutr );
+      QColor col
+        = QAColorDialog::getColor(
+          QColor( (int) ( _fusion->noPotRed() * 256 ),
+                  (int) (_fusion->noPotGreen() * 256 ),
+                  (int) (_fusion->noPotBlue() * 256 ) ),
+          0, tr( "Color for 'no potential'" ).toStdString().c_str(), &alpha,
+          &neutr );
       if( col.isValid() )
 	{
 	  _updating = true;
@@ -402,14 +435,14 @@ void QFFoldCtrl::setNoPotColor()
 	  pix.fill( QColor( (int) ( _fusion->noPotRed() * 256 ), 
 			    (int) ( _fusion->noPotGreen() * 256 ), 
 			    (int) ( _fusion->noPotBlue() * 256 ) ) );
-	  _nopotCol->setPixmap( pix );
+	  _nopotCol->setIcon( pix );
 	  _fusion->setColors();
 	  _fusion->notifyObservers( this );
 	  _updating = false;
 	}
     }
   else
-    close( true );
+    close();
 }
 
 
@@ -430,7 +463,7 @@ void QFFoldCtrl::updateModelWeights()
       _updating = false;
     }
   else
-    close( true );
+    close();
 }
 
 
