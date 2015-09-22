@@ -23,7 +23,6 @@
 #include <qpushbutton.h>
 #include <qcheckbox.h>
 #include <qtooltip.h>
-#include <aims/qtcompat/qfiledialog.h>
 #include <qvalidator.h>
 #include <qevent.h>
 #include <qapplication.h>
