@@ -148,7 +148,7 @@ int main( int argc, char** argv )
   cout << "tout lu : " << str.size() << " , nb experts : " << nexpert << endl;
 
   map<string, unsigned>::const_iterator	is, fs = str.end();
-  string	rexp[n];
+  vector<string>	rexp(n);
   unsigned	wt;
 
   is=str.begin();

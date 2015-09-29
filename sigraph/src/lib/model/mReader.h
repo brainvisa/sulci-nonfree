@@ -19,10 +19,10 @@ namespace sigraph
     MReader( const std::string & filename, 
 	     const TreePostParser::FactorySet & fs = baseFactorySet(), 
 	     const carto::SyntaxSet & synt = syntax,
-	     const carto::AttributedReader::HelperSet& helpers = helpers);
+	     const carto::AttributedReader::HelperSet& helpers_ = helpers);
     MReader( const TreePostParser::FactorySet & fs = baseFactorySet(), 
 	     const carto::SyntaxSet & synt = syntax, 
-	     const carto::AttributedReader::HelperSet& helpers = helpers);
+	     const carto::AttributedReader::HelperSet& helpers_ = helpers);
     virtual ~MReader();
 
     virtual Model* readModel();
