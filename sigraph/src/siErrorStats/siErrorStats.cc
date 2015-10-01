@@ -175,8 +175,8 @@ int main( int argc, const char** argv )
 
       ng = par.graphs.size();
 
-      FGraph	gr[ ng ];
-      string	names[ ng ];
+      FGraph*	gr = new FGraph[ ng ];
+      vector<string>	names( ng );
       FRGraph	*frg = 0;
 
       if( !par.modelGraph.empty() )
@@ -590,6 +590,8 @@ int main( int argc, const char** argv )
               en = an.processAllPotentials();
               t->setProperty( "initial_energy", en );
             }
+
+          delete[] gr;
 
           for( iv=frg->begin(); iv!=fv; ++iv )
             {

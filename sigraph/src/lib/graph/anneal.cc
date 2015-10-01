@@ -717,7 +717,7 @@ void Anneal::processPotentials( const set<Vertex *> & ver,
   ef.push_back( noChange );
 
   bool		npos[ver.size()];
-  string	orLab[ver.size()];
+  string*	orLab = new string[ver.size()];
   unsigned	i;
   set<Vertex *>::const_iterator	ic;
 
@@ -727,6 +727,8 @@ void Anneal::processPotentials( const set<Vertex *> & ver,
 
   //	calcule toutes les configs
   processNodes( ver, ef, npos, 0, nn, orLab );
+
+  delete[] orLab;
 
   //	calcule les probas
   double		sumE = 0., sumP = 0.;
