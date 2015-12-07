@@ -28,5 +28,11 @@ if( anatomist-free_FOUND )
     add_subdirectory( anafold )
 endif()
 
+BRAINVISA_DEPENDENCY( RUN DEPENDS "aims-free" RUN ">= ${aims-free_VERSION};<< ${soma-base_VERSION_MAJOR}.${result}" )
+BRAINVISA_DEPENDENCY( DEV DEPENDS "${PROJECT_NAME}" RUN "== ${${PROJECT_NAME}_VERSION}" )
+BRAINVISA_DEPENDENCY( DEV DEPENDS "aims-free" DEV ">= ${aims-free_VERSION};<< ${soma-base_VERSION_MAJOR}.${result}" )
+BRAINVISA_DEPENDENCY( RUN DEPENDS "libsvm2" RUN )
+BRAINVISA_DEPENDENCY( RUN RECOMMENDS "sulci-models" RUN )
+
 BRAINVISA_CREATE_CMAKE_CONFIG_FILES()
 
