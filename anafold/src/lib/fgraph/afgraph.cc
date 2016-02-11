@@ -228,6 +228,8 @@ float AFGraph::maxTexValue() const
 
 void AFGraph::initCliques()
 {
+  using carto::shared_ptr;
+
   //  Anatomist::Cursor	curs = theAnatomist->cursor();
   theAnatomist->setCursor( Anatomist::Working );
 
@@ -448,6 +450,8 @@ void AFGraph::setColors()
 
 void AFGraph::setColorsNodePot()
 {
+  using carto::shared_ptr;
+
   //cout << "AFGraph::setColorsNodePot()\n";
 
   CGraph		*cg = (CGraph *) _folds->graph();
