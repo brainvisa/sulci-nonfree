@@ -396,7 +396,7 @@ double SubAdaptive::genMeanErrorRate() const
   Thus, the generalization power of this model is unknown. So we inhibit it
   with a rate up to 0.5 which gives a null weight of this model in the
   simulated anneal. */
-  if (isnan(_ggErrorRate))	return 0.5;
-  else if (isnan(_gbErrorRate))	return 0.5;
+  if (std::isnan(_ggErrorRate))	return 0.5;
+  else if (std::isnan(_gbErrorRate))	return 0.5;
   else	return( ( _ggErrorRate + _gbErrorRate ) / 2 );
 }
