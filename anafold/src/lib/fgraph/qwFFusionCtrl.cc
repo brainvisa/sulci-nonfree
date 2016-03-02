@@ -59,7 +59,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   _groupBox->addButton( tp, 1 );
   _groupBox->addButton( la, 2 );
   _groupBox->addButton( wt, 3 );
-//   _groupBox->addButton( wtt, 4 );
+  _groupBox->addButton( wtt, 4 );
 
   np->setFixedSize( np->sizeHint() );
   tp->setFixedSize( tp->sizeHint() );
@@ -73,11 +73,10 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   QVBoxLayout	*lay5 = new QVBoxLayout( bg );
   lay5->setMargin( 10 );
   lay5->setSpacing( 10 );
-  QButtonGroup *relgroup = new QButtonGroup( bg );
   _rpBtn = new QCheckBox( tr( "Show edge potentials" ), bg );
   _rpBtn->setObjectName( "relpot" );
   _rpBtn->setFixedSize( _rpBtn->sizeHint() );
-  relgroup->addButton( _rpBtn );
+  relgb->hide(); // not used up to now...
 
   // right panel
 
@@ -202,8 +201,8 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   update( _fusion );
 
   resize( minimumSizeHint() );
-  connect( _groupBox, SIGNAL( clicked( int ) ), this, 
-	   SLOT( btnClick( int ) ) );
+  connect( _groupBox, SIGNAL( buttonClicked( int ) ), this,
+           SLOT( btnClick( int ) ) );
   connect( _rpBtn, SIGNAL( clicked() ), this, SLOT( relPotBtnClicked() ) );
   connect( _wtBtn, SIGNAL( clicked() ), this, SLOT( weightButtonClicked() ) );
   connect( _midBtn, SIGNAL( clicked() ), this, SLOT( midBtnClicked() ) );
@@ -308,20 +307,20 @@ void QFFoldCtrl::relPotBtnClicked()
   if( _updating )
     return;
   if( theAnatomist->hasObject( _fusion ) )
+  {
+    if( _fusion->isRelPotentials() != _rpBtn->isChecked() )
     {
-      if( _fusion->isRelPotentials() != _rpBtn->isChecked() )
-	{
-	  _updating = true;
-	  _fusion->setRelPotentials( _rpBtn->isChecked() );
-	  _fusion->getOrCreatePalette();
-	  AObjectPalette	*pal = _fusion->palette();
-	  pal->setMin1( 0 );
-	  pal->setMax1( 1 );
-	  _fusion->setColors();
-	  _fusion->notifyObservers( this );
-	  _updating = false;
-	}
+      _updating = true;
+      _fusion->setRelPotentials( _rpBtn->isChecked() );
+      _fusion->getOrCreatePalette();
+      AObjectPalette	*pal = _fusion->palette();
+      pal->setMin1( 0 );
+      pal->setMax1( 1 );
+      _fusion->setColors();
+      _fusion->notifyObservers( this );
+      _updating = false;
     }
+  }
   else
     close();
 }
