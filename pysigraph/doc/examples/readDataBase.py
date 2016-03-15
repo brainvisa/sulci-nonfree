@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # Copyright CEA (2000-2006)
 #
 #  This software and supporting documentation were developed by

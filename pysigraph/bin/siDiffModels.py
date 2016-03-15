@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import os, numpy, sigraph, sigraph.cover, sigraph.models
 from soma import aims

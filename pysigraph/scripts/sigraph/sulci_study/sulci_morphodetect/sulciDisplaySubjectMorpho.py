@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import anatomist.direct.api as ana
 from soma import aims

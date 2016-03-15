@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import os, sys, numpy, pprint, re
 from optparse import OptionParser

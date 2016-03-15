@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import os, sys, numpy, pickle, time, copy
 from optparse import OptionParser, OptionGroup

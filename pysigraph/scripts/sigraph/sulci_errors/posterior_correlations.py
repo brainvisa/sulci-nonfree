@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import os, sys, numpy
 from optparse import OptionParser
 import datamind.io as datamind_io

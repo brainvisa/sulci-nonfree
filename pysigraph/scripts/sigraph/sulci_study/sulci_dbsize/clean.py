@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import glob, sys, os, numpy, collections, shutil
 from optparse import OptionParser

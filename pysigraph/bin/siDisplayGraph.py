@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import os, sys, exceptions, numpy
 import glob, re
 from scipy.interpolate.fitpack2 import BivariateSpline, dfitpack

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import os, sys, numpy
 import matplotlib
 matplotlib.use('Qt4Agg')

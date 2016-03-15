@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import numpy, os, pylab, sys, svm
 from soma import aims
 import sigraph.datamind_backend

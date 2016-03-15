@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import os, sys, numpy
 from optparse import OptionParser
 from sulci.common import io, add_translation_option_to_parser

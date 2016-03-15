@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import os, sys, numpy, pprint
 from optparse import OptionParser
 import sigraph

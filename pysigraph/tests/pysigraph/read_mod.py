@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import sigraph
 
 r = sigraph.MReader("data/model.mod")

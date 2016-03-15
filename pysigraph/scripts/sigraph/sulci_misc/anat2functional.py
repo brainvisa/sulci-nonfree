@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import sys, os, numpy
 from optparse import OptionParser
 from soma import aims, aimsalgo

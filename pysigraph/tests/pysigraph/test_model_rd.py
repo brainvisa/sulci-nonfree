@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import numpy, os, pylab, sys, svm
 import datamind
 import sigraph.datamind_backend

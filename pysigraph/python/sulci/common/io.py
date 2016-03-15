@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import os, sys, pprint
 from sulci.models import distribution, distribution_all, \
