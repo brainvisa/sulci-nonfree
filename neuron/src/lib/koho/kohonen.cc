@@ -458,8 +458,6 @@ int Kohonen::ByteSize() const
   cout << "KOhonen::FindWinner\n";
 }*/
 
-template class vector<double>;
-
 VectCode *Kohonen::FindWinner( const vector<double> *vec )
 {
   unsigned	i, ind=0;
