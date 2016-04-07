@@ -75,7 +75,7 @@ void FoldVertex::addBuiltins()
 {
   PropertySet	& ps = getValue();
   ps.addBuiltinProperty( SIA_SIZE, size );
-  ps.addBuiltinProperty( SIA_REFSIZE, size, refsize_valid );
+  ps.addBuiltinProperty( SIA_REFSIZE, refsize, refsize_valid );
   ps.addBuiltinProperty( SIA_INDEX, index, index_valid );
   ps.addBuiltinProperty( SIA_LABEL, label, label_valid );
   ps.addBuiltinProperty( SIA_GRAVITY_CENTER, gravity_center, 
