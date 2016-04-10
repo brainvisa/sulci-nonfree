@@ -21,6 +21,7 @@
 #include <graph/tree/treader.h>
 #include <graph/tree/twriter.h>
 #include <graph/tree/tree.h>
+#include <neur/rand/rand.h>
 #include <cartobase/exception/ioexcept.h>
 #include <cartobase/stream/sstream.h>
 #include <iostream>
@@ -75,6 +76,7 @@ void AnnealConfigurator::init()
   maxIterations = 0;
   mpmUnrecordedIterations = 0;
   forbidVoidLabel = 0;
+  randomSeed = 0;
 }
 
 
@@ -129,6 +131,7 @@ bool AnnealConfigurator::loadConfig( const string & filename )
   t.getProperty( "maxIterations", maxIterations );
   t.getProperty( "MPMUnrecordedIterations", mpmUnrecordedIterations );
   t.getProperty( "forbidVoidLabel", forbidVoidLabel );
+  t.getProperty( "randomSeed", randomSeed );
 
   return processParams();
 }
@@ -198,6 +201,8 @@ void AnnealConfigurator::saveConfig( const string & filename )
     t.setProperty( "MPMUnrecordedIterations", mpmUnrecordedIterations );
   if( forbidVoidLabel != 0 )
     t.setProperty( "forbidVoidLabel", forbidVoidLabel );
+  if( randomSeed != 0 )
+    t.setProperty( "randomSeed", randomSeed );
 
   tw << t;
 }
@@ -434,8 +439,13 @@ void AnnealConfigurator::loadGraphs( MGraph & rg, CGraph & fg )
 void AnnealConfigurator::initAnneal( Anneal & an, ofstream *plotf ) const
 {
   cout << "Init Anneal..." << endl;
+  if( randomSeed != 0 )
+  {
+    setRandSeed( randomSeed );
+    srand( randomSeed );
+  }
   an.init( bmode, temp, rate, tempICM, stopRate, gibbsChange, verbose, 
- 	   bItType, initLabelType, voidLabel, plotf, 
+           bItType, initLabelType, voidLabel, plotf,
            (unsigned) niterBelowStopProp );
   an.setVoidMode( bvoidmode, voidOccurency );
   an.setDoubleDrawingLots( doubleDrawingLots );
