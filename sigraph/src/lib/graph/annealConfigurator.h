@@ -67,6 +67,7 @@ namespace sigraph
     int                         maxIterations;
     int                         mpmUnrecordedIterations;
     int                         forbidVoidLabel;
+    long                        randomSeed;
   protected:
 
   private:

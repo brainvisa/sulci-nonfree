@@ -39,6 +39,8 @@ inline float	EnergyFunc( float x, float m, float s )
 ///	Calcule l'argument d'un complexe
 float angle( float x, float y );
 
+void setRandSeed( long x );
+
 ///	Fonction carre (math)
 template<class T> T sqr( T t ) { return( t * t ); }
 

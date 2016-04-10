@@ -29,5 +29,6 @@ allowThreads            int
 maxIterations           int
 MPMUnrecordedIterations int
 forbidVoidLabel         int
+randomSeed              int
 
 *END

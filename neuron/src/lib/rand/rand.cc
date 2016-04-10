@@ -65,6 +65,13 @@ double ran1()
 }
 
 
+void setRandSeed( long seed )
+{
+  ran1();
+  *_idum = seed;
+}
+
+
 double GaussRand( double mean, double stdev )
 {
   static int iset = 0;
