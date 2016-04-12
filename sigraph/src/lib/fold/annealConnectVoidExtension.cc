@@ -94,7 +94,6 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
       ccm.erase( ccm.begin(), fcc );
       n = VertexClique::connectivity( sv, &cc, syntTypes );
 
-      //	ordonnancement aléatoire des composantes
       // reorder cc in a reproducible way
       ccord.clear();
       for( isc=cc.begin(); isc!=cend; ++isc )
