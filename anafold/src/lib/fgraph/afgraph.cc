@@ -35,7 +35,8 @@
 #include <graph/tree/tree.h>
 #include <aims/rgb/rgb.h>
 #include <neur/gauss/gaussnet.h>
-#include <aims/mesh/meshMerge.h>
+#include <aims/mesh/surfaceOperation.h>
+#include <aims/mesh/surfacegen.h>
 #include <si/graph/anneal.h>
 // just to extract the descriptor vector...
 #include <si/model/adaptiveLeaf.h>
@@ -1436,17 +1437,20 @@ void AFGraph::makeDomTriang( ATriangulated* tri, DomainRBF* dom, FGraph* fg )
       center[1] = c[1] / tscal[1];
       center[2] = c[2] / tscal[2];
       v1x = trot[0] * center[0] + trot[3] * center[1] 
-	+ trot[6] * center[2];
+        + trot[6] * center[2];
       v1y = trot[1] * center[0] + trot[4] * center[1] 
-	+ trot[7] * center[2];
+        + trot[7] * center[2];
       v1z = trot[2] * center[0] + trot[5] * center[1] 
-	+ trot[8] * center[2];
+        + trot[8] * center[2];
       center[0] = v1x - ttransl[0];
       center[1] = v1y - ttransl[1];
       center[2] = v1z - ttransl[2];
 
       // make a mesh of a sphere
-      meshMerge( *surf, createIcosahedron( center, radius ) );
+      AimsSurfaceTriangle *ico = SurfaceGenerator::icosahedron( center,
+                                                                radius );
+      SurfaceManip::meshMerge( *surf, *ico );
+      delete ico;
     }
 
   tri->setSurface( surf );

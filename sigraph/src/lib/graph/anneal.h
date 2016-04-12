@@ -15,8 +15,8 @@ namespace sigraph
   class AnnealExtension;
   class SGProvider;
 
-  /**	Type utilisé pour les calculs d'énergie : Classe de stockage des 
-	champs d'énergie pour l'échantillonneur de Gibbs ou l'ICM
+  /**	Type utilisÃ© pour les calculs d'Ã©nergie : Classe de stockage des 
+	champs d'Ã©nergie pour l'Ã©chantillonneur de Gibbs ou l'ICM
   */
   struct EnergyField
   {
@@ -27,15 +27,15 @@ namespace sigraph
     std::vector<Vertex*>	vertices;
     ///	Labels choisis pour ces noeuds
     std::vector<std::string>	labels;
-    ///	Cliques impliquées par ces noeuds, énergies recalculées correspondantes
+    ///	Cliques impliquÃ©es par ces noeuds, Ã©nergies recalculÃ©es correspondantes
     std::map<Clique*, double>	involvedCliques;
-    ///	Modification d'énergie pour ces changements de labels
+    ///	Modification d'Ã©nergie pour ces changements de labels
     double			energy;
     ///	exp( - Denergy / temp )
     double			expEnergy;
-    ///	Probabilité de cette configuration
+    ///	ProbabilitÃ© de cette configuration
     double			probability;
-    ///	Probabilité cummulée
+    ///	ProbabilitÃ© cummulÃ©e
     double			probabilitySum;
   };
 
@@ -58,44 +58,43 @@ namespace sigraph
   }
 
 
-  /**	Recuit simulé.
+  /**	Recuit simulÃ©.
 
 
-	Fait le recuit simulé à partir d'un graphe à cliques (CGraph) à 
-	étiqueter et d'un graphe modèle (MGraph).
+	Fait le recuit simulÃ© Ã  partir d'un graphe Ã  cliques (CGraph) Ã  
+	Ã©tiqueter et d'un graphe modÃ¨le (MGraph).
 
-	Avant de faire un recuit, il faut avoir initialisé les cliques du 
-	graphe à étiqueter (fonction CGraph::initCliques() de la classe 
-	CGraph).
+	Avant de faire un recuit, il faut avoir initialisÃ© les cliques du 
+	graphe Ã  Ã©tiqueter (fonction ModelFinder::initCliques()).
 
-	Il faut aussi initialiser les paramètres du recuit en appelant la 
+	Il faut aussi initialiser les paramÃ¨tres du recuit en appelant la 
 	fonction init().
 
 	Puis l'utilisation se fait par la fonction fit() (recuit complet), 
-	ou pas à pas en initialisant d'abord le recuit (fonction reset()) 
-	puis en appelant la fonction fitStep() en boucle jusqu'à ce que 
-	isFinished() retourne \c true (recuit terminé).
+	ou pas Ã  pas en initialisant d'abord le recuit (fonction reset()) 
+	puis en appelant la fonction fitStep() en boucle jusqu'Ã  ce que 
+	isFinished() retourne \c true (recuit terminÃ©).
 
 
 	Plusieurs modes de recuit sont disponibles:
-	- METROPOLIS: Algorithme de Metropolis simplifié. Pour chaque 
-	  passe de recuit simulé, on essaie, pour chaque noeud du graphe à 
-	  étiqueter, un changement aléatoire d'étiquette. L'ordre de 
-	  passage des noeuds est aléatoire et change d'une fois sur 
-	  l'autre. La température est abaissée après chaque passage de 
+	- METROPOLIS: Algorithme de Metropolis simplifiÃ©. Pour chaque 
+	  passe de recuit simulÃ©, on essaie, pour chaque noeud du graphe Ã  
+	  Ã©tiqueter, un changement alÃ©atoire d'Ã©tiquette. L'ordre de 
+	  passage des noeuds est alÃ©atoire et change d'une fois sur 
+	  l'autre. La tempÃ©rature est abaissÃ©e aprÃ¨s chaque passage de 
 	  tous les noeuds (sans attendre stabilisation comme dans 
 	  l'algorithme original de Metropolis).
 	- GIBBS: Algorithme du Gibbs Sampler. A chaque passe, chaque 
-	  clique est traitée dans un ordre aléatoire. (on travaille sur 
+	  clique est traitÃ©e dans un ordre alÃ©atoire. (on travaille sur 
 	  les cliques, et pas sur les noeuds comme dans l'algorithme de 
 	  Metropolis). Pour chaque clique, toutes les transformations 
-	  possibles impliquant un nombre de noeuds maximal donné sont 
-	  évaluées, puis le choix se fait aléatoirement parmi ces 
-	  transformations en fonction de la probabilité de chacune.
-	- ICM: Mode déterministe. L'ICM fonctionne comme le Gibbs sampler 
-	  (évaluations par cliques, configurations à plusieurs 
-	  changements) sauf que le choix final n'est pas aléatoire, mais 
-	  on prend systématiquement le choix le plus probable.
+	  possibles impliquant un nombre de noeuds maximal donnÃ© sont 
+	  Ã©valuÃ©es, puis le choix se fait alÃ©atoirement parmi ces 
+	  transformations en fonction de la probabilitÃ© de chacune.
+	- ICM: Mode dÃ©terministe. L'ICM fonctionne comme le Gibbs sampler 
+	  (Ã©valuations par cliques, configurations Ã  plusieurs 
+	  changements) sauf que le choix final n'est pas alÃ©atoire, mais 
+	  on prend systÃ©matiquement le choix le plus probable.
         - MPM: Maximum Posterior Marginal. Annealing is done at a constant 
           temperature (ideally the critical temperature), using the Gibbs
           Sampler algorithm. When the process ends (after a determined number
@@ -106,18 +105,18 @@ namespace sigraph
 
 
 	Les modes Metropolis, Gibbs et MPM basculent vers le mode ICM en
-        dessous	d'un certain seuil de température, pour finir le recuit au
+        dessous	d'un certain seuil de tempÃ©rature, pour finir le recuit au
         plus vite dans le minimum local le plus proche.
 
-	Le recuit s'arrête lorsque la proportion du nombre de transformations 
-	acceptées par rapport au nombre proposé passe en dessous d'un seuil 
-	donné lui aussi.
+	Le recuit s'arrÃªte lorsque la proportion du nombre de transformations 
+	acceptÃ©es par rapport au nombre proposÃ© passe en dessous d'un seuil 
+	donnÃ© lui aussi.
 
 
-	On peut interroger l'état du système: température, nombres de 
-	changements proposés et acceptés, énergie actuelle, différence 
-	d'énergie entre le début du recuit et l'état actuel, différence 
-	d'énergie au cours de la dernière passe, etc. en utilisant les 
+	On peut interroger l'Ã©tat du systÃ¨me: tempÃ©rature, nombres de 
+	changements proposÃ©s et acceptÃ©s, Ã©nergie actuelle, diffÃ©rence 
+	d'Ã©nergie entre le dÃ©but du recuit et l'Ã©tat actuel, diffÃ©rence 
+	d'Ã©nergie au cours de la derniÃ¨re passe, etc. en utilisant les 
 	fonctions qui vont bien.
   */
   class Anneal
@@ -125,11 +124,11 @@ namespace sigraph
   public:
     enum Mode
       {
-	///	Algorithme original de Métropolis
+	///	Algorithme original de MÃ©tropolis
 	METROPOLIS, 
 	///	Gibbs Sampler
 	GIBBS,
-	///	ICM (déterministe)
+	///	ICM (dÃ©terministe)
 	ICM,
         /// MPM (Maximum Posterior Marginal)
         MPM,
@@ -139,11 +138,11 @@ namespace sigraph
 
     enum IterType
       {
-	///	Itération noeud par noeud, ordre aléatoire
+	///	ItÃ©ration noeud par noeud, ordre alÃ©atoire
 	VERTEX, 
-	///	Itération clique par clique, ordre aléatoire
+	///	ItÃ©ration clique par clique, ordre alÃ©atoire
 	CLIQUE, 
-	///	Itération sur d'autres groupes de noeuds (je verrai + tard)
+	///	ItÃ©ration sur d'autres groupes de noeuds (je verrai + tard)
 	CUSTOM
       };
 
@@ -151,7 +150,7 @@ namespace sigraph
       {
 	///	Pas de mode void
 	VOIDMODE_NONE, 
-	///	Mode régulier
+	///	Mode rÃ©gulier
 	VOIDMODE_REGULAR, 
 	///	Mode stochastique
 	VOIDMODE_STOCHASTIC
@@ -159,7 +158,7 @@ namespace sigraph
 
     enum InitLabelsType
       {
-	///	Pas d'initialisation des labels: prendre ceux qui y sont déjà
+	///	Pas d'initialisation des labels: prendre ceux qui y sont dÃ©jÃ 
 	INITLABELS_NONE, 
 	INITLABELS_VOID, 
 	INITLABELS_RANDOM
@@ -168,32 +167,32 @@ namespace sigraph
     Anneal( CGraph & cg, MGraph & rg );
     virtual ~Anneal();
 
-    /**	Fixe l'état initial
+    /**	Fixe l'Ã©tat initial
 	@param	mode	Type de recuit (Anneal::METROPOLIS, Anneal::GIBBS ou 
 	Anneal::ICM)
-	@param	temp	Température initiale
-	@param	tmult	Multiplicateur de décroissance de température (entre 0 
+	@param	temp	TempÃ©rature initiale
+	@param	tmult	Multiplicateur de dÃ©croissance de tempÃ©rature (entre 0 
 	et 1)
 	@param	tICM	Un recuit METROPOLIS ou GIBBS passe en mode ICM quand 
-	la température atteint la température tICM
-	@param	stopProp	Proportion de changements acceptés en dessous 
-	duquel le recuit s'arrête
-	@param	gibbsMaxTrans	Nombre max. de transformations à la fois dans 
+	la tempÃ©rature atteint la tempÃ©rature tICM
+	@param	stopProp	Proportion de changements acceptÃ©s en dessous 
+	duquel le recuit s'arrÃªte
+	@param	gibbsMaxTrans	Nombre max. de transformations Ã  la fois dans 
 	une clique par l'algorithme du Gibbs Sampler 
 	et l'ICM
-	@param	verbosity	Si {\tt true} (par défaut), affiche à chaque 
-	pas la température, le mode de recuit, la 
-	variation d'énergie du pas, les nombres de 
-	changements acceptés et proposés. Si {\tt 
+	@param	verbosity	Si {\tt true} (par dÃ©faut), affiche Ã  chaque 
+	pas la tempÃ©rature, le mode de recuit, la 
+	variation d'Ã©nergie du pas, les nombres de 
+	changements acceptÃ©s et proposÃ©s. Si {\tt 
 	false}, n'affiche rien.
-	@param	itType		Type d'itération sur le graphe: types de 
+	@param	itType		Type d'itÃ©ration sur le graphe: types de 
 	groupes de noeuds et ordre de passage. Pour 
-	l'instant ça n'est utilisé qu'en modes ICM et 
+	l'instant Ã§a n'est utilisÃ© qu'en modes ICM et 
 	Gibbs. Pour Metropolis on verra plus tard.
-	@param	plotStream	stream dans lequel les énergies sont écrites
-	à chaque pas de recuit, pour traçage de 
-	courbes. Si ce paramètre est laissé à 0, rien 
-	n'est écrit.
+	@param	plotStream	stream dans lequel les Ã©nergies sont Ã©crites
+	Ã  chaque pas de recuit, pour traÃ§age de 
+	courbes. Si ce paramÃ¨tre est laissÃ© Ã  0, rien 
+	n'est Ã©crit.
     */
     void init( Mode mode, double temp, double tmult, double tICM, 
 	       double stopProp, unsigned gibbsMaxTrans, bool verbose = true, 
@@ -202,91 +201,91 @@ namespace sigraph
 	       const std::string & voidLabel = "", 
                std::ostream *plotStream = 0, 
                unsigned niterBelowStopProp = 1 );
-    /**	Mode "void": essais de configs où tous les labels sont remplacés par
+    /**	Mode "void": essais de configs oÃ¹ tous les labels sont remplacÃ©s par
 	void
-	@param	mode	VOIDMODE_NONE: désactivé; VOIDMODE_REGULAR: essais 
-	réguliers, une fois sur occurency; VOIDMODE_STOCHASTIC:
-	essais irréguliers, avec probabilité 1/occurency
-	@param	occurency	périodicité de la passe en mode "void" */
+	@param	mode	VOIDMODE_NONE: dÃ©sactivÃ©; VOIDMODE_REGULAR: essais 
+	rÃ©guliers, une fois sur occurency; VOIDMODE_STOCHASTIC:
+	essais irrÃ©guliers, avec probabilitÃ© 1/occurency
+	@param	occurency	pÃ©riodicitÃ© de la passe en mode "void" */
     void setVoidMode( VoidMode mode, unsigned occurency = 0 );
     void deleteExtensions();
     void addExtension( AnnealExtension* ae, unsigned occurency = 20 );
-    ///	Libère les structures allouées dans les graphes
+    ///	LibÃ¨re les structures allouÃ©es dans les graphes
     void clear();
     ///	Revient aux conditions initiales
     void reset();
-    ///	Teste le critère d'arrêt et fixe l'état correspondant
+    ///	Teste le critÃ¨re d'arrÃªt et fixe l'Ã©tat correspondant
     void checkStop();
     ///	Effectue une passe de recuit
     void fitStep();
     ///	Effectue tout le recuit
     void fit();
-    ///	Effectue une passe en mode Métropolis
+    ///	Effectue une passe en mode MÃ©tropolis
     void stepMetropolis();
     ///	Effectue une passe en mode Gibbs Sampler
     void stepGibbs();
-    ///	Effectue une passe en mode ICM déterministe
+    ///	Effectue une passe en mode ICM dÃ©terministe
     void stepICM();
     /**	Effectue une passe en mode Void (essais de configs ou tout un label 
-	est enlevé) */
+	est enlevÃ©) */
     void stepVoid();
-    /**	Calcule les différentes énergies des transitions possibles d'un 
+    /**	Calcule les diffÃ©rentes Ã©nergies des transitions possibles d'un 
 	groupe de noeuds, en Gibbs Sampler ou en ICM.
 	Cette fonction efface le vecteur et le re-remplit
     */
     void processPotentials( const std::set<Vertex *> & vertices, 
 			    std::vector<EnergyField> & en );
     /**	Calcule les potentiels de toutes les cliques. 
-	Cette fonction est utilisée à l'initialisation, ou pour calculer 
-	l'énergie totale du graphe
-	@return	énergie totale du graphe
+	Cette fonction est utilisÃ©e Ã  l'initialisation, ou pour calculer 
+	l'Ã©nergie totale du graphe
+	@return	Ã©nergie totale du graphe
     */
     double processAllPotentials();
 
-    /**@name	Interrogation de l'état du système */
+    /**@name	Interrogation de l'Ã©tat du systÃ¨me */
     //@{
-    ///	Graphe à étiqueter
+    ///	Graphe Ã  Ã©tiqueter
     const CGraph & cGraph() const { return( _cgraph ); }
     CGraph & cGraph() { return( _cgraph ); }
-    ///	Graphe modèle
+    ///	Graphe modÃ¨le
     const MGraph & rGraph() const { return( _mgraph ); }
     MGraph & rGraph() { return( _mgraph ); }
     ///	Mode de recuit initial
     Mode modeI() const { return( _modeI ); }
     ///	Mode courant
     Mode mode() const { return( _mode ); }
-    ///	Température initiale
+    ///	TempÃ©rature initiale
     double tempI() const { return( _tempI ); }
-    ///	Température courante
+    ///	TempÃ©rature courante
     double temp() const { return( _temp ); }
     ///	Retourne true si le recuit est fini
     bool isFinished() const { return( _finished ); }
-    ///	Multiplicxateur de température
+    ///	Multiplicxateur de tempÃ©rature
     double tMult() const { return( _tmult ); }
-    ///	Température de passage en ICM
+    ///	TempÃ©rature de passage en ICM
     double tICM() const { return( _tICM ); }
-    /**	Proportion de transformations acceptées en dessous de laquelle on 
-	arrête le recuit */
+    /**	Proportion de transformations acceptÃ©es en dessous de laquelle on 
+	arrÃªte le recuit */
     double stopProp() const { return( _stopProp ); }
-    ///	Nombre de transformations acceptées au cours de la dernière passe
+    ///	Nombre de transformations acceptÃ©es au cours de la derniÃ¨re passe
     unsigned nTrans() const { return( _ntrans ); }
-    ///	Nombre de transformations proposées au cours de la dernière passe
+    ///	Nombre de transformations proposÃ©es au cours de la derniÃ¨re passe
     unsigned maxTrans() const { return( _maxtrans ); }
     /**	Nombre max. de transformations par groupe de noeuds dans le 
 	Gibbs Sampler (et l'ICM) */
     unsigned gibbsMaxTrans() const { return( _gibbsMaxTrans ); }
-    ///	Variation d'énergie du graphe depuis le début du recuit
+    ///	Variation d'Ã©nergie du graphe depuis le dÃ©but du recuit
     double deltaE() const { return( _deltaE ); }
-    ///	Variation d'énergie du graphe à la dernière passe
+    ///	Variation d'Ã©nergie du graphe Ã  la derniÃ¨re passe
     double stepDeltaE() const { return( _stepDeltaE ); }
     double initialEnergy() const { return( _initEnergy ); }
     double energy() const { return( _initEnergy + _deltaE ); }
-    ///	dit si les affichages sont autorisés ou interdits
+    ///	dit si les affichages sont autorisÃ©s ou interdits
     bool verbosity() const { return( _verbose ); }
     IterType iterType() const { return( _iterType ); }
-    ///	Nb d'itérations de recuit effectuées
+    ///	Nb d'itÃ©rations de recuit effectuÃ©es
     unsigned nIter() const { return( _niter ); }
-    /**	Dit si on est en mode DoubleTirage, technologie © JeffProd'00, pour 
+    /**	Dit si on est en mode DoubleTirage, technologie Â© JeffProd'00, pour 
 	les passes void et extensions */
     bool doubleDrawingLots() const { return( _doubleDrawingLots ); }
     void setDoubleDrawingLots( bool t ) { _doubleDrawingLots = t; }
@@ -319,17 +318,17 @@ namespace sigraph
     //@}
 
   protected:
-    ///	Graphe à étiqueter
+    ///	Graphe Ã  Ã©tiqueter
     CGraph				&_cgraph;
-    ///	Graphe modèle
+    ///	Graphe modÃ¨le
     MGraph				&_mgraph;
     ///	Mode initial
     Mode				_modeI;
     ///	Mode courant
     Mode				_mode;
-    ///	Température initiale
+    ///	TempÃ©rature initiale
     double				_tempI;
-    ///	Température courante
+    ///	TempÃ©rature courante
     double				_temp;
     bool				_finished;
     double				_tmult;
@@ -360,29 +359,29 @@ namespace sigraph
     struct Private;
     Private	*d;
 
-    /**	Fonction utilisée par processPotentials().
+    /**	Fonction utilisÃ©e par processPotentials().
 	Calcule les potentiels pour les changements de nn noeuds parmi ceux de 
-	numéro au moins \c first
-	@param	ver	groupe de noeuds à tester
-	@param	ef	vecteur d'énergies à remplir. Les nouvelles valeurs 
-	sont ajoutées au vecteur
-	@param	npos	tableau de booléens des positions de tous les noeuds 
+	numÃ©ro au moins \c first
+	@param	ver	groupe de noeuds Ã  tester
+	@param	ef	vecteur d'Ã©nergies Ã  remplir. Les nouvelles valeurs 
+	sont ajoutÃ©es au vecteur
+	@param	npos	tableau de boolÃ©ens des positions de tous les noeuds 
 	(de taille \c cl->size())
-	@param	first	numéro du 1er noeud qu'on a le droit d'utiliser
-	@param	nn	nombre de noeuds à choisir (parmi les <tt>cl->size() 
+	@param	first	numÃ©ro du 1er noeud qu'on a le droit d'utiliser
+	@param	nn	nombre de noeuds Ã  choisir (parmi les <tt>cl->size() 
 	- first</tt>)
 	@param	orLab	tableau des labels d'origine des noeuds de la clique
     */
     void processNodes( const std::set<Vertex *> & ver, std::vector<EnergyField> & ef, 
 		       bool* npos, unsigned first, unsigned nn, 
 		       std::string* orLab );
-    /**	Fonction utilisée par processPotentials().
-	Calcule le potentiel d'une configuration, labels déjà fixés sur les 
+    /**	Fonction utilisÃ©e par processPotentials().
+	Calcule le potentiel d'une configuration, labels dÃ©jÃ  fixÃ©s sur les 
 	noeuds
 	@param	ver	groupe de noeuds
-	@param	ef	vecteur de champs d'énergies auquel on ajoute une 
-	entrée
-	@param	npos	liste des noeuds modifiés
+	@param	ef	vecteur de champs d'Ã©nergies auquel on ajoute une 
+	entrÃ©e
+	@param	npos	liste des noeuds modifiÃ©s
 	@param	orLab	tableau des labels d'origine des noeuds de la clique
     */
     void processConfig( const std::set<Vertex *> & ver, 
