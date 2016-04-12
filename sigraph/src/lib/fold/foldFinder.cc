@@ -233,10 +233,10 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
 
   //	Cliques type "Random Edge"
 
-  if( _mgraph.size() > 0 )	// si pas de random edges, rien à faire
+  if( _mgraph.edgesSize() > 0 ) // if not random edge: nothing to do
     {
       if( verbose )
-	cout << "\nCreating Random Edge cliques...\n";
+        cout << "\nCreating Random Edge cliques...\n";
       n = mc.size();
 
       for( imc=mc.begin(), fmc=mc.end(), i=1; imc!=fmc; ++imc, ++i )
