@@ -190,27 +190,26 @@ unsigned VertexClique::connectivity( const set<Vertex *> & vx,
 				     set<CComponent *> *sc, 
 				     const set<string> & syntTypes )
 {
-  set<Vertex *>			done;	// ceux qui ont d�j� trait�s
+  set<Vertex *>                 done;   // those already processed
   set<Vertex *>::const_iterator	iv, fv=vx.end(), notdone=done.end();
   Vertex			*v;
   string			label2;
   CComponent			*cc = 0;
   unsigned			num = 0;
 
-  //	
   for( iv=vx.begin(); iv!=fv; ++iv )
     if( done.find( *iv ) == notdone )
+    {
+      v = *iv;
+      if( sc )
       {
-	v = *iv;
-	if( sc )
-	  {
-	    cc = new CComponent;
-	    sc->insert( cc );
-	  }
-	++num;
-
-	connPropagate( v, vx, done, cc, syntTypes );
+        cc = new CComponent;
+        sc->insert( cc );
       }
+      ++num;
+
+      connPropagate( v, vx, done, cc, syntTypes );
+    }
 
   return( num );
 }

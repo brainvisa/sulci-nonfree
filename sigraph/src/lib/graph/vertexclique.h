@@ -5,8 +5,6 @@
 #include <set>
 #include <graph/graph/vertex.h>
 #include <si/graph/clique.h>
-// DEBUG
-#include <iostream>
 
 
 namespace sigraph
