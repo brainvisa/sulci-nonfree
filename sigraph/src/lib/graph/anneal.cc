@@ -49,8 +49,11 @@ struct Anneal::Private
   ThreadedLoop	*threadloop;
 #endif
 
+  void reorderVertices( CGraph & );
+
   unsigned      maxIterations;
   unsigned      mpmUnrecordedIterations;
+  map<long, Vertex *> tractable_vert;
 
   Private();
   ~Private();
@@ -94,6 +97,24 @@ void Anneal::Private::PotContext::doIt( int startIndex, int count )
     }
 }
 #endif
+
+
+
+void Anneal::Private::reorderVertices( CGraph & cgraph )
+{
+  if( !tractable_vert.empty() )
+    return;
+
+  CGraph::iterator iv, ev=cgraph.end();
+  int index;
+  for( iv=cgraph.begin(); iv!=ev; ++iv )
+  {
+    if( !(*iv)->getProperty( "index", index )
+        && !(*iv)->getProperty( "skeleton_label", index ) )
+      index = reinterpret_cast<long>( *iv ); // NON-TRACTABLE.
+    tractable_vert[ index ] = *iv;
+  }
+}
 
 
 Anneal::Anneal( CGraph & cg, MGraph & rg )
@@ -158,6 +179,7 @@ void Anneal::init( Anneal::Mode mode, double temp, double tmult, double tICM,
 
   d->maxIterations = 0;
   d->mpmUnrecordedIterations = 0;
+  d->tractable_vert.clear();
 }
 
 
@@ -439,7 +461,6 @@ void Anneal::checkStop()
 
 void Anneal::stepMetropolis()
 {
-  CGraph::const_iterator	iv, fv=_cgraph.end();
   set<Clique*>			*cs;
   set<Clique*>::const_iterator	ic, fc;
   Clique			*cl = 0;
@@ -456,19 +477,22 @@ void Anneal::stepMetropolis()
   _stepDeltaE = 0;
 
   //	Tirer au sort l'ordre de passage des vertex
-  for( iv=_cgraph.begin(); iv!=fv; ++iv )
+  d->reorderVertices( _cgraph );
+  map<long, Vertex *>::iterator iv, ev=d->tractable_vert.end();
+  for( iv=d->tractable_vert.begin(); iv!=ev; ++iv )
+  {
+    do
     {
-      do
-	{
-	  rnd = ran1();
-	} while( mv.find( rnd ) != mv.end() );
+      rnd = ran1();
+    } while( mv.find( rnd ) != mv.end() );
 
-      mv[ rnd ] = *iv;
-    }
+    mv[ rnd ] = iv->second;
+  }
 
   map<Vertex*, string>	changes;
 
-  //	Iteration sur chaque Vertex dans l'ordre tir�
+
+  //	Iteration on eachVertex in drawn order
   for( im=mv.begin(), fm=mv.end(); im!=fm; ++im )
     {
       v = (*im).second;
@@ -555,7 +579,7 @@ void Anneal::stepGibbs()
         ++count;
         cout << setw( 5 ) << count << " " << (*is)->size();
         if( (*is)->size() == 1 &&
-            (*(*is)->begin())->getProperty( "name", str ) )
+            (*(*is)->begin())->getProperty( SIA_LABEL, str ) )
           cout << " " << str;
         cout << "                         \r" << flush;
       }
