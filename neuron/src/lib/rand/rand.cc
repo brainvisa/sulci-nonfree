@@ -24,6 +24,7 @@
 #define NDIV (1+(IM-1)/NTAB)
 
 static long *_idum = NULL;
+static bool _reset_srand = true;
 
 
 double ran1()
@@ -37,8 +38,10 @@ double ran1()
   if( _idum == NULL )
     {
       _idum = new long;
-      srand( time( NULL ) );
+      if( _reset_srand )
+        srand( time( NULL ) );
       *_idum = -rand();
+      iy = 0;
     }
 
   if( *_idum <= 0 || !iy )
@@ -67,8 +70,10 @@ double ran1()
 
 void setRandSeed( long seed )
 {
-  ran1();
-  *_idum = seed;
+  delete _idum;
+  _idum = 0;
+  _reset_srand = false;
+  srand( seed );
 }
 
 

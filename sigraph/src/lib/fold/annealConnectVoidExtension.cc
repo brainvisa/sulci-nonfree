@@ -36,21 +36,24 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
 
   for( iv=_anneal->cGraph().begin(); iv!=fv; ++iv )
     if( (*iv)->getProperty( SIA_LABEL, label ) 
-	&& label != _anneal->voidLabel() )
+        && label != _anneal->voidLabel() )
+    {
+      set<Vertex *>	& sv = sg[label];
+      sv.insert( *iv );
+      if( sv.size() > maxs )
+        maxs = sv.size();
+    }
+
+  // randomly reorder labels (assigning them in a controlled order)
+  map<string, set<Vertex *> >::iterator isg, esg = sg.end();
+  for( isg=sg.begin(); isg!=esg; ++isg )
+  {
+    do
       {
-	set<Vertex *>	& sv = sg[label];
-	if( sv.empty() )
-	  {
-	    do
-	      {
-		r = ran1();
-	      } while( order.find( r ) != order.end() );
-	    order[ r ] = label;
-	  }
-	sv.insert( *iv );
-	if( sv.size() > maxs )
-	  maxs = sv.size();
-      }
+        r = ran1();
+      } while( order.find( r ) != order.end() );
+    order[ r ] = isg->first;
+  }
 
   // itération sur chaque groupe
 
@@ -70,7 +73,12 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
   unsigned				n;
   set<string>				syntTypes;
   map<double, CComponent *>		ccm;
-  map<double, CComponent *>::iterator	icc, fcc = ccm.end();
+  map<double, CComponent *>::iterator     icc, fcc = ccm.end();
+  map<long, CComponent *>                 ccord;
+  map<long, CComponent *>::const_iterator ico, eco = ccord.end();
+  Vertex                                  *v;
+  int                                     index;
+  long                                    key;
 
   ef.vertices.reserve( maxs );
   syntTypes.insert( SIA_JUNCTION_SYNTAX );
@@ -81,30 +89,44 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
       label = (*ig).second;
       set<Vertex *>	& sv = sg[ label ];
 
-      // séparer chaque sillon en composantes connexes
+      // split each sulcus into connected components
       cc.erase( cc.begin(), cend );
       ccm.erase( ccm.begin(), fcc );
       n = VertexClique::connectivity( sv, &cc, syntTypes );
 
-      //	ordonnancement aléatoire des composantes
+      // reorder cc in a reproducible way
+      ccord.clear();
       for( isc=cc.begin(); isc!=cend; ++isc )
-	{
-	  do
-	    {
-	      r = rand();
-	    } while( ccm.find( r ) != fcc );
-	  ccm[r] = *isc;
-	}
+      {
+        Vertex *v = *(*isc)->begin();
+        if( v->getProperty( "index", index )
+            || v->getProperty( "skeleton_label", index ) )
+          key = index;
+        else
+          key = reinterpret_cast<long>( v );
+        ccord[ key ] = *isc;
+      }
+      /* in this order, randomly re-order
+         (this is done in 2 passes to ensure reproducibility of random
+         numbers order when we want to control srand)
+      */
+      for( ico=ccord.begin(); ico!=eco; ++ico )
+      {
+        do
+          {
+            r = rand();
+          } while( ccm.find( r ) != fcc );
+        ccm[r] = ico->second;
+      }
 
-      //	essai pour chaque composante
+      //        try each component
       for( icc=ccm.begin(); icc!=fcc; ++icc )
 	{
-	  //ef.vertices.erase( ef.vertices.begin(), ef.vertices.end() );
-	  ef.involvedCliques.erase( ef.involvedCliques.begin(), 
+	  ef.involvedCliques.erase( ef.involvedCliques.begin(),
 				    ef.involvedCliques.end() );
 	  changes.erase( changes.begin(), changes.end() );
 
-	  for( isv=(*icc).second->begin(), fsv=(*icc).second->end(); 
+	  for( isv=(*icc).second->begin(), fsv=(*icc).second->end();
 	       isv!=fsv; ++isv )
 	    {
 	      //ef.vertices.push_back( *isv );
@@ -120,13 +142,13 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
 
 	  ef.energy = 0;
 
-	  for( ic2=ef.involvedCliques.begin(), 
+	  for( ic2=ef.involvedCliques.begin(),
 		 fc2=ef.involvedCliques.end(); ic2!=fc2; ++ic2 )
 	    {
 	      cl = (*ic2).first;
 	      cl->getProperty( SIA_POTENTIAL, E );
-	      /* normalement il faudrait prendre dans 'changes' une 
-		 sous-liste dont les noeuds sont effectivement dans cette 
+	      /* normalement il faudrait prendre dans 'changes' une
+		 sous-liste dont les noeuds sont effectivement dans cette
 		 clique */
 	      (*ic2).second = mf.potential( cl, changes );
 	      ef.energy += (*ic2).second - E;
@@ -155,13 +177,13 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
 	      //	tirage
 	      limit = ef.expEnergy / (ef.expEnergy + 1);
 	      // technologie du DoubleTirage © JeffProd'00
-	      if( ran1() < limit 
+	      if( ran1() < limit
 		  && ( !_anneal->doubleDrawingLots() || ran1() < limit ) )
 		accept = true;
 	    }
 	  if( accept )	  //	accepte: mettre les nouveaux potentiels
 	    {
-	      for( ic2=ef.involvedCliques.begin(), 
+	      for( ic2=ef.involvedCliques.begin(),
 		     fc2=ef.involvedCliques.end(); ic2!=fc2; ++ic2 )
 		{
 		  cl = (*ic2).first;

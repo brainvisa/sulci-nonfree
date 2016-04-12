@@ -34,30 +34,37 @@ void AnnealConnectExtension::specialStep( unsigned )
   AttributedObject		*mao;
   map<Vertex *, string>		changes;
   string			voidl = _anneal->voidLabel();
+  map<string, Clique *>          clord;
+  map<string, Clique *>::const_iterator iclo, eclo = clord.end();
 
   //  cout << "Passe connexe...\n";
   _ntrans = 0;
   _maxtrans = 0;
   _stepDeltaE = 0;
 
+  // order cliques by label
   for( ic=_anneal->cGraph().cliques().begin(); ic!=fc; ++ic )
-    {
-      // modèle associé à la clique
-      mao = mf.selectModel( ic->get() );
-      // ne garder que les modèles de noeuds (1 label)
-      if( mao && mao->getProperty( SIA_LABEL, label ) 
-          && label != voidl )
-	{
-	  // tirer un numéro
-	  do
-	    {
-	      p = rand();
-	    } while( cliques.find( p ) != fcm );
-	  // stocker la clique numérotée et le label
-	  cliques[p] = (VertexClique *) ic->get();
-	  labels[(VertexClique *) ic->get()] = label;
-	}
-    }
+  {
+    // modèle associé à la clique
+    mao = mf.selectModel( ic->get() );
+    // ne garder que les modèles de noeuds (1 label)
+    if( mao && mao->getProperty( SIA_LABEL, label )
+        && label != voidl )
+      clord[label] = ic->get();
+  }
+
+  // from this reproducible order, randomly reorder them
+  for( iclo=clord.begin(); iclo!=eclo; ++iclo )
+  {
+    // tirer un numéro
+    do
+      {
+        p = rand();
+      } while( cliques.find( p ) != fcm );
+    // stocker la clique numérotée et le label
+    cliques[p] = (VertexClique *) iclo->second;
+    labels[(VertexClique *) iclo->second] = label;
+  }
 
   //	pour chaque clique dans l'ordre de tirage, 
   //	découpage en composantes connexes
@@ -77,6 +84,11 @@ void AnnealConnectExtension::specialStep( unsigned )
   double					E, eE, limit;
   bool						accept;
   Clique					*cl;
+  map<long, CComponent *>                 ccord;
+  map<long, CComponent *>::const_iterator ico, eco = ccord.end();
+  Vertex                                  *v;
+  int                                     index;
+  long                                    key;
 
   syntTypes.insert( SIA_JUNCTION_SYNTAX );
   syntTypes.insert( SIA_PLI_DE_PASSAGE_SYNTAX );
@@ -97,15 +109,30 @@ void AnnealConnectExtension::specialStep( unsigned )
 	       << " composantes             \r" 
 	       << flush;
 
-	  //	ordonnancement aléatoire des composantes
-	  for( isc=cc.begin(); isc!=cend; ++isc )
-	    {
-	      do
-		{
-		  p = rand();
-		} while( ccm.find( p ) != fcc );
-	      ccm[p] = *isc;
-	    }
+          // reorder cc in a reproducible way
+          ccord.clear();
+          for( isc=cc.begin(); isc!=cend; ++isc )
+          {
+            Vertex *v = *(*isc)->begin();
+            if( v->getProperty( "index", index )
+                || v->getProperty( "skeleton_label", index ) )
+              key = index;
+            else
+              key = reinterpret_cast<long>( v );
+            ccord[ key ] = *isc;
+          }
+          /* in this order, randomly re-order
+            (this is done in 2 passes to ensure reproducibility of random
+            numbers order when we want to control srand)
+          */
+          for( ico=ccord.begin(); ico!=eco; ++ico )
+          {
+            do
+              {
+                p = rand();
+              } while( ccm.find( p ) != fcc );
+            ccm[p] = ico->second;
+          }
 
 	  //	essai pour chaque composante
 	  for( icc=ccm.begin(); icc!=fcc; ++icc )
