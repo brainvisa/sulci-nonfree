@@ -131,7 +131,10 @@ bool AnnealConfigurator::loadConfig( const string & filename )
   t.getProperty( "maxIterations", maxIterations );
   t.getProperty( "MPMUnrecordedIterations", mpmUnrecordedIterations );
   t.getProperty( "forbidVoidLabel", forbidVoidLabel );
-  t.getProperty( "randomSeed", randomSeed );
+  // randomSeed is a long, not an int, thus needs cast
+  int rseed = 0;
+  if( t.getProperty( "randomSeed", rseed ) )
+    randomSeed = rseed;
 
   return processParams();
 }
@@ -202,7 +205,7 @@ void AnnealConfigurator::saveConfig( const string & filename )
   if( forbidVoidLabel != 0 )
     t.setProperty( "forbidVoidLabel", forbidVoidLabel );
   if( randomSeed != 0 )
-    t.setProperty( "randomSeed", randomSeed );
+    t.setProperty( "randomSeed", (int) randomSeed );
 
   tw << t;
 }
@@ -442,7 +445,6 @@ void AnnealConfigurator::initAnneal( Anneal & an, ofstream *plotf ) const
   if( randomSeed != 0 )
   {
     setRandSeed( randomSeed );
-    srand( randomSeed );
   }
   an.init( bmode, temp, rate, tempICM, stopRate, gibbsChange, verbose, 
            bItType, initLabelType, voidLabel, plotf,
