@@ -107,12 +107,15 @@ void Anneal::Private::reorderVertices( CGraph & cgraph )
 
   CGraph::iterator iv, ev=cgraph.end();
   int index;
+  long key;
   for( iv=cgraph.begin(); iv!=ev; ++iv )
   {
     if( !(*iv)->getProperty( "index", index )
         && !(*iv)->getProperty( "skeleton_label", index ) )
-      index = reinterpret_cast<long>( *iv ); // NON-TRACTABLE.
-    tractable_vert[ index ] = *iv;
+      key = reinterpret_cast<long>( *iv ); // NON-TRACTABLE.
+    else
+      key = index;
+    tractable_vert[ key ] = *iv;
   }
 }
 

@@ -40,12 +40,15 @@ void VertexProvider::init()
 
   // sort vertices first in a reproducible order
   int index;
+  long key;
   for( iv=_graph.begin(); iv!=fv; ++iv )
   {
     if( !(*iv)->getProperty( "index", index )
         && !(*iv)->getProperty( "skeleton_label", index ) )
-      index = reinterpret_cast<long>( *iv ); // NON-TRACTABLE.
-    tractable_vert[ index ] = *iv;
+      key = reinterpret_cast<long>( *iv ); // NON-TRACTABLE.
+    else
+      key = index;
+    tractable_vert[ key ] = *iv;
   }
 
   map<long, Vertex *>::iterator iov, eov = tractable_vert.end();
@@ -126,11 +129,14 @@ void VertexCliqueProvider::init()
 
   // sort cliques first in a reproducible order
   int index;
+  long key;
   for( ic=sc.begin(); ic!=fc; ++ic )
   {
     if( !(*ic)->getProperty( "index", index ) )
-      index = reinterpret_cast<long>( ic->get() ); // NON-TRACTABLE.
-    tractable_cliques[ index ] = ic->get();
+      key = reinterpret_cast<long>( ic->get() ); // NON-TRACTABLE.
+    else
+      key = index;
+    tractable_cliques[ key ] = ic->get();
   }
 
   map<long, Clique *>::iterator ioc, eoc = tractable_cliques.end();
