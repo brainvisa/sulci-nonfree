@@ -34,13 +34,25 @@ void VertexProvider::init()
 {
   CGraph::const_iterator	iv, fv=_graph.end();
   set<Vertex *>			*sv;
+  map<long, Vertex *> tractable_vert;
 
   cleanup();
 
+  // sort vertices first in a reproducible order
+  int index;
   for( iv=_graph.begin(); iv!=fv; ++iv )
+  {
+    if( !(*iv)->getProperty( "index", index )
+        && !(*iv)->getProperty( "skeleton_label", index ) )
+      index = reinterpret_cast<long>( *iv ); // NON-TRACTABLE.
+    tractable_vert[ index ] = *iv;
+  }
+
+  map<long, Vertex *>::iterator iov, eov = tractable_vert.end();
+  for( iov=tractable_vert.begin(); iov!=eov; ++iov )
     {
       sv = new set<Vertex *>;
-      sv->insert( *iv );
+      sv->insert( iov->second );
       _data.push_back( sv );
     }
 }
@@ -110,9 +122,20 @@ void VertexCliqueProvider::init()
 
   const CGraph::CliqueSet 		& sc = _graph.cliques();
   CGraph::CliqueSet::const_iterator	ic, fc=sc.end();
+  map<long, Clique *>                   tractable_cliques;
 
+  // sort cliques first in a reproducible order
+  int index;
   for( ic=sc.begin(); ic!=fc; ++ic )
-    _data.push_back( &((VertexClique *) ic->get())->vertices() );
+  {
+    if( !(*ic)->getProperty( "index", index ) )
+      index = reinterpret_cast<long>( ic->get() ); // NON-TRACTABLE.
+    tractable_cliques[ index ] = ic->get();
+  }
+
+  map<long, Clique *>::iterator ioc, eoc = tractable_cliques.end();
+  for( ioc=tractable_cliques.begin(); ioc!=eoc; ++ioc )
+    _data.push_back( &((VertexClique *) ioc->second)->vertices() );
 }
 
 

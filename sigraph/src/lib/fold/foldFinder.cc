@@ -155,6 +155,7 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
   VertexClique::iterator		ic, fc;
   unsigned				i, n;
   CGraph::CliqueSet			& cliques = data.cliques();
+  int                                   index = 0;
 
   //	Création des cliques "Random Vertex" (vides d'abord)
 
@@ -168,6 +169,8 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
       if( !sel || selected.find( label1 ) != selected.end() )
         {
           cl = new VertexClique;
+          cl->setProperty( "index", index ); // to order in a reproducible way
+          ++index;
           cl->setProperty( SIA_MODEL_TYPE, (string) SIV_RANDOM_VERTEX );
           cl->setProperty( SIA_LABEL, label1 );
           cl->setProperty( SIA_GRAPH, (Graph *) &data );
@@ -258,6 +261,8 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
 	      if( se.size() >= 1 )
 		{
 		  cl = new VertexClique;
+                  cl->setProperty( "index", index );
+                  ++index;
 		  cl->setProperty( SIA_MODEL_TYPE, (string) SIV_RANDOM_EDGE );
 		  cl->setProperty( SIA_GRAPH, (Graph *) &data );
 		  cl->setProperty( SIA_LABEL1, label1 );
@@ -283,6 +288,8 @@ void FoldFinder::initCliques( CGraph & data, bool verbose, bool withCache,
       && ( !sel || selected.find( SIV_VOID_LABEL ) != selected.end() ) )
     {
       cl = new VertexClique;
+      cl->setProperty( "index", index ); // to order in a reproducible way
+      ++index;
       cl->setSyntax( SIA_FAKEREL );
       cl->setProperty( SIA_MODEL_TYPE, (string) SIV_FAKE_REL );
       cl->setProperty( SIA_GRAPH, (Graph *) &data );
