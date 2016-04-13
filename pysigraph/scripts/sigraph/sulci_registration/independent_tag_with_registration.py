@@ -177,6 +177,7 @@ class Tagger(object):
 
         # set label to maximum a posteriori
         i = 0
+        csv_table = {}
         for xi in self._graph_data.vertices():
             if xi.getSyntax() != 'fold':
                 continue
@@ -195,12 +196,16 @@ class Tagger(object):
             s = "%d\t%f\t%f\t%f" % (ind, li, logli, p)
             for si in range(self._states_n):
                 s += '\t%f' % posteriors_xi[si]
-            self._fd.write(s + '\n')
+            csv_table[ind] = s + '\n'
             filter = numpy.asarray(posteriors_xi > 0.01).flatten()
             k = numpy.argwhere(filter).T.flatten()
             available_labels[ind] = \
                 [self._states[si] for si in k]
             i += 1
+
+        # write nodes likelihoods sorted by node index
+        for ind in sorted(csv_table.keys()):
+            self._fd.write(csv_table[ind])
 
         return trans, available_labels
 
