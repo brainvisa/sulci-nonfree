@@ -988,24 +988,29 @@ void Anneal::stepVoid()
   map<double, string>		order;
   unsigned			maxs = 0;
 
+  // partion nodes according to their label.
   for( iv=_cgraph.begin(); iv!=fv; ++iv )
     if( (*iv)->getProperty( SIA_LABEL, label ) && label != _voidLabel )
-      {
-	set<Vertex *>	& sv = sg[label];
-	if( sv.empty() )
-	  {
-	    do
-	      {
-		r = ran1();
-	      } while( order.find( r ) != order.end() );
-	    order[ r ] = label;
-	  }
-	sv.insert( *iv );
-	if( sv.size() > maxs )
-	  maxs = sv.size();
-      }
+    {
+      set<Vertex *>	& sv = sg[label];
+      sv.insert( *iv );
+      if( sv.size() > maxs )
+        maxs = sv.size();
+    }
 
-  // it�ration sur chaque groupe
+  // randomly reorder labels (assigning them in a controlled order)
+  map<string, set<Vertex *> >::iterator isg, esg = sg.end();
+  for( isg=sg.begin(); isg!=esg; ++isg )
+  {
+    do
+      {
+        r = ran1();
+      } while( order.find( r ) != order.end() );
+    order[ r ] = isg->first;
+  }
+
+
+  // iterate on each group
 
   map<double, string>::const_iterator	ig, fg=order.end();
   set<Vertex *>::const_iterator		isv, fsv;

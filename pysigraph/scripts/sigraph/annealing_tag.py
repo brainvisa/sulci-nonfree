@@ -2,6 +2,7 @@
 
 import os, sys, numpy, pickle, time, copy
 from optparse import OptionParser, OptionGroup
+import random
 from soma import aims
 import sigraph
 from sulci.common import io, add_translation_option_to_parser
@@ -1069,6 +1070,9 @@ def parseOpts(argv):
 		action='store_true', default=False, help="divide energies " + \
 		"difference by the weights of the considered segment")
 	parser.add_option_group(misc_group)
+	parser.add_option('--seed', dest='random_seed', type='int', default=0,
+                          help='set a fixed random seed before processing. '
+                          'Default=0, means random initialization.')
 
 	return parser, parser.parse_args(argv)
 
@@ -1077,6 +1081,10 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	parser.check_required('-i')
 	parser.check()
+
+        if options.random_seed != 0:
+            random.seed(options.random_seed)
+
 
 	print "read..."
 	if options.sulci is None:
