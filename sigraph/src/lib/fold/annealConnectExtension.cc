@@ -105,20 +105,25 @@ void AnnealConnectExtension::specialStep( unsigned )
 	{
 	  // découpage en CC
 	  n = VertexClique::connectivity( voidNodes, &cc, syntTypes );
-	  cout << "label " << label << " : " << n 
-	       << " composantes             \r" 
-	       << flush;
 
           // reorder cc in a reproducible way
           ccord.clear();
           for( isc=cc.begin(); isc!=cend; ++isc )
           {
-            Vertex *v = *(*isc)->begin();
-            if( v->getProperty( "index", index )
-                || v->getProperty( "skeleton_label", index ) )
-              key = index;
-            else
-              key = reinterpret_cast<long>( v );
+            key = -1;
+            CComponent::const_iterator ivc, evc = (*isc)->end();
+            long tmp_key;
+            for( ivc=(*isc)->begin(); ivc!=evc; ++ivc )
+            {
+              Vertex *v = *ivc;
+              if( v->getProperty( "index", index )
+                  || v->getProperty( "skeleton_label", index ) )
+                tmp_key = index;
+              else
+                tmp_key = reinterpret_cast<long>( v );
+              if( key == -1 || tmp_key < key )
+                key = tmp_key;
+            }
             ccord[ key ] = *isc;
           }
           /* in this order, randomly re-order
