@@ -98,12 +98,20 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
       ccord.clear();
       for( isc=cc.begin(); isc!=cend; ++isc )
       {
-        Vertex *v = *(*isc)->begin();
-        if( v->getProperty( "index", index )
-            || v->getProperty( "skeleton_label", index ) )
-          key = index;
-        else
-          key = reinterpret_cast<long>( v );
+        key = -1;
+        CComponent::const_iterator ivc, evc = (*isc)->end();
+        long tmp_key;
+        for( ivc=(*isc)->begin(); ivc!=evc; ++ivc )
+        {
+          Vertex *v = *ivc;
+          if( v->getProperty( "index", index )
+              || v->getProperty( "skeleton_label", index ) )
+            tmp_key = index;
+          else
+            tmp_key = reinterpret_cast<long>( v );
+          if( key == -1 || tmp_key < key )
+            key = tmp_key;
+        }
         ccord[ key ] = *isc;
       }
       /* in this order, randomly re-order
@@ -114,7 +122,7 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
       {
         do
           {
-            r = rand();
+            r = ran1();
           } while( ccm.find( r ) != fcc );
         ccm[r] = ico->second;
       }
