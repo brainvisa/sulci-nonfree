@@ -32,6 +32,9 @@ class Tagger(object):
         self._states_map = dict((label, i)
                                 for i, label in enumerate(self._states))
         self._graph_data = graph_data
+        vdict = dict([(v['index'], v) for v in graph_data.vertices()])
+        self._graph_data_vertices = [vdict[index]
+                                     for index in sorted(vdict.keys())]
         if no_tal:
             self._motion = aims.Motion()
             self._motion.setToIdentity()
@@ -140,7 +143,7 @@ class Tagger(object):
 
     def get_available_labels_matrix(self, available_labels):
         L = []
-        for xi in self._graph_data.vertices():
+        for xi in self._graph_data_vertices:
             if xi.getSyntax() != 'fold':
                 continue
             if self._not_selected(xi):
@@ -178,7 +181,7 @@ class Tagger(object):
         # set label to maximum a posteriori
         i = 0
         csv_table = {}
-        for xi in self._graph_data.vertices():
+        for xi in self._graph_data_vertices:
             if xi.getSyntax() != 'fold':
                 continue
             node_index = xi['index']
@@ -213,7 +216,7 @@ class Tagger(object):
         X = []
         groups = []
         id = 0
-        for xi in self._graph_data.vertices():
+        for xi in self._graph_data_vertices:
             if xi.getSyntax() != 'fold':
                 continue
             if self._not_selected(xi):
