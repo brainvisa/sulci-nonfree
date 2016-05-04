@@ -52,19 +52,20 @@ Main specialized classes:
   - L{FoldDescr2}
 '''
 
+from __future__ import print_function
+
 import soma.aims
-import sigraphsip
-#from sigraphsip import *
+from sigraph import sigraphsip
 import string, os, sys
 from soma.importer import ExtendedImporter
 
 # get everything out of namespace sigraph
-ExtendedImporter().importInModule( '', globals(), locals(), 'sigraphsip' )
-ExtendedImporter().importInModule( '', globals(), locals(), 'sigraphsip', ['sigraphsip.sigraph'] )
+ExtendedImporter().importInModule('', globals(), locals(), 'sigraphsip')
+ExtendedImporter().importInModule('', globals(), locals(), 'sigraphsip', ['sigraphsip.sigraph'])
 
 del ExtendedImporter
 
-soma.aims.__fixsipclasses__( locals().items() )
+soma.aims.__fixsipclasses__(locals().items())
 
 # load plugins
 __pluginsdir__ = os.path.join(os.path.dirname(__file__), 'plugins')
@@ -74,25 +75,25 @@ pf = filter(lambda x: x.endswith('.py') \
              or os.path.isdir(os.path.join(__pluginsdir__, x)),
              os.listdir(__pluginsdir__))
 for x in pf:
-  p = os.path.basename(x)
-  if not os.path.isdir(os.path.join(__pluginsdir__, x)):
-    i = p.rfind('.')
-    if i >= 0: p = p[:i]
-  try:
-    exec('import ' + p)
-    __plugins__.append(p)
-  except Exception, e:
-    print 'loading of sigraph.' + p, 'failed:'
-    print e
-    del e
+    p = os.path.basename(x)
+    if not os.path.isdir(os.path.join(__pluginsdir__, x)):
+        i = p.rfind('.')
+        if i >= 0: p = p[:i]
+    try:
+        exec('import ' + p)
+        __plugins__.append(p)
+    except Exception as e:
+        print('loading of sigraph.' + p, 'failed:')
+        print(e)
+        del e
 del os, x, p, i, sys, pf
 
 convertersObjectToPython = {
-	'PN7sigraph12VertexCliqueE' :sigraphsip.sigraph.VertexClique.fromObject,
-	'set of CliquePtr' : Clique.fromSetPtrObject,
-	'PN7sigraph5ModelE' : Model.fromObject,
-	'PSt3setIPN7sigraph6CliqueESt4lessIS2_ESaIS2_EE' :
-			sigraphsip.sigraph.Clique.fromSetPtrObject,
+    'PN7sigraph12VertexCliqueE' :sigraphsip.sigraph.VertexClique.fromObject,
+    'set of CliquePtr' : Clique.fromSetPtrObject,
+    'PN7sigraph5ModelE' : Model.fromObject,
+    'PSt3setIPN7sigraph6CliqueESt4lessIS2_ESaIS2_EE' :
+                    sigraphsip.sigraph.Clique.fromSetPtrObject,
 }
 soma.aims.convertersObjectToPython.update(convertersObjectToPython)
 
@@ -100,12 +101,12 @@ del soma, sigraph, convertersObjectToPython
 
 
 class Settings(object):
-	'''
+    '''
     Settings : sigraph global settings are defined here.
- 
+
     debug : if True some debug is activated (and also datamind one).
-	'''
-	debug = False
+    '''
+    debug = False
 
 # docs
 
@@ -116,7 +117,7 @@ A model graph contains vertices and edges that are model
 elements (L{Model}). They provide potentials to assess a clique graph
 (L{CGraph}) and can be adaptive. Learning techniques work on model graphs.
 
-U{Link to the C++ API<../../sigrpah-3.1/doxygen/classsigraph_1_1MGraph.html>}
+U{Link to the C++ API<../../sigraph/doxygen/classsigraph_1_1MGraph.html>}
 '''
 
 #MGraph.checkCompatibility.__doc__ = '''
