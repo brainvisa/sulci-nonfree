@@ -461,7 +461,7 @@ void QAnnealParams::loadConfig()
   QString filter = tr( "Annealing configuration" );
   filter += " (*.cfg)";
   QFileDialog	& fd = fileDialog();
-  fd.selectFilter( filter );
+  fd.selectNameFilter( filter );
   fd.setWindowTitle( tr( "Open annealing configuration" ) );
   fd.setFileMode( QFileDialog::ExistingFile );
   if( !fd.exec() )
@@ -649,7 +649,7 @@ void QAnnealParams::selectTranslationFile()
   QString filter = tr( "Translation file" );
   filter += " (*.def)";
   QFileDialog	& fd = fileDialog();
-  fd.selectFilter( filter );
+  fd.selectNameFilter( filter );
   fd.setWindowTitle( tr( "Open translation file" ) );
   fd.setFileMode( QFileDialog::ExistingFile );
   if( !fd.exec() )
@@ -676,7 +676,7 @@ void QAnnealParams::selectPlotFile()
   QString filter = tr( "Output plot file" );
   filter += " (*.dat)";
   QFileDialog	& fd = fileDialog();
-  fd.selectFilter( filter );
+  fd.selectNameFilter( filter );
   fd.setWindowTitle( tr( "Select output plot file" ) );
   fd.setFileMode( QFileDialog::AnyFile );
   if( !fd.exec() )
