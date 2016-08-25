@@ -63,7 +63,7 @@ void AnnealConnectExtension::specialStep( unsigned )
       } while( cliques.find( p ) != fcm );
     // stocker la clique numérotée et le label
     cliques[p] = (VertexClique *) iclo->second;
-    labels[(VertexClique *) iclo->second] = label;
+    labels[(VertexClique *) iclo->second] = iclo->first;
   }
 
   //	pour chaque clique dans l'ordre de tirage, 
@@ -223,5 +223,9 @@ void AnnealConnectExtension::specialStep( unsigned )
 	      ++_maxtrans;
 	    }	// CC suivante
 	}	// (if clique pas vide)
+
+      // cleanup
+      for( isc=cc.begin(); isc!=cend; ++isc )
+        delete *isc;
     }		// clique suivante
 }
