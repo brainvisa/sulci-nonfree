@@ -210,5 +210,9 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
 	    }
 	  ++_maxtrans;
 	}	// composante suivante
+
+      // cleanup
+      for( isc=cc.begin(); isc!=cend; ++isc )
+        delete *isc;
     }		// label suivant
 }
