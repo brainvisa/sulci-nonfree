@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy
 from soma import aims
 
@@ -471,7 +472,7 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 								segments2)
 					if not connected and dist > dist2_th:
 						continue
-					print name1, name2
+					print(name1, name2)
 					D = self.compute(motion, g1, g2,
 								connected)
 					if D is None: continue
@@ -483,7 +484,7 @@ class AllMinDistanceRelationDescriptor(MinDistanceRelationDescriptor):
 						data[key] = D
 						count[key] = 1
 
-		print "-- end data from graphs --"
+		print("-- end data from graphs --")
 		for rel, D in data.items():
 			if len(D):
 				data[rel] = numpy.vstack(D), count[rel]
@@ -569,7 +570,7 @@ class AllConnectedDistanceRelationDescriptor(AllMinDistanceRelationDescriptor):
 		for (i,j) in indexes:
 			if i >= nX or j >= nY: continue
 			dist.append(C[i, j])
-		#	print C[i,j]
+		#	print(C[i,j])
 		#	if C[i,j] > 60: continue
 		#	m3 += aims.SurfaceGenerator.cylinder(X[i], Y[j], 0.3, 0.3, 10, 1, 1)
 		#aims.Writer().write(m3, "plop3_0.mesh")

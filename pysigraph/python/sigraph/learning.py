@@ -33,6 +33,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 import os, sys, numpy
 import sigraph, datamind
 from soma import aims
@@ -54,14 +55,14 @@ def trainer_trainOne( self, it, obj):
 	par = aims.carto.PyObjectfromObject(obj.get())
 	mod = it.model()
 	if not mod.isAdaptive():
-		print 'skip learning of non adaptive model'
+		print('skip learning of non adaptive model')
 		return
 	if not mod.topModel():
-		print 'Trainer.trainOne: no TopModel'
+		print('Trainer.trainOne: no TopModel')
 		return
 	labels = [x for x in mod.topModel().significantLabels() \
 						if x != 'unknown']
-	print ' * labels : ', ' '.join(labels)
+	print(' * labels : ', ' '.join(labels))
 	err = 0
 	mgraph = self.getGraphModel()
 	modelfilename = mgraph['aims_reader_filename']
@@ -78,7 +79,7 @@ def trainer_trainOne( self, it, obj):
           fnamebase += '.data'
 	if prefix == '' : prefix = '.'
         prefix = os.path.join( prefix, fnamebase )
-        # print 'prefix:', prefix
+        # print('prefix:', prefix)
 	m = self.mode()
 	opt = {}
 	opt['dimreduction'] = par.dimreduction_mode
@@ -111,7 +112,7 @@ def trainer_trainOne( self, it, obj):
 	if opt['dimreduction'] == 'None': opt['dimreduction'] = False
 	if opt['optimized_dim'] == 'None': opt['optimized_dim'] = False
 
-	print "options = ", opt
+	print("options = ", opt)
 
 	opt['labels'] = labels
 	if m == sigraph.Trainer.GenerateOnly:
@@ -127,7 +128,7 @@ def trainer_trainOne( self, it, obj):
 		self.trainDomain(it)
 	elif m == sigraph.Trainer.TrainStats:
 		self.trainStats(it)
-	else:	print 'unknown Trainer mode', m
+	else:	print('unknown Trainer mode', m)
 
 def write_database_from_c_plus_plus(ad, prefix):
 	import datamind.io.old_csvIO as io
@@ -141,8 +142,8 @@ def write_database_from_c_plus_plus(ad, prefix):
 	w = io.WriterCsv()
 	csv_filename = ad.getDataBaseName(prefix) + '.data'
 	minf_filename = ad.getDataBaseName(prefix) + '.minf'
-        # print 'csv_filename:', csv_filename
-        # print 'minf_filename:', minf_filename
+        # print('csv_filename:', csv_filename)
+        # print('minf_filename:', minf_filename)
 	sigraph_dic = {
 		'split' : learnable.getSplit(),
 		'cycles' : learnable.getCycles(),
@@ -753,7 +754,7 @@ class SiOneGaussian(datamind.ml.model.Model):
 		gaussnet.setWeight(0, 1)
 		subad.setDefaultValue(0)
 		logli = self._onegaussian_model.loglikelihood(db)
-		print "mean log likelihood : ", logli / data.shape[0]
+		print("mean log likelihood : ", logli / data.shape[0])
 
 
 
@@ -1127,8 +1128,8 @@ class SiUnivariateDimensionReduction(SiDimensionReduction):
 		scores = self._dr.getScores()
 		ranks = self._dr.getRanks()
 		self._selected_dim = self._ranker.selected_dim(scores)
-		print "scores = ", scores
-		print "ranks = ", self._dr.getRanks()
+		print("scores = ", scores)
+		print("ranks = ", self._dr.getRanks())
 
 	def register(self, n):
 		if not self._dr:
@@ -1142,7 +1143,7 @@ class SiUnivariateDimensionReduction(SiDimensionReduction):
 	def get_reduced_train(self, train, n=-1):
 		if n == 'auto' :
 			n = self._selected_dim
-			print "selected dim (auto) = ", n
+			print("selected dim (auto) = ", n)
 		reduced_train = self._dr.reduce(self._scaled_train, n)
 		groups = train.getGroups()
 		self.postNormalization(reduced_train, groups)
@@ -1433,7 +1434,7 @@ class MattBlendRanker(Ranker):
 					s2 += W[Y[i]] * e
 			s2 /= len(X) * W.sum()
 			s += s2 / (len(X) * W.sum())
-		print s
+		print(s)
 		return s
 
 
@@ -1767,7 +1768,7 @@ def precomputing(model, train, test, opt):
 def read_database(ad, prefix):
 	from  datamind.ml import reader
 	filename = ad.getDataBaseName(prefix) + '.minf'
-	print " * read '%s'" % filename
+	print(" * read '%s'" % filename)
 	return reader.Reader('Sigraph').read(filename)
 
 
@@ -1822,8 +1823,8 @@ def adaptiveLeaf_train(self, prefix, opt):
 			trainsi, testsi = precomputing(self, train, test, opt)
 			err = self.learn_svm(prefix, trainsi, testsi, opt)
 	else:
-		print 'type = ', type(self.workEl())
-		print " * unknown subadaptive -> skip"
+		print('type = ', type(self.workEl()))
+		print(" * unknown subadaptive -> skip")
 		return 0.
 	msg.write_list([' * ', ('err', 'green'), ' = ', err, '\n'])
 	return err
