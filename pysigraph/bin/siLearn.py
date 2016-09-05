@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, signal
 from optparse import OptionParser
 import sigraph
@@ -24,15 +25,15 @@ def select_cover(selectivetrainer, fundict, user_data):
 def saveModel(labels_filter, filter_mode):
 	global rg, par, tr, insave
 	if insave:
-		print '--- Recursive save ---\n(Not done again'
+		print('--- Recursive save ---\n(Not done again')
 		return
 	insave = 1
 	if par.nosave == 0:
-		print 'Saving model...'
+		print('Saving model...')
 		w = sigraph.FrgWriter(par.model)
 		if labels_filter is None:
 			if isinstance(tr, sigraph.SelectiveTrainer):
-				print '(writing parts only)'
+				print('(writing parts only)')
 				tr.save(w)
 			else:	w.write(rg)
 		else:
@@ -78,7 +79,7 @@ class Param:
 par = Param()
 
 def sig_break(sig, stack):
-	print 'SIGINT : save ? '
+	print('SIGINT : save ? ')
 	sys.stdout.flush()
 	c = sys.stdin.readline()
 	if c == 'o' or c == 'O' or c == 'y' or c == 'Y':
@@ -87,35 +88,35 @@ def sig_break(sig, stack):
 
 def sig_saveAndCont(sig, stack):
 	signal(signal.SIGUSR1, sig_saveAndCont)
-	print '--- Saving ... ---'
+	print('--- Saving ... ---')
 	saveModel(options.labels_filter, options.filter_mode)
-	print '--- Continuing... ---'
+	print('--- Continuing... ---')
 
 def sig_term( sig, stack ):
-	print '*** Reveived signal SIGTERM ***'
-	print 'Saving before stoping...'
+	print('*** Reveived signal SIGTERM ***')
+	print('Saving before stoping...')
 	saveModel(options.labels_filter, options.filter_mode)
 	exit(2)
 
 def sig_crash( sig, stack ):
-  print '*** CRASH ***'
+  print('*** CRASH ***')
   sys.stdout.write( 'Received signal ' )
   if sig == signal.SIGSEGV:
-    print 'SIGSEGV, segmentation fault'
+    print('SIGSEGV, segmentation fault')
   elif sig == signal.SIGBUS:
-    print 'SIGBUS, bus error'
+    print('SIGBUS, bus error')
   elif sig == signal.SIGILL:
-    print 'SIGILL, illegal instruction'
+    print('SIGILL, illegal instruction')
   elif sig == signal.SIGFPE:
-    print 'SIGFPE, floating point exception'
-  else:	print sig
-  print 'python stack:'
-  print stack
+    print('SIGFPE, floating point exception')
+  else:	print(sig)
+  print('python stack:')
+  print(stack)
   saveModel(options.labels_filter, options.filter_mode)
   exit( 1 )
 
 def initCliques(rg, par, learn, test):
-  print 'Init cliques...'
+  print('Init cliques...')
   mf = rg.modelFinder()
   if par.labelsMap != '':
     tr = sigraph.FoldLabelsTranslator(rg, par.labelsMap)
@@ -268,21 +269,21 @@ def main():
 
  
   
-  print 'learn graphs:', par.graphs
-  print 'test graphs:', par.testGraphs
+  print('learn graphs:', par.graphs)
+  print('test graphs:', par.testGraphs)
   if par.mode != sigraph.Trainer.ReadAndTrain and len( par.graphs ) == 0:
-    print 'No learning graphs - graphFiles parameter must be present in '
-    'this mode'
+    print('No learning graphs - graphFiles parameter must be present in '
+    'this mode')
     exit(1)
   
   # read model
   
   r = aims.Reader()
   
-  print 'model:', par.model
+  print('model:', par.model)
   rg = r.read( par.model )
  
-  print 'learner:', par.trainscheme
+  print('learner:', par.trainscheme)
   if not (mode in ['readAndTrain', 'trainDomain']):
     flr = sigraph.FoldLearnReader( par.trainscheme )
     learner = flr.read()
@@ -291,7 +292,7 @@ def main():
   
   # read learning base
   learn = []
-  print 'Reading learn base :'
+  print('Reading learn base :')
   for x in par.graphs:
     checkfile(x)
     fg = r.read(x, 0, 0)
@@ -299,14 +300,14 @@ def main():
     vc = rg.checkCompatibility(fg)
     graph_select_names_or_labels(fg)
     if not vc.ok:
-      print 'Warning: model / data graphs version mismatch'
-      print vc.message
+      print('Warning: model / data graphs version mismatch')
+      print(vc.message)
       print
-      print 'I will continue but wrong or inaccurate results can be achieved'
+      print('I will continue but wrong or inaccurate results can be achieved')
   
   # read test base
   test = []
-  print 'Reading test base :'
+  print('Reading test base :')
   for x in par.testGraphs:
     checkfile(x)
     fg = r.read(x)
@@ -314,10 +315,10 @@ def main():
     vc = rg.checkCompatibility(fg)
     graph_select_names_or_labels(fg)
     if not vc.ok:
-      print 'Warning: model / data graphs version mismatch'
-      print vc.message
-      print
-      print 'I will continue but wrong or inaccurate results can be achieved'
+      print('Warning: model / data graphs version mismatch')
+      print(vc.message)
+      print()
+      print('I will continue but wrong or inaccurate results can be achieved')
 
  
   # labels translation
@@ -341,7 +342,7 @@ def main():
   
   # SelectiveTrainer
   if len( par.atts ) != 0 and par.pattern != '':
-    print 'SelectiveTrainer'
+    print('SelectiveTrainer')
     tr = sigraph.SelectiveTrainer( rg, learner, par.pattern )
     tr.setFiltAttributes( par.atts, par.mixed_filter_attributes )
   else:
@@ -358,11 +359,11 @@ def main():
       continue
     labels = [l for l in ad.significantLabels() if l != 'unknown']
     if not filtred(labels, options.labels_filter, options.filter_mode):
-      print 'learning model', citer, '/', niter
+      print('learning model', citer, '/', niter)
       sys.stdout.flush()
       tit.train(aims.Object(par))
       # save the model once it is trained
-      print 'saving model', citer, '/', niter
+      print('saving model', citer, '/', niter)
       w = sigraph.FrgWriter( par.model )
       w.dataDirectory( rg )
       w.parseModel( tit.model().parentAO() )
