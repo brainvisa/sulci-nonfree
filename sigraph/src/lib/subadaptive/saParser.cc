@@ -102,11 +102,12 @@ void SAParser::buildMatriceList( AttributedObject* parent, Tree* ao,
 }
 
 void SAParser::buildSubMlp( AttributedObject* parent, Tree* ao, 
-			    const string & filename )
+                            const string & filename )
 {
-  if( ao->size() != 0 )
+  if( ao->childrenSize() != 0 )
     {
-      cerr << "warning : SubAdMlp with children (" << ao->size() << ")\n";
+      cerr << "warning : SubAdMlp with children (" << ao->childrenSize()
+           << ")\n";
     }
 
   if( parent )
@@ -327,9 +328,10 @@ static SubAdGauss *factorySubAddGauss(std::string name, std::string type)
 void SAParser::buildSubGauss( AttributedObject* parent, Tree* ao, 
 			      const string & )
 {
-  if( ao->size() != 0 )
+  if( ao->childrenSize() != 0 )
     {
-      cerr << "warning : SubAdGauss with children (" << ao->size() << ")\n";
+      cerr << "warning : SubAdGauss with children (" << ao->childrenSize()
+           << ")\n";
     }
 
   if( parent )
@@ -475,10 +477,10 @@ void SAParser::buildSubGauss( AttributedObject* parent, Tree* ao,
 void SAParser::buildSubMixGauss( AttributedObject* parent, Tree* ao, 
 			      const string & )
 {
-  if( ao->size() > 1 )
+  if( ao->childrenSize() > 1 )
     {
       cerr << "warning : SubAdMixGauss with more than one children ("
-           << ao->size() << ")\n";
+           << ao->childrenSize() << ")\n";
     }
 
   if( parent )

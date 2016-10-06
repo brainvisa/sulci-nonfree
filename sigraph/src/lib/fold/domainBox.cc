@@ -223,7 +223,7 @@ void DomainBox::buildTree( Tree & tr ) const
 
 void DomainBox::buildDomBox( Tree*, Tree* ao )
 {
-  if( ao->size() != 0 )
+  if( ao->childrenSize() != 0 )
     {
       cerr << "warning : Domain Box with children\n";
     }
