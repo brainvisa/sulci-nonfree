@@ -285,7 +285,7 @@ void MGraph::setWeights( double fac )
       (*iv)->getProperty( "model", mod );
       tm = mod->topModel();
       if ( tm )
-	tm->setWeight( ((double) (*iv)->size()) * fac / 2 );
+        tm->setWeight( ((double) (*iv)->edgesSize()) * fac / 2 );
     }
 }
 

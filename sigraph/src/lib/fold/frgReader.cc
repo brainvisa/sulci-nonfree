@@ -180,7 +180,7 @@ void FrgReader::readModel( Graph & sg, AttributedObject* go,
 
   //	Lire le modele
 
-  _mreader->open( file );
+  _mreader->attach( file );
   Model		*mod = _mreader->readModel();
   _mreader->close();
 
@@ -297,7 +297,7 @@ void FrgReader::readFakeRel( AttributedObject*, Tree* ao,
 			     const string & )
 {
   //cout << "read fake rel\n";
-  if( ao->size() != 0 )
+  if( ao->childrenSize() != 0 )
     cerr << "warning : FoldFakeRel with children\n";
 
   FoldFakeRel	*ffr = new FoldFakeRel;

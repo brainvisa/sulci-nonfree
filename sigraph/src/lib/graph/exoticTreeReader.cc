@@ -91,7 +91,7 @@ SyntaxSet ExoticTreeReader::initSyntax( const string & filename )
 void ExoticTreeReader::readTree( Tree* tr )
 {
   //cout << "ExoticTreeReader::readTree\n";
-  TreeReader::readTree( tr );
+  TreeReader::read( *tr );
 
   //cout << "Verification des attributs de l'arbre...\n";
 

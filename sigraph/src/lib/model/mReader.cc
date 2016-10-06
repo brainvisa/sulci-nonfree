@@ -245,9 +245,9 @@ void MReader::parseModel( Model* mod, carto::AttributedObject* parent,
 
 
 void MReader::buildTop( carto::AttributedObject* parent, Tree* ao, 
-			const string & )
+                        const string & )
 {
-  if( ao->size() == 0 )
+  if( ao->childrenSize() == 0 )
     {
       cerr << "warning : empty TopAdaptive\n";
     }
@@ -293,9 +293,9 @@ void MReader::buildTop( carto::AttributedObject* parent, Tree* ao,
 
 
 void MReader::buildTree( carto::AttributedObject* parent, Tree* ao, 
-			 const string & )
+                         const string & )
 {
-  if( ao->size() == 0 )
+  if( ao->childrenSize() == 0 )
     {
       cerr << "warning : empty AdTree\n";
     }
@@ -308,12 +308,12 @@ void MReader::buildTree( carto::AttributedObject* parent, Tree* ao,
 
 
 void MReader::buildLeaf( carto::AttributedObject* parent, Tree* ao, 
-			 const string & )
+                         const string & )
 {
-  if( ao->size() < 2 || ao->size() > 5 )
+  if( ao->childrenSize() < 2 || ao->childrenSize() > 5 )
     {
-      cerr << "warning : AdLeaf nb of children is " << ao->size() 
-	   << ", should be between 2 and 5\n";
+      cerr << "warning : AdLeaf nb of children is " << ao->childrenSize()
+           << ", should be between 2 and 5\n";
     }
  AdaptiveLeaf	*adl = new AdaptiveLeaf;
  ao->setProperty( "pointer", (Model *) adl );
@@ -339,9 +339,9 @@ void MReader::buildLeaf( carto::AttributedObject* parent, Tree* ao,
 
 
 void MReader::buildNull( carto::AttributedObject* parent, Tree* ao, 
-			 const string & )
+                         const string & )
 {
-  if( ao->size() != 0 )
+  if( ao->childrenSize() != 0 )
     cerr << "warning : NullModel with children\n";
   NullModel	*nm = new NullModel;
 
@@ -351,9 +351,9 @@ void MReader::buildNull( carto::AttributedObject* parent, Tree* ao,
 
 
 void MReader::buildConst( carto::AttributedObject* parent, Tree* ao, 
-			  const string & )
+                          const string & )
 {
-  if( ao->size() != 0 )
+  if( ao->childrenSize() != 0 )
     cerr << "warning : ConstModel with chiuldren\n";
 
   ConstModel	*nm = new ConstModel;

@@ -100,10 +100,10 @@ void DimReductorParser::parseDimReductor(AttributedObject* parent, Tree *ao, Dim
 	Model		*mod = NULL;
 	AdaptiveLeaf	*al = NULL;
 
-	if(ao->size())
+	if(ao->childrenSize())
 	{
 		std::cerr << "warning : DimReductor with children ("
-			  << ao->size() << ")" << std::endl;;
+			  << ao->childrenSize() << ")" << std::endl;;
 		return;
 	}
 	if (!parent)

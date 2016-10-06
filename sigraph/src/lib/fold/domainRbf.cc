@@ -145,7 +145,7 @@ GaussNet & DomainRBF::gaussNet()
 
 void DomainRBF::buildDomRBF( Tree*, Tree* ao )
 {
-  if( ao->size() != 0 )
+  if( ao->childrenSize() != 0 )
     {
       cerr << "warning : Domain Box with children\n";
     }
