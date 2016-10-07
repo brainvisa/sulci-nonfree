@@ -141,7 +141,9 @@ void replaceNets( const string & modelpath, const string & netname )
 
   cout << "Remplacement des réseaux...\n";
   for( ifl=files.begin(); ifl!=files.end(); ++ifl )
-    system( ( string( "cp -f " ) + netname + " " + *ifl ).c_str() );
+    if( system( ( string( "cp -f " ) + netname + " " + *ifl ).c_str() ) != 0 )
+      cerr << "Warning: command 'cp -f " << netname << " " + *ifl 
+           << "' failed.\n";
   cout << "OK." << endl;
 }
 
@@ -226,7 +228,10 @@ int main( int argc, const char** argv )
         {
           cout << "Réseau " << *net << "...\n";
           // remplacer le réseau
-          system( ( string( "cp -f " ) + *net + " " + par.netTarget ).c_str() );
+          if( system( ( string( "cp -f " ) + *net + " " 
+                      + par.netTarget ).c_str() ) != 0 )
+            cerr << "Warning: command 'cp -f " << *net << " " << par.netTarget 
+                 << "' failed.\n";
           // nom du réseau sans / et sans .net
           string::size_type pos = (*net).rfind( '/' );
           if( pos == string::npos )
@@ -302,7 +307,8 @@ int main( int argc, const char** argv )
                   cout << "Apprentissage..." << endl;
                   cmd = string( "siLearn " ) + tmpLrnCfg;
                   cout << cmd << endl;
-                  system( cmd.c_str() );
+                  if( system( cmd.c_str() ) != 0 )
+                    cerr << "Warning: command '" << cmd << "' failed.\n";
                   cout << "Apprentissage fini" << endl;
 
                   // nom du learner sans / et sans .
@@ -320,19 +326,22 @@ int main( int argc, const char** argv )
                     + pnetname + "-" + pcfgname + "-" + plrnname + ".eps " 
                     + datafile + ".dat bim " + par.plotFields + " " 
                     + par.outPlotField;
-                  system( cmd.c_str() );
+                  if( system( cmd.c_str() ) != 0 )
+                    cerr << "Warning: command '" << cmd << "' failed.\n";
                   // sorties, base de test
                   cmd = par.plotCmd + " " + par.outputDir + "/gen-sorties-" 
                     + pnetname + "-" + pcfgname + "-" + plrnname + ".eps " 
                     + datafile + "-tst.dat bim " + par.plotFields + " " 
                     + par.outPlotField;
-                  system( cmd.c_str() );
+                  if( system( cmd.c_str() ) != 0 )
+                    cerr << "Warning: command '" << cmd << "' failed.\n";
                   // erreur, base de test
                   cmd = par.plotCmd + " " + par.outputDir + "/gen-erreur-" 
                     + pnetname + "-" + pcfgname + "-" + plrnname + ".eps " 
                     + datafile + "-tst.dat b " + par.plotFields + " " 
                     + par.errPlotField;
-                  system( cmd.c_str() );
+                  if( system( cmd.c_str() ) != 0)
+                    cerr << "Warning: command '" << cmd << "' failed.\n";
                 }
             }
         }
