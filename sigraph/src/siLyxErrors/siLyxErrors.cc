@@ -221,7 +221,8 @@ gnuplotErrGraph( const vector<float> & adds, const vector<float> & rejs,
 
       command += comfile;
       command += "\"";
-      system( command.c_str() );
+      if( system( command.c_str() ) != 0 )
+        cerr << "Warning: command '" << command << "' failed.\n";
 
       //	on efface les commandes
       remove( comfile.c_str() );
@@ -294,7 +295,8 @@ void gnuplotSizeGraph( const vector<float> & sizes,
 
       command += comfile;
       command += "\"";
-      system( command.c_str() );
+      if( system( command.c_str() ) != 0 )
+        cerr << "Warning: command '" << command << "' failed.\n";
 
       //	on efface les commandes
       remove( comfile.c_str() );
@@ -468,7 +470,7 @@ int main( int argc, char** argv )
       mt[ name ] = t;
       }*/
 
-  nl = graphs->size();
+  nl = graphs->childrenSize();
   grlist[0] = nbase;
   grlist[1] = ntest;
   grlist[2] = ngen;
