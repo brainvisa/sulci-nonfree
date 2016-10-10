@@ -49,7 +49,7 @@ int main( int argc, const char** argv )
       //	Read Model
       Model		*ad = 0;
       MReader	& ar = FrgReader::defaultMReader();
-      ar.open( adapfile );
+      ar.attach( adapfile );
       FDParser	fp;
       ar.addFactories( fp.factories() );
       ad = ar.readModel();
