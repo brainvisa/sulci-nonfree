@@ -24,8 +24,8 @@ int main( int argc, char** argv )
     {
       fr >> fg;
 
-      cout << "OK.\nnb nodes : " << fg.order() << "\nnb edges : " << fg.size() 
-	   << endl;
+      cout << "OK.\nnb nodes : " << fg.order() << "\nnb edges : " 
+           << fg.edgesSize() << endl;
     }
     catch( parse_error & e )
       {
