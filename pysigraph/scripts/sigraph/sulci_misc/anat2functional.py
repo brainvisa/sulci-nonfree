@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import sys, os, numpy
 from optparse import OptionParser
 from soma import aims, aimsalgo
@@ -138,7 +139,7 @@ def main():
 		(options.output_space == 'MNI' and None in [options.input]) or\
 		(options.output_space == 'Tal_global' and \
 			None in [options.trm]):
-		print "missing option(s)"
+		print("missing option(s)")
 		parser.print_help()
 		sys.exit(1)
 

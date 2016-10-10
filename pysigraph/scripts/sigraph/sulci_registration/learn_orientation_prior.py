@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys, os, pprint, re
 import numpy
 from optparse import OptionParser
@@ -28,7 +29,7 @@ def get_orientations_from_skeletons(sulci, graphs, skelnames,
 		if os.path.exists(gXname) and os.path.exists(gYname) and \
 			os.path.exists(gZname):
 			reader = aims.Reader()
-			print "find grad X,Y,Z maps for subject '%s'" % subject
+			print("find grad X,Y,Z maps for subject '%s'" % subject)
 			gradsX = reader.read(gXname)
 			gradsX = aims.AimsData_FLOAT(gradsX)
 			gradsY = reader.read(gYname)
@@ -36,8 +37,8 @@ def get_orientations_from_skeletons(sulci, graphs, skelnames,
 			gradsZ = reader.read(gZname)
 			gradsZ = aims.AimsData_FLOAT(gradsZ)
 		else:
-			print "compute grad X,Y,Z maps for subject '%s'" % \
-								subject
+			print("compute grad X,Y,Z maps for subject '%s'" % \
+								subject)
 			fat = aims.FoldGraphAttributes(skel, graph)
 			fat.prepareBrainDepthMap()
 			gradsX = fat.getBrainDepthGradX()
@@ -116,7 +117,7 @@ class Compute(object):
 		prefix = self._distribdir
 		try:	os.mkdir(prefix)
 		except OSError, e:
-			print "warning: directory '%s' allready exists" % prefix
+			print("warning: directory '%s' allready exists" % prefix)
 
 	def compute_orientations(self):
 		# first mean orientation estimation to reorient direction of
@@ -330,24 +331,24 @@ def main():
 
 	inputs = args[1:]
 	if len(inputs) == 0:
-		print "error: missing input graph(s)/skeleton(s)"
+		print("error: missing input graph(s)/skeleton(s)")
 		parser.print_help()
 		sys.exit(1)
 	if not (options.splitmode in ['labels', 'nodes', 'voxels']):
-		print "error: unknown split mode '%s'" % options.splitmode
+		print("error: unknown split mode '%s'" % options.splitmode)
 		parser.print_help()
 		sys.exit(1)
 	if options.data_type not in ['orientation', 'refhull_normal',
 		'refnormal', 'coordinate_system']:
-		print "error: unknown data mode '%s'" % options.data_type
+		print("error: unknown data mode '%s'" % options.data_type)
 		parser.print_help()
 		sys.exit(1)
 	if options.splitmode in ['labels', 'nodes']:
 		graphnames, skelnames = inputs, None
 	elif options.splitmode == 'voxels':
 		if options.data_type == 'coordinate_system':
-			print "error: unavailable splitmode 'voxels' for " + \
-				"datatype 'coordinate_system'"
+			print("error: unavailable splitmode 'voxels' for " + \
+				"datatype 'coordinate_system'")
 			parser.print_help()
 			sys.exit(1)
 		s = len(inputs)
@@ -361,9 +362,9 @@ def main():
 		if options.model_type is None:
 			options.model_type = 'matrix_bingham'
 	if options.model_type not in authorized_distr:
-		print "error: '%s' unknown model type or unauthorized " + \
+		print("error: '%s' unknown model type or unauthorized " + \
 			"type for this datatype : '%s'" % (options.model_type,
-			options.data_type)
+			options.data_type))
 		parser.print_help()
 		sys.exit(1)
 
@@ -385,18 +386,18 @@ def main():
 		compute(graphs, options.distribdir,
 			sulci, orientations, options, selected_sulci)
 	elif options.mode == 'loo' :
-		print "-- all --"
+		print("-- all --")
 		distribdir = os.path.join('all', options.distribdir)
 		compute(graphs, distribdir,
 				sulci, orientations, options, selected_sulci)
 		for i in range(len(graphs)):
 			subgraphs = graphs[:i] + graphs[i+1:]
 			dir = 'cv_%d' % i
-			print '-- %s --' % dir
+			print('-- %s --' % dir)
 			distribdir = os.path.join(dir, options.distribdir)
 			compute(subgraphs, distribdir,
 				sulci, orientations, options, selected_sulci)
 	else:
-		print "error : '%s' unknown mode" % options.mode
+		print("error : '%s' unknown mode" % options.mode)
 
 if __name__ == '__main__' : main()

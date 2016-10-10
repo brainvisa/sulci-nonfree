@@ -32,6 +32,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 import sigraph
 from datamind.tools import *
 
@@ -133,7 +134,7 @@ def filtred(labels, filter, mode):
 
 def save_adaptive_callback(ad, user_data):
 	ao = ad.topModel().parentAO()
-        print ao
+        print(ao)
 	mw = user_data['frgwriter']
         mw.dataDirectory( user_data[ 'graph' ] )
         mw.parseModel(ao, "model_file", "model")

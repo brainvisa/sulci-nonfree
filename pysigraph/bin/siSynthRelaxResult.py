@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import sys, os
 import numpy, exceptions
 from optparse import OptionParser
@@ -54,7 +55,7 @@ def old_read_csv_result(filename):
 			data[d[0]].append(res)
 		else:	data[d[0]] = [res]
 	fd.close()
-	print repr(data)
+	print(repr(data))
 	return data
 
 
@@ -454,7 +455,7 @@ def process(f, options):
 		if options.show_best: old_compute_best_info(f)
 		if options.show_correlation: old_compute_all_info(f, 'all')
 	else:
-		print '------ %s ------' % f
+		print('------ %s ------' % f)
 		try: db = read_csv_result(f)
 		except :
                 	msg.write("\t(skip)\n", 'thin_gray')
@@ -473,7 +474,7 @@ def process(f, options):
 			celltypes=numpy.hstack((['string']*2, r[0]._celltypes)))
 		res[:, 0] = datamind.core.DataFrame.code(f)
 		res[:, 1] = datamind.core.DataFrame.code(options.database_name)
-		print res
+		print(res)
 		return res
 
 
@@ -528,8 +529,8 @@ def main():
 	if options.database_name == '2000': gen = gen2000
 	elif options.database_name == '2005': gen = gen2005
 	else:
-		print "error : %s is not a valid database" % \
-					options.database_name
+		print("error : %s is not a valid database" % \
+					options.database_name)
 		sys.exit(1)
 
 	all_res = {}

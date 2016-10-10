@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, numpy, scipy.stats
 from optparse import OptionParser
 import datamind.io as datamind_io
@@ -35,14 +36,14 @@ def compute_local(X1, X2, test):
 			val2.append(v2)
 		val1 = numpy.array(val1)
 		val2 = numpy.array(val2)
-		print "*", sulcus
+		print("*", sulcus)
 		pvals = []
 		for n in range(min(val1.shape[1], val2.shape[1])):
 			t, pval = test(val1[:, n],val2[:, n])
 			pval *= sulci_n
 			pvals.append(pval)
-			print "-%s) t (bonferoni corrected pval) = %f, (%e)" % \
-				(X1.colnames()[n + 2], t, pval)
+			print("-%s) t (bonferoni corrected pval) = %f, (%e)" % \
+				(X1.colnames()[n + 2], t, pval))
 		res[sulcus] = pvals
 	return res
 
@@ -63,7 +64,7 @@ def compute_global(X1, X2, test):
 	for n in range(val1.shape[1]):
 		t, pval = test(val1[:, n], val2[:, n])
 		pvals.append(pval)
-		print "-%s) t (pval) = %f (%e)" %(X1.colnames()[n + 1], t, pval)
+		print("-%s) t (pval) = %f (%e)" %(X1.colnames()[n + 1], t, pval))
 	return {'global' : pvals}
 
 
@@ -103,7 +104,7 @@ def main():
 	dims1 = X1.colnames()
 	dims2 = X1.colnames()
 	if numpy.any(dims1 != dims2):
-		print "error: headers of the 2 input files does not matched."
+		print("error: headers of the 2 input files does not matched.")
 		sys.exit(1)
 
 	# compute	
@@ -121,7 +122,7 @@ def main():
 			fd.write(line + '\n')
 	elif dims1[0] == 'Subject':
 		res = compute_global(X1, X2, test)
-	else:	print "error : unknown file format"
+	else:	print("error : unknown file format")
 
 
 if __name__ == '__main__' : main()

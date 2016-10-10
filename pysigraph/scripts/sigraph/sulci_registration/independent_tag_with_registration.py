@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 import sys
 import numpy
@@ -119,13 +120,13 @@ class Tagger(object):
                 if self._states != prior_labels:
                     if len(self._states) != \
                             len(prior_labels):
-                        print "error : labels size " + \
+                        print("error : labels size " + \
                             "differs between " + \
-                            "sulcimodel and prior."
+                            "sulcimodel and prior.")
                         sys.exit(1)
-                    print "warning : labels order differs" +\
+                    print("warning : labels order differs" +\
                         " between sulcimodel and " + \
-                        "prior : order fixed."
+                        "prior : order fixed.")
                     indices = [numpy.argwhere(p == x)[0, 0]
                                for x in s]
                     priors = numpy.asarray(priors)[0][indices]
@@ -397,12 +398,12 @@ def print_available_labels(filename, h):
 def main():
     parser, (options, args) = parseOpts(sys.argv)
     if None in [options.input_graphname, options.distribname]:
-        print "missing option(s)"
+        print("missing option(s)")
         parser.print_help()
         sys.exit(1)
 
     if options.mode == 'local' and options.distrib_gaussians_name is None:
-        print "error : missing gaussian distrib"
+        print("error : missing gaussian distrib")
         sys.exit(1)
 
     if options.node_index:
@@ -410,7 +411,7 @@ def main():
     else:
         node_index = None
 
-    print "read..."
+    print("read...")
     if options.input_labelsfile:
         input_available_labels = io.read_available_labels(
             options.input_labelsfile)
@@ -462,12 +463,12 @@ def main():
         elif isinstance(distrib, distribution_aims.Spam):
             s.add('spam')
     if len(s) > 1:
-        print "error: mix of different models is not handle"
-        print "%s found" % str(list(s))
+        print("error: mix of different models is not handle")
+        print("%s found" % str(list(s)))
         sys.exit(1)
     model_type = list(s)[0]
     if not (model_type in ['gaussian', 'spam']):
-        print "error : unhandle model type '%s'" % model_type
+        print("error : unhandle model type '%s'" % model_type)
         sys.exit(1)
 
     if options.input_motion:
@@ -482,7 +483,7 @@ def main():
         d = GaussianTagger(*tagger_opt)
     elif model_type == 'spam':
         d = SpamTagger(*tagger_opt)
-    print "tag..."
+    print("tag...")
     mode = options.mode
 
     # tag/registration + write outputs
@@ -503,11 +504,11 @@ def main():
                 trans.add_transformation(sulcus, t)
             dir = options.motion
             filename = options.motion + '.dat'
-            print dir, filename
+            print(dir, filename)
             try:
                 trans.write(dir, filename)
-            except OSError, e:
-                print e
+            except OSError as e:
+                print(e)
                 sys.exit(1)
 
     print_available_labels(options.output_labelsfile, output_available_labels)

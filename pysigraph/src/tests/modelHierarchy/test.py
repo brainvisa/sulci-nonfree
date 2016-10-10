@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 from soma import aims
 from sigraph import *
 
@@ -34,17 +35,17 @@ def example():
 		def get_string(el, name):
 			'''Get string from element.'''
 			return el[name].get().getString()
-		print "----"
-		print "  model file :  '%s'" % get_string(el, 'model_file')
+		print("----")
+		print("  model file :  '%s'" % get_string(el, 'model_file'))
 		if is_vertex:
-			print "  domain file : '%s'" % \
-				get_string(el, 'domain_file')
-			print "  label :       '%s'" % get_string(el, 'label')
+			print("  domain file : '%s'" % \
+				get_string(el, 'domain_file'))
+			print("  label :       '%s'" % get_string(el, 'label'))
 		else:
-			print "  label1 :      '%s'" % get_string(el,'label1')
-			print "  label2 :      '%s'" % get_string(el,'label2')
-		print "  occurence :   '%s'" % \
-			get_string(el, 'occurence_count')
+			print("  label1 :      '%s'" % get_string(el,'label1'))
+			print( "  label2 :      '%s'" % get_string(el,'label2'))
+		print("  occurence :   '%s'" % \
+			get_string(el, 'occurence_count'))
 		# get model/adaptive instance
 		mod = Model.fromObject(el['model'].get())
 

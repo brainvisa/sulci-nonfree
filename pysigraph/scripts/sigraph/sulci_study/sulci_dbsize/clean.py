@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import glob, sys, os, numpy, collections, shutil
 from optparse import OptionParser
 from datamind.io import csvIO
@@ -30,7 +31,7 @@ def reformat_and_clean(directories, to_rename={},
 		src = directories[ind]
 		dst = os.path.join(os.path.dirname(src), name)
 		if print_only or verbose:
-			if src != dst: print "move %s -> %s" % (src, dst)
+			if src != dst: print("move %s -> %s" % (src, dst))
 		if not print_only:
 			if src != dst: shutil.move(src, dst)
 	ignore_indices = to_rename.values()
@@ -51,7 +52,7 @@ def reformat_and_clean(directories, to_rename={},
 			except ValueError: pass
 		for filename in files:
 			if print_only or verbose:
-				print "rm '%s'" % filename
+				print("rm '%s'" % filename)
 			if not print_only:
 				if os.path.isfile(filename):
 					os.remove(filename)

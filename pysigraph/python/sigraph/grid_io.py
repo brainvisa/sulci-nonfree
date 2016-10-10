@@ -32,6 +32,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 import sigraph
 import datamind.ml.classifier.optimizers
 import string, os, sys
@@ -76,7 +77,7 @@ class GridPlotter(object):
 				pylab.scatter([numpy.log(params[0])],
 					[numpy.log(params[1])], s=(size * 10))
 		except :
-			print "skip '" + filename + "' (insufficient data)"
+			print("skip '" + filename + "' (insufficient data)")
 			return
 		pylab.xticks(numpy.log(ranges[0]), labels1)
 		pylab.yticks(numpy.log(ranges[1]), labels2)

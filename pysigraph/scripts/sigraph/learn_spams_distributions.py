@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, numpy, pprint, re, glob
 from optparse import OptionParser
 import sigraph
@@ -41,7 +42,7 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
 		need_data = True
 	else:	need_data = False
 
-	print "compute sulci hash..."
+	print("compute sulci hash...")
 	sulci_set = {}
 	motions = []
 	data = []
@@ -62,12 +63,12 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
 				depthmapname = os.path.join('..', depthmapname)
 			if os.path.exists(depthmapname):
 				reader = aims.Reader()
-				print "find depthmap for subject '%s'" % subject
+				print("find depthmap for subject '%s'" % subject)
 				depthmap = reader.read(depthmapname)
 				depthmap = aims.AimsData_FLOAT(depthmap)
 			else:
-				print "compute depthmap for subject '%s'" % \
-								subject
+				print("compute depthmap for subject '%s'" % \
+								subject)
 				direc = os.path.join(os.path.dirname(filename),
 						'..', 'skeleton', '%s*%s*.' \
 							% (side, subject))
@@ -80,9 +81,9 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
 					elif len(res) == 0:
 						continue
 					else:
-						print "error: find more than "+\
+						print("error: find more than "+\
 							"one skeleton file : "+\
-							str(res)
+							str(res))
 						sys.exit(1)
 				skel = reader.read(skelname)
 				fat = aims.FoldGraphAttributes(skel, g)
@@ -196,7 +197,7 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
 	prefix = distribdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % prefix
+		print("warning: directory '%s' allready exists" % prefix)
 	if options.depth_weighted:
 		model_type = 'depth_weighted_spam'
 	else:	model_type = 'spam'
@@ -206,7 +207,7 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
 	for sulcus, infos in sulci_set.items():
 		if selected_sulcus != None and selected_sulcus != sulcus:
 			continue
-		print "*** %s ***" % sulcus
+		print("*** %s ***" % sulcus)
 		sigma = sigmas['sulci'].get(sulcus, sigma_value)
 		if options.depth_weighted:
 			s = distribution_aims.DepthWeightedSpam(sigma)
@@ -303,7 +304,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	inputs = args[1:]
 	if len(inputs) == 0:
-		print "missing graph"
+		print("missing graph")
 		sys.exit(1)
 	ind = [i for i, input in enumerate(inputs) if input == '==']
 	if len(ind) == 0:
@@ -334,8 +335,8 @@ def main():
 		data_type = 'voxels_bottom'
 		bucket_name = 'aims_bottom'
 	else:
-		print "error : '%s' is not a valid data type" % \
-						options.data_type
+		print("error : '%s' is not a valid data type" % \
+						options.data_type)
 		sys.exit(1)
 	sigma_value = float(options.sigma_value)
 
@@ -344,7 +345,7 @@ def main():
 			sigma_value, options.sigma_file, data_type, bucket_name,
 			ss, options.sulcus, options)
 	elif options.mode == 'loo' :
-		print "-- all --"
+		print("-- all --")
 		distribdir = os.path.join('all', options.distribdir)
 		if options.sigma_file is None:
 			sigma_file = None
@@ -357,7 +358,7 @@ def main():
 			subsegments_weights = segments_weights[:i] + \
 						segments_weights[i+1:]
 			directory = 'cv_%d' % i
-			print '-- %s --' % directory
+			print('-- %s --' % directory)
 			distribdir = os.path.join(directory, options.distribdir)
 			if options.sigma_file is None:
 				sigma_file = None
@@ -368,7 +369,7 @@ def main():
 					sigma_file, data_type, bucket_name,
 					ss, options.sulcus, options)
 	else:
-		print "error : '%s' unknown mode" % options.mode
+		print("error : '%s' unknown mode" % options.mode)
 
 
 

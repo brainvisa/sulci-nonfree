@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, pprint, numpy
 from optparse import OptionParser
 import datamind.io.old_csvIO as datamind_io
@@ -59,7 +60,7 @@ def main():
 	sulcidb = io.read_databaselist(options.database)
 
 	if sulcidb['data'] != 'sulci_features':
-		print 'database data type must be : sulci_features'
+		print('database data type must be : sulci_features')
 		sys.exit(1)
 
 	dbdir = options.clfdir
@@ -69,7 +70,7 @@ def main():
 	# create output directory
 	try:	os.mkdir(dbdir)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % dbdir
+		print("warning: directory '%s' already exists" % dbdir)
 
 	#clf_type = 'gaussian_crvm'
 	clf_type = 'optimized_gaussian_crvm'
@@ -97,15 +98,15 @@ def main():
 		#folds_n = 10
 		#ind = range(size)
 		#fold_size = size / folds_n
-		#print "labels = ", labels
+		#print("labels = ", labels)
 		#for i in range(folds_n):
 		#	s1 = (size - fold_size) / (folds_n - 1)
 		#	test = ind[i * s1:i * s1 + fold_size + 1]
 		#	train = ind[:i * s1] + ind[i * s1 + fold_size + 1:]
 		#	filter.fit(X[train], Y[train])	
 		#	P, labels = filter.predict_db(X[test])
-		#	print (labels ==Y[test]).sum() * 100. / len(labels), "%"
-		#	print "P = ", (P * labels + (1-P) * (1-labels)).mean()
+		#	print((labels ==Y[test]).sum() * 100. / len(labels), "%")
+		#	print("P = ", (P * labels + (1-P) * (1-labels)).mean())
 		# break #FIXME
 
 		filter.fit(X, Y)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys
 from optparse import OptionParser
 from soma import aims
@@ -33,7 +34,7 @@ def main():
 	tmp_volname = options.tmp_volname
 	output_roigraph = options.output_roigraph
 	if None in [input_volname, input_sulci_map, output_roigraph]:
-		print 'error : missing parameter'
+		print('error : missing parameter')
 		sys.exit(1)
 
 	finder = aims.Finder()
@@ -52,7 +53,7 @@ def main():
 		aims.Writer().write(tmp_vol, tmp_volname)
 		input_volname = tmp_volname
 	elif data_type != 'S16':
-		print "datatype '%s' not supported" % data_type
+		print("datatype '%s' not supported" % data_type)
 		sys.exit(1)
 
 	# read S16 data

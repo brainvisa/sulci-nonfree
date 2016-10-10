@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, numpy, pickle, time, copy
 from optparse import OptionParser, OptionGroup
 import random
@@ -231,8 +232,8 @@ class SegmentObserver(Observer):
 			
 		id1 = tagger.getCurrenSegmentID()
 		if id1 not in self._indices: return
-		print " -- label has changed on segment n.%d --" % id1
-		print " - relations : "
+		print(" -- label has changed on segment n.%d --" % id1)
+		print(" - relations : ")
 		availablelabels = tagger.getAvailableLabels(id1)
 		availablelabels_n = len(availablelabels)
 		if availablelabels_n == 1: return 0, 0
@@ -246,23 +247,23 @@ class SegmentObserver(Observer):
 			P12_id2 = P12[:,l2].T
 			relcum += P12_id2
 			label = tagger.getSegmentLabel(id2)
-			print "    n.%3d : %s %s (%s) " % (id2, s(P12_id2 / w),
-				 s(proba(neighbours_n * P12_id2 / w)), label)
+			print("    n.%3d : %s %s (%s) " % (id2, s(P12_id2 / w),
+				 s(proba(neighbours_n * P12_id2 / w)), label))
 		relcum /= w
-		print "  =        ", s(relcum), s(proba(relcum))
+		print("  =        ", s(relcum), s(proba(relcum)))
 		priors = tagger.eval_priors(id1) / w
-		print " - priors :", s(priors), s(proba(priors))
+		print(" - priors :", s(priors), s(proba(priors)))
 		seg_pot = tagger.segPotential(id1) / w
-		print " - seg :   ", s(seg_pot), s(proba(seg_pot))
+		print(" - seg :   ", s(seg_pot), s(proba(seg_pot)))
 		en = relcum + priors + seg_pot
-		print " - En :    ", s(en), s(proba(en))
-		print " - Labels :", availablelabels
+		print(" - En :    ", s(en), s(proba(en)))
+		print(" - Labels :", availablelabels)
 		
 	def label_choosen(self, tagger):
-		print " -- choosen labels --"
+		print(" -- chosen labels --")
 		for id in self._indices:
 			label = tagger.getSegmentLabel(id)
-			print "n.%d : %s" % (id, label)
+			print("n.%d : %s" % (id, label))
 
 
 ################################################################################
@@ -378,13 +379,13 @@ class Tagger(object):
 			if self._states != prior_labels:
 				if len(self._states) != \
 					len(prior_labels):
-					print "error : labels size " + \
+					print("error : labels size " + \
 						"differs between " + \
-						"sulcimodel and prior."
+						"sulcimodel and prior.")
 					sys.exit(1)
-				print "warning : labels order differs"+\
+				print("warning : labels order differs"+\
 					" between sulcimodel and " + \
-					"prior : order fixed."
+					"prior : order fixed.")
 				indices = [numpy.argwhere(p == x)[0,0] \
 							for x in s]
 				priors = numpy.asarray(priors)[indices]
@@ -411,13 +412,13 @@ class Tagger(object):
 			if self._states != prior_labels:
 				if len(self._states) != \
 					len(prior_labels):
-					print "error : labels size " + \
+					print("error : labels size " + \
 						"differs between " + \
-						"sulcimodel and prior."
+						"sulcimodel and prior.")
 					sys.exit(1)
-				print "warning : labels order differs"+\
+				print("warning : labels order differs"+\
 					" between sulcimodel and " + \
-					"prior : order fixed."
+					"prior : order fixed.")
 				indices = [numpy.argwhere(p == x)[0,0] \
 							for x in s]
 				priors = numpy.asarray(priors)[indices]
@@ -442,7 +443,7 @@ class Tagger(object):
 			reldistr = self._relations_distrib['edges']
 		else:	reldistr = None
 
-		print "compute initialization..."
+		print("compute initialization...")
 		self._availablelabels = {}
 		self._labelsind = {}
 		self._taglabels = {}
@@ -494,7 +495,7 @@ class Tagger(object):
 			seg_edges[node_index] = []
 
 
-		print "compute potentials and neighbourhood..."
+		print("compute potentials and neighbourhood...")
 		if reldescr:
 			graph_edges = reldescr.edges_from_graph(self._graph)
 			if weighting_mode == 'number':
@@ -548,7 +549,7 @@ class Tagger(object):
 			fd.close()
 
 	def precompute_from_pickle(self, filename):
-		print "read from precomputing data from '%s'" % filename
+		print("read from precomputing data from '%s'" % filename)
 		fd = open(filename, 'r')
 		obj = pickle.load(fd)
 		(self._availablelabels, self._labelsind, self._taglabels,
@@ -611,12 +612,12 @@ class Tagger(object):
 		elif mode == 'icm': return self.algo_icm()
 		elif mode == 'mpm': return self.algo_mpm()
 		elif mode == 'sa': return self.algo_simulated_annealing()
-		elif mode == 'energy': print "energy = ", self.energy()
+		elif mode == 'energy': print("energy = ", self.energy())
 		elif mode == 'error':
 			pass #FIXME
 
 	def algo_simulated_annealing(self):
-		print "start simulated annealing..."
+		print("start simulated annealing...")
 		self._temp, rate, stopRate, tmax = self._anneal_opt
 		segments_n = len(self._segments)
 		en = self.energy()
@@ -639,8 +640,8 @@ class Tagger(object):
 			self._state = 'after_pass'
 			self.notifyObservers()
 			chgmt /= segments_n
-			print "t = %d, temp = %3.4f, en = %3.3f, chgmt = %2.2f"\
-				% (t, self._temp, en, chgmt)
+			print("t = %d, temp = %3.4f, en = %3.3f, chgmt = %2.2f"\
+				% (t, self._temp, en, chgmt))
 			self._nrj_fd.write("%d\t%3.4f\t%3.3f\t%2.2f\n" % (t, \
 							self._temp, en, chgmt))
 			t += 1
@@ -652,7 +653,7 @@ class Tagger(object):
 		self.algo_icm()
 
 	def algo_icm(self):
-		print "start icm..."
+		print("start icm...")
 		self._temp, rate, stopRate, tmax = self._anneal_opt
 		en = self.energy()
 		best_en = numpy.inf
@@ -673,8 +674,8 @@ class Tagger(object):
 				self.notifyObservers()
 			self._state = 'after_pass'
 			self.notifyObservers()
-			print "t = %d, en = %3.3f, chgmt = %2.2f" % (t, \
-								en, chgmt)
+			print("t = %d, en = %3.3f, chgmt = %2.2f" % (t, \
+								en, chgmt))
 			t += 1
 			if en < best_en: self.store_state(en)
 			if chgmt == 0: break
@@ -682,7 +683,7 @@ class Tagger(object):
 		self.restore_state()
 
 	def algo_mpm(self):
-		print "start mpm..."
+		print("start mpm...")
 		self._freq = {}
 		for id in self._seg_indices:
 			size = len(self._availablelabels[id1])
@@ -690,13 +691,13 @@ class Tagger(object):
 		self._temp, rate, stopRate, tmax = self._anneal_opt
 		self._current_seg_id = None
 		t = 0
-		print "burning period..."
+		print("burning period...")
 		self._state = 'running'
 		while 1:
 			numpy.random.shuffle(self._seg_indices)
 			if t >= 100:
 				if t == 100:
-					print "start computing frequencies..."
+					print("start computing frequencies...")
 				for id in self._seg_indices:
 					self._current_seg_id = id
 					self.gibbs(id)
@@ -704,7 +705,7 @@ class Tagger(object):
 					self.notifyObservers()
 			self._state = 'after_pass'
 			self.notifyObservers()
-			print "t = %d" % t
+			print("t = %d" % t)
 			t += 1
 			if t > tmax: break
 		for id in self._seg_indices:
@@ -725,7 +726,7 @@ class Tagger(object):
 		en_rel /= 2.
 		if self._sulci_descriptor: en_sulci = self._sulci_en.sum()
 		else:	en_sulci = 0.
-		print en_rel, en_seg, self.eval_prior(), en_sulci
+		print(en_rel, en_seg, self.eval_prior(), en_sulci)
 		return en_rel + en_seg + self.eval_prior() + en_sulci
 
 	def local_energy(self, id1):
@@ -774,7 +775,7 @@ class Tagger(object):
 
 	def init_sulci_potentials(self):
 		if not self._sulci_descriptor: return
-		print "init sulci potentials"
+		print("init sulci potentials")
 		self._sulci_local_en = {}
 		label_segments = {}
 		for label in range(self._states_n): label_segments[label] = {}
@@ -1086,7 +1087,7 @@ def main():
             random.seed(options.random_seed)
 
 
-	print "read..."
+	print("read...")
 	if options.sulci is None:
 		selected_sulci = None
 	else:	selected_sulci = options.sulci.split(',')
@@ -1127,7 +1128,7 @@ def main():
 	if options.lookat_seg_id:
 		indices = [int(id) for id in options.lookat_seg_id.split(',')]
 		tagger.addObserver(SegmentObserver(indices))
-	print "tag..."
+	print("tag...")
 	tagger.tag(options.mode, options.init_mode, options.weighting_mode,
 		options.select_mode, options.precomputing, options.picklename)
 

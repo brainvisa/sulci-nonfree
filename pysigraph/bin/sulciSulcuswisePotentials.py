@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import sigraph
 from soma import aims
 from optparse import OptionParser
@@ -35,17 +36,17 @@ sulci = {}
 ng = len( options.graphs )
 
 for ig, gn in enumerate( options.graphs ):
-  print gn
+  print(gn)
   graph = aims.read( gn )
   mg.modelFinder().initCliques( graph )
   an = sigraph.Anneal( graph, mg )
   energy = an.processAllPotentials()
   del an
-  print 'cliques:', graph.cliques().size(), ', energy:', energy
+  print('cliques:', graph.cliques().size(), ', energy:', energy)
   cliques = graph.cliques()
   for c in cliques:
     if not c.has_key( 'potential' ):
-      print 'no pot for clique', c
+      print('no pot for clique', c)
     pot = c[ 'potential' ]
     if c.has_key( 'label' ):
       label = c[ 'label' ]
@@ -62,12 +63,12 @@ for ig, gn in enumerate( options.graphs ):
         sulci[ label ] = [ 0 ] * ng
       sulci[ label ][ ig ] += pot
 
-print 'labels:', len( sulci )
+print('labels:', len( sulci ))
 
 snames = sulci.keys()
 snames.sort()
 wf = open( options.output, 'w' )
-print >> wf, 'subject,', ', '.join( snames )
+print('subject,', ', '.join( snames ), file=wf)
 for i in range( ng ):
-  print >> wf, options.graphs[i] + ',', ', '.join( [ str( sulci[n][i] ) for n in snames ] )
+  print(options.graphs[i] + ',', ', '.join( [ str( sulci[n][i] ) for n in snames ] ), file=wf)
 

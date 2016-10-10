@@ -32,6 +32,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 import numpy
 from soma import aims
 import sigraph, sigraph.cover
@@ -142,7 +143,7 @@ class ModelDifferentiator(object):
 		k1, a1 = self._dict_to_array(d1)
 		k2, a2 = self._dict_to_array(d2)
 
-		if (k1 != k2).any() : print "arrrrrrrg"
+		if (k1 != k2).any() : print("arrrrrrrg")
 		else:	keys = k1
 		di = a1 - a2
 		if self._abs: di = numpy.absolute(di)
@@ -168,13 +169,13 @@ class ModelDifferentiator(object):
 		bad_value = 1.
 		if name == 'unknown' : return name, bad_value
 		ind = numpy.argwhere(self._diff.keys() == name)
-		if name == 'ventricle': print 'name = ', name, ind
+		if name == 'ventricle': print('name = ', name, ind)
 		if numpy.shape(ind) == (1, 1):
 			ind = ind[0, 0]
 			val = self._diff.differences()[ind,
 					self._cmp_enum[cmp_mode]]
 			if name == 'ventricle':
-				print "val = ", val
+				print("val = ", val)
 			return name, self._diff.differences()[ind, \
 					self._cmp_enum[cmp_mode]]
 		else:	return name, bad_value

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
 from soma import aims
@@ -54,7 +55,7 @@ def main():
 		prefix = distribdir
 		try:	os.mkdir(prefix)
 		except OSError, e:
-			print "warning: directory '%s' allready exists" % prefix
+			print("warning: directory '%s' allready exists" % prefix)
 
 	for sulcus, motions in data.items():
 		n = len(motions)

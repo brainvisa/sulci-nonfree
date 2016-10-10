@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys
 
 if sys.argv[1] in ( '-h', '--help' ):
-  print 'usage:'
-  print sys.argv[0], 'outputfile.txt labelledsulci.arg [labelledsulci2.arg ...]'
-  print 
+  print('usage:')
+  print(sys.argv[0], 'outputfile.txt labelledsulci.arg [labelledsulci2.arg ...]')
+  print()
   sys.exit(0)
 
 from soma import aims
@@ -32,12 +33,12 @@ for s in subjectsfiles:
   sum += sz
   sqsum += sz * sz
   num += 1
-  print >> out, os.path.basename(s) + '\t' + str( sz )
+  print(os.path.basename(s) + '\t' + str( sz ), file=out)
 
 if num != 0:
   mean = sum / num
   if num >= 2:
     std = math.sqrt( sqsum / ( num - 1 ) - mean * mean )
-    print >> out, 'mean_size:\t' + str(mean) + '\tstd:\t' + str(std)
+    print('mean_size:\t' + str(mean) + '\tstd:\t' + str(std), file=out)
 
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sigraph, os, sys
 from soma import aims
 from optparse import OptionParser
@@ -15,20 +16,20 @@ def printDescriptors( dg ):
       descr = cl[ 'pot_vector' ]
       dnames = cl[ 'descriptor_names' ]
     except:
-      print 'warning: clique with no pot_vector or no descriptor_names'
+      print('warning: clique with no pot_vector or no descriptor_names')
       descr = []
       dnames = []
     sumpot += pot
     if cl.has_key( 'label' ):
       l = cl[ 'label' ]
-      print 'sulcus clique:', l, ', pot:', pot
+      print('sulcus clique:', l, ', pot:', pot)
     elif cl.has_key( 'label1' ) and cl.has_key( 'label2' ):
       l1 = cl[ 'label1' ]
       l2 = cl[ 'label2' ]
-      print 'relation clique:', (l1, l2), 'pot:', pot
-    print zip( dnames, descr )
+      print('relation clique:', (l1, l2), 'pot:', pot)
+    print(zip( dnames, descr ))
 
-  print 'energy:', sumpot
+  print('energy:', sumpot)
 
 
 defaultmgraph = os.path.join( aims.carto.Paths.shfjShared(), 'models', '3.0',

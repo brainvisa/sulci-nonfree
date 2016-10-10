@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys
 import numpy
 import sigraph
@@ -306,9 +307,9 @@ class ThresholdWeightsModifier(GraphWeightsModifier):
 			cls = v["cliques"]
 			for c in cls:
 				if c in todel: del cls[c]
-		print "number of truncated models (vertices, edges) : " \
+		print("number of truncated models (vertices, edges) : " \
 			"%s (%s, %s)" % (len(todel), todel_vertices_n, \
-					todel_edges_n)
+					todel_edges_n))
 
 	def setLambda(self, x):
 		self._lambda = x
@@ -395,12 +396,12 @@ def print_potentials(fg):
 			p = c["potential"]
 		except: p = numpy.nan
 		if c.getSyntax() != 'clique':
-			print "fakeRel\t%f" % p
+			print("fakeRel\t%f" % p)
 		else:
 			try:
-				print "%s-%s\t%f" % (c['label1'], \
-						c['label2'], p)
-			except: print "%s\t%f" % (c['label'], p)
+				print("%s-%s\t%f" % (c['label1'], \
+						c['label2'], p))
+			except: print("%s\t%f" % (c['label'], p))
 
 def main():
 	# read options

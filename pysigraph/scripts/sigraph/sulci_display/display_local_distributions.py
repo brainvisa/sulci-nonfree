@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
 from datamind.tools import *
@@ -51,7 +52,7 @@ class SegmentsDisplay(GlobalModelDisplay):
 		GlobalModelDisplay.__init__(self, *args, **kwargs)
 
 	def display(self):
-		print "compute meshes..."
+		print("compute meshes...")
 		bar = ProgressionBarPct(len(self._sulci), '#', color = 'blue')
 		for i, sulcus in enumerate(self._sulci):
 			if self._selected_sulci is not None and \
@@ -69,7 +70,7 @@ class RelationsDisplay(GlobalModelDisplay):
 		GlobalModelDisplay.__init__(self, *args, **kwargs)
 
 	def display(self):
-		print "compute meshes..."
+		print("compute meshes...")
 		relations = self._local_distrib['edges'].keys()
 		bar = ProgressionBarPct(len(relations), '#', color = 'blue')
 		for i, relation in enumerate(relations):
@@ -365,7 +366,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.distrib_gaussians_name,
 		options.distrib_local_name, options.output]:
-		print "error : missing option(s)"
+		print("error : missing option(s)")
 		parser.print_help()
 		sys.exit(1)
 	if options.sulci is None:

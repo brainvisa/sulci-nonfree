@@ -32,6 +32,8 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
+
 
 def resume_errors_info(data):
 	import numpy
@@ -39,7 +41,7 @@ def resume_errors_info(data):
 
 	def print_errors(type, errors) :
 		if len(errors) == 0:
-			print '\tN/D\tN/D\tN/D\tN/D'
+			print('\tN/D\tN/D\tN/D\tN/D')
 			return
 		list = (float(numpy.mean(errors)), float(numpy.std(errors)),
 				float(max(errors)), float(min(errors)))

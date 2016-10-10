@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, numpy
 import matplotlib
 matplotlib.use('Qt4Agg')
@@ -165,7 +166,7 @@ def main():
 	sulci = model['vertices'].keys()
 	pcts = []
 	for sulcus in sulci:
-		print "*** %s ***" % sulcus
+		print("*** %s ***" % sulcus)
 		l, vols, entropies, distribs, vols_th = [], [], [], [], []
 		for name, model in models:
 			try:
@@ -192,7 +193,7 @@ def main():
 			[entropies[0], entropies[1], entropy_diff, kl]
 		pcts.append(vol_pct)
 	pct_mean = numpy.mean(pcts)
-	print "pct mean = ", pct_mean
+	print("pct mean = ", pct_mean)
 
 	fd = open(options.output, 'w')
 	l = ['sulci', "'volume_%s'" % names[0], "'volume_%s'" % names[1],

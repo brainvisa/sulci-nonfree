@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, numpy, pprint, re
 from optparse import OptionParser
 import sigraph
@@ -52,13 +53,13 @@ class Tagger(object):
 				if self._states != prior_labels:
 					if len(self._states) != \
 						len(prior_labels):
-						print "error : labels size " + \
+						print("error : labels size " + \
 							"differs between " + \
-							"sulcimodel and prior."
+							"sulcimodel and prior.")
 						sys.exit(1)
-					print "warning : labels order differs"+\
+					print("warning : labels order differs"+\
 						" between sulcimodel and " + \
-						"prior : order fixed."
+						"prior : order fixed.")
 					indices = [numpy.argwhere(p == x)[0,0] \
 								for x in s]
 					priors = numpy.asarray(priors)[0][indices]
@@ -156,7 +157,7 @@ def main():
 		node_index = int(options.node_index)
 	else:	node_index = None
 
-	print "read..."
+	print("read...")
 	if options.sulci is None:
 		selected_sulci = None
 	else:	selected_sulci = options.sulci.split(',')
@@ -172,11 +173,11 @@ def main():
 	check, models_types = check_same_distribution(\
 				segments_distrib['vertices'])
 	if not check:
-		print "error : only one model_type is supported. Found : " +\
-			str(list(models_types))
+		print("error : only one model_type is supported. Found : " +\
+			str(list(models_types)))
 		sys.exit(1)
 	models_type = list(models_types)[0]
-	print "models type = ", models_type
+	print("models type = ", models_type)
 	descriptor = descriptorFactory(data_type)
 
 	# descriptor depth map
@@ -188,10 +189,10 @@ def main():
 		subject = re.sub('_.*', '', subject)[1:]
 		depthmapname = os.path.join('..', '%s_depthmap.ima' % subject)
 		if not os.path.exists(depthmapname):
-			print "error : can't find depthmap file '%s'" % \
-								depthmapname
+			print("error : can't find depthmap file '%s'" % \
+								depthmapname)
 			sys.exit(1)
-		print "find depthmap for subject '%s'" % subject
+		print("find depthmap for subject '%s'" % subject)
 		depthmap = reader.read(depthmapname)
 		depthmap = aims.AimsData_FLOAT(depthmap)
 		descriptor.setDepthMap(depthmap)
@@ -199,7 +200,7 @@ def main():
 	# sulci tag
 	tagger = Tagger(sulcimodel, descriptor, graph,
 			options.csvname, selected_sulci, node_index)
-	print "tag..."
+	print("tag...")
 	available_labels = tagger.tag()
 	io.write_pp('labels', options.labelsfile, available_labels)
 

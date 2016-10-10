@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys
 import numpy
 from sulci.models import distribution
@@ -104,12 +105,12 @@ class SphericalKmeans(object):
 		return C
 
 	def algo_euclidian(self, C, eps=0.001, max_iter=10000, verbose=False):
-		if verbose: print "* euclidian optimization"
+		if verbose: print("* euclidian optimization")
 		return self.algo(self.euclidian_cluster,
 			self.euclidian_mean, C, eps, max_iter, verbose)
 
 	def algo_riemannian(self, C, eps=0.001, max_iter=10000, verbose=False):
-		if verbose: print "* riemannian optimization"
+		if verbose: print("* riemannian optimization")
 		return self.algo(self.euclidian_cluster,
 			self.riemannian_mean, C, eps, max_iter, verbose)
 
@@ -128,7 +129,7 @@ class SphericalKmeans(object):
 		while 1:
 			clusters, dist = cluster(C, self._X)
 			en = dist.mean()
-			if verbose: print "n = %3d, en = %f" % (n, en)
+			if verbose: print("n = %3d, en = %f" % (n, en))
 			for i in range(self._k):
 				C[i] = mean(C[i], self._X[clusters == i])
 			n += 1
@@ -477,7 +478,7 @@ class Registration(object):
 		n = 0
 		self._w = numpy.asmatrix(numpy.zeros((3, 1)))
 		old_energy = self.energy()
-		if self._verbose > 0: print 'init en = ', old_energy
+		if self._verbose > 0: print('init en = ', old_energy)
 		R0 = numpy.identity(3)
 		while 1:
 			n += 1
@@ -506,7 +507,7 @@ class Registration(object):
 					if new_energy - old_energy < eps: break
 				else: break
 			if self._verbose > 0:
-				print "%d) en = %f " % (n, new_energy)
+				print("%d) en = %f " % (n, new_energy))
 			self._energy = new_energy
 			user_func(self, user_data)
 			if old_energy - new_energy < eps: break
@@ -555,7 +556,7 @@ class Registration(object):
 						break
 				else: break
 			if self._verbose > 0:
-				print "%d) en = %f " % (n, new_energy)
+				print("%d) en = %f " % (n, new_energy))
 			self._w = vector_from_rotation(self._R)
 			self._energy = new_energy
 			user_func(self, user_data)
@@ -573,7 +574,7 @@ class Registration(object):
 				user_func(self, user_data)
 			self._energy = self.energy()
 			if self._verbose > 0:
-				print "powell, en = %f " % (self._energy)
+				print("powell, en = %f " % (self._energy))
 			self._n += 1
 			return self._energy
 		x0 = numpy.asarray(self._t).ravel()
@@ -601,7 +602,7 @@ class Registration(object):
 				user_func(self, user_data)
 			self._energy = self.energy()
 			if self._verbose > 0:
-				print "powell, en = %f " % (self._energy)
+				print("powell, en = %f " % (self._energy))
 			self._n += 1
 			return self._energy
 		w = vector_from_rotation(self._R)
@@ -645,7 +646,7 @@ class Registration(object):
 				user_func(self, user_data)
 			self._energy = self.energy()
 			if self._verbose > 0:
-				print "powell, en = %f " % (self._energy)
+				print("powell, en = %f " % (self._energy))
 			self._n += 1
 			return self._energy
 		U, D, V = numpy.linalg.svd(self._R) # R : affine matrix here
@@ -917,7 +918,7 @@ class MixtureGlobalRegistration(Registration):
 		n = 0
 		while 1:
 			if n >= maxiter: break
-			if self._verbose > 0: print "**** %d *****" % n
+			if self._verbose > 0: print("**** %d *****" % n)
 			weights, loglikelihoods, likelihoods = \
 						self.posteriors(X2)
 			Algo = self.get_registration_algo()
@@ -932,7 +933,7 @@ class MixtureGlobalRegistration(Registration):
 				user_func, user_data, mode, affine)
 			new_energy = algo.getCurrentEnergy()
 			if self._verbose > 0:
-				print "mixture registration : en = ", new_energy
+				print("mixture registration : en = ", new_energy)
 			n += 1
 			if old_energy - new_energy < eps: break
 			else:	old_energy = new_energy
@@ -1003,7 +1004,7 @@ class MixtureLocalRegistration(Registration):
 		posteriors, loglikelihoods, likelihoods = self._posteriors(X)
 		L = self._available_labels
 		while 1:
-			if self._verbose > 0: print "**** %d *****" % n
+			if self._verbose > 0: print("**** %d *****" % n)
 			loglikelihoods, likelihoods = [], []
 			new_energy = 0.
 			for i, spam in enumerate(self._mixture.get_models()):
@@ -1031,7 +1032,7 @@ class MixtureLocalRegistration(Registration):
 				local_en = algo.getCurrentEnergy()
 				new_energy += local_en
 				if self._verbose > 1:
-					print "local en = ", local_en
+					print("local en = ", local_en)0
 				self._trans[i] = R, t
 				Xi = R * (X - g) + (t + g)
 				logli, li = spam.likelihoods_groups(Xi.T,
@@ -1045,7 +1046,7 @@ class MixtureLocalRegistration(Registration):
 					posteriors.sum(axis=1))
 
 			if self._verbose > 0:
-				print "local registrations : en = ", new_energy
+				print("local registrations : en = ", new_energy)
 			n += 1
 			if n >= maxiter: break
 			if old_energy - new_energy < eps: break

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys, os
 from optparse import OptionParser
 from soma import aims, aimsalgo
@@ -25,7 +26,7 @@ def parseOpts(argv):
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.graphname]:
-		print "error: missing option(s)"
+		print("error: missing option(s)")
 		parser.print_help()
 		sys.exit(1)
 

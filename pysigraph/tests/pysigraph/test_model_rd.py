@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import numpy, os, pylab, sys, svm
 import datamind
 import sigraph.datamind_backend
@@ -58,7 +59,7 @@ def print_dimreduction_info(dr):
 	q = 0
 	for i in inf:
 		q += i
-		print q * 100, "/ 100"
+		print(q * 100, "/ 100")
 
 
 
@@ -70,7 +71,7 @@ def test_dim_reduction(dr, train, test, train_weights, test_weights):
 		test_reduced = dr.reduce(test, ndim)
 		res.append(test_clf(train_reduced, test_reduced,
 				train_weights, test_weights))
-		print res
+		print(res)
 	return res
 
 
@@ -97,13 +98,13 @@ def test_clf(train, test, train_weights, test_weights):
 	# fit data with best learned parameters
 	clf.setParams(res['best_params'])
 	clf.fit(train)
-	print "best params = ", res['best_params']
+	print("best params = ", res['best_params'])
 
 	# predict
 	res = clf.predict(test)
 	res.compute_wmse(test_weights)
 	res.compute_mse()
-	print res
+	print(res)
 	return res
 
 
@@ -120,8 +121,8 @@ def main():
 	sys.exit(1)
 	res = test_dim_reduction(dr, scaled_train, scaled_test,
 				train_weights, test_weights)
-	print "=================="
-	print res
+	print("==================")
+	print(res)
 
 
 def test(train):

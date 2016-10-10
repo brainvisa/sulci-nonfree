@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys,os, math
 
 if sys.argv[1] in ( '-h', '--help' ):
-  print 'usage:'
-  print sys.argv[0], 'statsfile.txt'
-  print 'Checks the value for each sulcus / std deviation, in a leqve-one-out way.'
-  print 'statsfile.txt must be computed using sulciRecordStats.py'
-  print 'The output is the ratio score for each subject/sulcus. No filtering/thresholding is applied.'
-  print 'Output goes to the standard output and can be redirected to a file'
+  print('usage:')
+  print(sys.argv[0], 'statsfile.txt')
+  print('Checks the value for each sulcus / std deviation, in a leqve-one-out way.')
+  print('statsfile.txt must be computed using sulciRecordStats.py')
+  print('The output is the ratio score for each subject/sulcus. No filtering/thresholding is applied.')
+  print('Output goes to the standard output and can be redirected to a file')
   sys.exit(0)
 
 statsfile = sys.argv[1]
@@ -27,4 +28,4 @@ for s,stats in subjectspotentials.iteritems():
       std = math.sqrt( sqsum / ( num - 1 ) - mean * mean )
       if std != 0:
         score = ( pot - mean ) / std
-        print os.path.basename(s) + '\t' + label + '\t' + str( score )
+        print(os.path.basename(s) + '\t' + label + '\t' + str( score ))

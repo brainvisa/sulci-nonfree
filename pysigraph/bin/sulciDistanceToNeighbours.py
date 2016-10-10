@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, re
 from soma import aims, aimsalgo
 import numpy, optparse, tempfile, subprocess
@@ -68,9 +69,9 @@ def distanceToNeighbours( vertex, label ):
 	  mindist = dist
 	ndist += 1
   #if mindist == 0.:
-    #print 'null min, ndist:', ndist
+    #print('null min, ndist:', ndist)
     #if meandist != 0.:
-      #print 'null min, mean:', mean, 'ndist:', ndist
+      #print('null min, mean:', mean, 'ndist:', ndist)
   return mindist, meandist, ndist
 
 
@@ -97,7 +98,7 @@ diststats = {}
 for v in graph.vertices():
   if v.has_key( labelatt ):
     label = v[ labelatt ]
-    print label
+    print(label)
     if labelsfilter.match( label ):
       mindist, meandist, ndist = distanceToNeighbours( v, label )
       stats = diststats.get( label, None )
@@ -132,4 +133,4 @@ for label, stats in diststats.iteritems():
   meandist = stats[ 'meandist' ]
   if ndist != 0:
     meandist /= ndist
-  print >> csv, ulabel, side, stats[ 'mindist' ], meandist, ndist
+  print(ulabel, side, stats[ 'mindist' ], meandist, ndist, file=csv)

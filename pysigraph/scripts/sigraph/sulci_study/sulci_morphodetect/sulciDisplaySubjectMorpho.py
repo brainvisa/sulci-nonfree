@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import anatomist.direct.api as ana
 from soma import aims
 import os, sys,numpy
@@ -62,9 +63,9 @@ def mapProperty( graph, statprop, prop, subject, labelprop, morpho, means, std )
 
 if __name__ == '__main__':
   if sys.argv[1] in ( '-h', '--help' ):
-    print 'usage:'
-    print sys.argv[0], 'morphomean.dat morphostd.dat subject.arg morphodir property subjectname'
-    print ''
+    print('usage:')
+    print(sys.argv[0], 'morphomean.dat morphostd.dat subject.arg morphodir property subjectname')
+    print()
     sys.exit(0)
 
   morpho = loadMorpho( sys.argv[4] )

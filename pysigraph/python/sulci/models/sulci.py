@@ -1,3 +1,6 @@
+from __future__ import print_function
+
+
 class SulciModel(object):
 	def __init__(self, graphmodel, segments_distrib=None,
 		relations_distrib=None, sulci_distrib=None,
@@ -18,7 +21,7 @@ class SulciModel(object):
 			pairs = self._segments_distrib['vertices'].keys()
 			return set([pairs[0] for x in l]+[pairs[1] for x in l])
 		else:
-			print "error : not implemented"
+			print("error : not implemented")
 			import sys
 			sys.exit(1)
 	def graphmodel(self): return self._graphmodel

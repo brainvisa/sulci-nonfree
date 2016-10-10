@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 
+from __future__ import print_function
 import numpy, sys
 
 import sigraph
@@ -48,7 +49,7 @@ def main():
 	X = numpy.vstack(p_list)
 	spam = Spam()
 	spam.read(spamname)
-	print "sulci registration..."
+	print("sulci registration...")
 	spamreg = SpamRegistration(spam, X, None, None, None, None)
 	R, t = spamreg.optimize_powell()
 	#motionname = 'motion.trm'

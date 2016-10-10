@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, exceptions, numpy
 import glob, re
 from scipy.interpolate.fitpack2 import BivariateSpline, dfitpack
@@ -13,7 +14,7 @@ from soma import aims
 try:
 	import datamind.io.old_csvIO as csv_io
 except ImportError:
-	print "import failed: disable datamind"
+	print("import failed: disable datamind")
 if sys.modules.has_key( 'PyQt4' ):
   USE_QT4=True
   import PyQt4.QtCore as qt
@@ -455,7 +456,7 @@ class SulciBivariateSpline(SulciDisplay):
 
 	def _display_one_sulci(self, sulcus, vertices):
 		if sulcus == 'unknown': return
-		print "sulcus = ", sulcus
+		print("sulcus = ", sulcus)
 
 		s = aims.set_VertexPtr()
 		for seg in vertices: s.add(seg)

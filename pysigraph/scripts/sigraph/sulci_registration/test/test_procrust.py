@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, vtk
 import numpy
 import sulci.registration as S
@@ -32,9 +33,9 @@ def test1():
 	t = numpy.array([[40, 20, 10]]).T
 	#t = 0
 	X = R.T * (Y2 - t)
-	print "-- Real transformation --"
-	print "t = ", t
-	print "R = ", R
+	print("-- Real transformation --")
+	print("t = ", t)
+	print("R = ", R)
 	#A = numpy.asmatrix(numpy.identity(3))
 	P = S.rotation_from_antisymetric_matrix(\
 		S.antisymetric_matrix_from_vector([0, 0, 0.5]))
@@ -60,9 +61,9 @@ def test1():
 	p = S.ProcrustMetric(X, Y, A)
 	R, t = p.optimize_riemannian(user_func=update_cloud,
 			user_data=(Y, pcX, tcl, vec, plotter))
-	print "-- Estimated transformation --"
-	print "t = ", t
-	print "R = ", R
+	print("-- Estimated transformation --")
+	print("t = ", t)
+	print("R = ", R)
 	AX2 = A * (R * X + t)
 	AY = A * Y
 
@@ -120,9 +121,9 @@ def test2():
 	R = S.rotation_from_antisymetric_matrix(J)
 	#t = numpy.array([[20, 0, 0]]).T
 	t = numpy.array([[0.], [0.], [0.]])
-	print "-- Real transformation --"
-	print "t = ", t
-	print "R = ", R
+	print("-- Real transformation --")
+	print("t = ", t)
+	print("R = ", R)
 	X = R.T * (V.gen_data_gmm(centers, covariances, n) - t)
 	weights = []
 	sum = 0.
@@ -162,9 +163,9 @@ def test2():
 	#R, t = pmf.optimize(user_func=update_cloud,
 	R, t = pmf.optimize_riemannian(user_func=update_cloud2,
                         user_data=(Y, pcX, fgl, vec, plotter))
-	print "-- Estimated transformation --"
-	print "t = ", t
-	print "R = ", R
+	print("-- Estimated transformation --")
+	print("t = ", t)
+	print("R = ", R)
 
 	#X2 = (R * X + t)
 	#pylab.plot(Y[0], Y[1], 'ro')
@@ -202,9 +203,9 @@ def test3():
 	R = S.rotation_from_antisymetric_matrix(J)
 	t = numpy.array([[10, 0, 0]]).T
 	#t = 0.
-	print "-- Real transformation --"
-	print "t = ", t
-	print "R = ", R
+	print("-- Real transformation --")
+	print("t = ", t)
+	print("R = ", R)
 	#X = R.T * (V.gen_data_gmm(centers, covariances, n) - t)
 	X = R * numpy.asmatrix(numpy.hstack(centers)) - t #FIXME
 	n = 1 #FIXME
@@ -240,9 +241,9 @@ def test3():
 		user_func=update_cloud2, user_data=(Y, pcX, fgl, vec, plotter))
 	#R = trans._R
 	#t = trans._t
-	print "-- Estimated transformation --"
-	print "t = ", t
-	print "R = ", R
+	print("-- Estimated transformation --")
+	print("t = ", t)
+	print("R = ", R)
 
 	plotter.show()
 

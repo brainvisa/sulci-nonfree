@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, numpy, pprint
 from optparse import OptionParser
 import sigraph
@@ -91,7 +92,7 @@ def main():
 	database = io.read_databaselist(options.database)
 
 	if database['data'] != 'voxels_coordinates':
-		print 'database data type must be : voxels_coordinates'
+		print('database data type must be : voxels_coordinates')
 		sys.exit(1)
 
 	dbdir = options.distribdir
@@ -119,14 +120,14 @@ def main():
 	# create output directory
 	try:	os.mkdir(dbdir)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % dbdir
+		print("warning: directory '%s' allready exists" % dbdir)
 
 	voxels_total = 0
 	h = {'model' : model_type, 'files' : {}}
 	for sulcus, minfname in database['files'].items():
 		if options.sulcus is not None and sulcus != options.sulcus:
 			continue
-		print minfname
+		print(minfname)
 		db, header = datamind_io.ReaderMinfCsv().read(minfname)
 		db = filter_database(db, options.pct)
 		size = len(db)

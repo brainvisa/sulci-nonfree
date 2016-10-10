@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, glob
 from soma import aims
 
@@ -33,14 +34,14 @@ def makeSpamGraph( level, meshdir ):
 
 def writeref( argfile, uuid ):
     f = open( argfile + '.minf', 'w' )
-    print >> f, "attributes = { 'referential' : '" + uuid + "' }"
+    print("attributes = { 'referential' : '" + uuid + "' }", file=f)
     f.close()
 
 if __name__ == '__main__':
   if len(sys.argv) == 1 or sys.argv[1] in ( '-h', '--help' ):
-    print 'usage:', sys.argv[0], 'mesh_dir [referential_uuid]'
-    print 'makes 3 graphs from a set of SPAM model mesges (3 levels)'
-    print 'output graphs are written in the meshes directory'
+    print('usage:', sys.argv[0], 'mesh_dir [referential_uuid]')
+    print('makes 3 graphs from a set of SPAM model mesges (3 levels)')
+    print('output graphs are written in the meshes directory')
     sys.exit( 1 )
 
   meshdir = sys.argv[1]

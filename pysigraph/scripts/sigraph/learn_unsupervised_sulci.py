@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, pprint, numpy
 from optparse import OptionParser
 import datamind.io.old_csvIO as datamind_io
@@ -75,15 +76,15 @@ def group_dimensions_sulci_fd3(sulci, db):
 	else:	tn = 'none'
 	blocs['others_diagonal']= types[1], diagonal_bloc
 	blocs['others_fixed_spherical'] = types[3], fixed_spherical_bloc, 0.5
-	print '* %s : ' % sulci
+	print('* %s : ' % sulci)
 	if not valid_extremities or not valid_normal:
 		s = ' - invalid : '
 		if not valid_extremities: s += 'extremities, '
 		if not valid_normal: s += 'normal'
-		print s
+		print(s)
 	s = ' - extremities : %s (%d : %d%%)\n' % (te, ev, rev * 100)
 	s += ' - normal : %s (%d : %d%%)' % (tn, nv, rnv * 100)
-	print s
+	print(s)
 	
 	# nan extremities when unvalid
 	d = X.shape[1]
@@ -109,13 +110,13 @@ def main():
 	prefix = os.path.dirname(options.database)
 
 	if database['data'] != 'sulci_features':
-		print 'database data type must be : voxels_coordinates'
+		print('database data type must be : voxels_coordinates')
 		sys.exit(1)
 
 	# create output directory
 	try:	os.mkdir(dbdir)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % dbdir
+		print("warning: directory '%s' allready exists" % dbdir)
 
 	nodes_total = 0
 

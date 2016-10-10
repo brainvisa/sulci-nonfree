@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys
 from collections import defaultdict
 import numpy
@@ -44,12 +45,12 @@ def parseOpts(argv):
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.distribname, options.graphname]:
-		print "missing gaussian distrib or input sulci graph"
+		print("missing gaussian distrib or input sulci graph")
 		parser.print_help()
 		sys.exit(1)
 	if options.mode == 'posterior':
 		if options.posterior is None:
-			print "missing posterior file"
+			print("missing posterior file")
 			parser.print_help()
 			sys.exit(1)
 	if options.sulci is None:

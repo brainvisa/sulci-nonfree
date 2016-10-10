@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # standard
+from __future__ import print_function
 import os, sys, glob, re
 import numpy
 from optparse import OptionParser
@@ -51,7 +52,7 @@ def sort_data_along_subject(I, filename, descr):
 	if features == None: return [None] * 4
 	X2 = X[:, features]
 	if numpy.any(I[:, 'subject'] != X[:, 'subject']):
-		print "error I != X"
+		print("error I != X")
 		sys.exit(1)
 	# bug datamind X2[valid != True] = plop ne marche pas
 	# pb avec __setitem__ sur les dmarray

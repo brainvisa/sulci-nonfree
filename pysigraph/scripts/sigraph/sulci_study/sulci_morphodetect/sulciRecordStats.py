@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 from soma import aims
 import sigraph
 import math, sys
@@ -16,7 +17,7 @@ def sulciRecordStats( inputs, modelfile, output ):
     return math.sqrt( squaresum / ( n - 1 ) - mean * mean )
 
   for subj in inputs:
-    print subj
+    print(subj)
     gr = aims.read( subj )
     mf = model.modelFinder()
     mf.initCliques( gr, True, False, True )
@@ -78,11 +79,11 @@ def sulciRecordStats( inputs, modelfile, output ):
     del cl
     subjectspotentials[ subj ] = totstats_persubject
 
-  #print 'nodes:', nodecliquestats
-  #print 'rels:', relcliquestats
-  #print 'total:', totalstats
+  #print('nodes:', nodecliquestats)
+  #print('rels:', relcliquestats)
+  #print('total:', totalstats)
 
-  print 'computing means/std'
+  print('computing means/std')
   import sys
   sys.stdout.flush()
   for label, cl in nodecliquestats.items():
@@ -106,11 +107,11 @@ def sulciRecordStats( inputs, modelfile, output ):
 
 if __name__ == '__main__':
   if sys.argv[1] in ( '-h', '--help' ):
-    print 'usage:'
-    print sys.argv[0], 'modelfile.arg outputstats.txt subject01.arg [subject02.arg ...]'
-    print 'Record stats about sulci potentials on a group of subjects.'
-    print 'The output file is a python dictionary containing sums, means and std deviation on the sulci.'
-    print 'It also contains per-subject potentials that can be used later for tests: see sulciTestStats.py and sulciCheckBase.py.'
+    print('usage:')
+    print(sys.argv[0], 'modelfile.arg outputstats.txt subject01.arg [subject02.arg ...]')
+    print('Record stats about sulci potentials on a group of subjects.')
+    print('The output file is a python dictionary containing sums, means and std deviation on the sulci.')
+    print('It also contains per-subject potentials that can be used later for tests: see sulciTestStats.py and sulciCheckBase.py.')
     sys.exit(0)
 
   modelfile = sys.argv[1]

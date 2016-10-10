@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, pprint, numpy
 from optparse import OptionParser
 import datamind.io.old_csvIO as datamind_io
@@ -46,7 +47,7 @@ def main():
 	sulcidb = io.read_databaselist(options.database)
 
 	if sulcidb['data'] != 'sulci_features':
-		print 'database data type must be : sulci_features'
+		print('database data type must be : sulci_features')
 		sys.exit(1)
 
 	prefix = os.path.dirname(options.database)

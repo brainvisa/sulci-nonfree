@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import re, os, sys
 from optparse import OptionParser
 from soma import aims
@@ -92,7 +93,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	graphnames = args[1:]
 	if None in [options.sulci]:
-		print 'error: missing options'
+		print('error: missing options')
 		parser.print_help()
 		sys.exit(1)
 

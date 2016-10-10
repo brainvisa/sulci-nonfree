@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, numpy, pprint, copy
 from optparse import OptionParser
 import sigraph
@@ -290,13 +291,13 @@ class GlobalSpamLearner(SpamLearner):
 		transformations = []
 		total_energy = 0.
 		# spams learning
-		if verbose > 0: print "spams learning..."
+		if verbose > 0: print("spams learning...")
 		mixture = self.learn_spams(motions, self._sulci_set)
 		# registration
-		if verbose > 0: print "registration..."
+		if verbose > 0: print("registration...")
 		for i, g in enumerate(self._graphs):
 			if verbose > 1:
-				print "graph %d/%d" % (i + 1, len(self._graphs))
+				print("graph %d/%d" % (i + 1, len(self._graphs)))
 			trans, energy = self.register(i, mixture, verbose - 1)
 			total_energy += energy
 			transformations.append(trans)
@@ -319,13 +320,13 @@ class GlobalSpamLearner(SpamLearner):
 		old_energy = numpy.inf
 		while 1:
 			if verbose > 0:
-				print "*********"
-				print "**  %d   " % n
-				print "*********"
+				print("*********")
+				print("**  %d   " % n)
+				print("*********")
 			n += 1
 			transformations, energy = self.learn_onestep(\
 						cur_motions, verbose)
-			if verbose > 0: print "subjects mean energy :", energy
+			if verbose > 0: print("subjects mean energy :", energy)
 			if (n >= miniter) and \
 				(old_energy - energy < energy_eps):
 				break
@@ -362,7 +363,7 @@ class GlobalSpamLearnerLoo(GlobalSpamLearner):
 		total_energy = 0.
 		for i, g in enumerate(self._graphs):
 			if verbose > 1:
-				print "graph %d/%d" % (i + 1, len(self._graphs))
+				print("graph %d/%d" % (i + 1, len(self._graphs)))
 			# learn spams
 			mixture = self.learn_spams_loo(i, motions)
 			# registration
@@ -439,19 +440,19 @@ class LocalSpamLearner(SpamLearner):
 			dir_prior = self._dir_priors['vertices'][sulcus]
 		else:	dir_prior = None
 		X_subjects = self._data_by_label[sulcus]
-		if verbose > 0: print "spams learning..."
+		if verbose > 0: print("spams learning...")
 		spam = self.learn_spam(sulcus, motions, self._sulci_set)
 		for i, g in enumerate(self._graphs):
 			if verbose > 1:
-				print "graph %d/%d" % (i + 1, len(self._graphs))
+				print("graph %d/%d" % (i + 1, len(self._graphs)))
 			X = X_subjects[i]
 			if X is None:
 				transformations.append(None)
-				if verbose > 1: print "(skip graph)"
+				if verbose > 1: print("(skip graph)")
 				continue
 			global_trans, energy = self.register(sulcus, i, X, spam,
 					dir_prior, verbose - 1)
-			if verbose > 1: print "graph energy :", energy
+			if verbose > 1: print("graph energy :", energy)
 			total_energy += energy
 			transformations.append(global_trans)
 		total_energy /= len(self._graphs)
@@ -474,14 +475,14 @@ class LocalSpamLearner(SpamLearner):
 		n = 0
 		while 1:
 			if verbose > 0:
-				print "*********"
-				print "**  %d   " % n
-				print "*********"
+				print("*********")
+				print("**  %d   " % n)
+				print("*********")
 			n += 1
 			transformations, energy = \
 				self.learn_sulcus_onestep(sulcus,
 						cur_motions, verbose - 1)
-			if verbose > 0: print "subjects mean energy :", energy
+			if verbose > 0: print("subjects mean energy :", energy)
 			if (n >= miniter) and \
 				(old_energy - energy < energy_eps): break
 			else:   old_energy = energy
@@ -507,7 +508,7 @@ class LocalSpamLearner(SpamLearner):
 			if self._selected_sulci != None and \
 				sulcus not in self._selected_sulci:
 				continue
-			if verbose > 0: print "========== %s =========" % sulcus
+			if verbose > 0: print("========== %s =========" % sulcus)
 			transformations, spam = self.learn_sulcus(sulcus,
 						miniter, maxiter, verbose - 1)
 			spams.append(spam)
@@ -569,16 +570,16 @@ class LocalSpamLearnerLoo(LocalSpamLearner):
 			dir_prior = self._dir_priors['vertices'][sulcus]
 		else:	dir_prior = None
 		X_subjects = self._data_by_label[sulcus]
-		if verbose > 0: print "spams learning..."
+		if verbose > 0: print("spams learning...")
 		for i, g in enumerate(self._graphs):
 			if verbose > 1:
-				print "graph %d/%d" % (i + 1, len(self._graphs))
+				print("graph %d/%d" % (i + 1, len(self._graphs)))
 			spam = self.learn_spam_loo(sulcus, i, motions)
 			X = X_subjects[i]
 			if X is None: continue
 			global_trans, energy = self.register(i, X, spam,
 					dir_prior, verbose - 1)
-			if verbose > 1: print "graph energy :", energy
+			if verbose > 1: print("graph energy :", energy)
 			total_energy += energy
 			transformations.append(global_trans)
 		total_energy /= len(self._graphs)
@@ -674,7 +675,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 
 	if options.distrib_gaussians is None:
-            print >> sys.stderr, '--dir-gaussians option is mandatory'
+            print('--dir-gaussians option is mandatory', file=sys.stderr)
             parser.print_help()
             sys.exit( 1 )
 
@@ -727,8 +728,8 @@ def main():
 		ss = False
 		data_type = 'voxels_bottom'
 	else:
-		print "error : '%s' is not a valid data type" % \
-						options.data_type
+		print("error : '%s' is not a valid data type" % \
+						options.data_type)
 		sys.exit(1)
 	if options.sigma_file is not None:
 		sigmas = io.read_from_exec(options.sigma_file, 'sigma')
@@ -738,9 +739,9 @@ def main():
 	# create output directory
 	prefix = options.distribdir
 	try:	os.mkdir(prefix)
-	except OSError, e:
-		print "warning: directory '%s' could not be created" % prefix
-		print e
+	except OSError as e:
+		print("warning: directory '%s' could not be created" % prefix)
+		print(e)
 
 	# learn
 	if options.mode == 'global':
@@ -794,8 +795,8 @@ def main():
 		gravity_centers = learner._new_gravity_centers
 		gprefix = options.distrib_gaussians
 		try:    os.mkdir(gprefix)
-		except OSError, e:
-			print "warning: directory '%s' allready exists" %gprefix
+		except OSError as e:
+			print("warning: directory '%s' allready exists" %gprefix)
 		h = {'data_type' : 'refgravity_center', 'files' : {},
 			'level' : 'segments'}
 		for sulcus, distr in gravity_centers.items():

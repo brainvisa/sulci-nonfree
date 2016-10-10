@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys, numpy, pprint
 from optparse import OptionParser
 import sigraph
@@ -41,13 +42,13 @@ def main():
 		parser.print_help()
 		sys.exit(1)
 
-	print "read..."
+	print("read...")
 	bayesian_model = io.read_bayesian_model(
 			options.graphmodelname, options.input_distribname)
 	distribs = bayesian_model['node_distrib']
 	databases = io.read_databaselist(options.database)
 
-	print "compute likelihoods..."
+	print("compute likelihoods...")
 	gv = bayesian_model['vertices']
 	states = gv.keys()
 	pn = bayesian_model['priors_nodes_hash']
@@ -81,7 +82,7 @@ def main():
 
 
 	# EM : learn priors
-	print "estimate priors..."
+	print("estimate priors...")
 	mse = numpy.inf
 	n = 0
 	Ps = [P]
@@ -95,13 +96,13 @@ def main():
 		n += 1
 
 		Q = numpy.multiply(B, numpy.log(P) + Bl).sum()
-		print "Q = ", Q
+		print("Q = ", Q)
 
 	Ps = numpy.hstack(Ps)
-	print "priors estimated in %d steps" % n
+	print("priors estimated in %d steps" % n)
 
 	# write priors
-	print "write priors in distrib file..."
+	print("write priors in distrib file...")
 	distribs['priors_nodes_names'].append('EM')
 	distribs['priors_nodes_total'].append(1.0)
 	for labels, local_model_infos in distribs['files'].items():
@@ -119,7 +120,7 @@ def main():
 	fd.close()
 
 	# write csv of priors
-	print "write priors evolution (while EM running) in csv..."
+	print("write priors evolution (while EM running) in csv...")
 	fd = open(options.csvname, 'w')
 	s = "sulci\t"
 	s += '\t'.join([("prior_%d" % i) for i in range(n + 1)]) + '\n'

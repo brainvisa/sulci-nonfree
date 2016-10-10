@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys
 import pylab, matplotlib, numpy
 
@@ -9,8 +10,8 @@ def read_graph(filename):
 		execfile(filename)
 		graph2 = locals()['graph']
 		return graph2
-	except exceptions, e:
-		print e
+	except exceptions as e:
+		print(e)
 		sys.exit(1)
 		
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import os, sys, exceptions, numpy
 from optparse import OptionParser
 import sigraph
@@ -41,7 +42,7 @@ def main():
 	database = io.read_databaselist(options.database)
 
 	if database['data'] != 'voxels_coordinates':
-		print 'database data type must be : voxels_coordinates'
+		print('database data type must be : voxels_coordinates')
 		sys.exit(1)
 
 	hie_filename = os.path.join(aims.carto.Paths.shfjShared(),

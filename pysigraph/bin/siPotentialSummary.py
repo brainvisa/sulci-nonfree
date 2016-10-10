@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sigraph
 from soma import aims
 from optparse import OptionParser
@@ -35,10 +36,10 @@ def potentials( mg, dg ):
             vpot += c[ 'potential' ]
         except:
           pass
-    #print 'pot of node', label, ':', vpot
+    #print('pot of node', label, ':', vpot)
     v[ 'potential_summary' ] = vpot
-    #print v[ 'potential_summary' ]
-    #print v.keys()
+    #print(v[ 'potential_summary' ])
+    #print(v.keys())
 
 
 def main( argv ):

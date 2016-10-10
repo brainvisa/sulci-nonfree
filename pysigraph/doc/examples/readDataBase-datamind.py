@@ -33,6 +33,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 import sigraph
 import numpy
 import sigraph.learning
@@ -51,15 +52,15 @@ def main():
 	#INF = db.getINF()
 
 	# Print Data
-	print "**** X ***"
-	print X
-	print "**** Y ***"
-	print Y
-	#print "**** INF ***"
-	#print INF
+	print("**** X ***")
+	print(X)
+	print("**** Y ***")
+	print(Y)
+	#print("**** INF ***")
+	#print(INF)
 	v = db.select(rows=(Y['class_id'] == 0))
 	for i, r in enumerate(v.getRowIterator()):
-		print "%d)" % i, r
+		print("%d)" % i, r)
 
 
 if __name__ == '__main__' : main()

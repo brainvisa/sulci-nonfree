@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import os, sys
 import numpy, pylab
 from optparse import OptionParser
@@ -49,12 +50,12 @@ def main():
 	# options
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.input]:
-		print "error: missing input"
+		print("error: missing input")
 		parser.print_help()
 		sys.exit(1)
 
 	if options.input is None and options.show_only is False:
-		print "error: missing output"
+		print("error: missing output")
 		parser.print_help()
 		sys.exit(1)
 
@@ -64,8 +65,8 @@ def main():
 		try:
 			ind = header.index(options.model + '_mean')
 		except ValueError:
-			print "wrong model value see header :"
-			print header
+			print("wrong model value see header :")
+			print(header)
 			sys.exit(1)
 		labels = options.model
 		usecols = [0] + list(ind + numpy.arange(3))

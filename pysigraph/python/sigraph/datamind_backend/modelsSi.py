@@ -33,6 +33,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 from datamind.ml import classifier
 from datamind.ml import database
 from datamind.tools import *
@@ -67,7 +68,7 @@ class WrapperSi(classifier.Classifier):
 		return self._getResult(res)
 	
 	def setParams(self, params):
-		print "warning", params
+		print("warning", params)
 
 	def _convert(self, db):
 		import numpy
@@ -106,8 +107,8 @@ class MlpSi(WrapperSi):
 		return sidb
 	
 	def setParams(self, params):
-		print "warning : currently MLP(sigraph) have not any free " + \
-			"parameters."
+		print("warning : currently MLP(sigraph) have not any free " + \
+			"parameters.")
 
 	def fit(self, part):
 		train = self._convert(part.getTrain())

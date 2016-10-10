@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import re, os, sys, numpy
 import sigraph
 from sulci.common import io, add_translation_option_to_parser
@@ -78,7 +79,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	graphnames = args[1:]
 	if len(graphnames) == 0:
-		print 'error: missing graph (at least one)'
+		print('error: missing graph (at least one)')
 		parser.print_help()
 		sys.exit(1)
 	ft = sigraph.FoldLabelsTranslator(options.transfile)
@@ -94,7 +95,7 @@ def main():
 				resume[sulcus] += n
 			else:	resume[sulcus] = n
 	print
-	print "voxels_number = ", resume
+	print("voxels_number = ", resume)
 
 
 if __name__ == '__main__': main()

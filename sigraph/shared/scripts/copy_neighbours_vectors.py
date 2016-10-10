@@ -1,11 +1,12 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import sys, os, re
 
 def read_minf(file):
 	try:
 		fd = open(file, 'r')
 	except:
-		print "skip '%s' (read minf)" % file
+		print("skip '%s' (read minf)" % file)
 		return
 	code = '\n'.join(fd.readlines())
 	exec code
@@ -20,12 +21,12 @@ def convert_minf(file, oldsplit, newsplit, oldsize, newsize):
 	try:
 		fdin = open(file, 'r')
 	except:
-		print "skip '%s' (read minf : convert)" % file
+		print("skip '%s' (read minf : convert)" % file)
 		return
 	try:
 		fdout = open(newfile, 'w')
 	except:
-		print "skip '%s' (write data)" % newfile
+		print("skip '%s' (write data)" % newfile)
 		fdin.close()
 		return
 	c1 = re.compile("\s*'split'\s+:\s+%d,\s*" % oldsplit)
@@ -91,8 +92,8 @@ def findNeigbhours(model, modelfilename, labels, is_edge):
 			l = [v for v in e.vertices() \
 				if v['label'].get().getString() != label]
 			if len(l) != 1:
-				print 'error : handle only relation between '\
-					'2 sulci.'
+				print('error : handle only relation between '\
+					'2 sulci.')
 				sys.exit(1)
 			neighbours.append(l[0])
 	# find full path of neighbours minf file
@@ -116,7 +117,7 @@ def copy_data(fdout, filename, split, before_split, copy_header, class_n):
 	try:
 		fdin = open(filename, 'r')
 	except:
-		print "skip '%s' (read minf : convert)" % file
+		print("skip '%s' (read minf : convert)" % file)
 		return
 
 	lines = fdin.readlines()
@@ -159,7 +160,7 @@ def convert_data(mode, filename, neighbours):
 	try:
 		fdout = open(newfile, 'w')
 	except:
-		print "skip '%s' (write data)" % newfile
+		print("skip '%s' (write data)" % newfile)
 		fdin.close()
 		return
 
@@ -186,14 +187,14 @@ def convert(mode, modelfilename, model, filename):
 
 def main():
 	if len(sys.argv) <= 3:
-		print "Usage %s MODE model.arg file1.minf file2.minf ..." % \
-			os.path.basename(sys.argv[0])
-		print "    MODE : 2classes, nclasses"
+		print("Usage %s MODE model.arg file1.minf file2.minf ..." % \
+			os.path.basename(sys.argv[0]))
+		print("    MODE : 2classes, nclasses")
 		sys.exit(1)
 	from soma import aims
 	mode = sys.argv[1]
 	if not mode in ['2classes', 'nclasses']:
-		print "unknown mode '%s'" % mode
+		print("unknown mode '%s'" % mode)
 		sys.exit(1)
 	modelfilename = sys.argv[2]
 	files = sys.argv[3:]

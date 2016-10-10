@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 from soma import aims
 from sigraph import *
@@ -111,7 +112,7 @@ def monitor(t, dirs, newer):
 		control(t, dirs, data, l, size, newer)
 		if str(data['n']) == size: break
 		time.sleep(t)
-	print '\nMonitoring finished.'
+	print('\nMonitoring finished.')
 
 
 def remote_working(hostname, files):
@@ -127,7 +128,7 @@ def remote_working(hostname, files):
 				('running', 'green'), '...\n'])
 		else:	msg.write_list([' * ', (hostname, 'cyan'), ' : ',
 				('crashed', 'red'), '!\n'])
-		print files
+		print(files)
 	elif s == '65280' :
 		msg.error("ynknown %s : connection non available" % hostname)
 	elif s == '256' :
@@ -146,9 +147,9 @@ def log_control(files, logfilename):
 	if len(int) == 0:
 		msg.write_list([' * log : ', ('OK', 'green'), '\n'])
 	else:
-		print "Interrupted or unfinished processes :"
+		print("Interrupted or unfinished processes :")
 		msg.write(' * ', 'red')
-		print int
+		print(int)
 	return int
 
 def remote_log_control(logfilename, interrupted_tasks):
@@ -180,7 +181,7 @@ def batch_remaining_from_log(logfilename, batchfile, interrupted_tasks):
 		if l.find('Execute: ssh') == -1: continue
 		if not log in interrupted_tasks: continue
 		cmd = l[l.find('nice "cd') + 5:-1]
-		print >> batchfd, cmd
+		print(cmd, file=batchfd)
 	batchfd.close()
 
 def batch_remaining_from_batch(inputbatch, outputbatch, interrupted_tasks):
@@ -193,7 +194,7 @@ def batch_remaining_from_batch(inputbatch, outputbatch, interrupted_tasks):
 		log = os.path.basename(e[:e.rfind('.log') + 4])
 		if not log in interrupted_tasks:
 			continue
-		print >> batchfd, l[:-1]
+		print(l[:-1], file=batchfd)
 	batchfd.close()
 		
 def get_log_files(logfilename):
@@ -241,10 +242,10 @@ def main():
 		try:
 			monitor(5, data['dirs'], options.newer)
 		except KeyboardInterrupt:
-			print 'keyboard interruption.'
+			print('keyboard interruption.')
 			for dir, files in data['dirs'].items():
 				for f in files:
-					print os.path.join(dir, f)
+					print(os.path.join(dir, f))
 			logfiles = []
 			for dir, files in data['dirs'].items():
 				for f in files :
@@ -270,7 +271,7 @@ def main():
 		batch_remaining_from_log(options.logfilename,
 					options.outputbatch, int)
 	else :
-		print >> sys.stderr, "error : '%s' unknown task." % options.task
+		print("error : '%s' unknown task." % options.task, file=sys.stderr)
 		sys.exit(1)
 		
 

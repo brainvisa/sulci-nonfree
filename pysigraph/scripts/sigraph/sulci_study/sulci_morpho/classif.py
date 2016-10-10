@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # standard
+from __future__ import print_function
 import os, sys, pickle
 import numpy, scipy.stats
 from optparse import OptionParser
@@ -125,7 +126,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	reader = ReaderCsv()
 
-	print "read..."
+	print("read...")
 	M = reader.read(options.input)
 	indices = [ind for ind, name in enumerate(M.colnames()) \
 				if name != options.classname]
@@ -140,7 +141,7 @@ def main():
 		Y = Y[sel]
 		Y = (Y == Y[0]) + 0.
 
-	print "loo pvals..."
+	print("loo pvals...")
 	if options.dump is None or not os.path.exists(options.dump):
 		loo_pvals, loo_indices = loo_pvalues(X, Y)
 		if options.dump:
@@ -154,9 +155,9 @@ def main():
 	nrange = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 20, 25,
 			30, 40, 50, 75, 100, 125, 150, 175, 200]
 	rates = []
-	print "classif..."
+	print("classif...")
 	for n in nrange:
-		print "n = ", n
+		print("n = ", n)
 		rates.append(classif(X, Y, n, loo_indices, options.mode))
 
 	fd = open(options.output, 'w')
@@ -164,7 +165,7 @@ def main():
 	fd.write("rates = " + str(rates) + '\n')
 	fd.close()
 
-	print "global pvals..."
+	print("global pvals...")
 	dims = M.colnames()
 	pvals = pvalues(X, Y)
 	fd = open(options.output_pvals, 'w')

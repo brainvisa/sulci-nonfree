@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys
 import numpy
 
@@ -114,7 +115,7 @@ def main():
 	# read options
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.inputname, options.outputname]:
-		print "error: missing input or output."
+		print("error: missing input or output.")
 		parser.print_help()
 		sys.exit(1)
 
