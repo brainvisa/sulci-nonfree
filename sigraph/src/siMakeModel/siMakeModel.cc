@@ -59,11 +59,11 @@ int main( int argc, const char** argv )
       //	read default model
       Model		*defMod = 0;
       if( !defmodfile.empty() && defmodfile != "-" )
-        {
-	  ar.open( defmodfile );
-	  defMod = ar.readModel();
-	  ar.close();
-        }
+      {
+        ar.attach( defmodfile );
+        defMod = ar.readModel();
+        ar.close();
+      }
 
       //	read Domain
       Domain	*dom = 0;
@@ -88,16 +88,16 @@ int main( int argc, const char** argv )
       //	read fallback relations model
       Model		*defRelMod = 0;
       if( !defrelfile.empty() )
-        {
-	  ar.open( defrelfile );
-	  defRelMod = ar.readModel();
-	  ar.close();
+      {
+        ar.attach( defrelfile );
+        defRelMod = ar.readModel();
+        ar.close();
 
-          string mname = FileUtil::basename( defrelfile );
-          mg->setProperty( SIA_MODEL, (Model*) defRelMod );
-          mg->setProperty( SIA_FAKEREL_MODEL, defRelMod );
-          mg->setProperty( SIA_MODEL_FILE, mname );
-        }
+        string mname = FileUtil::basename( defrelfile );
+        mg->setProperty( SIA_MODEL, (Model*) defRelMod );
+        mg->setProperty( SIA_FAKEREL_MODEL, defRelMod );
+        mg->setProperty( SIA_MODEL_FILE, mname );
+      }
 
       //	write model graph
       cout << "Writing model...\n";
@@ -105,7 +105,7 @@ int main( int argc, const char** argv )
       cout << "graph name : " << modelname << endl;
       //cout << "(" << mg << ")" << endl;
       cout << "nodes : " << mg->order() << endl;
-      cout << "rels  : " << mg->size() << endl;
+      cout << "rels  : " << mg->edgesSize() << endl;
       rw << *mg;
       cout << "OK\n";
 
