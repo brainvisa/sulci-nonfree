@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import os, sys, pprint, re
 from optparse import OptionParser
 import numpy
@@ -40,13 +41,13 @@ def main():
 
 	datatypes = databases['data']
 	if datatypes != 'gravity_centers':
-		print 'error : wrong datatype'
+		print('error : wrong datatype')
 		sys.exit(1)
 
 	# create output directory
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % prefix
+		print("warning: directory '%s' allready exists" % prefix)
 
 	nodes_total = 0
 
@@ -133,9 +134,9 @@ def main():
 	n = 0
 	old_energy = total_energy = numpy.inf
 	while 1:
-		print "*********"
-		print "**  %d   " % n
-		print "*********"
+		print("*********")
+		print("**  %d   " % n)
+		print("*********")
 		n += 1
 		means, metrics = [], []
 		total_det, total_lognormalization = 0., 0.
@@ -154,7 +155,7 @@ def main():
 			total_det += g.det()
 			total_lognormalization += labels_n[j] * \
 						g.lognormalization()
-		print "total determinant : ", total_det
+		print("total determinant : ", total_det)
 
 		total_energy = 0.
 		for i in range(len(subjects)):
@@ -168,10 +169,10 @@ def main():
 			total_energy += energy
 			old_params[i] = R, t
 			old_energies[i] = energy
-			print "%d) en = %f" % (i, energy)
+			print("%d) en = %f" % (i, energy))
 		total_lognormalization *= len(subjects)
 		total_energy += total_lognormalization
-		print "Total en = ", total_energy
+		print("Total en = ", total_energy)
 
 		for j, label in enumerate(labels):
 			X = data_0[label]

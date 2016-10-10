@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import os, sys
 from soma import aims, aimsalgo
 import numpy
@@ -136,7 +137,7 @@ else:
     outdist = tmpf2[1]
     os.close( outdist[0] )
 
-  print 'closing the distance map...'
+  print('closing the distance map...')
   subprocess.call( [ 'AimsMorphoMath', '-i', tmpf[1], '-o', outdist, '-r', '3',
     '-m', 'clo' ] )
   os.unlink( tmpf[1] )
@@ -163,9 +164,9 @@ if translation is not None:
 if outputcsv:
   csvfile = open( outputcsv, 'w' )
   if subject:
-    print >> csvfile, 'subject',
-  print >> csvfile, 'label side distance distance_points touching ' \
-    'min_lesion_distance'
+    print('subject', file=csvfile, end=' ')
+  print('label side distance distance_points touching ' \
+    'min_lesion_distance', file=csvfile)
 else:
   csvfile = None
 
@@ -226,8 +227,8 @@ for gnum, graphfile in enumerate( graphfiles ):
         side = 'both'
         ulabel = label
       if subject:
-        print >> csvfile, subject,
-      print >> csvfile, ulabel, side, dist[ 'dist' ], dist[ 'ndist' ], \
-        dist[ 'touching' ], dist[ 'mindist' ]
+        print(subject, file=csvfile, end='')
+      print(ulabel, side, dist[ 'dist' ], dist[ 'ndist' ], \
+        dist[ 'touching' ], dist[ 'mindist' ], file=csvfile)
 
 

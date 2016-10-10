@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import sys, os, pprint, numpy
 from optparse import OptionParser
 import sigraph
@@ -18,8 +19,8 @@ def read_graphmodel(filename):
 		execfile(filename)
 		o = locals()['graphmodel']
 		return o
-	except Exception, e:
-		print e
+	except Exception as e:
+		print(e)
 	sys.exit(1)
 
 def write_graphmodel(filename, graphmodel):

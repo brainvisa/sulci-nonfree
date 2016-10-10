@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys, numpy, pprint
 from optparse import OptionParser
 from soma import aims, aimsalgo
@@ -216,7 +217,7 @@ def parseOpts(argv):
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.distribnames, options.output, options.sulci_map]:
-		print 'error : missing distribution'
+		print('error : missing distribution')
 		parser.print_help()
 		sys.exit(1)
 

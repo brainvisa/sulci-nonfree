@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 from sigraph import *
 from numpy import *
 
@@ -19,22 +20,22 @@ def test_view():
 	db._INF = array([['a'], ['b'], ['c'], ['d'], ['e'], ['f'], ['g'],['h']])
 	view = db.views.View(db, array([1, 2, 3, 4, 5, 6]))
 	view2 = db.views.View(view, array([3, 5]))
-	print "-----------"
+	print("-----------")
 	for i in range(db._X.shape[0]):
-		print db[i]
-	print "-----------"
+		print(db[i])
+	print("-----------")
 	for v in db:
-		print v
-	print "-----------"
+		print(v)
+	print("-----------")
 	for v in view:
-		print v
-	print "-----------"
+		print(v)
+	print("-----------")
 	for v in view2:
-		print v
+		print(v)
 
 
 def main():
-	print "-- main --"
+	print("-- main --")
 	test_optimizer()
 	test_view()
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import sys, os, numpy, pprint, re
 from optparse import OptionParser
 import sigraph
@@ -84,7 +85,7 @@ class NodeDatabaseCreator(AbstractDatabaseCreator):
 		self._writer = datamind_io.WriterCsv()
 
 	def save_to_csv(self):
-		print "save node databases..."
+		print("save node databases...")
 		bar = ProgressionBarPct(len(self._h), '#', color = 'blue')
 		for i, (label, d) in enumerate(self._h.items()):
 			bar.display(i)
@@ -157,7 +158,7 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
 		self._rel_done = set()
 
 	def save_to_csv(self):
-		print "save relation databases..."
+		print("save relation databases...")
 		bar = ProgressionBarPct(len(self._h), '#', color = 'blue')
 		for i, (labels, d) in enumerate(self._h.items()):
 			bar.display(i)
@@ -303,10 +304,10 @@ def dbcreatorFactory(node_model_type, rel_model_type):
 		'min_distance' : MinDistanceRelDatabaseCreator,
 	}
 	if node_model_type and not nodeh.has_key(node_model_type):
-		print "invalid node model type '%s'" % node_model_type
+		print("invalid node model type '%s'" % node_model_type)
 		sys.exit(1)
 	if rel_model_type and not relh.has_key(rel_model_type):
-		print "invalid relation model type '%s'" % rel_model_type
+		print("invalid relation model type '%s'" % rel_model_type)
 		sys.exit(1)
 
 	NodeDbC = nodeh.get(node_model_type, None)
@@ -318,7 +319,7 @@ def compute_database(graphs, dbdir, options):
 	prefix = dbdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % prefix
+		print("warning: directory '%s' allready exists" % prefix)
 
 	N, R = dbcreatorFactory(options.node_model_type, options.rel_model_type)
 
@@ -331,12 +332,12 @@ def compute_database(graphs, dbdir, options):
 	creator = DatabaseCreator(prefix, options.sulcus,
 			node_dbcreator, rel_dbcreator)
 
-	print "create databases..."
+	print("create databases...")
 	bar = ProgressionBarPct(len(graphs), '#', color = 'purple')
 	for i, g in enumerate(graphs):
 		bar.display(i)
 		creator.add_graph(g)
-	print "write csv..."
+	print("write csv...")
 	summary_file = prefix + '.dat'
 	creator.save_to_csv(summary_file)
 
@@ -397,17 +398,17 @@ def main():
 	if options.mode == 'normal' :
 		compute_database(graphs, options.dbdir, options)
 	elif options.mode == 'loo' :
-		print "-- all --"
+		print("-- all --")
 		dbdir = os.path.join('all', options.dbdir)
 		compute_database(graphs, dbdir, options)
 		for i in range(len(graphs)):
 			subgraphs = graphs[:i] + graphs[i+1:]
 			dir = 'cv_%d' % i
-			print '-- %s --' % dir
+			print('-- %s --' % dir)
 			dbdir = os.path.join(dir, options.dbdir)
 			compute_database(subgraphs, dbdir, options)
 	else:
-		print "error : '%s' unknown mode" % options.mode
+		print("error : '%s' unknown mode" % options.mode)
 
 
 

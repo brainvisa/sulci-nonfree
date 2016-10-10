@@ -33,6 +33,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 import sigraph
 import numpy
 
@@ -50,12 +51,12 @@ def main():
 	#INF = db.arraydataINF()
 
 	# Print Data
-	#print "**** X ***"
-	print X
-	print "**** Y ***"
-	print Y
-	#print "**** INF ***"
-	#print INF
+	#print("**** X ***")
+	print(X)
+	print("**** Y ***")
+	print(Y)
+	#print("**** INF ***")
+	#print(INF)
 
 	# Changes
 	X[:] = 0
@@ -63,7 +64,7 @@ def main():
 
 	# Save Data
 	outputs = "/tmp/plop.minf", "/tmp/plop.data"
-	print "Save changes to", ' and '.join(outputs)
+	print("Save changes to", ' and '.join(outputs))
 	io.write(*outputs)
 
 if __name__ == '__main__' : main()

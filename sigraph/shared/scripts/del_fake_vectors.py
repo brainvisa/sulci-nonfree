@@ -1,11 +1,12 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import sys, os, shutil, re
 
 def read_minf(file):
 	try:
 		fd = open(file, 'r')
 	except:
-		print "skip '%s' (read minf)" % file
+		print("skip '%s' (read minf)" % file)
 		return
 	code = '\n'.join(fd.readlines())
 	exec code
@@ -20,12 +21,12 @@ def convert_data(file, split, size):
 	try:
 		fdin = open(file, 'r')
 	except:
-		print "skip '%s' (read data)" % file
+		print("skip '%s' (read data)" % file)
 		return
 	try:
 		fdout = open(newfile, 'w')
 	except:
-		print "skip '%s' (write data)" % (newfile)
+		print("skip '%s' (write data)" % (newfile))
 		fdin.close()
 		return
 
@@ -55,12 +56,12 @@ def convert_minf(file, oldsplit, newsplit, oldsize, newsize):
 	try:
 		fdin = open(file, 'r')
 	except:
-		print "skip '%s' (read minf : convert)" % file
+		print("skip '%s' (read minf : convert)" % file)
 		return
 	try:
 		fdout = open(newfile, 'w')
 	except:
-		print "skip '%s' (write data)" % newfile
+		print("skip '%s' (write data)" % newfile)
 		fdin.close()
 		return
 	c1 = re.compile("\s*'split'\s+:\s+%d,\s*" % oldsplit)
@@ -88,8 +89,8 @@ def convert(file):
 
 def main():
 	if len(sys.argv) == 1:
-		print "Usage %s file1.minf file2.minf ..." % \
-			os.path.basename(sys.argv[0])
+		print("Usage %s file1.minf file2.minf ..." % \
+			os.path.basename(sys.argv[0]))
 		sys.exit(1)
 	files = sys.argv[1:]
 	for f in files: convert(f)

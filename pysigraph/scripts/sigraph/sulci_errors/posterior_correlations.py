@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
 import datamind.io as datamind_io
@@ -145,7 +146,7 @@ def main():
 		sys.exit(1)
 	ind = [i for i, input in enumerate(inputs) if input == '==']
 	if len(ind) == 0:
-		print "error : missing =="
+		print("error : missing ==")
 		sys.exit(1)
 	ind = ind[0]
 	graphnames = inputs[:ind]

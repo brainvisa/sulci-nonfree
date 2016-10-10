@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import sigraph
 import anatomist.direct.api as anatomist
 from soma import aims
@@ -45,7 +46,7 @@ def print_csv_format():
       ammon       0       0.1  2.4
       zeus        1       1.5  6.5
   '''
-  print format
+  print(format)
 
 def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
   filterExpr=None):
@@ -58,7 +59,7 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
       break
   fd.close()
   header_minf = { 'Y' : [], 'labels' : labels }
-  # print 'labels:', labels
+  # print('labels:', labels)
   labels2 = [ x.lower() for x in labels ]
   subjectcol = None
   labelcol = None
@@ -107,7 +108,7 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
       olabels.remove( labels[sidecol] )
       infsidecol = 0
   else:
-    print "bad csv format"
+    print("bad csv format")
     sys.exit(1)
   if len( columns ) != 0:
     header_minf['X'] = columns
@@ -157,10 +158,10 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
   Xm = X3.mean(axis=0)
   Xs = X3.std(axis=0)
   Xsum = X4.sum(axis=0)
-  print "global mean over sulci :", Xm
-  print "global std over sulci : ", Xs
-  print "global sum over sulci :", Xsum
-  print olabels
+  print("global mean over sulci :", Xm)
+  print( "global std over sulci : ", Xs)
+  print("global sum over sulci :", Xsum)
+  print(olabels)
   return olabels, sulci_data, mode
 
 def write_summary_csv(csvfilename, labels, sulci_data, mode):

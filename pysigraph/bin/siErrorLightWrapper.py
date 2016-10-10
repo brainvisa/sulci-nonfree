@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
 import sigraph.error, sigraph.nrj
@@ -81,7 +82,7 @@ def main():
 		nrj = sigraph.nrj.computeNrj(options.model,
 					options.labeled_graph,
 					options.labels_translation)
-		print "Energy = %f %%" % nrj
+		print("Energy = %f %%" % nrj)
 	else:	nrj = numpy.nan
 	addInfoToCSV(options.csvfilename, options.graphname,
                      global_errors2, nrj, append=options.append)

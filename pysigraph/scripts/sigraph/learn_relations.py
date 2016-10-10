@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys, numpy, pprint, re, glob, pickle
 from optparse import OptionParser
 try:
@@ -6,7 +7,7 @@ try:
 	matplotlib.use('Qt4Agg')
 	import pylab
 except IOError, e:
-	print "can't import matplotlib : ", e
+	print("can't import matplotlib : ", e)
 import sigraph
 from soma import aims
 from sulci.common import io, add_translation_option_to_parser
@@ -48,7 +49,7 @@ def compute_relations(graphs, distribdir, input_motions,
 	prefix = distribdir
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % prefix
+		print("warning: directory '%s' allready exists" % prefix)
 
 	if options.model_type == 'direction':
 		mtype_inter = 'kent'
@@ -65,7 +66,7 @@ def compute_relations(graphs, distribdir, input_motions,
 		'files' : {}}
 	if options.savefig:
 		s = [len(X) for relation, X in data.items()]
-		print "number of relations= ", len(data)
+		print("number of relations= ", len(data))
 		if len(data) and (numpy.min(s) != numpy.max(s)):
 			f = pylab.gcf()
 			pylab.hist(s, bins=150)
@@ -192,7 +193,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	inputs = args[1:]
 	if len(inputs) == 0:
-		print "error: at least one graph is needed"
+		print("error: at least one graph is needed")
 		parser.print_help()
 		sys.exit(1)
 	ind = [i for i, input in enumerate(inputs) if (input == '==')]
@@ -203,7 +204,7 @@ def main():
 		ind = ind[0]
 		graphnames, input_motions_names = inputs[:ind], inputs[ind + 1:]
 	else:
-		print "error: unintelligible input: 'only one == tag needed'"
+		print("error: unintelligible input: 'only one == tag needed'")
 		sys.exit(1)
 
 	# read data
@@ -221,7 +222,7 @@ def main():
 		compute_relations(graphs, options.distribdir, input_motions,
 						selected_sulci, options)
 	elif options.mode == 'loo' :
-		print "-- all --"
+		print("-- all --")
 		distribdir = os.path.join('all', options.distribdir)
 		if options.sigma_file is None:
 			sigma_file = None
@@ -230,7 +231,7 @@ def main():
 		for i in range(len(graphs)):
 			subgraphs = graphs[:i] + graphs[i+1:]
 			directory = 'cv_%d' % i
-			print '-- %s --' % directory
+			print('-- %s --' % directory)
 			distribdir = os.path.join(directory, options.distribdir)
 			if options.sigma_file is None:
 				sigma_file = None
@@ -239,7 +240,7 @@ def main():
 			compute_relations(subgraphs, distribdir, input_motions,
 					selected_sulci, options)
 	else:
-		print "error : '%s' unknown mode" % options.mode
+		print("error : '%s' unknown mode" % options.mode)
 
 
 

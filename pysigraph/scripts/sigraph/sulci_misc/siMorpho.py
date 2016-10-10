@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 from optparse import OptionParser
 import os, sys, numpy
 import sigraph
@@ -32,7 +33,7 @@ class SulcusInfo(object):
 
 def compute_descriptors(mf, graphs, sulcus):
 	descriptors = {}
-	print "compute descriptors..."
+	print("compute descriptors...")
 	size = len(graphs)
 	for i, g in enumerate(graphs):
 		sys.stdout.write("%d/%d\r" % (i + 1, size))
@@ -63,7 +64,7 @@ def compute_descriptors(mf, graphs, sulcus):
 	return descriptors
 
 def save_to_csv(dbdir, descriptors):
-	print "saving to csv..."
+	print("saving to csv...")
 	h = { 'data' : 'sulci_features', 'files' : {}}
 	w = datamind_io.WriterCsv()
 	size = len(descriptors)
@@ -110,7 +111,7 @@ def main():
 
 	try:	os.mkdir(options.dbdir)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % options.dbdir
+		print("warning: directory '%s' allready exists" % options.dbdir)
 
 	graphs = io.load_graphs(options.transfile, graphnames)
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 from soma import aims
 from sigraph import *
 from sigraph.cover import *
@@ -64,9 +65,9 @@ class DataSynthesizer(object):
 				"any grid file\n")
 			return
 		else :
-			print self.name + ' : synthesis based on ' + \
+			print(self.name + ' : synthesis based on ' + \
 				'%d/%d .grid files over .mod files' % \
-				(n, self.mod_number)
+				(n, self.mod_number))
 		a = self.array_mean
 		a /= n
 		if numpy.isnan(a).any():
@@ -91,7 +92,7 @@ class DataSynthesizer(object):
 		try :
 			fd = open(gridname, 'r')
 		except IOError:
-			print "skip : '" + gridname + "' (unknown file)"
+			print("skip : '" + gridname + "' (unknown file)")
 			return
 		(filename, a, names, ranges) = self.gr.read(gridname)
 		if self.info is not None:
@@ -111,7 +112,7 @@ class DataSynthesizer(object):
 		if self.options.all:
 			epsname = model_file + '_errors_grid.' + self.ext
 			if (self.options.verbose > 0):
-				print "write : '" + epsname + "'"
+				print("write : '" + epsname + "'")
 			else :
 				self.progression_bar.display(self.n)
 				self.n += 1

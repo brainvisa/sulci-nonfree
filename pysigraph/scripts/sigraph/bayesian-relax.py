@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
 import sigraph
@@ -114,16 +115,16 @@ def clean_available_labels(cgraph, availablelabels, fixed_labels):
 					possible_labels.append(s)
 		if add_ok and not (v['label'] in possible_labels):
 			if len(possible_labels) > 0:
-				print "Warning : node " + str(v['index']) + \
+				print("Warning : node " + str(v['index']) + \
 					", '" + v['label'] + \
 					"' label forbidden, replace it by '" + \
-					possible_labels[0] + "'"
+					possible_labels[0] + "'")
 				v['label'] = possible_labels[0]
 			else:
-				print "Warning : node " + str(v['index']) + \
+				print("Warning : node " + str(v['index']) + \
 					"available labels empty, fill it " + \
 					"with current label '" + \
-					v['label'] + "'"
+					v['label'] + "'")
 				possible_labels.append(v['label'])
 
 		# clean cliques
@@ -387,7 +388,7 @@ def replace_models(datagraph, mgraph, (nodes_model, sulci_model),
 			m = PythonClassifierSulcusOnlyAdaptive(datagraph,
 				mgraph, oldmodel.graphObject(), node_model,
 				sulcus_model, prior_ind, weights, node_weight)
-		else:	print "unknown type '%s'" % sulci_model_type
+		else:	print("unknown type '%s'" % sulci_model_type)
 		m.setParent(oldmodel.parent())
 		m.setCliqueDescr(oldmodel.model().cliqueDescr())
 		keep_python_wrappers.append(m)
@@ -572,8 +573,8 @@ def main():
 		parser.print_help()
 		sys.exit(1)
 	if options.distribname_sulci and options.clfname_sulci:
-		print "Only one option among --distrib_sulci and clf_sulci " + \
-			"can be specified."
+		print("Only one option among --distrib_sulci and clf_sulci " + \
+			"can be specified.")
 		parser.print_help()
 		sys.exit(1)
 
@@ -597,7 +598,7 @@ def main():
 
 	
 	# read
-	print "reading..."
+	print("reading...")
 	if options.labelsfile:
 		availablelabels = io.read_availablelabels(options.labelsfile)	
 	else:	availablelabels = None
@@ -632,7 +633,7 @@ def main():
 	an.setVoidMode(sigraph.Anneal.VOIDMODE_NONE, 0)
 
 	# prepare models : remove relations/labels if needed
-	print "adapt models..."
+	print("adapt models...")
 	cgraph = an.cGraph() # datagraph
 	cgraph.loadAllMissingElements() # load buckets
 
@@ -653,7 +654,7 @@ def main():
 	# fit
 	an.reset()
 	while not an.isFinished():
-		print "---"
+		print("---")
 		an.nIter()
 		an.fitStep()
 

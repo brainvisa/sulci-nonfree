@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import os, sys, pprint
 from optparse import OptionParser
 import datamind.io.old_csvIO as datamind_io
@@ -42,21 +43,21 @@ def main():
 		if not (dt in authorized_datatypes):
 			datatype_error = True
 	if datatype_error:
-		print "at least one datatype is incorrect among : " + \
-			str(datatypes)
+		print("at least one datatype is incorrect among : " + \
+			str(datatypes))
 		sys.exit(1)
 
 	# create output directory
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % prefix
+		print("warning: directory '%s' allready exists" % prefix)
 
 	# db => mean/cov
 	# bayesian_*.minf => bayesian_density_*.minf
 	h = {'data_type' : databases['data'], 'files' : {},
 		'level' : 'segments'}
 	for labels, minfname in databases['files'].items():
-		print minfname
+		print(minfname)
 		db, header = datamind_io.ReaderMinfCsv().read(minfname)
 		size = len(db)
 		if db.getX().std(axis=0).sum() == 0: # all values equal

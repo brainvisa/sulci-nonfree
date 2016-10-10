@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
 import matplotlib
@@ -47,7 +48,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	inputs = args[1:]
 	if None in [options.output_count, options.output_pct]:
-		print "error: missing options"
+		print("error: missing options")
 		parser.print_help()
 		sys.exit(1)
 

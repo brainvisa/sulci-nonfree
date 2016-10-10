@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import glob, sys, os, numpy, collections
 from optparse import OptionParser
 from datamind.io import csvIO
@@ -37,8 +38,8 @@ def subjects_global_error(dir):
 	se = numpy.array([errors[errors[:, 0] == s, 1].mean() \
 					for s in subjects])
 	if numpy.isnan(se).any():
-		print ("warning: not enough sample: some subjects "
-			"have not been tested")
+		print(("warning: not enough sample: some subjects "
+			"have not been tested"))
 		se = se[numpy.logical_not(numpy.isnan(se))]
 	return se.mean(), se.std(), n
 
@@ -104,8 +105,8 @@ def subjects_local_error(dir):
 	for subject in subjects:
 		su = errors[errors[:, 0] == subject]
 		if len(su) == 0:
-			print ("warning: not enough sample: some subjects "
-				"have not been tested")
+			print(("warning: not enough sample: some subjects "
+				"have not been tested"))
 	for sulcus in sulci:
 		se = errors[sulci_col == code(sulcus)][:, [0, 2]]
 		su = numpy.array([se[se[:, 0] == subject, 1].mean() \
@@ -153,8 +154,8 @@ def main():
 		error.append("missing directory")
 	if len(error):
 		if len(error) == 1:
-			print "error: %s" % error[0]
-		else:	print 'error:\n    - ' + '\n    - '.join(error)
+			print("error: %s" % error[0])
+		else:	print('error:\n    - ' + '\n    - '.join(error))
 		print
 		parser.print_help()
 		sys.exit(1)
@@ -171,8 +172,8 @@ def main_global(options, directories):
 		elif options.group == 'sample':
 			mean, std, n = samples_global_error(dir)
 
-		print "* " + dir
-		print "    mean (std) = %2.2f (%2.2f), n = %d" % (mean, std, n)
+		print("* " + dir)
+		print("    mean (std) = %2.2f (%2.2f), n = %d" % (mean, std, n))
 		s.append('%2.2f\t%2.2f\t%d' % (mean, std, n))
 
 	# write result

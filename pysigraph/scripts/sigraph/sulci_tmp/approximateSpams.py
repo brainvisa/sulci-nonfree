@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import re, os, sys, numpy
 from optparse import OptionParser
 import sigraph
@@ -22,7 +23,7 @@ from sulci.models import check_same_distribution
 #	return rbf
 
 def autofit_rec(spam, n, kmin, kmax, side, (kbest, bic_best), h):
-	print "[%d %d]" % (kmin, kmax)
+	print("[%d %d]" % (kmin, kmax))
 	k0 = 1
 	if side == 1:
 		klist = [kmin] * 3
@@ -35,7 +36,7 @@ def autofit_rec(spam, n, kmin, kmax, side, (kbest, bic_best), h):
 			k = k0 * side + kmax
 			if k < kmin: break
 		klist.append(k)
-		print "\tk = ", k
+		print("\tk = ", k)
 		if not h.has_key(k):
 			gmm, bic = fit_gmm(spam, n, k)
 			h[k] = gmm, bic
@@ -63,7 +64,7 @@ def autofit_rec(spam, n, kmin, kmax, side, (kbest, bic_best), h):
 def autofit_gmm(spam, n):
 	h = {}
 	k, bic = autofit_rec(spam, n, 0, 32, 1, (1, numpy.inf), h)
-	print "h = ", h
+	print("h = ", h)
 	return h[k]
 
 def fit_gmm(spam, n, k):
@@ -95,7 +96,7 @@ def update_spam(spam, distr):
 		logli, li_i = distr.likelihoods(Xi)
 		li.append(li_i)
 	li = numpy.hstack(li)
-	print "mse = ", (img.ravel() - li).mean()
+	print("mse = ", (img.ravel() - li).mean())
 	img[:] = li.reshape(shape).T[None]
 
 
@@ -151,13 +152,13 @@ def main():
 	check, models_types = check_same_distribution(\
 				input_distrib['vertices'])
 	if not check:
-		print "error : only one model_type is supported. Found : " +\
-			str(list(models_types))
+		print("error : only one model_type is supported. Found : " +\
+			str(list(models_types)))
 		sys.exit(1)
 	model_type = list(models_types)[0]
 	if model_type != 'spam':
-		print "error : '%s' : no supported. " % model_type + \
-			"Convert only spam model"
+		print("error : '%s' : no supported. " % model_type + \
+			"Convert only spam model")
 		sys.exit(1)
 
 	# create output directory
@@ -166,7 +167,7 @@ def main():
 	if not options.skip:
 		try:	os.mkdir(prefix)
 		except OSError, e:
-			print "warning: directory '%s' allready exists" % prefix
+			print("warning: directory '%s' allready exists" % prefix)
 
 	level = input_distrib['level']
 	data_type = input_distrib['data_type']
@@ -180,14 +181,14 @@ def main():
 		filename = io.node2densityname(prefix,
 				'gmm', sulcus)
 		if (options.skip and os.path.exists(filename)):
-			print "skip '%s'" % sulcus
+			print("skip '%s'" % sulcus)
 			continue
-		print "*** %s ***" % sulcus
+		print("*** %s ***" % sulcus)
 		spam = input_distrib['vertices'][sulcus]
 		if options.k is not None:
 			gmm, bic = fit_gmm(spam, voxels_n_sulcus, options.k)
 		else:	gmm, bic = autofit_gmm(spam, voxels_n_sulcus)
-		print "bic, k = ", bic, gmm._k
+		print("bic, k = ", bic, gmm._k)
 		gmm.write(filename)
 		h['files'][sulcus] = (model_type, filename)
 

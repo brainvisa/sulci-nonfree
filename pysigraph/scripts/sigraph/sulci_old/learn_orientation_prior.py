@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import sys, os, pprint
 import numpy
 from optparse import OptionParser
@@ -196,12 +197,12 @@ def main():
 def main_subject(parser, options, args):
 	if None in [options.graphname, options.skelname,
 		options.orientations, options.graphmodelname]:
-		print "error: missing option(s)"
+		print("error: missing option(s)")
 		parser.print_help()
 		sys.exit(1)
 
 	if not (options.splitmode in ['labels', 'nodes']):
-		print "error: unknown split mode '%s'" % options.splitmode
+		print("error: unknown split mode '%s'" % options.splitmode)
 		parser.print_help()
 		sys.exit(1)
 
@@ -220,7 +221,7 @@ def main_subject(parser, options, args):
 			graph['aims_reader_filename']))[0]
 	depthmapname = '%s_depth.ima' % subject
 	if os.path.exists(depthmapname):
-		print "find depthmap '%s'" % depthmapname
+		print("find depthmap '%s'" % depthmapname)
 		depth = aims.Reader().read(depthmapname)
 		depth = aims.AimsData_FLOAT(depth)
 	else:	depth = compute_depthmap(subject, graph,
@@ -235,12 +236,12 @@ def main_subject(parser, options, args):
 
 def main_mean(parser, options, args):
 	if None in [options.orientations]:
-		print "error: missing option(s)"
+		print("error: missing option(s)")
 		parser.print_help()
 		sys.exit(1)
 	orientations_files = args[1:]
 	if len(orientations_files) == 0:
-		print "error: missing orientations files"
+		print("error: missing orientations files")
 		parser.print_help()
 		sys.exit(1)
 	res = {}

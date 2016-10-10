@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, numpy
 from soma import aims
 
@@ -45,8 +46,8 @@ class NoMessage(object):
 
 try:
 	grid = import_from('grid.py')
-except ImportError, e:
-	#print "warning: can't load grid module '%s'" %e
+except ImportError as e:
+	#print("warning: can't load grid module '%s'" %e)
 	pass
 else:
 	grid.msg = NoMessage()

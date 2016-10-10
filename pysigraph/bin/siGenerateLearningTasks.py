@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 from soma import aims
 from sigraph import *
 from sigraph.cover import *
@@ -50,22 +51,22 @@ def cmd_LSF(labels, options, user_data):
     dir = user_data['output_dir']
     log = get_logfile(dir, labels)
     fd = open(filename, 'w')
-    print >> fd, '#!/bin/bash'
-    print >> fd, '#BSUB -n 1'
-    print >> fd, '#BSUB -J ' + os.path.basename(options.bin) + '-' + n
-    print >> fd, '#BSUB -c ' + options.time
-    print >> fd, '#BSUB -o ' + log
-    print >> fd, '#BSUB -e ' + log
-    print >> fd, '#BSUB -u ' + user_data['email']
-    print >> fd, '#BSUB -N '
-    print >> fd, 'cd ' + dir
-    print >> fd, get_cmd(labels, options, user_data)
+    print('#!/bin/bash', file=fd)
+    print('#BSUB -n 1', file=fd)
+    print('#BSUB -J ' + os.path.basename(options.bin) + '-' + n, file=fd)
+    print('#BSUB -c ' + options.time, file=fd)
+    print('#BSUB -o ' + log, file=fd)
+    print('#BSUB -e ' + log, file=fd)
+    print('#BSUB -u ' + user_data['email'], file=fd)
+    print('#BSUB -N ', file=fd)
+    print('cd ' + dir, file=fd)
+    print(get_cmd(labels, options, user_data), file=fd)
     fd.close()
     user_data['n'] += 1
 
 def cmd_somaworkflow(labels, options, user_data):
     cmd = get_cmd_raw(labels, options, user_data)
-    print cmd
+    print(cmd)
     #user_data['output_fd'].write(cmd)
     from soma.workflow import client as swf
     job = swf.Job( cmd, name=str(labels) )

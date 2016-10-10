@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import sys, os, types
 import pylab
 
@@ -29,17 +30,17 @@ def loadSubjectsPotentials( files ):
 
 if __name__ == '__main__':
   if sys.argv[1] in ( '-h', '--help' ):
-    print 'usage:'
-    print sys.argv[0], 'label statsfile.txt [statsfile2.txt ...]'
-    print 'Plots the potentials of all subjects of one or several groups for one sulcus.'
-    print 'This python script should rather be used interactively in an IPython shell to avoid GUI event loop problems:'
-    print 'run:\nipython -pylab'
-    print 'then within ipython:'
-    print 'import sulciPlotPot'
-    print 'files = [ "statsfile.txt", "statsfile2.txt" ]'
-    print 'sp = sulciPlotPot.loadSubjectsPotentials( files )'
-    print 'sulciPlotPot.plotSulcus( "S.T.s._left", sp )'
-    print 'sulciPlotPot.plotSulcus( "F.C.L.a._left", sp )'
+    print('usage:')
+    print(sys.argv[0], 'label statsfile.txt [statsfile2.txt ...]')
+    print('Plots the potentials of all subjects of one or several groups for one sulcus.')
+    print('This python script should rather be used interactively in an IPython shell to avoid GUI event loop problems:')
+    print('run:\nipython -pylab')
+    print('then within ipython:')
+    print('import sulciPlotPot')
+    print('files = [ "statsfile.txt", "statsfile2.txt" ]')
+    print('sp = sulciPlotPot.loadSubjectsPotentials( files )')
+    print('sulciPlotPot.plotSulcus( "S.T.s._left", sp )')
+    print('sulciPlotPot.plotSulcus( "F.C.L.a._left", sp )')
     sys.exit(0)
   label = sys.argv[1]
   files = sys.argv[2:]

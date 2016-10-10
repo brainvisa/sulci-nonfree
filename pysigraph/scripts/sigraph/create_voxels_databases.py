@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import sys, os, numpy, pprint
 from optparse import OptionParser
 import sigraph
@@ -10,7 +11,7 @@ from datamind.ml.database import DbNumpy
 
 
 def compute(graph_list):
-	print "creating database..."
+	print("creating database...")
 	voxels_dict = {}
 	size = len(graph_list)
 	for i, g in enumerate(graph_list):
@@ -28,7 +29,7 @@ def compute(graph_list):
 
 
 def save2csv(dbdir, voxels_dict):
-	print "saving to csv..."
+	print("saving to csv...")
 	w = datamind_io.WriterCsv()
 	size = len(voxels_dict)
 	h = { 'data' : 'voxels_coordinates', 'files' : {} }
@@ -69,7 +70,7 @@ def main():
 
 	try:	os.mkdir(options.dbdir)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % dbdir
+		print("warning: directory '%s' allready exists" % dbdir)
 
 	graphs = io.load_graphs(options.transfile, graphnames)
 	voxels_dict = compute(graphs)

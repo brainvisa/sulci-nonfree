@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
 from sulci.common import io, add_translation_option_to_parser
@@ -16,9 +17,9 @@ def compute_mixup_matrix(sulci, graph):
 
 def save_matrix(filename, sulci, M):
 	fd = open(filename, 'w')
-	print >> fd, '\t'.join(['sulci'] + sulci)
+	print('\t'.join(['sulci'] + sulci), file=fd)
 	for i, m in enumerate(M):
-		print >> fd, '\t'.join([sulci[i]] + [str(x) for x in m])
+		print('\t'.join([sulci[i]] + [str(x) for x in m]), file=fd)
 	fd.close()
 
 
@@ -45,7 +46,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	inputs = args[1:]
 	if None in [options.graphname, options.graphmodelname, options.output]:
-		print "error: missing options"
+		print("error: missing options")
 		parser.print_help()
 		sys.exit(1)
 

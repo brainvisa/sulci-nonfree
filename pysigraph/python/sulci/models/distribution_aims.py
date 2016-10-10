@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import pickle, numpy, scipy.stats, scipy.special
 from soma import aims, aimsalgo
 import distribution
@@ -193,9 +194,9 @@ class PySpam(Distribution):
 			self._nodes_n += len(vertices)
 			n = numpy.sum([len(b[0].keys()) for b in bucketmaps_in])
 			if n == 0:
-				print "warning : in file " \
+				print("warning : in file " \
 					"'%s', " % graphinfo['name'] + \
-					"no voxels found !"
+					"no voxels found !")
 				continue
 			self._voxels_n += n
 			bucket_min, bucket_max, bb_subject_size, bucketmap = \
@@ -808,7 +809,7 @@ class Bingham(Distribution):
 			res = scipy.optimize.fmin_powell(func, z0,
 					args=(X, weights), disp=0, ftol=eps)
 		except RuntimeError:
-			print "warning: Bingham: optimization failed."
+			print("warning: Bingham: optimization failed.")
 			return None
 		return numpy.asarray(res).ravel()
 

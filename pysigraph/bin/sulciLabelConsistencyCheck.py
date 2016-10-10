@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import optparse
 from soma import aims
 import sys
@@ -29,14 +30,14 @@ graph = aims.read( graphfile )
 
 if not labelatt:
     try:
-        print 'checking label_property'
+        print('checking label_property')
         labelatt = graph[ 'label_property' ]
-        print 'done'
-        print labelatt
+        print('done')
+        print(labelatt)
     except:
         pass
     if not labelatt:
-        print >> sys.stderr, 'Could not guess label attribute.'
+        print('Could not guess label attribute.', file=sys.stderr)
         sys.exit( 2 )
 
 leftlabels = set()
@@ -49,36 +50,36 @@ for v in graph.vertices():
     elif label.endswith( '_right' ):
         rightlabels.add( label )
 
-print 'left labels:', len( leftlabels )
-print 'right labels:', len( rightlabels )
+print('left labels:', len( leftlabels ))
+print('right labels:', len( rightlabels ))
 
 if side is not None:
     if side == 'left':
         if len( rightlabels ) != 0:
-            print >> sys.stderr, \
+            print(
                 '** inconsistency: %d right labels present **' \
-                % len( rightlabels )
+                % len( rightlabels ), file=sys.stderr)
             sys.exit( 1 )
         else:
-            print 'No inconsistency found.'
+            print('No inconsistency found.')
             sys.exit( 0 )
     elif side == 'right':
         if len( leftlabels ) != 0:
-            print >> sys.stderr, \
+            print(
                 '** inconsistency: %d left labels present **' \
-                % len( leftlabels )
+                % len( leftlabels ), file=sys.stderr)
             sys.exit( 1 )
         else:
-            print 'No inconsistency found.'
+            print('No inconsistency found.')
             sys.exit( 0 )
     else:
-        print >> sys.stderr, 'cannot understand side parameter - ignoring'
+        print'cannot understand side parameter - ignoring', file=sys.stderr)
 
 if len( leftlabels ) != 0 and len( rightlabels ) != 0:
-    print >> sys.stderr, \
+    print(
         '** inconsistency: %d left labels and %d right labels present **' \
-        % ( len( leftlabels ), len( rightlabels ) )
+        % ( len( leftlabels ), len( rightlabels ) ), file=sys.stderr)
     sys.exit( 1 )
 else:
-    print 'No inconsistency found.'
+    print('No inconsistency found.')
 

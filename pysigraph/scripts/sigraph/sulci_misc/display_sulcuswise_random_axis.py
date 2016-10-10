@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys
 import numpy
 from optparse import OptionParser
@@ -46,7 +47,7 @@ def Axes():
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.distribname]:
-		print "missing gaussian distrib"
+		print("missing gaussian distrib")
 		parser.print_help()
 		sys.exit(1)
 	# read

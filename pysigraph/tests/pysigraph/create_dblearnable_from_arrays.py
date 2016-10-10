@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import numpy, os, pylab, sys, svm
 from soma import aims
 import sigraph.datamind_backend
@@ -30,8 +31,8 @@ def fun(db):
 def main():
 	db = read()
 	db2, view = fun(db)
-	print "Y = ", view.getDB().arraydataY()[[0, 5], :]
-	print "X = ", view.getDB().arraydataX()[[0,5], :]
+	print("Y = ", view.getDB().arraydataY()[[0, 5], :])
+	print("X = ", view.getDB().arraydataX()[[0,5], :])
 
 
 if __name__ == "__main__": main()

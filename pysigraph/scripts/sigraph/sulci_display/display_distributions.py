@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys, exceptions, numpy
 from optparse import OptionParser
 
@@ -12,7 +13,7 @@ from datamind.tools import *
 try:
   import fff.GMM
 except:
-  print 'warning, fff is not here or does not work. GMM will not be usable'
+  print('warning, fff is not here or does not work. GMM will not be usable')
 
 from sulci.common import io
 from sulci.models import check_same_distribution, distribution, \
@@ -104,7 +105,7 @@ class Display(object):
 			if self._selected_sulci is not None:
 				if not (sulcus in self._selected_sulci):
 					continue
-			else:	print "%2d/%d :  %s" % (i, s, sulcus)
+			else:	print("%2d/%d :  %s" % (i, s, sulcus))
 			self._display_one(sulcus, distrib)
 			i += 1
 
@@ -180,7 +181,7 @@ class BlocGaussianDisplay(Display):
 				"feature, try one among : " + str(available))
 			sys.exit(1)
 		if self._features == 'help' :
-			print "available features are : " + str(available)
+			print("available features are : " + str(available))
 			sys.exit(0)
 
 	def _display_one(self, sulcus, gaussian):
@@ -219,11 +220,11 @@ def addBorder(img_in, width=1, border_value=0., aims_border=False):
                 aims.Volume_S16.Position4Di(*dim_in))
         numpy.asarray(outvol2)[:] = numpy.asarray(img_in.volume())
         return aims.AimsData_S16( outvol2 )
-	#print 'dim_in:', dim_in, ', width:', width
+	#print('dim_in:', dim_in, ', width:', width)
 	#if aims_border:
 		#dim_out = dim_in + [1, width]
 	#else:	dim_out = [(d + width * 2) for d in dim_in]
-	#print 'dim_out:', dim_out
+	#print('dim_out:', dim_out)
 	## call Aims constructor with border (5th param)
 	#img_out = img_in.__class__(*dim_out)
 	#a_in = img_in.volume().get().arraydata()
@@ -238,9 +239,9 @@ def addBorder(img_in, width=1, border_value=0., aims_border=False):
 		#mask[0, :, r1, :] = mask[0, :, r2, :] = \
 		#mask[0, :, :, r1] = mask[0, :, :, r2] = 0
 	## apply
-	#print 'a_in:', a_in.shape, a_in.flatten().shape
-	#print 'mask:', mask.shape
-	#print 'a_out:', a_out.shape, a_out[mask].shape
+	#print('a_in:', a_in.shape, a_in.flatten().shape)
+	#print('mask:', mask.shape)
+	#print('a_out:', a_out.shape, a_out[mask].shape)
 	#a_out[mask] = a_in.flatten()
 	#a_out[mask == 0] = border_value
 
@@ -459,7 +460,7 @@ def main():
 
 	hie = aims.Reader().read(options.hierarchy)
 
-	print "read..."
+	print("read...")
 	if options.sulci is None:
 		selected_sulci = None
 	else:	selected_sulci = options.sulci.split(',')
@@ -469,15 +470,15 @@ def main():
 	distribs = sulcimodel.segments_distrib()['vertices']
 	val, model_types = check_same_distribution(distribs)
 	if not val:
-		print "error: mix of different models is not handle, " + \
-			"%s found" % str(list(model_types))
+		print("error: mix of different models is not handle, " + \
+			"%s found" % str(list(model_types)))
 		sys.exit(1)
 	model_type = list(model_types)[0]
 	if not (model_type in ['gaussian', 'spam', 'depth_weighted_spam',
 						'gmm_from_spam']):
-		print "error : unhandle model type '%s'" % model_type
+		print("error : unhandle model type '%s'" % model_type)
 		sys.exit(1)
-	else:	print "model type '%s' found" % model_type
+	else:	print("model type '%s' found" % model_type)
 	args = [sulcimodel.segments_distrib(), hie, selected_sulci,
 			options.all, options.features, sulci_weights]
 	if model_type == 'gaussian' : d = GaussianDisplay(*args)

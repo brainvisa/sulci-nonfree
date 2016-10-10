@@ -27,6 +27,7 @@ __all__ = ['whiten', 'vq', 'kmeans', 'kmeans2']
 #   - warning: what happens if different number of clusters ? For now, emit a
 #   warning, but it is not great, because I am not sure it really make sense to
 #   succeed in this case (maybe an exception is better ?)
+from __future__ import print_function
 import warnings
 
 from numpy.random import randint
@@ -233,7 +234,7 @@ def _py_vq_1d(obs, code_book):
     dist = N.zeros((n, nc))
     for i in range(nc):
         dist[:, i] = N.sum(obs - code_book[i])
-    print dist
+    print(dist)
     code = argmin(dist)
     min_dist = dist[code]
 
@@ -297,7 +298,7 @@ def _kmeans(obs, guess, weights, thresh=1e-5):
             code_book = take(code_book, has_members, 0)
         if len(avg_dist) > 1:
             diff = avg_dist[-2] - avg_dist[-1]
-    #print avg_dist
+    #print(avg_dist)
     return code_book, avg_dist[-1]
 
 def kmeans(obs, k_or_guess, weights, iter=20, thresh=1e-5):
@@ -370,7 +371,7 @@ def kmeans(obs, k_or_guess, weights, iter=20, thresh=1e-5):
         best_dist = 100000
         No = obs.shape[0]
         k = k_or_guess
-        #print 'kmeans iter: ',
+        #print('kmeans iter: ',)
         for i in range(iter):
             #the intial code book is randomly selected from observations
             guess = take(obs, randint(0, No, k), 0)
@@ -553,10 +554,10 @@ if __name__  == '__main__':
     #a = N.random.randn(4, 2)
     #b = N.random.randn(2, 2)
 
-    #print _vq.vq(a, b)
-    #print _vq.vq(N.array([[1], [2], [3], [4], [5], [6.]]), 
-    #        N.array([[2.], [5.]]))
-    #print _vq.vq(N.array([1, 2, 3, 4, 5, 6.]), N.array([2., 5.]))
+    #print(_vq.vq(a, b))
+    #print(_vq.vq(N.array([[1], [2], [3], [4], [5], [6.]]),
+    #        N.array([[2.], [5.]])))
+    #print(_vq.vq(N.array([1, 2, 3, 4, 5, 6.]), N.array([2., 5.])))
     #_vq.vq(a.astype(N.float32), b.astype(N.float32))
     #_vq.vq(a, b.astype(N.float32))
     #_vq.vq([0], b)

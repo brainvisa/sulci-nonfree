@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import os, sys, pprint
 from sulci.models import distribution, distribution_all, \
 			classifier, classifier_all, sulci
@@ -7,8 +8,8 @@ import sigraph
 from soma import aims
 try:
 	import datamind.io.old_csvIO as datamind_io
-except ImportError, e:
-	print "datamind disable: ", e
+except ImportError as e:
+	print("datamind disable: ", e)
 
 
 ################################################################################
@@ -69,8 +70,8 @@ def read_from_exec(filename, var):
 		execfile(filename)
 		o = locals()[var]
 		return o
-	except Exception, e:
-		print e
+	except Exception as e:
+		print(e)
 		sys.exit(1)
 
 def numpy_read_from_exec(filename, var):
@@ -81,8 +82,8 @@ def numpy_read_from_exec(filename, var):
 		execfile(filename)
 		o = locals()[var]
 		return o
-	except Exception, e:
-		print e
+	except Exception as e:
+		print(e)
 		sys.exit(1)
 
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import os, sys, re
 from soma import aims, aimsalgo
 import numpy, optparse, tempfile, subprocess
@@ -205,7 +206,7 @@ for v in graph.vertices():
         #elif e.getSyntax() == 'plidepassage':
           #if e.has_key( ppatt ):
             #gav[ 'ss' ].append( e[ ppatt ] )
-          #else: print 'pli de passage without bucket'
+          #else: print('pli de passage without bucket')
       gav[ 'ss' ].append( bck )
       gav[ 'boundaries' ][0] += boundaries
       gav[ 'boundaries' ][1] += inhibitbounds
@@ -289,11 +290,11 @@ for label, globval in globaverage.iteritems():
     aims.write( tex, tfile )
   if nav != 0:
     average /= nav
-  print label, 'global average:', average
+  print(label, 'global average:', average)
   if nodewise:
     if globval[ 'nav' ] != 0:
       globval[ 'average' ] /= globval[ 'nav' ]
-    print label, 'nodewise average:', globval[ 'average' ]
+    print(label, 'nodewise average:', globval[ 'average' ])
   if csvfile:
     if label.endswith( '_left' ):
       side = 'left'

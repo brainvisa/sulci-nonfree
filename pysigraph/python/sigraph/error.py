@@ -32,6 +32,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
 import numpy
 import sigraph
 from soma import aims
@@ -136,7 +137,7 @@ def computeLocalErrorRates(lg, bg, filtred_labels):
 		try: size = v['size']
 		except KeyError: size = 0
 		if label != name:
-			print "%s -> %s (size : %f)" % (name, label, size)
+			print("%s -> %s (size : %f)" % (name, label, size))
 			tp, fn = 0, size
 		else:	tp, fn = size, 0
 		if not sulci_errors.has_key(name):
@@ -190,9 +191,9 @@ def print_global_errors(dict):
     dict : output of computeGlobalErrorRates function.
 	'''
 	for type in dict.keys():
-		print "\n%s Errors (%%):" % type
+		print("\n%s Errors (%%):" % type)
 		for name, val in dict[type].items():
-			print "- %s : %f" % (name, val * 100)
+			print("- %s : %f" % (name, val * 100))
 
 
 def computeErrorRates(base_graph, labeled_graph,

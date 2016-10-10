@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import sys, os, shutil
 
 powermode = 0
@@ -28,18 +29,18 @@ while i < len( sys.argv ):
 divname += progsuffix
 silearn += progsuffix
 pidcom += progsuffix
-print 'siLearn command:', silearn
+print('siLearn command:', silearn)
 
-print "machines :"
-print machines
+print("machines :")
+print(machines)
 if len( machines ) == 0:
-    print "usage: ", sys.argv[0], " [-d|--devel] [-p|--power] machine1 ",
-    "[power1] machine2 [power2]..."
-    print "dispatches sigraph model learning over a set of machines"
-    print "-d: use devel version of learning command lines (si*-dev)"
-    print "-p: specify power index for each machine (default: all set to 1)"
-    print "[power1], [power2]....: if -p is given, power index associated with"
-    print "preceding machine"
+    print("usage: ", sys.argv[0], " [-d|--devel] [-p|--power] machine1 ",
+    "[power1] machine2 [power2]...")
+    print("dispatches sigraph model learning over a set of machines")
+    print("-d: use devel version of learning command lines (si*-dev)")
+    print("-p: specify power index for each machine (default: all set to 1)")
+    print("[power1], [power2]....: if -p is given, power index associated with")
+    print("preceding machine")
     sys.exit( 1 )
 
 npow = 0
@@ -48,30 +49,30 @@ while i < len( machines ):
     npow += machines[i][1]
     i += 1
 
-print "power sum: ", npow
+print("power sum: ", npow)
 
 file = os.popen( "ls model/adap/*.mod | wc" )
 n = file.readlines()
 file.close()
 if len( n ) == 0:
-    print "could not find nodes models"
+    print("could not find nodes models")
     sys.exit( 1 )
 nnodes = int( n[0].split()[0] ) - 1
-print "nodes: ", nnodes
+print("nodes: ", nnodes)
 
 file = os.popen( "ls model/edges/*.mod | wc" )
 n = file.readlines()
 file.close()
 if len( n ) == 0:
-    print "could not find relations models"
+    print("could not find relations models")
     sys.exit( 1 )
 nedges = int( n[0].split()[0] )
-print "edges: ", nedges
+print("edges: ", nedges)
 
 mnodes = nnodes * npow / ( nnodes + nedges )
-print mnodes
+print(mnodes)
 medges = npow - mnodes
-print medges
+print(medges)
 
 nodemach = 0
 nodepow = 0
@@ -88,7 +89,7 @@ while nodemach < len( machines ):
         break
 
 nodemach += 1
-print "machines for nodes: ", nodemach, "(power: ", nodepow, ")"
+print("machines for nodes: ", nodemach, "(power: ", nodepow, ")")
 
 i = 0
 cpustr = ""
@@ -97,7 +98,7 @@ while i < nodemach:
         cpustr += " "
     cpustr += str( machines[i][1] )
     i += 1
-print "dividing nodes..."
+print("dividing nodes...")
 os.system( divname + " -c model/adap /tmp/nodes " + cpustr )
 
 cpustr = ""
@@ -106,7 +107,7 @@ while i < len( machines ):
         cpustr += " "
     cpustr += str( machines[i][1] )
     i += 1
-print "dividing edges..."
+print("dividing edges...")
 os.system( divname + " -c -p edg model/edges /tmp/edges " + cpustr )
 
 cfgbase = 'siPartLearn-'
@@ -115,13 +116,13 @@ dir = os.getcwd()
 i = 0
 for m in machines:
     cfg = cfgbase + str(i) + '-' + m[0] + ".cfg"
-    print "config: ", cfg
+    print("config: ", cfg)
     log = "loglearn-" + str(i) + '-' + m[0] + ".log"
-    print "log file: ", log
+    print("log file: ", log)
     cmd = "cd " + dir + "; nice " + pidcom + " PID-" + str(i) + '-' \
           + m[0] + " " + silearn + " " + cfg + " >& " + log
-    print "command:"
-    print cmd
+    print("command:")
+    print(cmd)
     try:
         os.remove( log )
     except:
@@ -138,7 +139,7 @@ for m in machines:
     lines  = file.readlines()
     file.close()
     if len( lines ) == 0 or ( len( lines ) == 1 and lines[0] == '' ):
-        print "empty param file ", cfile
+        print("empty param file ", cfile)
         lfile.close()
         os.remove( cfile )
     else:
@@ -147,6 +148,6 @@ for m in machines:
         lfile.close()
         os.remove( cfile )
         rshcom = "rsh " + m[0] + ' "' + cmd + '" &'
-        print rshcom
+        print(rshcom)
         os.system( rshcom )
     i += 1

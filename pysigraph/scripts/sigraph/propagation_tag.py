@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import os, sys, numpy, pylab
 from optparse import OptionParser
 import sigraph
@@ -22,7 +23,7 @@ class VertexModel(object):
 			pn = bayesian_model['priors_nodes_hash']
 			self._prior_ind = pn[priors]
 		else:	self._prior_ind = -1
-		print "compute node priors..."
+		print("compute node priors...")
 		self._priors = self._compute_priors()
 
 	def _compute_priors(self):
@@ -45,7 +46,7 @@ class VertexModel(object):
 		return gv[label]['density']
 
 	def _transmat(self, xi):
-		print "error : abstract method"
+		print("error : abstract method")
 
 	def states(self): return self._states
 
@@ -114,7 +115,7 @@ class EdgeModel(object):
 			pn = bayesian_model['priors_relations_hash']
 			self._prior_ind = pn[priors]
 		else:	self._prior_ind = -1
-		print "compute relation priors..."
+		print("compute relation priors...")
 		self._priors = self._compute_priors()
 
 	def get_priors(self):
@@ -186,13 +187,13 @@ class EdgeModel(object):
 			distrib = ge[labels]['density']
 		except KeyError:
 			if labels == ('S.C._right', 'S.C._right'):
-				print ge[labels]['density']
+				print(ge[labels]['density'])
 			distrib = distribution.FakeGaussian(eps)
 			ge[labels] = {'density': distrib }
 		return distrib
 
 	def _transmat(self, xi, xj):
-		print "error : abstract method"
+		print("error : abstract method")
 
 	def transmat(self, xi, xj):
 		t = numpy.multiply(self._transmat(xi, xj), self._priors)
@@ -235,8 +236,8 @@ class GravityCentersDistanceEdgeModel(EdgeModel):
 
 	def _transmat(self, xi, xj):
 		#FIXME : unfinished
-		print type(xi['refgravity_center'])
-		print dir(xi['refgravity_center'])
+		print(type(xi['refgravity_center']))
+		print(dir(xi['refgravity_center']))
 		g1 = numpy.asarray(xi['refgravity_center'].list())
 		g2 = numpy.asarray(xj['refgravity_center'].list())
 		dist = numpy.sqrt(((g1 - g2) ** 2).sum())
@@ -358,7 +359,7 @@ class LoopyBeliefPropagation(object):
 		self._graph_data = graph_data
 		self._states = node_model._states
 		self._states_n = len(self._states)
-		print " * states number = ", self._states_n
+		print(" * states number = ", self._states_n)
 		self._messages = {}
 		self._messages2 = {}
 		self._transmats = {}
@@ -370,7 +371,7 @@ class LoopyBeliefPropagation(object):
 			if xi.getSyntax() != 'fold': continue
 			ri = xi['index']
 			self._old_believes[ri] = z.copy()
-		print "init transition matrices..."
+		print("init transition matrices...")
 		self._init_messages()
 
 	def _create_full_transmat(self, phi_i, psi_ij):
@@ -445,15 +446,15 @@ class LoopyBeliefPropagation(object):
 			#		if s == 'F.I.P.r.int.2_right'][0]
 			#	ind2 = [i for i, s in enumerate(self._states) \
 			#		if s == 'F.P.O._right'][0]
-			#	print "------------------"
-			#	print "b = ", b.T, b[ind1], b[ind2]
+			#	print("------------------")
+			#	print("b = ", b.T, b[ind1], b[ind2])
 			#	for xk in xi.neighbours():
 			#		if xk.getSyntax() != 'fold': continue
 			#		rk = xk['index']
 			#		mki = self._messages[rk, ri]
-			#		print "rk, mki = ", rk, mki.T, mki[ind1], mki[ind2]
-			#	print "prod_mki = ", prod_mki.T, prod_mki[ind1], prod_mki[ind2]
-			#	print 'phi_i = ', phi_i.T, phi_i[ind1], phi_i[ind2]
+			#		print("rk, mki = ", rk, mki.T, mki[ind1], mki[ind2])
+			#	print("prod_mki = ", prod_mki.T, prod_mki[ind1], prod_mki[ind2])
+			#	print('phi_i = ', phi_i.T, phi_i[ind1], phi_i[ind2])
 
 			self._believes[ri] = b
 
@@ -472,7 +473,7 @@ class LoopyBeliefPropagation(object):
 
 		while 1:
 			t += 1
-			print " ===== %s ===== " % t
+			print(" ===== %s ===== " % t)
 			for xi in g.vertices():
 				if xi.getSyntax() != 'fold': continue
 				for xj in xi.neighbours():
@@ -493,8 +494,8 @@ class LoopyBeliefPropagation(object):
 					b1 = self._old_believes[ri]
 					b2 = self._believes[ri]
 					e1 += numpy.abs(b1 - b2).sum()
-				print "e = ", e1, \
-					(e1 / (self._states_n * nodes_n))
+				print("e = ", e1, \
+					(e1 / (self._states_n * nodes_n)))
 				if t > 100 or e1 < 0.01: break
 				#if e1 < 0.1 or (e0 - e1 < 0) or t > 100 : break
 				e0 = e1
@@ -600,21 +601,21 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	error_parsing = False
 	if (None in [options.input_graphname]):
-		print "give an input graph"
+		print("give an input graph")
 		error_parsing = True
 	if (options.distribnodesname == None):
 		if (options.node_model_type == None):
-			print "give a node distrib model : --distrib_nodes " \
-				"or --node-type-model"
+			print("give a node distrib model : --distrib_nodes " \
+				"or --node-type-model")
 			error_parsing = True
 		if (options.node_prior):
-			print "node prior need a node distrib model"
+			print("node prior need a node distrib model")
 			error_parsing = True
 	if (options.distribrelname == None and \
 		options.distribnodesname == None and \
 		options.relation_prior):
-		print "relation prior need a relation distrib " \
-				"model or a node distrib model"
+		print("relation prior need a relation distrib " \
+				"model or a node distrib model")
 		error_parsing = True
 
 	if error_parsing:
@@ -622,7 +623,7 @@ def main():
 		sys.exit(1)
 
 	# read graph_model and distrib models
-	print "read..."
+	print("read...")
 	bayesian_model = io.read_bayesian_model(options.graphmodelname,
 			options.distribnodesname, options.distribrelname)
 	node_distrib = bayesian_model['node_distrib']
@@ -651,8 +652,8 @@ def main():
 		isinstance(node_model_type, tuple):
 		node_model_type = node_model_type[0]
 
-	print "node model = ", node_model_type
-	print "rel model = ", rel_model_type
+	print("node model = ", node_model_type)
+	print("rel model = ", rel_model_type)
 
 	# choose node models
 	node_opt = [graph, bayesian_model, options.node_prior]
@@ -678,7 +679,7 @@ def main():
 		edge_model = MinDistanceEdgeModel(*rel_opt)
 
 	# propagation tag
-	print "loopy belief propagation..."
+	print("loopy belief propagation...")
 	lbp = LoopyBeliefPropagation(node_model, edge_model, graph)
 	lbp.run(options.csvname, options.output_graphname,
 				options.save_all_steps)

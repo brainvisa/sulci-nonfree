@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys
 from optparse import OptionParser
 import sigraph
@@ -43,12 +44,12 @@ def parseOpts(argv):
 def main():
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.input_graphname, options.output_graphname]:
-		print "error: forgotten option"
+		print("error: forgotten option")
 		parser.print_help()
 		sys.exit(1)
 
 	if not (options.label_type in ['name', 'label']):
-		print "unknown label type '%s'" % options.label_type
+		print("unknown label type '%s'" % options.label_type)
 		parser.print_help()
 		sys.exit(1)
 

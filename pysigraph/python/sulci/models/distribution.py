@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import pickle, numpy, scipy.stats, scipy.special
 
 # from Gael Varoquaux
@@ -312,8 +313,8 @@ class Gaussian(Distribution):
 		else:	
 			if robust:
 				if (len(X) == 1):
-					print "warning: covariance matrix " + \
-					"estimation failed: not enough data."
+					print("warning: covariance matrix " + \
+					"estimation failed: not enough data.")
 					self._cov = None
 					return False
 				else:
@@ -322,8 +323,8 @@ class Gaussian(Distribution):
 			else:	cov = Xc.T * Xc / (n - 1)
 			l, v = numpy.linalg.eigh(cov.I)
 			if numpy.min(l) < 0:
-				print "warning: covariance matrix " + \
-					"estimation failed: negative eigvalue."
+				print("warning: covariance matrix " + \
+					"estimation failed: negative eigvalue.")
 				self._cov = None
 				return False
 		self._cov = cov
@@ -748,7 +749,7 @@ class Gamma(Distribution):
 		
 	def _check(self, X):
 		if X.min() >= 0: return 1
-		print 'LGamma : negative or null values. Cannot proceed'
+		print('LGamma : negative or null values. Cannot proceed')
 		return 0
 
 	def _dichopsi_log(self, u, v, y, eps = 0.00001):
@@ -784,7 +785,7 @@ class Gamma(Distribution):
 			y = numpy.dot(weights, numpy.log(X)) - \
 				numpy.log(numpy.dot(weights, X))
 		if y > 0:
-			print "y", y
+			print("y", y)
 			raise ValueError, "y>0, the problem cannot be solved"
 		u = 1.
 		if y > scipy.special.psi(u) - scipy.special.log(u):
@@ -1075,7 +1076,7 @@ class VonMises(Distribution):
 
 	def _check(self, X):
 		if X.shape[1] == 1: return 1
-		print "error : Von Misses : accept only 1D data of angles"
+		print("error : Von Misses : accept only 1D data of angles")
 		return 0
 
 	def _Ainv(self, x):
@@ -1183,7 +1184,7 @@ class VonMisesFisher(Distribution):
 
 	def _check(self, X):
 		if (((X ** 2).sum(axis=1) - 1) ** 2 > 10e-5).any(): return 1
-		print "error : Von Misses : accept only unit vectorial data"
+		print("error : Von Misses : accept only unit vectorial data")
 		return 0
 
 	def _Ainv_bisect(self, d, r, eps=10e-5):
@@ -1506,8 +1507,8 @@ class Dirichlet(Distribution):
 
 	def _check(self, X):
 		if ((X.sum(axis=1) - 1) ** 2 < 10e-5).all(): return 1
-		print "error : Dirichlet accepts only data on the " \
-			"(dim-1) simplex : for each X, sum(X)=1."
+		print("error : Dirichlet accepts only data on the " \
+			"(dim-1) simplex : for each X, sum(X)=1.")
 		return 0
 
 	def update(self):
@@ -1626,7 +1627,7 @@ class GeneralizedDirichlet(Dirichlet):
 			n = (m_i * (h - m_i) - v_i)
 			d = (m_i ** 2 * (k - h) + k * v_i)
 			if not d:
-				print "error fitting generalized dirichlet"
+				print("error fitting generalized dirichlet")
 				return
 			div = n / d
 			a_i = m_i * div
@@ -2282,13 +2283,13 @@ class Gmm(Distribution):
 		#filedump = "filedump" #FIXME
 		if W is not None:
 		#	if not os.path.exists(filedump):
-		#		print "write"
+		#		print("write")
 			C, labels = my_vq.kmeans2(X, k, weights=W)
 		#		fd = open(filedump, 'w')
 		#		pickle.dump((C,labels), fd)
 		#		fd.close()
 		#	else:
-		#		print "read"
+		#		print("read")
 		#		fd = open(filedump, 'r')
 		#		C, labels = pickle.load(fd)
 		#		fd.close()
@@ -2352,9 +2353,9 @@ class Gmm(Distribution):
 			#self._pi = Psum #
 			#self._pi[:] = 1. #
 			self._pi /= self._pi.sum()
-			#print "C = ", self._C
-			#print "S = ", self._S
-			#print "pi = ", self._pi
+			#print("C = ", self._C)
+			#print("S = ", self._S)
+			#print("pi = ", self._pi)
 
 
 			# energy
@@ -2380,7 +2381,7 @@ class Gmm(Distribution):
 				numpy.dot(1-theta,numpy.log(1./self._det))+tr)))
 				
 			en /= n
-			if verbose >= 1: print "%d) en = %f" % (t, en)
+			if verbose >= 1: print("%d) en = %f" % (t, en))
 			if ((t > itermin) and (en <= olden) \
 				and (olden - en < eps)) or (t > itermax):
 				break
@@ -2473,15 +2474,15 @@ class GmmFromSpam(Gmm):
 		X = numpy.array([x for x in index_tricks.ndindex(shape)])
 		X *= freq
 		X += t
-		#	print X.min(axis=0), X.max(axis=0)
+		#	print(X.min(axis=0), X.max(axis=0))
 		logli, W = spam.likelihoods(X, shift=0.)
-		#	print "write"
+		#	print("write")
 		#	obj = (X, logli, W)
 		#	fd = open(filedump, 'w')
 		#	pickle.dump(obj, fd)
 		#	fd.close()
 		#else:
-		#	print "read"
+		#	print("read")
 		#	fd = open(filedump, 'r')
 		#	(X, logli, W) = pickle.load(fd)
 		#	fd.close()

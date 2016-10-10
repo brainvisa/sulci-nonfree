@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import os, sys
 import numpy
 from soma import aims, aimsalgo
@@ -48,7 +49,7 @@ def main():
 	avol2 = vol2.volume().arraydata()
 	for i, ind in enumerate(indices):
 		avol2[avol == ind] = i
-	print "indices = ", indices
+	print("indices = ", indices)
 	aims.Writer().write(ttex, 'plop.tex')
 	aims.Writer().write(vol2, 'voronoi_vol.ima')
 

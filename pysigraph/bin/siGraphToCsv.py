@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import sys, os, numpy
 from optparse import OptionParser
 from sulci.common import io, add_translation_option_to_parser
@@ -30,13 +31,13 @@ def main():
 	graphnames = args[1:]
 	parser_error = False
 	if len(graphnames) == 0:
-		print "you must give at least one graph"
+		print("you must give at least one graph")
 		parser_error = True
 	if options.features is None:
-		print "you must specified at least one feature"
+		print("you must specified at least one feature")
 		parser_error = True
 	if options.csvname is None:
-		print "you must specified an output csv"
+		print("you must specified an output csv")
 		parser_error = True
 	if parser_error:
 		parser.print_help()
@@ -54,8 +55,8 @@ def main():
 				try:
 					data.append(v[feature])
 				except KeyError, e:
-					print "%s (%s) unknown feature %s" % \
-						(sulcus, v['index'], e)
+					print("%s (%s) unknown feature %s" % \
+						(sulcus, v['index'], e))
 					data.append(numpy.nan)
 			data = numpy.array(data)
 			if not h.has_key(sulcus):

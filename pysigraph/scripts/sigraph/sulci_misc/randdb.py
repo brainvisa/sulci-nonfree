@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
 
@@ -23,7 +24,7 @@ def main():
 	# options
 	parser, (options, args) = parseOpts(sys.argv)
 	if None in [options.training_size, options.graphsfile]:
-		print "missing option(s)"
+		print("missing option(s)")
 		parser.print_help()
 		sys.exit(1)
 

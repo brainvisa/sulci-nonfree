@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import os, sys, numpy, pprint, re
 from optparse import OptionParser
 import sigraph
@@ -24,11 +25,11 @@ class Prior(object):
 		self._compute_likelihoods = compute_likelihoods
 
 	def _extract_local_data(self, vertex):
-		print "undefined virtual method"
+		print("undefined virtual method")
 		sys.exit(1)
 
 	def _post_process_extracted_graph_data(self, h):
-		print "undefined virtual method"
+		print("undefined virtual method")
 		sys.exit(1)
 
 	def _extract_data(self):
@@ -50,7 +51,7 @@ class Prior(object):
 	def _compute_likelihoods_func(self, X):
 		for x in X:
 			logli, li = self._distr.likelihood(x)
-			print "proba density (log) = %f (%f) " % (li, logli)
+			print("proba density (log) = %f (%f) " % (li, logli))
 
 	def eval(self):
 		X = self._extract_data()
@@ -136,7 +137,7 @@ def compute_prior(graphs, MyPrior, distr, options, output):
 	prefix = output
 	try:	os.mkdir(prefix)
 	except OSError, e:
-		print "warning: directory '%s' allready exists" % prefix
+		print("warning: directory '%s' allready exists" % prefix)
 
 	prior = MyPrior(graphs, distr,
 			options.compute_likelihoods)
@@ -200,10 +201,10 @@ def main():
 
 	graphnames = args[1:]
 	if len(graphnames) == 0:
-		print "give at least one graph"
+		print("give at least one graph")
 		error_parsing = True
 	if not (options.prior_type in prior_map.keys()):
-		print "unknown prior type '%s'" % options.prior_type
+		print("unknown prior type '%s'" % options.prior_type)
 	if error_parsing:
 		parser.print_help()
 		sys.exit(1)
@@ -217,18 +218,18 @@ def main():
 	if options.mode == 'normal' :
 		compute_prior(graphs, MyPrior, distr, options, options.output)
 	elif options.mode == 'loo' :
-		print "-- all --"
+		print("-- all --")
 		distribdir = os.path.join('all', options.output)
 		compute_prior(graphs, MyPrior, distr, options, distribdir)
 		for i in range(len(graphs)):
 			subgraphs = graphs[:i] + graphs[i+1:]
 			dir = 'cv_%d' % i
-			print '-- %s --' % dir
+			print('-- %s --' % dir)
 			distribdir = os.path.join(dir, options.output)
 			compute_prior(subgraphs, MyPrior, distr,
 				options, distribdir)
 	else:
-		print "error : '%s' unknown mode" % options.mode
+		print("error : '%s' unknown mode" % options.mode)
 
 
 

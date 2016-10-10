@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, numpy
 from soma import aims
 from sulci.common import io
@@ -54,8 +55,8 @@ class SulcusWiseRigidTransformations(aims.Transformation3d):
 
 	def write(self, directory, summary_filename):
 		try:	os.mkdir(directory)
-		except OSError, e:
-			print "directory '%s' allready exists" % directory
+		except OSError as e:
+			print("directory '%s' allready exists" % directory)
 		h = {}
 		for sulcus, trans in self._transformations.items():
 			if trans is None: continue
