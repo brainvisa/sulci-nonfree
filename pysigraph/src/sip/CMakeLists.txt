@@ -11,6 +11,7 @@ BRAINVISA_COPY_FILES( ${PROJECT_NAME}-dev
 file( GLOB _sipSources "${CMAKE_CURRENT_SOURCE_DIR}/*.sip" )
 
 file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}" )
+
 exec_program( "${PYTHON_EXECUTABLE}"
   ARGS "${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py"
         -s "${AIMS-FREE_SIP_DIRECTORY}"
@@ -20,6 +21,7 @@ exec_program( "${PYTHON_EXECUTABLE}"
         -t "${AIMS-FREE_SIP_DIRECTORY}/typessub.py"
         -t "${CMAKE_CURRENT_SOURCE_DIR}/typessub.py"
         -l
+        -P "'${CMAKE_C_PREPROCESSOR}'"
   OUTPUT_VARIABLE _generatedSipFileList 
   RETURN_VALUE _returnValue )
 
