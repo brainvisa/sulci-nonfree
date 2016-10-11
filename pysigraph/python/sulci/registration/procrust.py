@@ -1032,7 +1032,7 @@ class MixtureLocalRegistration(Registration):
 				local_en = algo.getCurrentEnergy()
 				new_energy += local_en
 				if self._verbose > 1:
-					print("local en = ", local_en)0
+					print("local en = ", local_en)
 				self._trans[i] = R, t
 				Xi = R * (X - g) + (t + g)
 				logli, li = spam.likelihoods_groups(Xi.T,
