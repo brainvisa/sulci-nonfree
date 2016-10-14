@@ -284,8 +284,8 @@ class Gaussian(Distribution):
 
 	def setMeanCov(self, mean=None, cov=None):
 		'''set mean/cov (if not None) and update internal parameters'''
-		if mean != None: self.set_mean(mean)
-		if cov != None: self.set_cov(cov)
+		if mean is not None: self.set_mean(mean)
+		if cov is not None: self.set_cov(cov)
 		self.update()
 
 	def toTuple(self):
@@ -470,7 +470,7 @@ class FixedSphericalGaussian(Gaussian):
 
 	def setStd(self, std):
 		self._std = std
-		if self._mean != None: self._compute_norm()
+		if self._mean is not None: self._compute_norm()
 
 	def fit(self, db):
 		try:	X = db.getX()
