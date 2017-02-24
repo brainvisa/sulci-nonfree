@@ -26,6 +26,12 @@ string FGraphMethod::ID() const
 }
 
 
+string FGraphMethod::generatedObjectType() const
+{
+  return AObject::objectTypeName( AFGraph::classType() );
+}
+
+
 FGraphMethod::~FGraphMethod()
 {
 }
