@@ -9,12 +9,8 @@ import fff.GMM
 import datamind.io.old_csvIO as datamind_io
 from datamind.tools import *
 from sulci.common import io
-if sys.modules.has_key( 'PyQt4' ):
-	qt4=True
-	import PyQt4.QtGui as qt
-else:
-	qt4=False
-	import qt
+qt4=True
+import soma.qt_gui.qt_backend.QtGui as qt
 
 a = anatomist.Anatomist()
 

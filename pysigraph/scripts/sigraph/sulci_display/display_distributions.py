@@ -3,7 +3,7 @@ from __future__ import print_function
 import os, sys, exceptions, numpy
 from optparse import OptionParser
 
-import PyQt4.QtGui as qt
+import soma.qt_gui.qt_backend.QtGui as qt
 qt4 = True
 
 import sigraph

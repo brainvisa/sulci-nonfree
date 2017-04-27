@@ -15,12 +15,8 @@ try:
 	import datamind.io.old_csvIO as csv_io
 except ImportError:
 	print("import failed: disable datamind")
-if sys.modules.has_key( 'PyQt4' ):
-  USE_QT4=True
-  import PyQt4.QtCore as qt
-else:
-  USE_QT4=False
-  import qt
+USE_QT4=True
+import soma.qt_gui.qt_backend.QtCore as qt
 
 
 ################################################################################
