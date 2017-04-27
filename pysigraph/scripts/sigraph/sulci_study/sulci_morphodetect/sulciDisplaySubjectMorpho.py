@@ -85,12 +85,7 @@ w = a.createWindow( '3D' )
 a.execute( 'SetObjectPalette', objects=[ag], absoluteMode=1, min=-3., max=3. )
 w.addObjects( [ag], add_graph_nodes=True )
 
-if sys.modules.has_key( 'PyQt4' ):
-  from PyQt4 import QtGui
-  if QtGui.qApp.startingUp():
-    QtGui.qApp.exec_()
-else:
-  import qt
-  if qt.qApp.startingUp():
-    qt.qApp.exec_loop()
+from soma.qt_gui.qt_backend import QtGui
+if QtGui.qApp.startingUp():
+  QtGui.qApp.exec_()
 
