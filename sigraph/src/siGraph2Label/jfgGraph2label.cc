@@ -8,6 +8,8 @@
 #include <aims/io/writer.h>
 #include <aims/bucket/bucket.h>
 #include <aims/getopt/getopt2.h>
+#include <aims/transformation/affinetransformation3d.h>
+#include <aims/graph/graphmanip.h>
 #include <list>
 #include <vector>
 #include <cartobase/exception/assert.h>
@@ -28,6 +30,8 @@ int main( int argc, const char** argv )
   string		gname, tvname, vname, tname, otrans, itrans;
   vector<string>	bname, aname, lname1, synt1;
   set<string>		lname, synt;
+  bool                  use_tal = false;
+  Reader<AffineTransformation3d> trreader;
 
   AimsApplication	app( argc, argv, "Create a volume of label from a " 
                              "graph and a file translation.txt " 
@@ -77,6 +81,16 @@ int main( int argc, const char** argv )
                  "not saved]", true );
   app.alias( "--outtrans", "-ot" );
   app.alias( "--intrans", "-it" );
+  app.addOption( use_tal, "--talairach",
+                 "apply internal Talairach transform (prior to other "
+                 "coordinates transform if specified). Note that Talairach "
+                 "transform is centered on 0 and will end up with most of the "
+                 "brain outside of the output volume if used alone without an "
+                 "additional translation.", true );
+  app.addOption( trreader, "--transform",
+                 "apply the given coordinates transformation (.trm file), "
+                 "after Talairach transform if --talairach is also used",
+                 true );
 
   try
     {
@@ -93,6 +107,19 @@ int main( int argc, const char** argv )
       cout << "graph read\n";
       if( !tname.empty() )
         si().setLabelsTranslPath( tname );
+
+      // transformation handling
+      AffineTransformation3d transform, talairach;
+      talairach = GraphManip::talairach( *fg );
+      if( use_tal )
+        transform = talairach;
+
+      if( !trreader.fileName().empty() )
+      {
+        AffineTransformation3d tr;
+        trreader.read( tr );
+        transform = tr * transform;
+      }
 
       // graph voxel size
       vector<float>	vs;
@@ -119,6 +146,56 @@ int main( int argc, const char** argv )
         vol = VolumeRef<short>( dims[0] + 1, dims[1] + 1, dims[2] + 1 );
         vvs = vs;
         vol->header().setProperty( "voxel_size", vvs );
+      }
+
+      // adapt volume transforms
+      {
+        vector<string> refs;
+        vector<vector<float> > vtrans;
+        AffineTransformation3d invtrans = transform.inverse();
+        if( vol->header().hasProperty( "referential" ) )
+          vol->header().removeProperty( "referential" );
+        if( !transform.isIdentity() )
+        {
+          refs.push_back( "subject space" );
+          if( fg->hasProperty( "referential" ) )
+            refs[0] = fg->getProperty( "referential" )->getString();
+          vtrans.push_back( invtrans.toVector() );
+        }
+        else if( fg->hasProperty( "referential" ) )
+          vol->header().setProperty(
+            "referential", fg->getProperty( "referential" )->getString() );
+
+        refs.push_back( "Talairach-AC/PC-Anatomist" );
+        vtrans.push_back( ( talairach * invtrans ).toVector() );
+
+        if( fg->hasProperty( "transformations" ) )
+        {
+          Object tlist = fg->getProperty( "transformations" );
+          Object rlist = fg->getProperty( "referentials" );
+          int i;
+          Object it = tlist->objectIterator();
+          Object ir = rlist->objectIterator();
+          for( i=0; it->isValid() && ir->isValid();
+                it->next(), ir->next(), ++i )
+          {
+            string ref = ir->currentValue()->getString();
+            if( ref != "Talairach-AC/PC-Anatomist" )
+            {
+              AffineTransformation3d t
+                = AffineTransformation3d( it->currentValue() );
+              t *= invtrans;
+              vtrans.push_back( t.toVector() );
+              refs.push_back( ref );
+            }
+          }
+        }
+
+        if( !refs.empty() )
+        {
+          vol->header().setProperty( "referentials", refs );
+          vol->header().setProperty( "transformations", vtrans );
+        }
       }
 
       map<string, short>			labels;
@@ -232,8 +309,9 @@ int main( int argc, const char** argv )
                           {
                             pos = ib->first;
                             // transform voxel size from bucket vs to volume vs
-                            fpos = Point3df( pos[0] * vs[0], pos[1] * vs[1],
-                                             pos[2] * vs[2] );
+                            fpos = transform.transform(
+                              Point3df( pos[0] * vs[0], pos[1] * vs[1],
+                                        pos[2] * vs[2] ) );
                             pos[0] = int( rint( fpos[0] / vvs[0] ) );
                             pos[1] = int( rint( fpos[1] / vvs[1] ) );
                             pos[2] = int( rint( fpos[2] / vvs[2] ) );
@@ -257,9 +335,9 @@ int main( int argc, const char** argv )
                                 pos = ib->first;
                                 // transform voxel size from bucket vs
                                 // to volume vs
-                                fpos = Point3df( pos[0] * vs[0],
-                                                 pos[1] * vs[1],
-                                                 pos[2] * vs[2] );
+                                fpos = transform.transform(
+                                  Point3df( pos[0] * vs[0], pos[1] * vs[1],
+                                            pos[2] * vs[2] ) );
                                 pos[0] = int( rint( fpos[0] / vvs[0] ) );
                                 pos[1] = int( rint( fpos[1] / vvs[1] ) );
                                 pos[2] = int( rint( fpos[2] / vvs[2] ) );
