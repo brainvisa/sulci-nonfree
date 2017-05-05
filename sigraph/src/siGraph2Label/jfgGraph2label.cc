@@ -3,10 +3,10 @@
 #include <si/fold/fgraph.h>
 #include <si/global/global.h>
 #include <si/fold/labelsTranslator.h>
-#include <aims/data/data_g.h>
-#include <aims/io/io_g.h>
-#include <aims/bucket/bucket.h>
+#include <cartodata/volume/volume.h>
+#include <aims/io/reader.h>
 #include <aims/io/writer.h>
+#include <aims/bucket/bucket.h>
 #include <aims/getopt/getopt2.h>
 #include <list>
 #include <vector>
@@ -43,7 +43,10 @@ int main( int argc, const char** argv )
   app.alias( "-translation", "-tr" );
   app.alias( "--translation", "-tr" );
 
-  app.addOption( tvname, "-tv", "template volume: ", true );
+  app.addOption( tvname, "-tv",
+                 "template volume: used to set label volume dimensions and "
+                 "voxel size. Note that a resampling takes place if voxel "
+                 "sizes differ between graph and output volume.", true );
   app.alias( "-template", "-tv" );
   app.alias( "--template", "-tv" );
 
@@ -79,7 +82,7 @@ int main( int argc, const char** argv )
     {
       app.initialize();
 
-      AimsData<short> vol;
+      VolumeRef<short> vol;
 
       Reader<Graph>        fr( gname );
       auto_ptr<Graph>	fg( fr.read() );
@@ -91,26 +94,32 @@ int main( int argc, const char** argv )
       if( !tname.empty() )
         si().setLabelsTranslPath( tname );
 
+      // graph voxel size
+      vector<float>	vs;
+      if( !fg->getProperty( "voxel_size", vs ) || vs.size() < 3 )
+      {
+        vs.push_back( 1 );
+        vs.push_back( 1 );
+        vs.push_back( 1 );
+      }
+      // volume voxel size
+      vector<float> vvs( 1., 3 );
+
       if( !tvname.empty() )
-        {
-          Reader<AimsData<short> > tvreader( tvname );
-          tvreader.read( vol );
-        }
+      {
+        Reader<Volume<short> > tvreader( tvname );
+        vol.reset( tvreader.read() );
+        vvs = vol->getVoxelSize();
+      }
       else	// make vol from graph information
-        {
-          vector<int>	dims;
-          vector<float>	vs;
-          ASSERT( fg->getProperty( "boundingbox_max", dims ) 
-                  && dims.size() >= 3 );
-          if( !fg->getProperty( "voxel_size", vs ) || vs.size() < 3 )
-            {
-              vs.push_back( 1 );
-              vs.push_back( 1 );
-              vs.push_back( 1 );
-            }
-          vol = AimsData<short>( dims[0] + 1, dims[1] + 1, dims[2] + 1 );
-          vol.setSizeXYZT( vs[0], vs[1], vs[2], 1 );
-        }
+      {
+        vector<int>	dims;
+        ASSERT( fg->getProperty( "boundingbox_max", dims )
+                && dims.size() >= 3 );
+        vol = VolumeRef<short>( dims[0] + 1, dims[1] + 1, dims[2] + 1 );
+        vvs = vs;
+        vol->header().setProperty( "voxel_size", vvs );
+      }
 
       map<string, short>			labels;
       map<short, string>			rlabels;
@@ -123,10 +132,11 @@ int main( int argc, const char** argv )
       rc_ptr<BucketMap<Void> >			bck;
       BucketMap<Void>::Bucket::const_iterator	ib, fb;
       AimsVector<short, 3>			pos;
+      Point3df                                  fpos;
       FoldLabelsTranslator			trans;
       map<string, string>::const_iterator	il, fl = trans.end();
 
-      vol = 0;
+      *vol = 0;
       if( aname.empty() )
         {
           aname.push_back( "label" );
@@ -221,10 +231,16 @@ int main( int argc, const char** argv )
                         for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
                           {
                             pos = ib->first;
-                            if( pos[0] >= 0 && pos[0] < vol.dimX() 
-                                && pos[1] >= 0 && pos[1] < vol.dimY() 
-                                && pos[2] >= 0 && pos[2] < vol.dimZ() )
-                              vol( pos[0], pos[1], pos[2] ) = i;
+                            // transform voxel size from bucket vs to volume vs
+                            fpos = Point3df( pos[0] * vs[0], pos[1] * vs[1],
+                                             pos[2] * vs[2] );
+                            pos[0] = int( rint( fpos[0] / vvs[0] ) );
+                            pos[1] = int( rint( fpos[1] / vvs[1] ) );
+                            pos[2] = int( rint( fpos[2] / vvs[2] ) );
+                            if( pos[0] >= 0 && pos[0] < vol->getSizeX()
+                                && pos[1] >= 0 && pos[1] < vol->getSizeY()
+                                && pos[2] >= 0 && pos[2] < vol->getSizeZ() )
+                              vol->at( pos[0], pos[1], pos[2] ) = i;
                           }
                       }
                   for( ie=(*iv)->begin(), fe=(*iv)->end(); ie!=fe; ie++)
@@ -239,12 +255,19 @@ int main( int argc, const char** argv )
                                  ++ib )
                               {
                                 pos = ib->first;
-                                if( pos[0] >= 0 && pos[0] < vol.dimX() 
-                                    && pos[1] >= 0 
-                                    && pos[1] < vol.dimY() 
-                                    && pos[2] >= 0 
-                                    && pos[2] < vol.dimZ() )
-                                  vol( pos[0], pos[1], pos[2] ) = i;
+                                // transform voxel size from bucket vs
+                                // to volume vs
+                                fpos = Point3df( pos[0] * vs[0],
+                                                 pos[1] * vs[1],
+                                                 pos[2] * vs[2] );
+                                pos[0] = int( rint( fpos[0] / vvs[0] ) );
+                                pos[1] = int( rint( fpos[1] / vvs[1] ) );
+                                pos[2] = int( rint( fpos[2] / vvs[2] ) );
+                                if( pos[0] >= 0 && pos[0] < vol->getSizeX()
+                                    && pos[1] >= 0 && pos[1] < vol->getSizeY()
+                                    && pos[2] >= 0 && pos[2] < vol->getSizeZ()
+                                  )
+                                  vol->at( pos[0], pos[1], pos[2] ) = i;
                               }
                           }
                 }
@@ -254,7 +277,6 @@ int main( int argc, const char** argv )
 
       if( !otrans.empty() )
         {
-          
           ofstream	namefile( otrans.c_str() );
           map<string, short>::const_iterator	il, el = labels.end();
           for( il=labels.begin(); il!=el; ++il )
@@ -262,9 +284,9 @@ int main( int argc, const char** argv )
           namefile.close();
         }
       cout << count << " graph nodes written\n";
-      Writer<AimsData<short> >	vw( vname );
+      Writer<Volume<short> >	vw( vname );
 
-      vw << vol;
+      vw.write( *vol );
 
     }
   catch( user_interruption & )
