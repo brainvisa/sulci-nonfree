@@ -21,7 +21,7 @@ execute_process( COMMAND "${PYTHON_HOST_EXECUTABLE}"
         -t "${AIMS-FREE_SIP_DIRECTORY}/typessub.py"
         -t "${CMAKE_CURRENT_SOURCE_DIR}/typessub.py"
         -l
-        -P "'${CMAKE_C_PREPROCESSOR}'"
+        -P "${CMAKE_C_PREPROCESSOR}"
   OUTPUT_VARIABLE _generatedSipFileList 
   RESULT_VARIABLE _returnValue )
 
