@@ -12,8 +12,8 @@ file( GLOB _sipSources "${CMAKE_CURRENT_SOURCE_DIR}/*.sip" )
 
 file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}" )
 
-exec_program( "${PYTHON_HOST_EXECUTABLE}"
-  ARGS "${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py"
+execute_process( COMMAND "${PYTHON_HOST_EXECUTABLE}"
+        "${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py"
         -s "${AIMS-FREE_SIP_DIRECTORY}"
         -i "${CMAKE_CURRENT_SOURCE_DIR}/generatedtypes.py"
         -p "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -21,9 +21,9 @@ exec_program( "${PYTHON_HOST_EXECUTABLE}"
         -t "${AIMS-FREE_SIP_DIRECTORY}/typessub.py"
         -t "${CMAKE_CURRENT_SOURCE_DIR}/typessub.py"
         -l
-        -P "'${CMAKE_C_PREPROCESSOR}'"
+        -P "${CMAKE_C_PREPROCESSOR}"
   OUTPUT_VARIABLE _generatedSipFileList 
-  RETURN_VALUE _returnValue )
+  RESULT_VARIABLE _returnValue )
 
 if( NOT _returnValue EQUAL 0 )
   message( SEND_ERROR "The sip generation from ${PROJECT_NAME} templates with \"${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py\" returned an error:\n${_generatedSipFileList}\n========================")
