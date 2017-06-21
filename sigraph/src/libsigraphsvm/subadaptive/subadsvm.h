@@ -4,7 +4,7 @@
 #ifndef SI_NO_SVMLIB
 
 #include <si/subadaptive/nonIncrementalSubAdaptive.h>
-#include <datamind/libsvm/libsvm.h>
+#include <si/sisvm/libsvm.h>
 #include <cartobase/object/attributed.h>
 #include <iostream>
 
