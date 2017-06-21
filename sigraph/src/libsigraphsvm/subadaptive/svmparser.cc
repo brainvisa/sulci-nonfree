@@ -16,7 +16,7 @@
 #include <si/graph/attrib.h>
 #include <graph/tree/tree.h>
 #include <cartobase/stream/fileutil.h>
-#include <datamind/libsvm/libsvm.h>
+#include <si/sisvm/libsvm.h>
 #include <cartobase/exception/assert.h>
 
 using namespace sigraph;
