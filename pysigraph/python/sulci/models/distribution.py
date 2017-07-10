@@ -1748,7 +1748,8 @@ class MixtureModel(Distribution):
     priors : frequencies (1D numpy.array)
 	'''
 	def __init__(self, models=None, priors=None):
-		if not None in [models, priors] and len(priors) != len(models):
+		if models is not None and priors is not None \
+                                and len(priors) != len(models):
 			raise ValueError("number of models/priors mismatch.")
 		self._models = models
 		self._priors = priors
