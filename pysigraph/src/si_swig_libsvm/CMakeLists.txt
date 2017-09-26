@@ -16,6 +16,10 @@ IF ( SWIG_FOUND )
   set_property( TARGET __si_swig_libsvm PROPERTY LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python/sigraph )
   set_property( TARGET __si_swig_libsvm PROPERTY OUTPUT_NAME _si_swig_libsvm )
   set_property( TARGET __si_swig_libsvm PROPERTY PREFIX "" )
+  
+  if( WIN64 )
+    set_target_properties( __si_swig_libsvm PROPERTIES COMPILE_DEFINITIONS MS_WIN64)
+  endif()
 
 ENDIF ( SWIG_FOUND )
 
