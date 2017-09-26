@@ -8,6 +8,9 @@ ADD_LIBRARY(_si_libsvm SHARED ${_sources} )
 
 set_property( TARGET _si_libsvm PROPERTY LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python/sigraph )
 set_property( TARGET _si_libsvm PROPERTY PREFIX "" )
+if( WIN64 )
+    set_target_properties( _si_libsvm PROPERTIES COMPILE_DEFINITIONS MS_WIN64)
+endif()
 
 include_directories( "${CMAKE_BINARY_DIR}/include" "${PYTHON_INCLUDE_PATH}")
 target_link_libraries( _si_libsvm "${PYTHON_LIBRARY}" )
