@@ -120,7 +120,11 @@ void AnnealConnectExtension::specialStep( unsigned )
                   || v->getProperty( "skeleton_label", index ) )
                 tmp_key = index;
               else
-                tmp_key = reinterpret_cast<long>( v );
+                tmp_key = reinterpret_cast<long
+#if defined( _WIN64 )
+                                           long int
+#endif
+                                          >( v );
               if( key == -1 || tmp_key < key )
                 key = tmp_key;
             }
