@@ -45,7 +45,11 @@ void VertexProvider::init()
   {
     if( !(*iv)->getProperty( "index", index )
         && !(*iv)->getProperty( "skeleton_label", index ) )
-      key = reinterpret_cast<long>( *iv ); // NON-TRACTABLE.
+      key = reinterpret_cast<long
+#if defined( _WIN64 )
+                             long int
+#endif
+                            >( *iv ); // NON-TRACTABLE.
     else
       key = index;
     tractable_vert[ key ] = *iv;
@@ -133,7 +137,11 @@ void VertexCliqueProvider::init()
   for( ic=sc.begin(); ic!=fc; ++ic )
   {
     if( !(*ic)->getProperty( "index", index ) )
-      key = reinterpret_cast<long>( ic->get() ); // NON-TRACTABLE.
+      key = reinterpret_cast<long
+#if defined( _WIN64 )
+                             long int
+#endif
+                            >( ic->get() ); // NON-TRACTABLE.
     else
       key = index;
     tractable_cliques[ key ] = ic->get();
