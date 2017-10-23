@@ -242,8 +242,13 @@ int main( int argc, const char** argv )
                       string lnum = line.substr( pos+1, line.length() - pos );
                       istringstream	ss( lnum );
                       ss >> i;
-                      labels[ line.substr( 0, pos ) ] = i;
-                      rlabels[ i ] = line.substr( 0, pos );
+                      while( pos >= 0
+                             && ( line[pos] == ' ' || line[pos] == '\t' ) )
+                        --pos;
+                      ++pos;
+                      string label = line.substr( 0, pos );
+                      labels[ label ] = i;
+                      rlabels[ i ] = label;
                     }
                 }
               inames.close();
@@ -262,12 +267,15 @@ int main( int argc, const char** argv )
           slab.insert( il->second );
       // cout << slab.size() << " labels with translation file\n";
       for( lastlabel = 1, is=slab.begin(); is!=fs; ++is, ++lastlabel )
-	{
+      {
+        if( labels.find( *is ) == labels.end() )
+        {
           while( rlabels.find( lastlabel ) != rlabels.end() )
             ++lastlabel;
-	  labels[ *is ] = lastlabel;
+          labels[ *is ] = lastlabel;
           rlabels[ lastlabel ] = *is;
-	}
+        }
+      }
       // cout << labels.size() << " labels indices\n";
       unsigned	ial, nal = aname.size();
 
@@ -287,7 +295,7 @@ int main( int argc, const char** argv )
                 name = trans.lookupLabel( name );
               i = labels[name];
               if( i == 0 && trans.empty() 
-                  && ( lname.find( name ) != el || lname.empty() ) )
+                  && ( lname.empty() || lname.find( name ) != el ) )
                 {
                   while( rlabels.find( lastlabel ) != rlabels.end() )
                     ++lastlabel;
