@@ -54,9 +54,8 @@ namespace anatomist
 
     virtual bool CanRemove( AObject* obj );
 
-    virtual AObject* ObjectAt( float x, float y, float z, float t, 
-			       float tol = 0 )
-      { return( _folds->ObjectAt( x, y, z, t, tol ) ); }
+    virtual AObject* objectAt( const std::vector<float> & pos, float tol = 0 )
+    { return( _folds->objectAt( pos, tol ) ); }
     virtual void SetMaterial( const Material & mat );
     virtual void setPalette( const AObjectPalette & pal );
     virtual void internalUpdate();
