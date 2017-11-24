@@ -100,7 +100,7 @@ double Gaussian::arg( const InputIterator & start ) const
       if( sig != 0 )
 	x /= 2 * sig * sig;
       else
-	std::cerr << "Gaussian : Pas d'écart-type\n";
+	std::cerr << "Gaussian : no std deviation\n";
     }
   else
     {
