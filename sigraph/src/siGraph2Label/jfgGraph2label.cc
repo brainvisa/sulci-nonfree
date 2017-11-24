@@ -99,7 +99,7 @@ int main( int argc, const char** argv )
       VolumeRef<short> vol;
 
       Reader<Graph>        fr( gname );
-      auto_ptr<Graph>	fg( fr.read() );
+      unique_ptr<Graph>	fg( fr.read() );
 
       lname.insert( lname1.begin(), lname1.end() );
       synt.insert( synt1.begin(), synt1.end() );
