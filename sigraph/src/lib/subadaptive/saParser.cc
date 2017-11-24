@@ -161,7 +161,7 @@ void SAParser::buildSubMlp( AttributedObject* parent, Tree* ao,
 		    }
 		  else if( name == wrkm )
 		    {
-		      cout << "Mémo relu\n";
+		      cout << "Memo reread\n";
 		      adp->setWorkMemo( sad );
 		    }
 		  else if( name == evlm )
