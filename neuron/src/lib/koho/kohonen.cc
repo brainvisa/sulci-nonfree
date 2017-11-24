@@ -304,7 +304,7 @@ int Kohonen::AddVectCode( VectCode *vc )
 {
   if( vc->coord.size() != _nDim || vc->vect.size() != _nCDim )
     {
-      cerr << "Kohonen::AddvectCode : les dimensions ne collent pas\n";
+      cerr << "Kohonen::AddvectCode : dimensions do not match\n";
       return( false );
     }
   _vCode.push_back( vc );
@@ -321,7 +321,7 @@ int Kohonen::RemoveVectCode( const VectCode *vc )
   if( ivc != _vCode.end() ) _vCode.erase( ivc );
   else
     {
-      cerr << "Kohonen::DelVectCode : vecteur non trouvé\n";
+      cerr << "Kohonen::DelVectCode : vector not found\n";
       return( false );
     }
   return( true );
