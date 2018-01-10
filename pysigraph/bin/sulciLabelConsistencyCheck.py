@@ -73,7 +73,7 @@ if side is not None:
             print('No inconsistency found.')
             sys.exit( 0 )
     else:
-        print'cannot understand side parameter - ignoring', file=sys.stderr)
+        print('cannot understand side parameter - ignoring', file=sys.stderr)
 
 if len( leftlabels ) != 0 and len( rightlabels ) != 0:
     print(
