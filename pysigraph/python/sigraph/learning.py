@@ -1398,6 +1398,9 @@ class SvcRanker(Ranker):
         Ranker.__init__(self)
 
     def rank(self, X, Y):
+        # fix find_library so that it finds libsvm in a non-system path
+        from soma.utils import find_library
+        find_library.patch_ctypes_find_library()
         from datamind.ml import database, plugins, validation
         from datamind.ml.classifier import optimizers
         import datamind.ml.classifier.ofunc as ofunc
