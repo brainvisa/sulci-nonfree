@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os, numpy
 from soma import aims
+import six
 
 def add_translation_option_to_parser(parser):
 	transfile = os.path.join(aims.carto.Paths.shfjShared(), 'nomenclature',
@@ -18,20 +19,20 @@ def vertex2voxels(motion, vertex, data_type):
 	vox = [motion.transform(aims.Point3df(p * s)) for p in map[0].keys()]
 	return vox
 
-import os, distutils.spawn, ihooks
-import time, getpass, StringIO, re
+import os, distutils.spawn, importlib
+import time, getpass, re
+StringIO = six.moves
 
 def import_from(filename):
 	modulename = distutils.spawn.find_executable(filename)
 	if modulename is None:
-		raise ImportError, filename
-	loader = ihooks.BasicModuleLoader()
+		raise ImportError(filename)
 	path, file = os.path.split(modulename)
 	name, ext = os.path.splitext(file)
-	m = loader.find_module_in_dir(name, path)
-	if not m:
-		raise ImportError, name
-	return loader.load_module(name, m)
+	spec = importlib.util.spec_from_file_locarion(name, modulename)
+	if not spec:
+		raise ImportError(name)
+	return importlib.util.module_from_spec(spec)
 
 class NoMessage(object):
 	def haveColor(self):

@@ -7,7 +7,7 @@ try:
 except:
   # print('warning, fff is not here or does not work. GMM will not be usable')
   pass
-from distribution import Distribution, distribution_map
+from .distribution import Distribution, distribution_map
 
 
 ################################################################################

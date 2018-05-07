@@ -265,7 +265,8 @@ class GaussianTagger(Tagger):
         plotter.plot([fgl, pcX, pcY, vec])
         plotter.render()
 
-        def update_vtk(procrust, (pcX, fgl, vec, plotter)):
+        def update_vtk(procrust, params):
+            pcX, fgl, vec, plotter = params
             X = procrust._X
             t = procrust._t
             R = procrust._R
