@@ -78,7 +78,7 @@ class Distribution(object):
 		fd = open(filename, 'r')
 		obj = pickle.load(fd)
 		try:	self.fromTuple(obj)
-		except TypeError: raise IOError
+		except TypeError: raise IOError()
 		fd.close()
 		self.update()
 
@@ -786,7 +786,7 @@ class Gamma(Distribution):
 				numpy.log(numpy.dot(weights, X))
 		if y > 0:
 			print("y", y)
-			raise ValueError, "y>0, the problem cannot be solved"
+			raise ValueError("y>0, the problem cannot be solved")
 		u = 1.
 		if y > scipy.special.psi(u) - scipy.special.log(u):
 			while scipy.special.psi(u) - scipy.special.log(u) < y:
@@ -1316,7 +1316,7 @@ class Kent(Distribution):
 		else: self._normalization = None
 
 	def setUniform(self, dim=3):
-		if dim != 3: raise ValueError, "dim must be 3"
+		if dim != 3: raise ValueError("dim must be 3")
 		self._gamma = numpy.asmatrix(numpy.identity(3))
 		self._kappa = 1.
 		self._beta = 0.

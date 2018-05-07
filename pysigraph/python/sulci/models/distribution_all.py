@@ -1,1 +1,1 @@
-import distribution, distribution_aims, distribution_fff
+from . import distribution, distribution_aims, distribution_fff

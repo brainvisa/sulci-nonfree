@@ -1,5 +1,5 @@
 import scipy.optimize
-from procrust import Registration, MixtureGlobalRegistration, \
+from .procrust import Registration, MixtureGlobalRegistration, \
 				MixtureLocalRegistration
 from sulci.models import distribution, distribution_aims
 import numpy

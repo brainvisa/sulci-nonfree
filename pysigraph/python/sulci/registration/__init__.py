@@ -1,1 +1,1 @@
-from procrust import *
+from .procrust import *

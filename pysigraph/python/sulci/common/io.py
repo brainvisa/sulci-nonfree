@@ -10,6 +10,8 @@ try:
 	import datamind.io.old_csvIO as datamind_io
 except ImportError as e:
 	print("datamind disable: ", e)
+	import traceback
+	traceback.print_exc()
 
 
 ################################################################################

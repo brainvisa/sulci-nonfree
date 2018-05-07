@@ -198,8 +198,7 @@ class RelationDescriptor(Descriptor):
         if Y == None:
             Y = X
         if X.shape[1] != Y.shape[1]:
-            raise ValueError, "incompatible dimension " + \
-                "for X and Y matrices"
+            raise ValueError("incompatible dimension for X and Y matrices")
         s1 = X.shape[0]
         s2 = Y.shape[0]
         NX = numpy.reshape(numpy.sum(X * X, 1), (s1, 1))
@@ -590,7 +589,8 @@ a set of n voxels of s1 with a set of n voxels of s2.
             X.append(descr.data(motion, v))
         return numpy.vstack(X)
 
-    def data_cc(self, motion, (ci, cj)):
+    def data_cc(self, motion, c):
+        (ci, cj) = c
         hull_junction_mode = self.cc_has_hull_junction(ci) and \
             self.cc_has_hull_junction(cj)
         if hull_junction_mode:
