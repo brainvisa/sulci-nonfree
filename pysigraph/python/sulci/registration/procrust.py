@@ -7,6 +7,8 @@ from sulci.models import distribution
 from sulci.registration.transformation import RigidTransformation, \
 						LocalRigidTransformations
 
+if sys.version_info[0] >= 3:
+    long = int
 
 ################################################################################
 PI_div_2 = 1.5707963267948966
