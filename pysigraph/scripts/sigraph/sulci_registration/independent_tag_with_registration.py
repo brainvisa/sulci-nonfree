@@ -518,4 +518,9 @@ def main():
     w.write(graph)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        import traceback
+        traceback.print_exc()
+        raise

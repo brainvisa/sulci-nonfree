@@ -1,5 +1,5 @@
 from __future__ import print_function
-
+import six
 
 class SulciModel(object):
 	def __init__(self, graphmodel, segments_distrib=None,
@@ -16,7 +16,7 @@ class SulciModel(object):
 
 	def labels(self):
 		if self._segments_distrib:
-			return self._segments_distrib['vertices'].keys()
+			return list(six.iterkeys(self._segments_distrib['vertices']))
 		elif self._relations_distrib:
 			pairs = self._segments_distrib['vertices'].keys()
 			return set([pairs[0] for x in l]+[pairs[1] for x in l])
