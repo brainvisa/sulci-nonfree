@@ -29,7 +29,7 @@ namespace sigraph
     typedef void (* Factory )( carto::AttributedObject* parent, Tree* t, 
 			       const std::string & filename );
     ///	syntax -> reader
-    typedef std::map<const std::string, Factory>	FactorySet;
+    typedef std::map<std::string, Factory>	FactorySet;
 
     virtual ~TreePostParser();
 
