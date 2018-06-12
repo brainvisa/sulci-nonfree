@@ -1305,7 +1305,7 @@ class SiIca(SiMultivariateDimensionReduction):
             self._dr = dimreduction.IcaMdp(reduced_trainr1)
         # svd does not work converged, original train/test databases
         # are used.
-        except mdp.signal_node.NodeException, m:
+        except mdp.signal_node.NodeException as m:
             msg.warning("ICA exception, skip dimreduction "
                         "step : " + repr(m))
 
