@@ -52,9 +52,9 @@ class WrapperSi(classifier.Classifier):
                     ex : {'0' : 10., '1' : 1.}
     		'''
 		if not isinstance(adaptiveleaf, sigraph.AdaptiveLeaf):
-			raise ValueError, \
-				"'adaptiveleaf' parameter should be an " \
-				" AdaptiveLeaf instance."
+			raise (ValueError,
+                               ValueError("'adaptiveleaf' parameter should be "
+                                          "an AdaptiveLeaf instance."))
 		self._adaptiveleaf = adaptiveleaf
 		self._weights = weights
 		self._user_data = user_data
