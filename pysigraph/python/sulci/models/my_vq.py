@@ -33,12 +33,14 @@ import warnings
 
 from numpy.random import randint
 from numpy import shape, zeros, sqrt, argmin, minimum, array, \
-     newaxis, arange, compress, equal, common_type, single, double, take, \
+    newaxis, arange, compress, equal, common_type, single, double, take, \
      std, mean, asarray
 import numpy as N
 
+
 class ClusterError(Exception):
     pass
+
 
 def whiten(obs):
     """ Normalize a group of observations on a per feature basis.
@@ -83,6 +85,7 @@ def whiten(obs):
     """
     std_dev = std(obs, axis=0)
     return obs / std_dev
+
 
 def vq(obs, code_book):
     """ Vector Quantization: assign features sets to codes in a code book.
@@ -153,6 +156,7 @@ def vq(obs, code_book):
         results = py_vq(obs, code_book)
     return results
 
+
 def py_vq(obs, code_book):
     """ Python version of vq algorithm.
 
@@ -187,7 +191,7 @@ def py_vq(obs, code_book):
     if N.ndim(obs) == 1:
         if not N.ndim(obs) == N.ndim(code_book):
             raise ValueError(
-                    "Observation and code_book should have the same rank")
+                "Observation and code_book should have the same rank")
         else:
             return _py_vq_1d(obs, code_book)
     else:
@@ -198,7 +202,7 @@ def py_vq(obs, code_book):
     if not N.ndim(obs) == N.ndim(code_book):
         raise ValueError("Observation and code_book should have the same rank")
     elif not d == code_book.shape[1]:
-        raise ValueError("Code book(%d) and obs(%d) should have the same " \
+        raise ValueError("Code book(%d) and obs(%d) should have the same "
                          "number of features (eg columns)""" %
                          (code_book.shape[1], d))
 
@@ -210,6 +214,7 @@ def py_vq(obs, code_book):
         min_dist[i] = dist[code[i]]
 
     return code, sqrt(min_dist)
+
 
 def _py_vq_1d(obs, code_book):
     """ Python version of vq algorithm for rank 1 only.
@@ -275,32 +280,33 @@ def _kmeans(obs, guess, weights, thresh=1e-5):
            [ 0.73333333,  1.13333333]]), 0.40563916697728591)
 
     """
-    code_book = array(guess, copy = True)
+    code_book = array(guess, copy=True)
     nc = code_book.shape[0]
     avg_dist = []
-    diff = thresh+1.
+    diff = thresh + 1.
     while diff > thresh:
-        #compute membership and distances between obs and code_book
+        # compute membership and distances between obs and code_book
         obs_code, distort = vq(obs, code_book)
         avg_dist.append(N.dot(distort, weights))
-        #recalc code_book as centroids of associated obs
+        # recalc code_book as centroids of associated obs
         if(diff > thresh):
             has_members = []
             for i in arange(nc):
                 sel = equal(obs_code, i)
                 cell_members = compress(sel, obs, 0)
                 cell_weights = compress(sel, weights, 0)
-		cell_weights /= cell_weights.sum()
+                cell_weights /= cell_weights.sum()
                 if cell_members.shape[0] > 0:
-		    code_book[i] = mean(cell_members, 0)
+                    code_book[i] = mean(cell_members, 0)
                     code_book[i] = N.dot(cell_weights, cell_members)
                     has_members.append(i)
-            #remove code_books that didn't have any members
+            # remove code_books that didn't have any members
             code_book = take(code_book, has_members, 0)
         if len(avg_dist) > 1:
             diff = avg_dist[-2] - avg_dist[-1]
-    #print(avg_dist)
+    # print(avg_dist)
     return code_book, avg_dist[-1]
+
 
 def kmeans(obs, k_or_guess, weights, iter=20, thresh=1e-5):
     """Generate a code book with minimum distortion.
@@ -366,22 +372,23 @@ def kmeans(obs, k_or_guess, weights, iter=20, thresh=1e-5):
         raise ValueError, 'iter must be >= to 1.'
     if type(k_or_guess) == type(array([])):
         guess = k_or_guess
-        result = _kmeans(obs, guess, weights, thresh = thresh)
+        result = _kmeans(obs, guess, weights, thresh=thresh)
     else:
-        #initialize best distance value to a large value
+        # initialize best distance value to a large value
         best_dist = 100000
         No = obs.shape[0]
         k = k_or_guess
-        #print('kmeans iter: ',)
+        # print('kmeans iter: ',)
         for i in range(iter):
-            #the intial code book is randomly selected from observations
+            # the intial code book is randomly selected from observations
             guess = take(obs, randint(0, No, k), 0)
-            book, dist = _kmeans(obs, guess, weights, thresh = thresh)
+            book, dist = _kmeans(obs, guess, weights, thresh=thresh)
             if dist < best_dist:
                 best_book = book
                 best_dist = dist
         result = best_book, best_dist
     return result
+
 
 def _kpoints(data, k):
     """Pick k points at random in data (one row = one observation).
@@ -408,6 +415,7 @@ def _kpoints(data, k):
 
     return x
 
+
 def _krandinit(data, k):
     """Returns k samples of a random variable which parameters depend on data.
 
@@ -423,8 +431,8 @@ def _krandinit(data, k):
             Number of samples to generate.
 
     """
-    mu  = N.mean(data, 0)
-    cov = N.atleast_2d(N.cov(data, rowvar = 0))
+    mu = N.mean(data, 0)
+    cov = N.atleast_2d(N.cov(data, rowvar=0))
 
     # k rows, d cols (one row = one obs)
     # Generate k sample of a random variable ~ Gaussian(mu, cov)
@@ -435,10 +443,12 @@ def _krandinit(data, k):
 
 _valid_init_meth = {'random': _krandinit, 'points': _kpoints}
 
+
 def _missing_warn():
     """Print a warning when called."""
     warnings.warn("One of the clusters is empty. "
-                 "Re-run kmean with a different initialization.")
+                  "Re-run kmean with a different initialization.")
+
 
 def _missing_raise():
     """raise a ClusterError when called."""
@@ -447,8 +457,9 @@ def _missing_raise():
 
 _valid_miss_meth = {'warn': _missing_warn, 'raise': _missing_raise}
 
-def kmeans2(data, k, weights, iter = 10, thresh = 1e-5, minit = 'random',
-        missing = 'warn'):
+
+def kmeans2(data, k, weights, iter=10, thresh=1e-5, minit='random',
+            missing='warn'):
     """Classify a set of points into k clusters using kmean algorithm.
 
     The algorithm works by minimizing the euclidian distance between data points
@@ -494,10 +505,10 @@ def kmeans2(data, k, weights, iter = 10, thresh = 1e-5, minit = 'random',
     if missing not in _valid_miss_meth.keys():
         raise ValueError("Unkown missing method: %s" % str(missing))
     # If data is rank 1, then we have 1 dimension problem.
-    nd  = N.ndim(data)
+    nd = N.ndim(data)
     if nd == 1:
         d = 1
-        #raise ValueError("Input of rank 1 not supported yet")
+        # raise ValueError("Input of rank 1 not supported yet")
     elif nd == 2:
         d = data.shape[1]
     else:
@@ -529,6 +540,7 @@ def kmeans2(data, k, weights, iter = 10, thresh = 1e-5, minit = 'random',
     assert not iter == 0
     return _kmeans2(data, clusters, weights, iter, nc, _valid_miss_meth[missing])
 
+
 def _kmeans2(data, code, weights, niter, nc, missing):
     """ "raw" version of kmeans2. Do not use directly.
 
@@ -539,26 +551,26 @@ def _kmeans2(data, code, weights, niter, nc, missing):
         label = vq(data, code)[0]
         # Update the code by computing centroids using the new code book
         for j in range(nc):
-            mbs = N.where(label==j)
+            mbs = N.where(label == j)
             if mbs[0].size > 0:
                 weights_j = weights[mbs]
-		weights_j /= weights_j.sum()
+                weights_j /= weights_j.sum()
                 code[j] = N.dot(weights_j, data[mbs])
             else:
                 missing()
 
     return code, label
 
-if __name__  == '__main__':
+if __name__ == '__main__':
     pass
-    #import _vq
-    #a = N.random.randn(4, 2)
-    #b = N.random.randn(2, 2)
+    # import _vq
+    # a = N.random.randn(4, 2)
+    # b = N.random.randn(2, 2)
 
-    #print(_vq.vq(a, b))
-    #print(_vq.vq(N.array([[1], [2], [3], [4], [5], [6.]]),
+    # print(_vq.vq(a, b))
+    # print(_vq.vq(N.array([[1], [2], [3], [4], [5], [6.]]),
     #        N.array([[2.], [5.]])))
-    #print(_vq.vq(N.array([1, 2, 3, 4, 5, 6.]), N.array([2., 5.])))
+    # print(_vq.vq(N.array([1, 2, 3, 4, 5, 6.]), N.array([2., 5.])))
     #_vq.vq(a.astype(N.float32), b.astype(N.float32))
     #_vq.vq(a, b.astype(N.float32))
     #_vq.vq([0], b)

@@ -255,9 +255,9 @@ class OptimizedSvm(datamind.ml.model.Model):
 
     def _print_info(self, train):
         msg.write_list([' * ', ('Learning', 'green'), ' SVM with ',
-                      (str(self._nbfolds), 'cyan'), '-cv (mode : ' +
-            self._adap.workEl().getSvmMode() + ') on ',
-            (str(train.size()), 'cyan'), ' vectors\n'])
+                        (str(self._nbfolds), 'cyan'), '-cv (mode : ' +
+                        self._adap.workEl().getSvmMode() + ') on ',
+                        (str(train.size()), 'cyan'), ' vectors\n'])
 
     def fit(self, train):
         from datamind.ml.classifier import optimizers
