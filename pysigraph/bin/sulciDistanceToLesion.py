@@ -6,7 +6,7 @@ from soma import aims, aimsalgo
 import numpy
 import optparse
 import sigraph
-import tempfile, subprocess
+import tempfile, soma.subprocess
 
 parser = optparse.OptionParser( description='calculates a distance map from ' \
   'a lesion in the brain, and mean distance from the lesion to all sulci. ' \
@@ -138,7 +138,7 @@ else:
     os.close( outdist[0] )
 
   print('closing the distance map...')
-  subprocess.call( [ 'AimsMorphoMath', '-i', tmpf[1], '-o', outdist, '-r', '3',
+  soma.subprocess.call( [ 'AimsMorphoMath', '-i', tmpf[1], '-o', outdist, '-r', '3',
     '-m', 'clo' ] )
   os.unlink( tmpf[1] )
   os.unlink( tmpf[1] + '.minf' )

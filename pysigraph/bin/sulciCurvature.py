@@ -4,7 +4,7 @@
 from __future__ import print_function
 import os, sys, re
 from soma import aims, aimsalgo
-import numpy, optparse, tempfile, subprocess
+import numpy, optparse, tempfile, soma.subprocess
 import sigraph
 import time, tempfile, errno
 
@@ -102,7 +102,7 @@ def cleanmeshcurv( mesh, boundaries, inhibitbounds=[] ):
   tmpcurv = tf[1]
   aims.write( mesh, tmpmesh )
   tf = tempfile.mkstemp( 'stdout', 'aims' )
-  subprocess.call( [ 'AimsMeshCurvature', '-i', tmpmesh, '-o', tmpcurv, '-m',
+  soma.subprocess.call( [ 'AimsMeshCurvature', '-i', tmpmesh, '-o', tmpcurv, '-m',
     curvmethod ], stdout=tf[0] )
   os.close( tf[0] )
   os.unlink( tf[1] )
@@ -255,7 +255,7 @@ for label, globval in globaverage.iteritems():
   tmpvolfile = tf[1]
   aims.write( vol, tmpvolfile )
   tf = tempfile.mkstemp( 'stdout', 'aims' )
-  subprocess.call( [ 'AimsConnectComp', '-i', tmpvolfile, '-o', tmpvolfile,
+  soma.subprocess.call( [ 'AimsConnectComp', '-i', tmpvolfile, '-o', tmpvolfile,
     '-c', '18', '-n', '1', '-b' ], stdout=tf[0] )
   os.close( tf[0] )
   os.unlink( tf[1] )
