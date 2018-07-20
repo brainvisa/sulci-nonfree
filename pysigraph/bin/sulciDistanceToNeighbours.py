@@ -3,7 +3,7 @@
 from __future__ import print_function
 import os, sys, re
 from soma import aims, aimsalgo
-import numpy, optparse, tempfile, subprocess
+import numpy, optparse, tempfile, soma.subprocess
 import sigraph
 
 
