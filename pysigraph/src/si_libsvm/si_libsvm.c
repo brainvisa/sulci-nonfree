@@ -3,6 +3,8 @@
 #include <stdio.h>
 
 static PyObject *init_wrapper(PyObject *self, PyObject *null) {
+	(void)(self); /* compilation warning... */
+	(void)(null);
 	printf("init libsvm python\n");
 	return NULL;
 }

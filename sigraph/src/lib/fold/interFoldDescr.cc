@@ -86,6 +86,8 @@ bool InterFoldDescr::makeVectorElements( const Clique* cl,
 	}
       bool la_clique_n_a_pas_l_attribut_label1 = true;
       assert( !la_clique_n_a_pas_l_attribut_label1 );
+      // warning de compil...
+      la_clique_n_a_pas_l_attribut_label1=la_clique_n_a_pas_l_attribut_label1;
     }
   assert( cl->getProperty( SIA_LABEL2, label2 ) );
 
@@ -96,7 +98,7 @@ bool InterFoldDescr::makeVectorElements( const Clique* cl,
   float				s, sum1 = 0, sum2 = 0;
 
   if( sl1.size() == 0 || sl2.size() == 0 )
-    {	// un des sillons n'est pas là: pas de relation
+    {	// un des sillons n'est pas lï¿½: pas de relation
       vec.push_back( 0 );	// pas valide
       vec.push_back( 0 );	// long.
       vec.push_back( 0 );	// dist
@@ -172,10 +174,10 @@ bool InterFoldDescr::makeVectorElements( const Clique* cl,
   double	sc = 0, sj = 0;
 
   vcl->edgesBetween( sl1, sl2, ed );
-  gcc.push_back( 0 );	// centre gravité des relations corticales
+  gcc.push_back( 0 );	// centre gravitï¿½ des relations corticales
   gcc.push_back( 0 );
   gcc.push_back( 0 );
-  gj.push_back( 0 );	// centre gravité des jonctions
+  gj.push_back( 0 );	// centre gravitï¿½ des jonctions
   gj.push_back( 0 );
   gj.push_back( 0 );
 
@@ -230,12 +232,12 @@ bool InterFoldDescr::makeVectorElements( const Clique* cl,
   vec.push_back( sum2 );	// taille 2e sillon
   vec.push_back( vcl->connectivity( sl2, 0, SIA_JUNCTION_SYNTAX ) );
 
-  vec.push_back( d );	// distance des centres de gravité
+  vec.push_back( d );	// distance des centres de gravitï¿½
   vec.push_back( sc );	// taille des relations corticales
   vec.push_back( sj );	// taille des jonctions
 
   if( d == 0 )
-    d = 1.;	// précaution
+    d = 1.;	// prï¿½caution
   vec.push_back( ( gc2[0] - gc1[0] ) / d );
   vec.push_back( ( gc2[1] - gc1[1] ) / d );
   vec.push_back( ( gc2[2] - gc1[2] ) / d );
@@ -302,5 +304,5 @@ bool InterFoldDescr::hasChanged( const Clique* cl,
 	  return( true );				// non-void
       }
 
-  return( false );	// si rien n'a changé, on ne recalcule pas
+  return( false );	// si rien n'a changï¿½, on ne recalcule pas
 }

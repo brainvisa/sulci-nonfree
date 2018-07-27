@@ -45,9 +45,9 @@ void AnnealConnectExtension::specialStep( unsigned )
   // order cliques by label
   for( ic=_anneal->cGraph().cliques().begin(); ic!=fc; ++ic )
   {
-    // modèle associé à la clique
+    // modï¿½le associï¿½ ï¿½ la clique
     mao = mf.selectModel( ic->get() );
-    // ne garder que les modèles de noeuds (1 label)
+    // ne garder que les modï¿½les de noeuds (1 label)
     if( mao && mao->getProperty( SIA_LABEL, label )
         && label != voidl )
       clord[label] = ic->get();
@@ -56,18 +56,18 @@ void AnnealConnectExtension::specialStep( unsigned )
   // from this reproducible order, randomly reorder them
   for( iclo=clord.begin(); iclo!=eclo; ++iclo )
   {
-    // tirer un numéro
+    // tirer un numï¿½ro
     do
       {
         p = rand();
       } while( cliques.find( p ) != fcm );
-    // stocker la clique numérotée et le label
+    // stocker la clique numï¿½rotï¿½e et le label
     cliques[p] = (VertexClique *) iclo->second;
     labels[(VertexClique *) iclo->second] = iclo->first;
   }
 
   //	pour chaque clique dans l'ordre de tirage, 
-  //	découpage en composantes connexes
+  //	dï¿½coupage en composantes connexes
 
   set<Vertex *>					voidNodes;
   set<string>					syntTypes;
@@ -86,7 +86,6 @@ void AnnealConnectExtension::specialStep( unsigned )
   Clique					*cl;
   map<long, CComponent *>                 ccord;
   map<long, CComponent *>::const_iterator ico, eco = ccord.end();
-  Vertex                                  *v;
   int                                     index;
   long                                    key;
 
@@ -103,8 +102,9 @@ void AnnealConnectExtension::specialStep( unsigned )
       // si la clique est vide, on saute
       if( !voidNodes.empty() )
 	{
-	  // découpage en CC
+	  // dï¿½coupage en CC
 	  n = VertexClique::connectivity( voidNodes, &cc, syntTypes );
+    n = n; // compilation warning...
 
           // reorder cc in a reproducible way
           ccord.clear();
@@ -151,15 +151,15 @@ void AnnealConnectExtension::specialStep( unsigned )
 					ef.involvedCliques.end() );
 	      changes.erase( changes.begin(), changes.end() );
 
-	      //	config à tester: passer tout de "unknown" à 'label'
+	      //	config ï¿½ tester: passer tout de "unknown" ï¿½ 'label'
 	      for( iv=(*icc).second->begin(), fv=(*icc).second->end(); 
 		   iv!=fv; ++iv )
 		{
-		  // répertorier les noeuds et mettre leur label à 'label'
+		  // rï¿½pertorier les noeuds et mettre leur label ï¿½ 'label'
 		  //ef.vertices.push_back( *iv );
 		  changes[ *iv ] = voidl;
 		  (*iv)->setProperty( SIA_LABEL, label );
-		  // cliques concernées par les changements
+		  // cliques concernï¿½es par les changements
 		  if( (*iv)->getProperty( SIA_CLIQUES, sc ) )
 		    {
 		      for( ics=sc->begin(), ecs=sc->end(); ics!=ecs; ++ics )
@@ -168,7 +168,7 @@ void AnnealConnectExtension::specialStep( unsigned )
 		}
 	      ef.energy = 0;
 
-	      //	calcul des différences de potentiels
+	      //	calcul des diffï¿½rences de potentiels
 	      for( ic2=ef.involvedCliques.begin(), 
 		     fc2=ef.involvedCliques.end(); 
 		   ic2!=fc2; ++ic2 )
@@ -188,19 +188,19 @@ void AnnealConnectExtension::specialStep( unsigned )
 		eE = 700;
 	      ef.expEnergy = exp( eE );
 
-	      //	décision
+	      //	dï¿½cision
 	      accept = false;
 
-	      if( _anneal->mode() == Anneal::ICM )	// déterministe
+	      if( _anneal->mode() == Anneal::ICM )	// dï¿½terministe
 		{
 		  if( ef.energy < 0 )
 		    accept = true;
 		}
-	      else			// mode non-déterministe
+	      else			// mode non-dï¿½terministe
 		{
 		  //	tirage
 		  limit = ef.expEnergy / (ef.expEnergy + 1);
-		  // technologie du DoubleTirage © JeffProd'00
+		  // technologie du DoubleTirage ï¿½ JeffProd'00
 		  if( ran1() < limit 
 		      && ( !_anneal->doubleDrawingLots() || ran1() < limit ) )
 		    accept = true;
@@ -215,7 +215,7 @@ void AnnealConnectExtension::specialStep( unsigned )
 		      mf.update( cl, changes );
 		    }
 
-		  //	Stats, traces de l'énergie
+		  //	Stats, traces de l'ï¿½nergie
 		  ++_ntrans;
 		  _stepDeltaE += ef.energy;
 		}

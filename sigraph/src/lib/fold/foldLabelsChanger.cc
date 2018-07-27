@@ -388,7 +388,7 @@ double FoldLabelsChanger::edgeDist( Vertex* v, const string & oldlabel,
   InterFoldCache		*ifc = 0;
   enum				Type { ADD, REMOVE, CHANGE };
   Type				t;
-  unsigned			first;
+  //unsigned			first;
 
   if( cc )
     ifc = dynamic_cast<InterFoldCache *>( cc );
@@ -397,7 +397,7 @@ double FoldLabelsChanger::edgeDist( Vertex* v, const string & oldlabel,
 
   if( oldlabel == _label1 )
     {
-      first = 0;
+      //first = 0;
       if( newlabel == _label2 )
 	{
 	  t = CHANGE;
@@ -420,7 +420,7 @@ double FoldLabelsChanger::edgeDist( Vertex* v, const string & oldlabel,
     }
   else if( oldlabel == _label2 )
     {
-      first = 1;
+      //first = 1;
       if( newlabel == _label1 )
 	{
 	  t = CHANGE;
@@ -446,7 +446,7 @@ double FoldLabelsChanger::edgeDist( Vertex* v, const string & oldlabel,
       t = ADD;
       if( newlabel == label1 )
 	{
-	  first = 0;
+	  //first = 0;
 	  label1 = _label2;
 	  label2 = _label1;
 	  if( ifc )
@@ -454,7 +454,7 @@ double FoldLabelsChanger::edgeDist( Vertex* v, const string & oldlabel,
 	}
       else	// normalement label2 != void
 	{
-	  first = 1;
+	  //first = 1;
 	  label1 = _label1;
 	  label2 = _label2;
 	  if( ifc )

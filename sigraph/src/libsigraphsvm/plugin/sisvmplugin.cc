@@ -25,7 +25,7 @@ namespace
     return true;
   }
 
-  bool _svminit = initSiSvm();
+  bool _svminit __attribute__((unused)) = initSiSvm();
 
 }
 

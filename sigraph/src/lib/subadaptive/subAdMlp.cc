@@ -173,6 +173,7 @@ double SubAdMlp::learn(AdaptiveLeaf &al,
 	al.setLearnState(AdaptiveLeaf::STOPPABLE);
 	al.forceLearnFinished();
 	//current subadaptive instance should be different than al.workEl()
+  err = err; // compilation warning
 	return al.workEl().genErrorRate();
 }
 
@@ -223,7 +224,7 @@ double SubAdMlp::prop( const vector<double> & vec)
   double	nout = _net.u()[_net.fo()].o();
   double	outp = unNormalizedPotential(nout);
 
-  //	écriture
+  //	ï¿½criture
   if( _tstream )
     {
       for( int i=0; i<_net.ni(); ++i )

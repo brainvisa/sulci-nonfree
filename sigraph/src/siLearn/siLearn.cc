@@ -613,7 +613,7 @@ int main( int argc, char** argv )
       //	Apprentissage
 
       Trainer		*tr;
-      set<CGraph *>	*ts;
+      //set<CGraph *>	*ts;
 
       LearnStopCriterion::theCriterion->StopDelay = par.stopDelay;
       LearnStopCriterion::theCriterion->MaxAppError = par.maxAppError;
@@ -628,10 +628,12 @@ int main( int argc, char** argv )
 	tr = new Trainer( rg, learn );
 
       tr->init(par.mode);
+/*
       if( tsts.empty() )
 	ts = 0;
       else
 	ts = &tsts;
+*/
 
       cout << "App...---> nothing in fact :)" << endl;
       cout << "ne plus utiliser ce programme, siLearn.py est bien mieux" << endl;
@@ -661,8 +663,12 @@ int main( int argc, char** argv )
       for( is=tsts.begin(), fs=tsts.end(); is!=fs; ++is )
 	delete *is;
 
+#ifndef _WIN32
+      sig_old = signal( SIGINT, sig_old );
+#endif
+
       cout << "OK." << endl;
-      return 0;
+     return 0;
     }
   catch( exception & e )
     {

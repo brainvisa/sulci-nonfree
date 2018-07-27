@@ -158,8 +158,10 @@ void randOrder( int *list, int n )
 
 float EnergyFunc( float x )
 {
-  static float y, z;
-  return( (y=(z=x*x)*z) / ( 1. + 15./16 * y ) );
+  static float y = 0.0f, z = 0.0f;
+  z = x * x;
+  y = z * z;
+  return( y / ( 1. + 15./16 * y ) );
 }
 
 

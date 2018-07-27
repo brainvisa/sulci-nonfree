@@ -13,6 +13,9 @@ find_package( Doxygen )
 set( SIGRAPH_RELATIVE_SIP_DIRECTORY
      "share/sulci-private-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}/sip" )
 
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wall" )
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall" )
+
 add_subdirectory( neuron )
 add_subdirectory( sigraph )
 
