@@ -73,8 +73,8 @@ public:
   int		*dims = (int *) malloc(sizeof(int) * 2);
   dims[1] = sipCpp->getXcolsNumber();
   dims[0] = sipCpp->size();
-  sipRes = PyArray_FromDimsAndData(2, dims, PyArray_DOUBLE,
-					(char *) sipCpp->getX());
+  sipRes = PyArray_FromDimsAndData( 2, dims, NPY_DOUBLE,
+                                    (char *) sipCpp->getX() );
   if(sipRes) sipRes = PyArray_Return((PyArrayObject *) sipRes);
 %End
 
@@ -83,8 +83,8 @@ public:
   int		*dims = (int *) malloc(sizeof(int) * 2);
   dims[1] = sipCpp->getYcolsNumber();
   dims[0] = sipCpp->size();
-  sipRes = PyArray_FromDimsAndData(2, dims, PyArray_DOUBLE,
-					(char *) sipCpp->getY());
+  sipRes = PyArray_FromDimsAndData( 2, dims, NPY_DOUBLE,
+                                    (char *) sipCpp->getY() );
   if(sipRes) sipRes = PyArray_Return((PyArrayObject *) sipRes);
 %End
 
@@ -134,17 +134,17 @@ public:
                          "Building a DBLearnable from a non-contiguous array "
                          "is not supported" );
       }
-      else if ((!a0isnone and arr0->nd != 2) or
-               (!a1isnone and arr1->nd != 2) or
-	       (!a2isnone and arr2->nd != 2))
+      else if ((!a0isnone and PyArray_NDIM( arr0 ) != 2) or
+               (!a1isnone and PyArray_NDIM( arr1 ) != 2) or
+	       (!a2isnone and PyArray_NDIM( arr2 ) != 2))
       {
          sipIsErr = 1;
          PyErr_SetString( PyExc_RuntimeError,
                        "Array dimensions are not compatible with DBLearnable" );
       }
-      else if ((!a0isnone and arr0->descr->type_num != PyArray_DOUBLE) or
-               (!a1isnone and arr1->descr->type_num != PyArray_DOUBLE) or
-               (!a2isnone and arr2->descr->type_num != PyArray_STRING))
+      else if( (!a0isnone and PyArray_DESCR( arr0 )->type_num != NPY_DOUBLE) ||
+               (!a1isnone and PyArray_DESCR( arr1 )->type_num != NPY_DOUBLE) ||
+               (!a2isnone and PyArray_DESCR( arr2 )->type_num != NPY_STRING) )
       {
         sipIsErr = 1;
         PyErr_SetString( PyExc_TypeError, "wrong array data type" );
@@ -156,21 +156,21 @@ public:
     double		*Y = NULL;
     char		*I = NULL;
 
-    if (!a0isnone) X = (double *) arr0->data;
-    if (!a1isnone) Y = (double *) arr1->data;
-    if (!a2isnone) I = (char *) arr2->data;
+    if (!a0isnone) X = (double *) PyArray_DATA( arr0 );
+    if (!a1isnone) Y = (double *) PyArray_DATA( arr1 );
+    if (!a2isnone) I = (char *) PyArray_DATA( arr2 );
 
     std::vector<int>	dims(4);
-    if (!a0isnone) dims[0] = arr0->dimensions[1]; //cols_x
+    if (!a0isnone) dims[0] = PyArray_DIMS( arr0 )[1]; //cols_x
     else dims[0] = 0;
-    if (!a1isnone) dims[1] = arr1->dimensions[1]; //cols_y
+    if (!a1isnone) dims[1] = PyArray_DIMS( arr1 )[1]; //cols_y
     else dims[1] = 0;
-    if (!a2isnone) dims[2] = arr2->dimensions[1]; //cols_inf
+    if (!a2isnone) dims[2] = PyArray_DIMS( arr2 )[1]; //cols_inf
     else dims[2] = 0;
     //size
-    if (!a0isnone) dims[3] = arr0->dimensions[0];
-    else if (!a1isnone) dims[3] = arr1->dimensions[0];
-    else if (!a2isnone) dims[3] = arr2->dimensions[0];
+    if (!a0isnone) dims[3] = PyArray_DIMS( arr0 )[0];
+    else if (!a1isnone) dims[3] = PyArray_DIMS( arr1 )[0];
+    else if (!a2isnone) dims[3] = PyArray_DIMS( arr2 )[0];
     else dims[3] = 0;
     sipCpp = new sigraph::SiDBLearnable(X, Y, I, dims, false);
   }
