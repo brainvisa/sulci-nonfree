@@ -162,47 +162,48 @@ int main( int argc, const char **argv )
             }
         }
 
-      cout << endl << n << " erreurs sur " << fg->order() << ", donc " 
-           << fg->order() - n << " bons : " << (float)n/fg->order() * 100 
-           << "% d'erreur\n";
+      cout << endl << n << " errors out of " << fg->order() << ", thus "
+           << fg->order() - n << " correct: " << (float)n/fg->order() * 100
+           << "% of error\n";
       if( tots > 0 )
       {
-        cout << "En masse : " << errs / tots * 100 << "% d'erreur\n";
+        cout << "In mass: " << errs / tots * 100 << "% of error\n";
         si = 200 * sbon / ( 2 * sbon + errs );
         cout << "SI: " << si << "% (" << 100 - si << " % err)" << endl;
       }
-      cout << "Masse d'origine des non-brain : " << sobr << endl;
+      cout << "Initial mass of non-brain: " << sobr << endl;
 
-      cout << nbr << " étiquettes 'brain' bien placées ( " 
-           << (float)nbr*100/fg->order() << " %, masse : " << sbr 
+      cout << nbr << " 'brain' labels correctly placed ( "
+           << (float)nbr*100/fg->order() << " %, mass: " << sbr
            << " , " << sbr*100/tots << " % )\n";
 
-      cout << "Ajouts : " << naj << " (brain -> autre) :\n  " 
+      cout << "Additions: " << naj << " (brain -> other) :\n  "
            << ((float)naj*100)/fg->order() 
-           << " % du total, " << ((float)naj*100)/(fg->order()-nbr) 
-           << " % des non-brain\n";
-      cout << "masse : " << saj << " : " << saj*100/tots << " % du total, " 
-           << saj*100/(tots-sbr) << " % des non-brain\n";
+           << " % of total, " << ((float)naj*100)/(fg->order()-nbr)
+           << " % of non-brain\n";
+      cout << "mass: " << saj << " : " << saj*100/tots << " % of total, "
+           << saj*100/(tots-sbr) << " % of non-brain\n";
 
-      cout << "Rejets : " << nrj << " (autre -> brain) :\n  " 
+      cout << "Rejected: " << nrj << " (other -> brain) :\n  "
            << ((float)nrj*100)/fg->order() 
-           << " % du total, " << ((float)nrj*100)/(fg->order()-nbr) 
-           << " % des non-brain\n";
-      cout << "masse : " << srj << " : " << srj*100/tots << " % du total, " 
-           << srj*100/(tots-sbr) << " % des non-brain\n";
+           << " % of total, " << ((float)nrj*100)/(fg->order()-nbr)
+           << " % of non-brain\n";
+      cout << "mass: " << srj << " : " << srj*100/tots << " % of total, "
+           << srj*100/(tots-sbr) << " % of non-brain\n";
 
-      cout << "Changements : " << nch << " (n'impliquant pas 'brain') :\n  " 
-           << ((float)nch*100)/fg->order() << " % du total, " 
-           << ((float)nch*100)/(fg->order()-nbr) << " % des non-brain\n";
-      cout << "masse : " << sch << " : " << sch*100/tots << " % du total, " 
-           << sch*100/(tots-sbr) << " % des non-brain\n";
+      cout << "Changes: " << nch << " (not involving 'brain'):\n  "
+           << ((float)nch*100)/fg->order() << " % of total, "
+           << ((float)nch*100)/(fg->order()-nbr) << " % of non-brain\n";
+      cout << "mass: " << sch << " : " << sch*100/tots << " % of total, "
+           << sch*100/(tots-sbr) << " % of non-brain\n";
 
-      cout << "Bons : " << nbon << " (autre que 'brain', bien placés) :\n  " 
-           << ((float)nbon*100)/fg->order() << " % du total, " 
-           << ((float)nbon*100)/(fg->order()-nbr) << " % des non-brain\n";
-      cout << "masse : " << sbon << " : " << sbon*100/tots << " % du total, " 
-           << sbon*100/(tots-sbr) << " % des non-brain, " 
-           << sbon*100/(tots-sobr) << " des non-brain d'origine\n";
+      cout << "Correct: " << nbon
+           << " (other than 'brain', correctly placed):\n  "
+           << ((float)nbon*100)/fg->order() << " % of total, "
+           << ((float)nbon*100)/(fg->order()-nbr) << " % of non-brain\n";
+      cout << "mass: " << sbon << " : " << sbon*100/tots << " % of total, "
+           << sbon*100/(tots-sbr) << " % of non-brain, "
+           << sbon*100/(tots-sobr) << " of initial non-brain\n";
     }
   catch( user_interruption & )
     {
