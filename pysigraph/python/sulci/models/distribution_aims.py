@@ -711,7 +711,7 @@ class Spam(PySpam):
 
     def prodlikelihoods(self, X, shift=10.):
         if X.flags['C_CONTIGUOUS']:
-            X = X.copy('fortran')
+            X = X.copy(order='F')
         v = aims.Volume_DOUBLE(X)
         logli, li = self._c_spam.prodlikelihoods(v, shift)
         return logli, li
