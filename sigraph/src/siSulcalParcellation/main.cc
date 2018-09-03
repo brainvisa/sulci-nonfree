@@ -137,7 +137,7 @@ int main( int argc, const char** argv )
 
     // read translation file
     cout << "Read translation file \n";
-    ifstream 	tf(sulcitraductionfile);
+    ifstream 	tf(sulcitraductionfile.c_str());
     if (!tf)
       {
         cout << "File " << (string)sulcitraductionfile << " missing. Please first use siMeshSulciProjection...\n";
