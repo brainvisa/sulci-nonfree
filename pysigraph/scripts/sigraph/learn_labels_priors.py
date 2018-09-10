@@ -135,9 +135,9 @@ def priorFactory(type):
 def compute_prior(graphs, MyPrior, distr, options, output):
 	# create output directory
 	prefix = output
-	try:	os.mkdir(prefix)
+	try:	os.makedirs(prefix)
 	except OSError, e:
-		print("warning: directory '%s' allready exists" % prefix)
+		print("warning: directory '%s' already exists" % prefix)
 
 	prior = MyPrior(graphs, distr,
 			options.compute_likelihoods)

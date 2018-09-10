@@ -143,7 +143,7 @@ overlappe to each other.
     _bucketmap_bb_to_img_bb_with_motion = \
         classmethod(_bucketmap_bb_to_img_bb_with_motion)
 
-    def _compute_corners_with_motion(cls, motion, size_in, bmin, nmax):
+    def _compute_corners_with_motion(cls, motion, size_in, bmin, bmax):
         (xmin, ymin, zmin) = bmin
         (xmax, ymax, zmax) = bmax
         # input bounding box
@@ -712,7 +712,7 @@ class Spam(PySpam):
 
     def prodlikelihoods(self, X, shift=10.):
         if X.flags['C_CONTIGUOUS']:
-            X = X.copy('fortran')
+            X = X.copy(order='F')
         v = aims.Volume_DOUBLE(X)
         logli, li = self._c_spam.prodlikelihoods(v, shift)
         return logli, li
