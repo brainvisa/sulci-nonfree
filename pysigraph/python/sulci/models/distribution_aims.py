@@ -142,7 +142,7 @@ overlappe to each other.
     _bucketmap_bb_to_img_bb_with_motion = \
         classmethod(_bucketmap_bb_to_img_bb_with_motion)
 
-    def _compute_corners_with_motion(cls, motion, size_in, bmin, nmax):
+    def _compute_corners_with_motion(cls, motion, size_in, bmin, bmax):
         (xmin, ymin, zmin) = bmin
         (xmax, ymax, zmax) = bmax
         # input bounding box

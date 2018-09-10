@@ -675,7 +675,7 @@ def main():
 	parser, (options, args) = parseOpts(sys.argv)
 
 	if options.distrib_gaussians is None:
-            print('--dir-gaussians option is mandatory', file=sys.stderr)
+            print('--distrib-gaussians option is mandatory', file=sys.stderr)
             parser.print_help()
             sys.exit( 1 )
 
