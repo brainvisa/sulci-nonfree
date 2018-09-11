@@ -8,6 +8,7 @@ import scipy.special
 from soma import aims, aimsalgo
 from . import distribution
 from .distribution import Distribution, MixtureModel, distribution_map
+import six
 
 #
 # SPAM
@@ -58,6 +59,20 @@ class PySpam(Distribution):
         self._bb_talairach_size = None
         self._img_density = None
         self._fromlog = fromlog
+
+    def __getstate__(self):
+        state = {}
+        keys = ('_neighbourhood', '_name', '_gaussian_std', '_voxels_n',
+                '_nodes_n', '_bb_talairach_offset', '_bb_talairach_size',
+                '_img_density', '_fromlog', '_missing_energy', '_ss')
+        for k in keys:
+            if k in self.__dict__:
+                state[k] = self.__dict__[k]
+        return state
+
+    def __setstate__(self, state):
+        self.__init__(state['_gaussian_std'], state['_fromlog'])
+        self.__dict__.update(state)
 
     def is_fromlog(self): return self._fromlog
 
@@ -686,6 +701,10 @@ class Spam(PySpam):
     def __init__(self, gaussian_std=2, fromlog=False):
         PySpam.__init__(self, gaussian_std, fromlog)
         self._c_spam = None
+
+    def __setstate__(self, state):
+        super(Spam, self).__setstate__(state)
+        self.update()
 
     def fit_graphs(self, infos=None, motions=None, ss=True,
                    write_count=None):
