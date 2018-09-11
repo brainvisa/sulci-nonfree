@@ -27,26 +27,62 @@ if sys.version_info[0] >= 3:
 # load data graph
 
 
-def load_graphs(transfile, graphnames, label_mode='name'):
+def load_graphs(transfile, graphnames, label_mode='name', nthread=1):
     '''
 transfile :  translation file
 graphnames : list of graph names
 label_mode : name (default), label or both
+nthread : number of parallel threads used to load all graphs
     '''
     # translation of labels
     ft = sigraph.FoldLabelsTranslator(transfile)
     sigraph.si().setLabelsTranslPath(transfile)
 
-    reader = aims.Reader()
-    graphs = []
-    for graphname in graphnames:
-        g = reader.read(graphname)
-        graphs += [g]
+    def load_it(filename, graphs, i, label_mode, ft):
+        g = aims.read(filename)
+        graphs[i] = g
         if label_mode == 'both':
             ft.translate(g, 'label', 'label')
             ft.translate(g, 'name', 'name')
         else:
             ft.translate(g, label_mode, label_mode)
+
+    def worker_loop(q):
+        while True:
+            item = q.get()
+            if item is None:
+                q.task_done()
+                break
+            load_it(*item)
+            q.task_done()
+
+    import queue
+    import threading
+    import multiprocessing
+
+    q = queue.Queue()
+    if nthread == 0:
+        nthread = multiprocessing.cpu_count()
+    elif nthread < 0:
+        nthread += multiprocessing.cpu_count()
+        if nthread < 1:
+            nthread = 1
+
+    workers = []
+    for i in range(nthread):
+        worker = threading.Thread(target=worker_loop, args=(q, ))
+        worker.start()
+        workers.append(worker)
+
+    graphs = [None] * len(graphnames)
+    for i, graphname in enumerate(graphnames):
+        q.put((graphname, graphs, i, label_mode, ft))
+    for i in range(len(workers)):
+        q.put(None)
+
+    q.join()
+    for w in workers:
+        w.join()
 
     return graphs
 

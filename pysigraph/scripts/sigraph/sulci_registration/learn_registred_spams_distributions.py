@@ -13,10 +13,8 @@ from sulci.registration.transformation import RigidTransformation, \
 import multiprocessing
 import queue
 import threading
-
-
-#def do_register(spam_learner, i, mixture, verbose):
-    #return spam_learner.register(i, mixture, verbose)
+from soma import mpfork
+import numpy as np
 
 
 ################################################################################
@@ -269,36 +267,14 @@ class GlobalSpamLearner(SpamLearner):
         self._groups.append(numpy.array(subgroups))
 
     def learn_spams(self, motions, sulci_set):
-        def do_stuff(self, q, motions):
-            while True:
-                job = q.get()
-                if job is None:
-                    q.task_done()
-                    break
-                s, infos = job
-                print('fitting:', s)
-                s.fit_graphs(infos, motions, self._ss)
-                q.task_done()
-                print('done:', s)
+        def do_fit(self, s, infos, motions):
+            s.fit_graphs(infos, motions, self._ss)
+            return s
 
-        models = []
+        models = [None] * len(self._labels)
         q = queue.Queue()
-        workers = []
-        if self.nthread > 0:
-            n_thread = self.nthread
-        elif self.nthread == 0:
-            n_thread = multiprocessing.cpu_count()
-        else:
-            n_thread = multiprocessing.cpu_count() + self.nthread
-            if n_thread < 1:
-                n_thread = 1
-        for i in range(n_thread):
-            worker = threading.Thread(target=do_stuff,
-                                      args=(self, q, motions))
-            #worker.setDaemon(True)
-            worker.start()
-            workers.append(worker)
-        for sulcus in self._labels:
+        workers = mpfork.allocate_workers(q, self.nthread, motions)
+        for i, sulcus in enumerate(self._labels):
             if self._selected_sulci != None and \
                 sulcus not in self._selected_sulci:
                 continue
@@ -309,9 +285,10 @@ class GlobalSpamLearner(SpamLearner):
                 sigma = self._sigmas['sulci'].get(sulcus,
                             self._sigma_value)
                 s = distribution_aims.Spam(sigma, self._fromlog)
-                q.put((s, infos))
+                job = (i, do_fit, (self, s, infos), {}, models)
+                q.put(job)
                 #s.fit_graphs(infos, motions, self._ss)
-            models.append(s)
+            #models.append(s)
         for i in range(len(workers)):
             q.put(None)
 
@@ -334,6 +311,7 @@ class GlobalSpamLearner(SpamLearner):
         self._old_params[i] = R, t
         energy = reg.energy()
         trans = RigidTransformation(R, t)
+        #print('trans', i, ':', R, '\n', t)
         return trans, energy
 
     def learn_onestep(self, motions, verbose=0):
@@ -345,26 +323,18 @@ class GlobalSpamLearner(SpamLearner):
         # registration
         if verbose > 0: print("registration...")
 
-        def do_stuff(self, q, mixture, verbose, res):
-            while True:
-                i = q.get()
-                if i is None:
-                    q.task_done()
-                    break
-                print('registering:', i)
-                trans, energy = self.register(i, mixture, verbose - 1)
-                q.task_done()
-                print('done:', i)
-                res[i] = (trans, energy)
+        #def do_stuff(self, q, mixture, verbose, res):
+            #while True:
+                #i = q.get()
+                #if i is None:
+                    #q.task_done()
+                    #break
+                #print('registering:', i)
+                #trans, energy = self.register(i, mixture, verbose - 1)
+                #q.task_done()
+                #print('done:', i)
+                #res[i] = (trans, energy)
 
-        if self.nthread > 0:
-            n_thread = self.nthread
-        elif self.nthread == 0:
-            n_thread = multiprocessing.cpu_count()
-        else:
-            n_thread = multiprocessing.cpu_count() + self.nthread
-            if n_thread < 1:
-                n_thread = 1
 
         # multiprocessing cannot be used because graphs and vertices
         # cannot be pickled.
@@ -373,21 +343,17 @@ class GlobalSpamLearner(SpamLearner):
                        #[(self, i, mixture, verbose - 1)
                         #for i in range(len(self._graphs))])
 
-        res = [None] * len(self._graphs)
+        models = [None] * len(self._labels)
         q = queue.Queue()
-        workers = []
-        for i in range(n_thread):
-            worker = threading.Thread(target=do_stuff,
-                                      args=(self, q, mixture, verbose,
-                                            res))
-            #worker.setDaemon(True)
-            worker.start()
-            workers.append(worker)
+        workers = mpfork.allocate_workers(q, self.nthread, mixture,
+                                          verbose - 1)
+        res = [None] * len(self._graphs)
 
         for i, g in enumerate(self._graphs):
             if verbose > 1:
                 print("graph %d/%d" % (i + 1, len(self._graphs)))
-            q.put(i)
+            job = (i, self.register, (i, ), {}, res)
+            q.put(job)
             #trans, energy = self.register(i, mixture, verbose - 1)
             #total_energy += energy
             #transformations.append(trans)
@@ -397,6 +363,9 @@ class GlobalSpamLearner(SpamLearner):
         q.join()
         for worker in workers:
             worker.join()
+
+        for i, r in enumerate(res):
+            self._old_params[i] = r[0]._R, r[0]._t
 
         total_energy = sum([x[1] for x in res]) / len(self._graphs)
         transformations = [x[0] for x in res]
@@ -817,7 +786,8 @@ def main():
         input_motions_names = inputs[ind1 + 1:ind2]
         input_segments_weights = inputs[ind2 + 1:]
 
-    graphs = io.load_graphs(options.transfile, graphnames)
+    graphs = io.load_graphs(options.transfile, graphnames,
+                            nthread=options.thread)
     if input_motions_names:
         reader = aims.Reader()
         input_motions = [reader.read(f) for f in input_motions_names]
@@ -850,7 +820,7 @@ def main():
 
     # create output directory
     prefix = options.distribdir
-    try:    os.mkdir(prefix)
+    try:    os.makedirs(prefix)
     except OSError as e:
         print("warning: directory '%s' could not be created" % prefix)
         print(e)
@@ -909,14 +879,16 @@ def main():
         gprefix = options.distrib_gaussians
         try:    os.mkdir(gprefix)
         except OSError as e:
-            print("warning: directory '%s' allready exists" %gprefix)
+            print("warning: directory '%s' already exists" %gprefix)
         h = {'data_type' : 'refgravity_center', 'files' : {},
             'level' : 'segments'}
         for sulcus, distr in gravity_centers.items():
-            filename = io.node2densityname(gprefix,\
+            filename = io.node2densityname(os.path.basename(gprefix),\
                     'gaussian', sulcus)
             distr.write(filename)
-            h['files'][sulcus] = (distr.name(), filename)
+            h['files'][sulcus] = (distr.name(),
+                                  os.path.relpath(filename,
+                                                  os.path.dirname(gprefix)))
         summary_file = options.distrib_gaussians + '.dat'
         fd = open(summary_file, 'w')
         fd.write('distributions = \\\n')
@@ -932,7 +904,9 @@ def main():
         filename = io.node2densityname(prefix, 'spam', sulcus)
         s = spams[j]
         s.write(filename)
-        h['files'][sulcus] = ('spam', filename)
+        h['files'][sulcus] = ('spam',
+                              os.path.relpath(filename,
+                                              os.path.dirname(prefix)))
 
     # write distribution summary file
     summary_file = options.distribdir + '.dat'
