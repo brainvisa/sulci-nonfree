@@ -15,6 +15,7 @@ import queue
 import threading
 from soma import mpfork
 import numpy as np
+import time
 
 
 ################################################################################
@@ -140,6 +141,8 @@ class SpamLearner(object):
         self._no_tal = no_tal
         self._is_affine = is_affine
         self._init_data()
+        # number of threads to be used
+        self.nthread = 1
 
     def get_labels(self): return self._labels
 
@@ -218,8 +221,6 @@ class SpamLearner(object):
 class GlobalSpamLearner(SpamLearner):
     def __init__(self, *args, **kwargs):
         SpamLearner.__init__(self, *args, **kwargs)
-        # number of threads to be used
-        self.nthread = 1
 
     def _init_data(self):
         SpamLearner._init_data(self)
@@ -343,7 +344,6 @@ class GlobalSpamLearner(SpamLearner):
                        #[(self, i, mixture, verbose - 1)
                         #for i in range(len(self._graphs))])
 
-        models = [None] * len(self._labels)
         q = queue.Queue()
         workers = mpfork.allocate_workers(q, self.nthread, mixture,
                                           verbose - 1)
@@ -442,6 +442,29 @@ class GlobalSpamLearnerLoo(GlobalSpamLearner):
         total_energy /= len(self._graphs)
         return transformations, total_energy
 
+
+class Job(object):
+    def __init__(self, data, lock=None):
+        self.data = data
+        if lock is None:
+            lock = threading.RLock()
+        self.lock = lock
+        self._done = false
+
+    def done(self):
+        with self.lock:
+            return self._done
+
+    def set_done(self, state=True):
+        with self.lock:
+            self._done = state
+
+    def join(self):
+        while True:
+            done = self.done()
+            if done:
+                return
+            time.sleep(0.2)
 
 class LocalSpamLearner(SpamLearner):
     def __init__(self, graphs, segments_weights, input_motions,
@@ -573,13 +596,31 @@ class LocalSpamLearner(SpamLearner):
         local_graph_trans = [copy.copy(d) for i in self._graphs]
         global_graph_trans = [copy.copy(d) for i in self._graphs]
         spams = []
-        for sulcus in self._labels:
+
+        q = queue.Queue()
+        workers = mpfork.allocate_workers(q, self.nthread)
+        res = [None] * len(self._labels)
+
+        for i, sulcus in enumerate(self._labels):
             if self._selected_sulci != None and \
                 sulcus not in self._selected_sulci:
                 continue
             if verbose > 0: print("========== %s =========" % sulcus)
-            transformations, spam = self.learn_sulcus(sulcus,
-                        miniter, maxiter, verbose - 1)
+            job = (i, self.learn_sulcus,
+                   (sulcus, miniter, maxiter, verbose - 1), {}, res)
+            q.put(job)
+
+        for w in range(len(workers)):
+            q.put(None)
+
+        q.join()
+        for w in workers:
+            w.join()
+
+        for i, sulcus in enumerate(self._labels):
+            if res[i] is None:
+                continue
+            transformations, spam = res[i]
             spams.append(spam)
             for i, global_trans in enumerate(transformations):
                 global_graph_trans[i][sulcus] = global_trans
@@ -789,8 +830,7 @@ def main():
     graphs = io.load_graphs(options.transfile, graphnames,
                             nthread=options.thread)
     if input_motions_names:
-        reader = aims.Reader()
-        input_motions = [reader.read(f) for f in input_motions_names]
+        input_motions = [aims.read(f) for f in input_motions_names]
     else:    input_motions = None
     if input_segments_weights:
         segments_weights = io.read_segments_weights(\
@@ -859,6 +899,7 @@ def main():
             float(options.maxiter), verbose=int(options.verbose))
     spams = mixture.get_models()
     labels = learner.get_labels()
+    print('learning done.')
 
     # write motions
     for i, g in enumerate(graphs):
@@ -874,22 +915,25 @@ def main():
             dir = os.path.join(prefix, base)
             local_trans.write(dir + '_local', dir + '_local.dat')
             global_trans.write(dir + '_global', dir + '_global.dat')
+    print('transforms written.')
     if options.mode == 'local':
         gravity_centers = learner._new_gravity_centers
         gprefix = options.distrib_gaussians
-        try:    os.mkdir(gprefix)
+        print('write local gaussians:', gprefix)
+        try:    os.makedirs(gprefix)
         except OSError as e:
             print("warning: directory '%s' already exists" %gprefix)
         h = {'data_type' : 'refgravity_center', 'files' : {},
             'level' : 'segments'}
         for sulcus, distr in gravity_centers.items():
-            filename = io.node2densityname(os.path.basename(gprefix),\
-                    'gaussian', sulcus)
+            filename = io.node2densityname(gprefix, 'gaussian', sulcus)
+            print('writing:', filename)
             distr.write(filename)
             h['files'][sulcus] = (distr.name(),
                                   os.path.relpath(filename,
                                                   os.path.dirname(gprefix)))
         summary_file = options.distrib_gaussians + '.dat'
+        print('write gravity_centers:', summary_file)
         fd = open(summary_file, 'w')
         fd.write('distributions = \\\n')
         p = pprint.PrettyPrinter(indent=4, width=1000, stream=fd)
@@ -903,6 +947,7 @@ def main():
             continue
         filename = io.node2densityname(prefix, 'spam', sulcus)
         s = spams[j]
+        print('write:', filename)
         s.write(filename)
         h['files'][sulcus] = ('spam',
                               os.path.relpath(filename,
@@ -910,6 +955,7 @@ def main():
 
     # write distribution summary file
     summary_file = options.distribdir + '.dat'
+    print('write distribution:', summary_file)
     fd = open(summary_file, 'w')
     fd.write('distributions = \\\n')
     p = pprint.PrettyPrinter(indent=4, width=1000, stream=fd)
