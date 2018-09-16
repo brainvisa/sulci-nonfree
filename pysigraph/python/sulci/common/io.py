@@ -56,7 +56,11 @@ nthread : number of parallel threads used to load all graphs
             load_it(*item)
             q.task_done()
 
-    import queue
+    try:
+        import queue
+    except ImportError:
+        # python 2.6 and early 2.7.x
+        import Queue as queue
     import threading
     import multiprocessing
 

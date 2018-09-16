@@ -11,7 +11,11 @@ from sulci.registration.spam import SpamMixtureRegistration, SpamRegistration
 from sulci.registration.transformation import RigidTransformation, \
                     SulcusWiseRigidTransformations
 import multiprocessing
-import queue
+try:
+    import queue
+except ImportError:
+    # python 2.6 and early 2.7.x
+    import Queue as queue
 import threading
 from soma import mpfork
 import numpy as np
