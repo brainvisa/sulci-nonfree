@@ -73,7 +73,7 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    graphs = io.load_graphs(options.transfile, graphnames)
+    graphs = io.load_graphs(options.transfile, graphnames, nthread=0)
     graphmodel = create_graphmodel(graphs)
     write_graphmodel(options.modelname, graphmodel)
 
