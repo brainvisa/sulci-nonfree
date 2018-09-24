@@ -86,13 +86,11 @@ def get_orientations_from_graphs(sulci, graphs, skelnames,
                 (sulcus not in selected_sulci): continue
             if sulcus not in sulci:
                 print('sulcus', sulcus, 'not in sulci list')
-                print(sulci)
             if options.data_type == 'orientation':
                 orient = orientation.get_sulcus_rotation_axe(v)
                 if orient is None:
                     continue
                 o, w = orient
-                print('orientation 2')
             elif options.data_type == 'refhull_normal':
                 o, w = v['hull_normal'], v['hull_normal_weight']
             elif options.data_type == 'coordinate_system':
@@ -159,8 +157,7 @@ class Compute(object):
                     if self._options.data_type == \
                         'orientation':
                         o = mean_orientations[sulcus]
-                        ors = orientation.reorient( \
-                                ors, o)
+                        ors = orientation.reorient(ors, o)
                     o = numpy.dot(ws, ors) / numpy.sum(ws)
                     w = numpy.sum(ws)
                     ors2.append(o)
@@ -220,13 +217,16 @@ class ComputeOrientations(Compute):
         return level
 
     def get_learn_data(self, sulcus):
-        try:    ors, ws = self._selected_orientations[sulcus]
+        try:
+            ors, ws = self._selected_orientations[sulcus]
         except KeyError:
             return None, None
         if len(ors) == 0: return None, None
         ors = numpy.vstack(ors)
-        if self._options.data_type == 'orientation':
-            ors = orientation.reorient(ors, o)
+        #if self._options.data_type == 'orientation':
+            ## we don't have o here, and reorient has already been done
+            ## so I comment out this
+            #ors = orientation.reorient(ors, o)
         ws = numpy.array(ws)
         return ors, ws
 

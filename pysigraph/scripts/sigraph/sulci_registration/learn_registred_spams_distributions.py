@@ -98,6 +98,9 @@ def compute_gravity_centers(sulci_set, input_motions=None,
         db = []
         for i, h in data.items():
             g = h['gravity_center']
+            if np.any(np.isnan(np.asarray(g))):
+                print('NaN in gravity_centers, sulcus:', sulcus, i)
+                continue
             if input_motions:
                 motion = input_motions[i]
             else:
@@ -109,6 +112,7 @@ def compute_gravity_centers(sulci_set, input_motions=None,
                 motion = local_motion * motion
             db.append(motion.transform(g))
         db = numpy.array(db)
+
         distr = distribution.FixedSphericalGaussian(1.)
         distr.fit(db)
         gravity_centers[sulcus] = distr
@@ -197,9 +201,10 @@ class SpamLearner(object):
                     p_out = motion.transform(p_in)
                     X.append(p_out)
                 if segments_weights_g is None:
-                    if data.has_key(name):
-                        data[name].append(X)
-                    else:    data[name] = [X]
+                    if X != []:
+                        if data.has_key(name):
+                            data[name].append(X)
+                        else:    data[name] = [X]
                 else:
                     data.append(X)
                     data_weights.append(weights)
@@ -523,11 +528,17 @@ class LocalSpamLearner(SpamLearner):
         return global_trans, energy
 
     def learn_spam(self, sulcus, motions, sulci_set):
-        infos = sulci_set[sulcus]
-        sigma = self._sigmas['sulci'].get(sulcus, self._sigma_value)
-        spam = distribution_aims.Spam(sigma, self._fromlog)
-        spam.fit_graphs(infos, motions, self._ss)
-        return spam
+        try:
+            infos = sulci_set[sulcus]
+            sigma = self._sigmas['sulci'].get(sulcus, self._sigma_value)
+            spam = distribution_aims.Spam(sigma, self._fromlog)
+            spam.fit_graphs(infos, motions, self._ss)
+            return spam
+        except Exception as e:
+            print('exception in learn_spam:', type(e), e)
+            import traceback
+            traceback.print_exc()
+            raise
 
     def learn_sulcus_onestep(self, sulcus, motions, verbose=0):
         transformations = []
@@ -555,44 +566,50 @@ class LocalSpamLearner(SpamLearner):
         return transformations, total_energy
 
     def learn_sulcus(self, sulcus, miniter=0, maxiter=numpy.inf, verbose=0):
-        energy_eps = 0.1
-        cur_motions = self._motions
-        n = 0
-        self._old_params = []
-        id = numpy.asmatrix(numpy.identity(3))
-        z = numpy.asmatrix(numpy.zeros((3, 1)))
-        transformations = []
-        for i in range(len(self._graphs)):
-            R, t = id.copy(), z.copy()
-            trans = RigidTransformation(R, t)
-            self._old_params.append((R, t))
-            transformations.append(trans) # global transformation
-        old_energy = numpy.inf
-        n = 0
-        while 1:
-            if verbose > 0:
-                print("*********")
-                print("**  %d   " % n)
-                print("*********")
-            n += 1
-            transformations, energy = \
-                self.learn_sulcus_onestep(sulcus,
-                        cur_motions, verbose - 1)
-            if verbose > 0: print("subjects mean energy :", energy)
-            if (n >= miniter) and \
-                (old_energy - energy < energy_eps): break
-            else:   old_energy = energy
-            # compute transformation from subject space
-            cur_motions = []
+        try:
+            energy_eps = 0.1
+            cur_motions = self._motions
+            n = 0
+            self._old_params = []
+            id = numpy.asmatrix(numpy.identity(3))
+            z = numpy.asmatrix(numpy.zeros((3, 1)))
+            transformations = []
             for i in range(len(self._graphs)):
-                global_trans = transformations[i]
-                m = self._motions[i]
-                if global_trans:
-                    m = global_trans.to_motion() * m
-                cur_motions.append(m)
-            if n >= maxiter: break
-        spam = self.learn_spam(sulcus, cur_motions, self._sulci_set)
-        return transformations, spam
+                R, t = id.copy(), z.copy()
+                trans = RigidTransformation(R, t)
+                self._old_params.append((R, t))
+                transformations.append(trans) # global transformation
+            old_energy = numpy.inf
+            n = 0
+            while 1:
+                if verbose > 0:
+                    print("*********")
+                    print("**  %d   " % n)
+                    print("*********")
+                n += 1
+                transformations, energy = \
+                    self.learn_sulcus_onestep(sulcus,
+                            cur_motions, verbose - 1)
+                if verbose > 0: print("subjects mean energy :", energy)
+                if (n >= miniter) and \
+                    (old_energy - energy < energy_eps): break
+                else:   old_energy = energy
+                # compute transformation from subject space
+                cur_motions = []
+                for i in range(len(self._graphs)):
+                    global_trans = transformations[i]
+                    m = self._motions[i]
+                    if global_trans:
+                        m = global_trans.to_motion() * m
+                    cur_motions.append(m)
+                if n >= maxiter: break
+            spam = self.learn_spam(sulcus, cur_motions, self._sulci_set)
+            return transformations, spam
+        except Exception as e:
+            print('exception in learn_sulcus:', type(e), e)
+            import traceback
+            traceback.print_exc()
+            raise
 
     def learn(self, optimized_gravity_centers,
         miniter=0., maxiter=numpy.inf, verbose=0):
@@ -624,10 +641,20 @@ class LocalSpamLearner(SpamLearner):
         for i, sulcus in enumerate(self._labels):
             if res[i] is None:
                 continue
-            transformations, spam = res[i]
-            spams.append(spam)
-            for i, global_trans in enumerate(transformations):
-                global_graph_trans[i][sulcus] = global_trans
+            if len(res[i]) == 3 and isinstance(res[i][1], Exception):
+                print('error in learning of sulcus %s:' % sulcus)
+                print(res[i][0], res[i][1])
+                import traceback
+                traceback.print_exception(*res[i])
+                raise res[i][0], res[i][1], res[i][2]
+            try:
+                transformations, spam = res[i]
+                spams.append(spam)
+                for i, global_trans in enumerate(transformations):
+                    global_graph_trans[i][sulcus] = global_trans
+            except Exception as e:
+                print('exception:', type(e), e)
+                raise
 
         # gravity_centers in optimized referential space
         self._new_gravity_centers = compute_gravity_centers(\
@@ -704,12 +731,7 @@ class LocalSpamLearnerLoo(LocalSpamLearner):
 def parseOpts(argv):
     description = 'Compute Spam from a list of graphs, with registration.\n' \
     'Global registration or local registration modes\n\n' \
-    'Global mode:\n' \
     'Needs: labels translation file (.trl), sulci graphs (.arg).\n\n' \
-    'Local mode:\n' \
-    'Needs: labels translation file (.trl), sulci graphs (.arg), ' \
-    'von mises Fisher prior on sulcuswise rotation directions\n' \
-    '\n' \
     'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg...\n' \
     'learn_spams_distributions.py [OPTIONS] graph1.arg graph2.arg... == ' \
     'input_motion1.trm input_motion2.trm...\n' \
