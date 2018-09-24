@@ -63,15 +63,17 @@ class SulcusWiseRigidTransformations(aims.Transformation3d):
 
     def write(self, directory, summary_filename):
         try:
-            os.mkdir(directory)
+            os.makedirs(directory)
         except OSError as e:
-            print("directory '%s' allready exists" % directory)
+            print("directory '%s' already exists" % directory)
         h = {}
         for sulcus, trans in self._transformations.items():
             if trans is None:
                 continue
             filename = "motion_%s.trm" % sulcus
             filename = os.path.join(directory, filename)
-            h[sulcus] = filename
+            h[sulcus] = os.path.join(
+                os.path.basename(os.path.dirname(filename)),
+                os.path.basename(filename))
             trans.write(filename)
         io.write_pp('transformations', summary_filename, h)

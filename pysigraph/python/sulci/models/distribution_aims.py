@@ -202,7 +202,7 @@ overlappe to each other.
         bb_subjects = {}
 
         # 1) Bounding box estimations
-        # For each subjects
+        # For each subject
         for (id, graphinfo) in self._infos.items():
             vertices = graphinfo['vertices']
             weights = graphinfo['weights']
@@ -275,7 +275,7 @@ overlappe to each other.
         array = img_count.volume().get().arraydata()
         array /= array.sum()
         if write_count:
-            aims.Writer().write(img_count, write_count)
+            aims.write(img_count, write_count)
 
         # gaussian blur
         d = self._gaussian_std
