@@ -282,8 +282,9 @@ class GlobalSpamLearner(SpamLearner):
             return s
 
         models = [None] * len(self._labels)
-        q = queue.Queue()
-        workers = mpfork.allocate_workers(q, self.nthread, motions)
+        if self.nthread != 1:
+            q = queue.Queue()
+            workers = mpfork.allocate_workers(q, self.nthread, motions)
         for i, sulcus in enumerate(self._labels):
             if self._selected_sulci != None and \
                 sulcus not in self._selected_sulci:
@@ -295,16 +296,19 @@ class GlobalSpamLearner(SpamLearner):
                 sigma = self._sigmas['sulci'].get(sulcus,
                             self._sigma_value)
                 s = distribution_aims.Spam(sigma, self._fromlog)
-                job = (i, do_fit, (self, s, infos), {}, models)
-                q.put(job)
+                if self.nthread != 1:
+                    job = (i, do_fit, (self, s, infos), {}, models)
+                    q.put(job)
+                else:
+                    models[i] = do_fit(self, s, infos, motions)
                 #s.fit_graphs(infos, motions, self._ss)
             #models.append(s)
-        for i in range(len(workers)):
-            q.put(None)
-
-        q.join()
-        for worker in workers:
-            worker.join()
+        if self.nthread != 1:
+            for i in range(len(workers)):
+                q.put(None)
+            q.join()
+            for worker in workers:
+                worker.join()
 
         mixture = distribution_aims.SpamMixtureModel(models, None)
         return mixture
@@ -353,25 +357,30 @@ class GlobalSpamLearner(SpamLearner):
                        #[(self, i, mixture, verbose - 1)
                         #for i in range(len(self._graphs))])
 
-        q = queue.Queue()
-        workers = mpfork.allocate_workers(q, self.nthread, mixture,
-                                          verbose - 1)
+        if self.nthread != 1:
+            q = queue.Queue()
+            workers = mpfork.allocate_workers(q, self.nthread, mixture,
+                                              verbose - 1)
         res = [None] * len(self._graphs)
 
         for i, g in enumerate(self._graphs):
             if verbose > 1:
                 print("graph %d/%d" % (i + 1, len(self._graphs)))
-            job = (i, self.register, (i, ), {}, res)
-            q.put(job)
-            #trans, energy = self.register(i, mixture, verbose - 1)
-            #total_energy += energy
-            #transformations.append(trans)
-        for i in range(len(workers)):
-            q.put(None)
+            if self.nthread != 1:
+                job = (i, self.register, (i, ), {}, res)
+                q.put(job)
+            else:
+                trans, energy = self.register(i, mixture, verbose - 1)
+                #total_energy += energy
+                #transformations.append(trans)
+                res[i] = (trans, energy)
+        if self.nthread != 1:
+            for i in range(len(workers)):
+                q.put(None)
 
-        q.join()
-        for worker in workers:
-            worker.join()
+            q.join()
+            for worker in workers:
+                worker.join()
 
         for i, r in enumerate(res):
             self._old_params[i] = r[0]._R, r[0]._t
@@ -436,44 +445,76 @@ class GlobalSpamLearnerLoo(GlobalSpamLearner):
         return mixture
 
     def learn_onestep(self, motions, verbose=0):
+        def learn_onestep_job(self, i, motions, verbose):
+            try:
+                self.nthread = 1 # disable sub-divisions inside workers
+                # learn spams
+                mixture = self.learn_spams_loo(i, motions)
+                # registration
+                trans, energy = self.register(i, mixture, verbose)
+                self._old_params[i] = trans._R, trans._t
+                return trans, energy
+            except Exception as e:
+                print('exception:', e)
+                raise
+
         eps = 1
         transformations = []
         total_energy = 0.
+        q = queue.Queue()
+        workers = mpfork.allocate_workers(q, self.nthread)
+        res = [None] * len(self._graphs)
+
         for i, g in enumerate(self._graphs):
             if verbose > 1:
                 print("graph %d/%d" % (i + 1, len(self._graphs)))
-            # learn spams
-            mixture = self.learn_spams_loo(i, motions)
-            # registration
-            trans, energy = self.register(i, mixture, verbose)
-            total_energy += energy
-            transformations.append(trans)
+            job = (i, learn_onestep_job, (self, i, motions, verbose), {}, res)
+            q.put(job)
+            ## learn spams
+            #mixture = self.learn_spams_loo(i, motions)
+            ## registration
+            #trans, energy = self.register(i, mixture, verbose)
+            #total_energy += energy
+            #transformations.append(trans)
+
+        for i in range(len(workers)):
+            q.put(None)
+
+        q.join()
+        for worker in workers:
+            worker.join()
+
+        for i, r in enumerate(res):
+            self._old_params[i] = r[0]._R, r[0]._t
+            total_energy += r[1]
+            transformations.append(r[0])
+
         total_energy /= len(self._graphs)
         return transformations, total_energy
 
 
-class Job(object):
-    def __init__(self, data, lock=None):
-        self.data = data
-        if lock is None:
-            lock = threading.RLock()
-        self.lock = lock
-        self._done = false
+#class Job(object):
+    #def __init__(self, data, lock=None):
+        #self.data = data
+        #if lock is None:
+            #lock = threading.RLock()
+        #self.lock = lock
+        #self._done = false
 
-    def done(self):
-        with self.lock:
-            return self._done
+    #def done(self):
+        #with self.lock:
+            #return self._done
 
-    def set_done(self, state=True):
-        with self.lock:
-            self._done = state
+    #def set_done(self, state=True):
+        #with self.lock:
+            #self._done = state
 
-    def join(self):
-        while True:
-            done = self.done()
-            if done:
-                return
-            time.sleep(0.2)
+    #def join(self):
+        #while True:
+            #done = self.done()
+            #if done:
+                #return
+            #time.sleep(0.2)
 
 class LocalSpamLearner(SpamLearner):
     def __init__(self, graphs, segments_weights, input_motions,

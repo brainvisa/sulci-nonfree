@@ -32,8 +32,9 @@ def update_sulci_set(sulci_set, i, filename, name, v, w=None):
         if w: sulci_set[name][i]['weights'] = [w]
 
 ################################################################################
-def compute_spams(graphs, segments_weights, distribdir, sigma_value, sigma_file,
-    data_type, bucket_name, ss, selected_sulcus, options):
+def compute_spams(graphs, segments_weights, distribdir, sigma_value,
+                  sigma_file, data_type, bucket_name, ss, selected_sulcus,
+                  options):
     reader = aims.Reader()
     if sigma_file is not None:
         sigmas = io.read_from_exec(sigma_file, 'sigma')
@@ -301,6 +302,10 @@ def parseOpts(argv):
     parser.add_option('--depth-weighted', dest='depth_weighted',
         action='store_true', default = None,
         help='gives more weight to buried structures')
+    parser.add_option('--threads', dest='thread', type='int', default=1,
+        help='use the given number of threads when parallelisation is '
+        'possible. 0 means all available CPU cores, a negative number means '
+        'all available CPU cores except this number. Default=1.')
 
     return parser, parser.parse_args(argv)
 
@@ -323,7 +328,8 @@ def main():
         label_mode = 'both'
     else:
         label_mode = options.label_mode
-    graphs = io.load_graphs(options.transfile, graphnames, label_mode)
+    graphs = io.load_graphs(options.transfile, graphnames, label_mode,
+                            nthread=options.thread)
     if input_segments_weights:
         segments_weights = io.read_segments_weights(\
                     input_segments_weights)
