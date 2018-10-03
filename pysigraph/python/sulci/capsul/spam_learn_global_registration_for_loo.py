@@ -19,7 +19,7 @@ class SpamLearnGlobalRegistrationForLOO(Process):
     @property
     def native_specification(self):
         if self.threads > 1:
-            return '-l nodes=1;ppn=%d' % self.threads
+            return '-l nodes=1:ppn=%d' % self.threads
 
     def get_commandline(self):
         loo_dir = os.path.join(self.output_directory, self.loo_subject)
