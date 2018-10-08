@@ -18,8 +18,9 @@ class SpamLearnTransformationPriorForLOO(Process):
         direction_dir = os.path.join(loo_dir, 'bingham_direction_trm_priors')
         angle_dir = os.path.join(loo_dir, 'vonmises_angle_trm_priors')
 
-        dat_files = glob.glob(self.spams_directory, self.loo_subject,
-                              '*_local.dat')
+        dat_files = glob.glob(os.path.join(self.spams_directory,
+                                           self.loo_subject,
+                                           '*_local.dat'))
 
         cmd = ['python', '-m',
                'sulci.scripts.sulci_registration.learn_transformation_prior',
