@@ -18,8 +18,6 @@ class SpamLearnTransformationPriorForLOO(Process):
         direction_dir = os.path.join(loo_dir, 'bingham_direction_trm_priors')
         angle_dir = os.path.join(loo_dir, 'vonmises_angle_trm_priors')
 
-        graphs = list(self.graphs)
-        graphs.remove(self.loo_graph)
         local_referentials_dir = os.path.join(
             self.output_local_referentials_directory, self.loo_subject)
         dat_files = glob.glob(self.spams_directory, self.loo_subject,
