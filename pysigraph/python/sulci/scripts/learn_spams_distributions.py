@@ -196,7 +196,7 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value,
 
     # create output directory
     prefix = distribdir
-    try:    os.mkdir(prefix)
+    try:    os.makedirs(prefix)
     except OSError, e:
         print("warning: directory '%s' allready exists" % prefix)
     if options.depth_weighted:
@@ -234,6 +234,8 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value,
         filename = io.node2densityname(prefix, 'spam', sulcus)
         if options.depth_weighted:
             filename = re.sub('\.ima$', '.data', filename)
+        if not os.path.exists(os.path.dirname(filename)):
+            os.makedirs(os.path.dirname(filename))
         s.write(filename)
         relfilename = re.sub('^%s%s' % (os.path.dirname(prefix), \
                         os.path.sep), '', filename)
