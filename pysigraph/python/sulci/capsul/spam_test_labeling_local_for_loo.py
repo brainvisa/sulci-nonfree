@@ -46,7 +46,10 @@ class SpamTestLabelingLocalForLOO(Process):
 
         odir = os.path.join(self.output_directory, self.loo_subject)
         output_graph = os.path.join(odir, self.loo_subject + '_local.arg')
-        os.makedirs(odir)
+        try:
+            os.makedirs(odir)
+        except:
+            pass
         posterior_probabilities = os.path.join(
             odir,  self.loo_subject + '_local_proba.csv')
         output_local_transformations = os.path.join(

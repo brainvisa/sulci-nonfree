@@ -28,7 +28,10 @@ class SpamTestLabelingGlobalForLOO(Process):
                                      self.loo_subject + '.dat')
         odir = os.path.join(self.output_directory, self.loo_subject)
         output_graph = os.path.join(odir, self.loo_subject + '_global.arg')
-        os.makedirs(odir)
+        try:
+            os.makedirs(odir)
+        except:
+            pass
         posterior_probabilities = os.path.join(
             odir,  self.loo_subject + '_global_proba.csv')
         output_transformation = os.path.join(
