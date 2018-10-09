@@ -4,6 +4,10 @@ from capsul.api import Process
 import traits.api as traits
 import os
 import glob
+try:
+    import subprocess32 as subprocess
+except:
+    import subprocess
 
 class SpamLearnTransformationPriorForLOO(Process):
 
@@ -27,5 +31,6 @@ class SpamLearnTransformationPriorForLOO(Process):
                '--translation-distribdir', translation_dir,
                '--direction-distribdir', direction_dir,
                '--angle-distribdir', angle_dir] + dat_files
-        return cmd
+        print(cmd)
+        subprocess.check_call(cmd)
 

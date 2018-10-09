@@ -15,12 +15,15 @@ class SpamLearnPipelineLOO(Pipeline):
         self.export_parameter("learn_pipeline", "threads")
         self.export_parameter("learn_pipeline", "verbose")
         self.export_parameter("learn_pipeline", "translation_file")
+        self.export_parameter("learn_pipeline", "pipeline_steps", "learn_steps")
         self.export_parameter("learn_pipeline", "output_label_priors_directory")
         self.export_parameter("learn_pipeline", "output_talairach_directory")
         self.export_parameter("learn_pipeline", "output_global_registration_directory")
         self.export_parameter("learn_pipeline", "output_local_registration_directory")
         self.export_parameter("learn_pipeline", "output_local_referentials_directory")
         self.export_parameter("learn_pipeline", "output_transformation_priors_directory")
+        self.export_parameter("learn_pipeline", "output_test_global_directory")
+        self.export_parameter("learn_pipeline", "output_test_local_directory")
 
         # nodes positions
         self.node_position = {
