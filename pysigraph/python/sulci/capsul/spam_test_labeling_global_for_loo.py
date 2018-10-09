@@ -39,7 +39,7 @@ class SpamTestLabelingGlobalForLOO(Process):
         cmd = ['python', '-m', 'capsul',
                'morphologist.capsul.axon.sulcilabellingspamglobal.SulciLabellingSPAMGlobal',
                'data_graph=%s' % self.data_graph,
-               'model_type=Global registraton',
+               'model_type=Global registration',
                'model=%s' % model,
                'labels_translation_map=%s' % self.labels_translation_map,
                'labels_priors=%s' % labels_priors,
