@@ -53,5 +53,5 @@ class SpamTestLabelingGlobalForLOO(Process):
                   % output_t1_to_global_transformation,
         ]
         print(cmd)
-        #subprocess.check_call(cmd)
+        subprocess.check_call(cmd)
 
