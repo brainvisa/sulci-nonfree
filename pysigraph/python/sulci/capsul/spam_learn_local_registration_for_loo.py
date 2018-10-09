@@ -18,9 +18,12 @@ class SpamLearnLocalRegistrationForLOO(Process):
     verbose = traits.Int(0)
 
     @property
-    def native_specification(self):
+    def parallel_job_info(self):
         if self.threads > 1:
-            return '-l nodes=1:ppn=%d' % self.threads
+            return {'config_name': 'native',
+                    'nodes_number': 1,
+                    'cpu_per_node': self.threads}
+        return {}
 
     def get_commandline(self):
         loo_dir = os.path.join(self.output_directory, self.loo_subject)

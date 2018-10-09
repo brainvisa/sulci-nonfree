@@ -6,6 +6,14 @@ from soma import aims
 from sulci.registration.procrust import vector_from_rotation
 from sulci.common import io
 from sulci.models import distribution, distribution_aims
+try:
+    import queue
+except ImportError:
+    # python 2.6 and early 2.7.x
+    import Queue as queue
+from soma import mpfork
+import tempfile
+import shutil
 
 ################################################################################
 
@@ -24,6 +32,10 @@ def parseOpts(argv):
             help='output distribution directory for %s ' % s + \
             '(default : %default). A file named FILE.dat is ' + \
             'created to store labels/databases links.')
+    parser.add_option('--threads', dest='thread', type='int', default=1,
+        help='use the given number of threads when parallelisation is '
+        'possible. 0 means all available CPU cores, a negative number means '
+        'all available CPU cores except this number. Default=1.')
 
     return parser, parser.parse_args(argv)
 
@@ -34,16 +46,119 @@ def main():
         parser.print_help()
         sys.exit(1)
 
+    aims.carto.PluginLoader.load() # do it before forking
+
+    use_copy = True
     data = {}
+
+    def copy_trm(source, dest):
+        if not use_copy:
+            return source
+        shutil.copy(source, dest)
+        if os.path.exists(source + '.minf'):
+            shutil.copy(source + '.minf', dest + '.minf')
+        elif os.path.exists(dest + '.minf'):
+            os.unlink(dest + '.minf')
+        return dest
+
+    def read_transfo(filenames, tmp):
+        motions = []
+        #print('reading', len(filenames), '...')
+        for filename in filenames:
+            tmp = copy_trm(filename, tmp)
+            #print('read:', tmp)
+            motion = aims.read(tmp)
+            motions.append(motion.toMatrix())
+        print('read', len(motions), 'transforms')
+        return motions
+
+    nthread = options.thread
+    temps = []
+    if nthread > 1:
+        q = queue.Queue()
+        workers = mpfork.allocate_workers(q, nthread)
+        res = []
+        shunklen = 50
+        shunks = []
+        shunk = 0
+    else:
+        tmp = tempfile.mkstemp(suffix='.trm')
+        os.close(tmp[0])
+        temps.append(tmp[1])
+
+    motions_local_all = []
+    i = 0
     for t in transformations:
         motions_local = io.read_from_exec(t, 'transformations')
+        motions_local_all.append(motions_local)
+        i += len(motions_local)
+    if nthread > 1:
+        res = [None] * int(numpy.ceil(float(i) / shunklen))
+        print('reading:', i, 'transforms in', len(res), 'shunks')
+        for i in range(len(res)):
+            tmp = tempfile.mkstemp(suffix='.trm')
+            os.close(tmp[0])
+            temps.append(tmp[1])
+
+    i = 0
+    for t, motions_local in zip(transformations, motions_local_all):
         prefix = os.path.dirname(t)
         for sulcus, filename in motions_local.items():
             filename = os.path.join(prefix, filename)
-            motion = aims.Reader().read(filename)
-            if data.has_key(sulcus):
-                data[sulcus].append(motion)
-            else:    data[sulcus] = [motion]
+            if nthread > 1:
+                if len(shunks) <= shunk:
+                    shunks.append([filename])
+                else:
+                    shunks[shunk].append(filename)
+                if (i + 1) % shunklen == 0:
+                    job = (shunk, read_transfo, (shunks[shunk], temps[shunk]),
+                           {}, res)
+                    shunk += 1
+                    q.put(job)
+            else:
+                tmp = copy_trm(filename, temps[0])
+                motion = aims.read(tmp)
+                print(i)
+                if data.has_key(sulcus):
+                    data[sulcus].append(motion)
+                else:    data[sulcus] = [motion]
+            i += 1
+    if nthread > 1:
+        # last shunk
+        if len(shunks) == shunk + 1:
+            job = (shunk, read_transfo, (shunks[shunk], temps[shunk]), {}, res)
+            q.put(job)
+
+        for i in range(len(workers)):
+            q.put(None)
+        print('waiting for IO:', q.qsize())
+        q.join()
+        for worker in workers:
+            worker.join()
+        print('IO done.')
+        i = 0
+        shunk = 0
+        for t in transformations:
+            for sulcus in motions_local.keys():
+                motion = aims.AffineTransformation3d(res[shunk][i])
+                if data.has_key(sulcus):
+                    data[sulcus].append(motion)
+                else:    data[sulcus] = [motion]
+                i += 1
+                if i == shunklen:
+                    i = 0
+                    shunk += 1
+    for tmp in temps:
+        try:
+            os.unlink(tmp + '.minf')
+        except:
+            pass
+        try:
+            os.unlink(tmp)
+        except:
+            pass
+
+    print('motions OK')
 
     translation_priors = {}
     angle_priors = {}
@@ -57,7 +172,9 @@ def main():
         except OSError, e:
             print("warning: directory '%s' already exists" % prefix)
 
+    print()
     for sulcus, motions in data.items():
+        print('sulcus:', sulcus)
         n = len(motions)
         translations = []
         directions = []
