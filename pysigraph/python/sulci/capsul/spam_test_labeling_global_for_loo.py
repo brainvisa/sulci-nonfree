@@ -18,7 +18,7 @@ class SpamTestLabelingGlobalForLOO(Process):
                                          allowed_extensions=['.trl'],
                                          optional=False)
     labels_priors_directory = traits.Directory(output=False)
-    output_directory = traits.Directory(output=True)
+    output_test_directory = traits.Directory(output=True)
 
     def _run_process(self):
 
@@ -26,7 +26,7 @@ class SpamTestLabelingGlobalForLOO(Process):
                              self.loo_subject + '.dat')
         labels_priors = os.path.join(self.labels_priors_directory,
                                      self.loo_subject + '.dat')
-        odir = os.path.join(self.output_directory, self.loo_subject)
+        odir = os.path.join(self.output_test_directory, self.loo_subject)
         output_graph = os.path.join(odir, self.loo_subject + '_global.arg')
         try:
             os.makedirs(odir)
@@ -53,5 +53,5 @@ class SpamTestLabelingGlobalForLOO(Process):
                   % output_t1_to_global_transformation,
         ]
         print(cmd)
-        subprocess.check_call(cmd)
+        #subprocess.check_call(cmd)
 

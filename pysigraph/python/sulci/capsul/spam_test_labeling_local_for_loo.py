@@ -20,7 +20,7 @@ class SpamTestLabelingLocalForLOO(Process):
     labels_priors_directory = traits.Directory(output=False)
     local_referentials_directory = traits.Directory(output=False)
     transformation_priors_directory = traits.Directory(output=False)
-    output_directory = traits.Directory(output=True)
+    output_test_directory = traits.Directory(output=True)
 
     def _run_process(self):
 
@@ -44,7 +44,7 @@ class SpamTestLabelingLocalForLOO(Process):
                                           'gaussian_translation_trm_priors',
                                           self.loo_subject + '.dat')
 
-        odir = os.path.join(self.output_directory, self.loo_subject)
+        odir = os.path.join(self.output_test_directory, self.loo_subject)
         output_graph = os.path.join(odir, self.loo_subject + '_local.arg')
         try:
             os.makedirs(odir)

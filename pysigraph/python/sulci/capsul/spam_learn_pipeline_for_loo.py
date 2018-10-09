@@ -52,11 +52,11 @@ class SpamLearnPipelineForLOO(Pipeline):
         self.export_parameter("learn_local_registraton", "output_directory", "output_local_registration_directory")
         self.export_parameter("learn_local_registraton", "output_local_referentials_directory")
         self.add_link("learn_local_registraton.output_local_referentials_directory->test_labeling_local.local_referentials_directory")
-        self.add_link("learn_transformation_priors.output_directory->test_labeling_local.transformation_priors_directory")
-        self.export_parameter("learn_transformation_priors", "output_directory", "output_transformation_priors_directory")
-        self.add_link("test_labeling_global.output_directory->test_labeling_local.global_graph_directory")
-        self.export_parameter("test_labeling_global", "output_directory", "output_test_global_directory")
-        self.export_parameter("test_labeling_local", "output_directory", "output_test_local_directory")
+        self.add_link("learn_transformation_priors.output_transform_directory->test_labeling_local.transformation_priors_directory")
+        self.export_parameter("learn_transformation_priors", "output_transform_directory", "output_transformation_priors_directory")
+        self.add_link("test_labeling_global.output_test_directory->test_labeling_local.global_graph_directory")
+        self.export_parameter("test_labeling_global", "output_test_directory", "output_test_global_directory")
+        self.export_parameter("test_labeling_local", "output_test_directory", "output_test_local_directory")
 
         # nodes positions
         self.node_position = {

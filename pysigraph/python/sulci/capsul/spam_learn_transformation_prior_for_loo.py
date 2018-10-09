@@ -13,10 +13,11 @@ class SpamLearnTransformationPriorForLOO(Process):
 
     spams_directory = traits.Directory(output=False)
     loo_subject = traits.Str()
-    output_directory = traits.Directory(output=True)
+    output_transform_directory = traits.Directory(output=True)
+    threads = traits.Int(0, optional=True)
 
     def _run_process(self):
-        loo_dir = os.path.join(self.output_directory, self.loo_subject)
+        loo_dir = os.path.join(self.output_transform_directory, self.loo_subject)
         translation_dir = os.path.join(loo_dir,
                                        'gaussian_translation_trm_priors')
         direction_dir = os.path.join(loo_dir, 'bingham_direction_trm_priors')
@@ -30,7 +31,8 @@ class SpamLearnTransformationPriorForLOO(Process):
                'sulci.scripts.sulci_registration.learn_transformation_prior',
                '--translation-distribdir', translation_dir,
                '--direction-distribdir', direction_dir,
-               '--angle-distribdir', angle_dir] + dat_files
+               '--angle-distribdir', angle_dir,
+               '--threads', str(self.threads)] + dat_files
         print(cmd)
         subprocess.check_call(cmd)
 
