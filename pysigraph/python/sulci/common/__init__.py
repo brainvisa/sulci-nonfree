@@ -2,6 +2,7 @@ from __future__ import print_function
 import os
 import numpy
 from soma import aims
+import socket
 import six
 
 
@@ -84,8 +85,10 @@ When lock is supposed to be own by another process
 filename : lock filename
 timeout:   in seconds
     '''
-    host, pid = os.getenv('HOSTNAME'), os.getpid()
-    tmp = "lock.%s.%s" % (host, pid)
+    host, pid = socket.gethostname(), os.getpid()
+    # make sure to create the temp file in the same directory
+    # (on the same filesystem)
+    tmp = "%s.lock.%s.%s" % (filename, host, pid)
     fd = open(tmp, 'w')
     fd.write("%s\n%s\n" % (host, pid))
     fd.close()
@@ -100,8 +103,8 @@ timeout:   in seconds
             return
         try:
             lock_stats = os.stat(filename)
-        except OSError:
-            time.sleep(0.1)
+        except OSError as e:
+            time.sleep(0.5)
             continue
         last_modification = lock_stats[8]
         now = time.time()
