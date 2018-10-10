@@ -25,9 +25,11 @@ class SulciLabelingErrorForLOO(Process):
 
         odir = os.path.join(self.output_test_directory, self.loo_subject)
         test_graph = os.path.join(
-            odir, self.loo_subject + self.graph_suffix + '.arg')
+            odir, self.loo_subject,
+            self.loo_subject + self.graph_suffix + '.arg')
         output_csv = os.path.join(
-            odir, self.loo_subject + self.graph_suffix + '_err.csv')
+            odir, self.loo_subject,
+            self.loo_subject + self.graph_suffix + '_err.csv')
         try:
             os.makedirs(odir)
         except:

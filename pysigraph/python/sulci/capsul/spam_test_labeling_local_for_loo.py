@@ -25,9 +25,11 @@ class SpamTestLabelingLocalForLOO(Process):
     def _run_process(self):
 
         data_graph = os.path.join(self.global_graph_directory,
+                                  self.loo_subject,
                                   self.loo_subject + '_global.arg')
         global_transformation = os.path.join(
-            self.global_graph_directory, self.loo_subject + '_Tal_TO_SPAM.trm')
+            self.global_graph_directory, self.loo_subject,
+            self.loo_subject + '_Tal_TO_SPAM.trm')
         model = os.path.join(self.local_model_directory,
                              self.loo_subject + '.dat')
         labels_priors = os.path.join(self.labels_priors_directory,
