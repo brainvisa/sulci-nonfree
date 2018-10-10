@@ -37,14 +37,14 @@ class SpamTestLabelingLocalForLOO(Process):
         local_referentials = os.path.join(self.local_referentials_directory,
                                           self.loo_subject + '.dat')
         direction_priors = os.path.join(self.transformation_priors_directory,
-                                        'bingham_direction_trm_priors',
-                                        self.loo_subject + '.dat')
+                                        self.loo_subject,
+                                        'bingham_direction_trm_priors.dat')
         angle_priors = os.path.join(self.transformation_priors_directory,
-                                    'vonmises_angle_trm_priors',
-                                    self.loo_subject + '.dat')
-        translation_priors = os.path.join(self.transformation_priors_directory,
-                                          'gaussian_translation_trm_priors',
-                                          self.loo_subject + '.dat')
+                                    self.loo_subject,
+                                    'vonmises_angle_trm_priors.dat')
+        translation_priors = os.path.join(
+            self.transformation_priors_directory, self.loo_subject,
+            'gaussian_translation_trm_priors.dat')
 
         odir = os.path.join(self.output_test_directory, self.loo_subject)
         output_graph = os.path.join(odir, self.loo_subject + '_local.arg')
