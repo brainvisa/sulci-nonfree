@@ -26,9 +26,6 @@ class SpamLearnPipelineLOO(Pipeline):
         self.export_parameter("learn_pipeline", "output_test_global_directory")
         self.export_parameter("learn_pipeline", "output_test_local_directory")
 
-        # default and initial values
-        self.learn_steps = <soma.controller.controller.Controller object at 0x7fd6aa901a10>
-
         # nodes positions
         self.node_position = {
             "inputs": (-176.0, 57.0),
