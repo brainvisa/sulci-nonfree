@@ -138,7 +138,7 @@ def main():
         print('IO done.')
         i = 0
         shunk = 0
-        for t in transformations:
+        for t, motions_local in zip(transformations, motions_local_all):
             for sulcus in motions_local.keys():
                 motion = aims.AffineTransformation3d(res[shunk][i])
                 if data.has_key(sulcus):
