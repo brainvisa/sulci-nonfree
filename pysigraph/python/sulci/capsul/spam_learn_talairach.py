@@ -3,6 +3,7 @@ from capsul.api import Process
 
 import traits.api as traits
 import os
+import sys
 
 class SpamLearnTalairach(Process):
 
@@ -13,7 +14,8 @@ class SpamLearnTalairach(Process):
                                      allowed_extensions=['.arg']))
 
     def get_commandline(self):
-        cmd = ['python', '-m', 'sulci.scripts.learn_spams_distributions']
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m', 'sulci.scripts.learn_spams_distributions']
         if self.translation_file not in (None, '', traits.Undefined):
             cmd += ['-t', self.translation_file]
         cmd += ['-d', self.output_directory] + self.graphs

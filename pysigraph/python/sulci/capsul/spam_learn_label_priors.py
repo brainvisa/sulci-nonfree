@@ -2,6 +2,7 @@
 from capsul.api import Process
 import traits.api as traits
 import os
+import sys
 
 class SpamLearnLabelPriors(Process):
 
@@ -12,7 +13,8 @@ class SpamLearnLabelPriors(Process):
                                      allowed_extensions=['.arg']))
 
     def get_commandline(self):
-        cmd = ['python', '-m', 'sulci.scripts.learn_labels_priors']
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m', 'sulci.scripts.learn_labels_priors']
         if self.translation_file not in (None, '', traits.Undefined):
             cmd += ['-t', self.translation_file]
         cmd += ['-o', self.output_directory] + self.graphs

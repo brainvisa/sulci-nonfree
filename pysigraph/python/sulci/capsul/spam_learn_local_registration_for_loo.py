@@ -3,6 +3,7 @@ from capsul.api import Process
 
 import traits.api as traits
 import os
+import sys
 
 class SpamLearnLocalRegistrationForLOO(Process):
 
@@ -32,7 +33,8 @@ class SpamLearnLocalRegistrationForLOO(Process):
         local_referentials_dir = os.path.join(
             self.output_local_referentials_directory, self.loo_subject)
 
-        cmd = ['python', '-m',
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m',
                'sulci.scripts.sulci_registration.'
                'learn_registred_spams_distributions', '--mode', 'local']
         if self.translation_file not in (None, '', traits.Undefined):

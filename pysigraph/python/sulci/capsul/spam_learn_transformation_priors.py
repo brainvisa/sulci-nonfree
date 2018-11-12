@@ -4,6 +4,7 @@ from capsul.api import Process
 import traits.api as traits
 import os
 import glob
+import sys
 try:
     import subprocess32 as subprocess
 except:
@@ -21,7 +22,8 @@ class SpamLearnTransformationPrior(Process):
         dat_files = glob.glob(os.path.join(self.spams_directory,
                                            '*_local.dat'))
 
-        cmd = ['python', '-m',
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m',
                'sulci.scripts.sulci_registration.learn_transformation_prior',
                '--translation-distribdir', self.output_translation_directory,
                '--direction-distribdir', self.output_direction_directory,

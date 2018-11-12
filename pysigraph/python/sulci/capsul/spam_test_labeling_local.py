@@ -4,6 +4,7 @@ from capsul.api import Process
 import traits.api as traits
 import os
 import glob
+import sys
 try:
     import subprocess32 as subprocess
 except:
@@ -32,7 +33,8 @@ class SpamTestLabelingLocal(Process):
 
     def get_commandline(self):
 
-        cmd = ['python', '-m', 'capsul',
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m', 'capsul',
                'morphologist.capsul.axon.sulcilabellingspamlocal.SulciLabellingSPAMLocal',
                'data_graph=%s' % self.global_graph,
                'global_transformation=%s' % self.global_transformation,

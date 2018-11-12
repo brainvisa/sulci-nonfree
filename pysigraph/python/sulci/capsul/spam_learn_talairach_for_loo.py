@@ -3,6 +3,7 @@ from capsul.api import Process
 
 import traits.api as traits
 import os
+import sys
 
 class SpamLearnTalairachForLOO(Process):
 
@@ -19,7 +20,8 @@ class SpamLearnTalairachForLOO(Process):
         graphs = list(self.graphs)
         graphs.remove(self.loo_graph)
 
-        cmd = ['python', '-m', 'sulci.scripts.learn_spams_distributions']
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m', 'sulci.scripts.learn_spams_distributions']
         if self.translation_file not in (None, '', traits.Undefined):
             cmd += ['-t', self.translation_file]
         cmd += ['-d', loo_dir] + graphs

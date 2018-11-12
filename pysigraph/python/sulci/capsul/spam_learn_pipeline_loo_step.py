@@ -158,13 +158,13 @@ class Spam_learn_pipeline_loo_step(Pipeline):
         self.add_link("loo_exclude.filtered->local.graphs")
         self.add_link("loo_exclude.filtered->talairach.graphs")
         self.add_link("loo_exclude.filtered->global.graphs")
-        self.export_parameter("global_output_dir", "output_directory", "output_global_directory")
+        self.export_parameter("global_output_dir", "output_directory", "output_global_registration_directory")
         self.add_link("local.output_directory->local_output_dir.local_output_directory")
         self.add_link("local.output_directory->transformation_priors.spams_directory")
         self.add_link("local.output_directory->local_model_filename.local_model_dir")
         self.add_link("local.output_local_referentials_directory->output_local_referentials_dir.output_local_referentials_directory")
         self.add_link("local.output_local_referentials_directory->local_referentials_filename.local_referentials_dir")
-        self.export_parameter("local_output_dir", "output_directory", "output_local_directory")
+        self.export_parameter("local_output_dir", "output_directory", "output_local_registration_directory")
         self.export_parameter("output_local_referentials_dir", "local_referentials_directory", "output_local_referentials_directory")
         self.add_link("label_priors.output_directory->label_priors_filename.labels_input_directory")
         self.add_link("label_priors.output_directory->label_priors_directory.output_label_priors_directory")
@@ -190,7 +190,8 @@ class Spam_learn_pipeline_loo_step(Pipeline):
         self.add_link("label_priors_filename.label_priors->test_local.label_priors")
         self.add_link("label_priors_filename.label_priors->test_global.label_priors")
         self.add_link("global_model_filename.global_model->test_global.model")
-        self.export_parameter("loo_global_test_dir", "global_test_directory")
+        self.export_parameter("loo_global_test_dir", "global_test_directory",
+                              "output_test_global_directory")
         self.add_link("loo_global_test_dir.global_loo_test_dir->global_test_t1_transform_filename.global_test_dir")
         self.add_link("loo_global_test_dir.global_loo_test_dir->global_test_transform_filename.global_test_dir")
         self.add_link("loo_global_test_dir.global_loo_test_dir->global_error_filename.global_test_dir")
@@ -200,7 +201,8 @@ class Spam_learn_pipeline_loo_step(Pipeline):
         self.add_link("test_local.output_graph->local_error.test_graph")
         self.add_link("test_local.output_local_transformations->local_test_transform_dirname.output_local_transformations")
         self.add_link("test_local.output_posterior_probabilities->local_test_proba_filename.output_posterior_probabilities")
-        self.export_parameter("loo_local_test_dir", "local_test_directory")
+        self.export_parameter("loo_local_test_dir", "local_test_directory",
+                              "output_test_local_directory")
         self.add_link("loo_local_test_dir.local_loo_test_dir->local_error_filename.local_test_dir")
         self.add_link("loo_local_test_dir.local_loo_test_dir->local_test_transform_dirname.local_test_dir")
         self.add_link("loo_local_test_dir.local_loo_test_dir->local_test_graph_name.local_test_dir")
@@ -221,17 +223,6 @@ class Spam_learn_pipeline_loo_step(Pipeline):
         # default and initial values
         self.graphs = ['']
         self.threads = 36
-        self.translation_file = '/neurospin/lnao/Panabase/model_spam_archi_2018/sulci_model_2018.trl'
-        self.output_global_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/segments/global_registered_spam_left/spam_distribs'
-        self.output_local_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/segments/locally_from_global_registred_spam_left/spam_distribs'
-        self.output_local_referentials_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/segments/locally_from_global_registred_spam_left/local_referentials'
-        self.output_label_priors_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/labels_priors/frequency_segments_priors_left'
-        self.output_talairach_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/segments/talairach_spam_left/spam_distribs'
-        self.output_local_angle_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/segments/locally_from_global_registred_spam_left'
-        self.output_local_direction_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/segments/locally_from_global_registred_spam_left'
-        self.output_local_translation_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/segments/locally_from_global_registred_spam_left'
-        self.global_test_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/loo_tests_results/global_left'
-        self.local_test_directory = '/neurospin/lnao/Panabase/model_spam_archi_2018/loo_tests_results/local_left'
 
         # nodes positions
         self.node_position = {

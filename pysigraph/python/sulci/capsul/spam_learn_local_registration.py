@@ -3,6 +3,7 @@ from capsul.api import Process
 
 import traits.api as traits
 import os
+import sys
 
 class SpamLearnLocalRegistration(Process):
 
@@ -24,7 +25,8 @@ class SpamLearnLocalRegistration(Process):
         return {}
 
     def get_commandline(self):
-        cmd = ['python', '-m',
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m',
                'sulci.scripts.sulci_registration.'
                'learn_registred_spams_distributions', '--mode', 'local']
         if self.translation_file not in (None, '', traits.Undefined):

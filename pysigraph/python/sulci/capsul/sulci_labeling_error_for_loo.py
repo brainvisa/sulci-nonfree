@@ -5,6 +5,7 @@ from capsul.api import Process
 import traits.api as traits
 import os
 import glob
+import sys
 try:
     import subprocess32 as subprocess
 except:
@@ -33,7 +34,8 @@ class SulciLabelingErrorForLOO(Process):
         except:
             pass
 
-        cmd = ['python', '-m',
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m',
                'sulci.scripts.sulci_errors.siError',
                '-l', test_graph,
                '-t', self.labels_translation_map,
