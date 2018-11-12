@@ -4,6 +4,7 @@ from capsul.api import Process
 import traits.api as traits
 import os
 import glob
+import sys
 try:
     import subprocess32 as subprocess
 except:
@@ -26,7 +27,8 @@ class SpamTestLabelingGlobal(Process):
         = traits.File(output=True, allowed_extensions=['.trm'])
 
     def get_commandline(self):
-        cmd = ['python', '-m', 'capsul',
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m', 'capsul',
                'morphologist.capsul.axon.sulcilabellingspamglobal.SulciLabellingSPAMGlobal',
                'data_graph=%s' % self.data_graph,
                'model_type=Global registration',

@@ -27,7 +27,7 @@ class SpamLearnPipelineLOO(Pipeline):
         self.export_parameter("learn_pipeline", "output_test_local_directory")
 
         # default and initial values
-        self.learn_steps = {'test': True, 'learning2': True, 'evaluation': True, 'learning': True}
+        self.learn_steps = {'test': True, 'learning': True, 'evaluation': True}
 
         # nodes positions
         self.node_position = {

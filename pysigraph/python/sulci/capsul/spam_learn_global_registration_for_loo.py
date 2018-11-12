@@ -3,6 +3,7 @@ from capsul.api import Process
 
 import traits.api as traits
 import os
+import sys
 
 class SpamLearnGlobalRegistrationForLOO(Process):
 
@@ -29,7 +30,8 @@ class SpamLearnGlobalRegistrationForLOO(Process):
         graphs = list(self.graphs)
         graphs.remove(self.loo_graph)
 
-        cmd = ['python', '-m',
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m',
                'sulci.scripts.sulci_registration.'
                'learn_registred_spams_distributions']
         if self.translation_file not in (None, '', traits.Undefined):

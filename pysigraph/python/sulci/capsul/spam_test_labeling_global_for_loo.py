@@ -4,6 +4,7 @@ from capsul.api import Process
 import traits.api as traits
 import os
 import glob
+import sys
 try:
     import subprocess32 as subprocess
 except:
@@ -39,7 +40,8 @@ class SpamTestLabelingGlobalForLOO(Process):
         output_t1_to_global_transformation = os.path.join(
             odir, self.loo_subject + '_T1_TO_SPAM.trm')
 
-        cmd = ['python', '-m', 'capsul',
+        python_cmd = os.path.basename(sys.executable)
+        cmd = [python_cmd, '-m', 'capsul',
                'morphologist.capsul.axon.sulcilabellingspamglobal.SulciLabellingSPAMGlobal',
                'data_graph=%s' % self.data_graph,
                'model_type=Global registration',

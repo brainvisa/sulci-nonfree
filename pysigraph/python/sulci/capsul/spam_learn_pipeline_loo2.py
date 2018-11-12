@@ -16,17 +16,20 @@ class SpamLearnPipelineLOO(Pipeline):
         self.export_parameter("spam_loo", "translation_file")
         self.export_parameter("spam_loo", "verbose")
         self.export_parameter("spam_loo", "reference_graph")
-        self.export_parameter("spam_loo", "pipeline_steps", "loo_steps")
-        self.export_parameter("spam_loo", "output_global_directory")
-        self.export_parameter("spam_loo", "output_local_directory")
-        self.export_parameter("spam_loo", "output_local_referentials_directory")
+        self.export_parameter("spam_loo", "pipeline_steps", "learn_steps")
+        self.export_parameter("spam_loo",
+                              "output_global_registration_directory")
+        self.export_parameter("spam_loo",
+                              "output_local_registration_directory")
+        self.export_parameter("spam_loo",
+                              "output_local_referentials_directory")
         self.export_parameter("spam_loo", "output_label_priors_directory")
         self.export_parameter("spam_loo", "output_talairach_directory")
         self.export_parameter("spam_loo", "output_local_angle_directory")
         self.export_parameter("spam_loo", "output_local_direction_directory")
         self.export_parameter("spam_loo", "output_local_translation_directory")
-        self.export_parameter("spam_loo", "global_test_directory")
-        self.export_parameter("spam_loo", "local_test_directory")
+        self.export_parameter("spam_loo", "output_test_global_directory")
+        self.export_parameter("spam_loo", "output_test_local_directory")
 
         # default and initial values
         self.loo_steps = {'testing': True, 'evaluation': True, 'learning': True}
