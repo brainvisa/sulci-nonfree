@@ -16,8 +16,8 @@ class SulciLabelingAvgError(Process):
         bylabel = []
         bysubject = []
         for d in self.error_dir:
-            sum = 0.
-            weight = 0.
+            #tsum = 0.
+            #weight = 0.
             sbylabel = {}
             wbylabel = {}
             sbysubject = {}
@@ -47,8 +47,8 @@ class SulciLabelingAvgError(Process):
                                         if sulcus != 'unknown' \
                                                 and not sulcus.startswith(
                                                     'ventricle'):
-                                            sum += s
-                                            weight += w
+                                            #tsum += s
+                                            #weight += w
                                             wbysubject[subject] \
                                                 = wbysubject.setdefault(
                                                     subject, 0.) + w
@@ -63,11 +63,11 @@ class SulciLabelingAvgError(Process):
                                                 + s
                                     else:
                                         break
-            if weight != 0.:
-                avg = sum / weight
-            else:
-                avg = 0.
-            stats.append((d, avg))
+            #if weight != 0.:
+                #avg = tsum / weight
+            #else:
+                #avg = 0.
+            #stats.append((d, avg))
             for subject in sorted(sbysubject.keys()):
                 s = sbysubject[subject]
                 w = wbysubject[subject]
@@ -75,6 +75,12 @@ class SulciLabelingAvgError(Process):
                 if w != 0.:
                     err = s / w
                 bysubject.append((d, subject, err))
+            if len(bysubject) != 0.:
+                avg = sum([y for x, s, y in bysubject if x == d]) \
+                    / len(sbysubject)
+            else:
+                avg = 0.
+            stats.append((d, avg))
             for sulcus in sorted(sbylabel.keys()):
                 s = sbylabel[sulcus]
                 w = wbylabel[sulcus]
