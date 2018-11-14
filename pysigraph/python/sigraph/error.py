@@ -92,7 +92,7 @@ class SulciError(object):
         self._total_nodes += 1
 
     def update_label(self, fp):
-        self._fp = fp
+        self._fp += fp
         self._error += float(fp)
         self._sulci_size_for_error += float(fp)
         self._bad_tagged_nodes += 1
