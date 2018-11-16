@@ -129,7 +129,10 @@ def read_from_exec(filename, var):
         o = locals()[var]
         return o
     except Exception as e:
-        print(e)
+        print('error while reading:', filename, file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        # why exit ?? why not just raise ??
         sys.exit(1)
 
 
@@ -142,7 +145,10 @@ def numpy_read_from_exec(filename, var):
         o = locals()[var]
         return o
     except Exception as e:
-        print(e)
+        print('error while reading:', filename, file=sys.stderr)
+        import traceback
+        traceback.print_exc()
+        # why exit ?? why not just raise ??
         sys.exit(1)
 
 
