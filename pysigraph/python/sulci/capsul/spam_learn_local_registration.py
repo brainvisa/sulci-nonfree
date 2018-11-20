@@ -12,6 +12,7 @@ class SpamLearnLocalRegistration(Process):
     output_directory = traits.Directory(output=True)
     graphs = traits.List(traits.File(output=False,
                                      allowed_extensions=['.arg']))
+    global_spam_distribs = traits.Directory(output=False)
     threads = traits.Int(0)
     output_local_referentials_directory = traits.Directory(output=True)
     verbose = traits.Int(0)
@@ -33,9 +34,15 @@ class SpamLearnLocalRegistration(Process):
             cmd += ['-t', self.translation_file]
         cmd += ['--distrib-gaussians',
                 self.output_local_referentials_directory]
-        cmd += ['--threads', str(self.threads), '-d', self.output_directory] \
-            + self.graphs
+        cmd += ['--threads', str(self.threads), '-d', self.output_directory]
         if self.verbose != 0:
             cmd += ['--verbose', str(self.verbose)]
+        cmd += self.graphs
+        if self.global_spam_distribs is not None:
+            cmd.append('==')
+            motions = [os.path.join(self.global_spam_distribs,
+                                    os.path.basename(g)[:-4] + '_motion.trm')
+                       for g in self.graphs]
+            cmd += motions
         return cmd
 

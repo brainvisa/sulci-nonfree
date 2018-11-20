@@ -27,7 +27,8 @@ class SpamLearnGlobalRegistration(Process):
         python_cmd = os.path.basename(sys.executable)
         cmd = [python_cmd, '-m',
                'sulci.scripts.sulci_registration.'
-               'learn_registred_spams_distributions']
+               'learn_registred_spams_distributions', '--affine',
+               '--sigma-value', '2', '--mode', 'global']
         if self.translation_file not in (None, '', traits.Undefined):
             cmd += ['-t', self.translation_file]
         cmd += ['--threads', str(self.threads), '-d', self.output_directory] \
