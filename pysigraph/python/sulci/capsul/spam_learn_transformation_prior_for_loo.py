@@ -35,6 +35,6 @@ class SpamLearnTransformationPriorForLOO(Process):
                '--direction-distribdir', direction_dir,
                '--angle-distribdir', angle_dir,
                '--threads', str(self.threads)] + dat_files
-        print(cmd)
+        #print(cmd)
         subprocess.check_call(cmd)
 
