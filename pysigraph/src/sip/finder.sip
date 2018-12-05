@@ -14,7 +14,7 @@ public:
 				bool=true, bool=true /*, 
 				const aims::SelectionSet *=0 */ ) = 0 /AutoGen/;
 	virtual bool isAdaptive() const = 0 /AutoGen/;
-	carto::GenericObject* selectModel2(const sigraph::Clique*) /PyName=selectModel, Autogen/;
+	carto::GenericObject* selectModel2(const sigraph::Clique*) /PyName=selectModel, AutoGen/;
 %MethodCode
 	sipRes = sipCpp->selectModel(a0);
 %End
