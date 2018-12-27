@@ -33,7 +33,7 @@ def compute_orientation(subject, splitmode, sulci, hie, graph,
 			skel, depth, write_data=False):
 	motion = aims.GraphManip.talairach(graph)
 	motion2 = aims.Motion(motion)
-	motion2.setTranslation(-motion2.translation())
+	motion2.setTranslation([0, 0, 0])
 	writer = aims.Writer()
 
 
