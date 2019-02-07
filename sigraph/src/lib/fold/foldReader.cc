@@ -4,11 +4,13 @@
 #include <graph/graph/graph.h>
 #include <aims/bucket/bucket_g.h>
 #include <aims/def/general.h>
+#include <aims/graph/graphmanip.h>
 #include <cartobase/config/paths.h>
 #include <si/fold/fattrib.h>
 #include <cartobase/smart/rcptr.h>
 #include <cartobase/exception/file.h>
 #include <cartobase/exception/ioexcept.h>
+#include <aims/transformation/affinetransformation3d.h>
 
 using namespace sigraph;
 using namespace aims;
@@ -287,6 +289,7 @@ Graph* LowLevelFoldArgReader::read( const string & filename, int subobj )
   try
     {
       r.read( *g, subobj );
+      GraphManip::storeTalairach( *g, GraphManip::talairach( *g ) );
     }
   catch( exception & )
     {
