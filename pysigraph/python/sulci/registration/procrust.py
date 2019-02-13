@@ -16,6 +16,10 @@ PI_div_2 = 1.5707963267948966
 
 
 def antisymetric_matrix_from_vector(v):
+    if isinstance(v, numpy.matrix):
+        v = numpy.array(v).ravel()
+    elif isinstance(v, numpy.ndarray):
+        v = v.ravel()
     vx, vy, vz = v
     return numpy.matrix([[0, -vz, vy], [vz, 0, -vx], [-vy, vx, 0]])
 
