@@ -35,7 +35,7 @@ class Model /Abstract/
 
 public:
   virtual ~Model();
-  virtual sigraph::Model* clone() = 0 /Factory/;
+  virtual sigraph::Model* clone() const = 0 /Factory/;
   virtual double prop( const sigraph::Clique *) = 0 /AutoGen/;
   virtual bool isAdaptive() const;
 
