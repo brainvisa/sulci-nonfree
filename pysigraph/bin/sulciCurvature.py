@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
@@ -320,7 +320,7 @@ if csvfile and appendmode:
     try:
       os.mkdir( lockdir )
       success = True
-    except OSError, e:
+    except OSError as e:
       if e.errno != errno.EEXIST:
         raise
       time.sleep( 0.5 ) # wait a little bit

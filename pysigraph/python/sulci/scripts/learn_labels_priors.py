@@ -135,7 +135,7 @@ def compute_prior(graphs, MyPrior, distr, options, output):
     # create output directory
     prefix = output
     try:    os.makedirs(prefix)
-    except OSError, e:
+    except OSError as e:
         print("warning: directory '%s' already exists" % prefix)
 
     prior = MyPrior(graphs, distr,

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 from __future__ import print_function
 import os, sys, numpy
 from optparse import OptionParser
@@ -169,7 +169,7 @@ def main():
                 options.angle_distribdir]:
         prefix = distribdir
         try:    os.makedirs(prefix)
-        except OSError, e:
+        except OSError as e:
             print("warning: directory '%s' already exists" % prefix)
 
     print()

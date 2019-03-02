@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 from __future__ import print_function
 import sys, os
 import numpy, exceptions
@@ -36,7 +36,7 @@ def old_read_csv_result(filename):
 				float(d[1])
 				if len(d) == 3: float(d[2])
 				kept_lines.append(d)
-			except exceptions.ValueError, msg:
+			except ValueError as msg:
 				error_msg.append('l.%d : %s.\n' % (i, msg))
 		if len(error_msg) > 0:
 			sys.stderr.write("error : read error\n")

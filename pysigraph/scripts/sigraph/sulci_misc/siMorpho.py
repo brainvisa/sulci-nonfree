@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 from optparse import OptionParser
@@ -110,7 +110,7 @@ def main():
 		sys.exit(1)
 
 	try:	os.mkdir(options.dbdir)
-	except OSError, e:
+	except OSError as e:
 		print("warning: directory '%s' allready exists" % options.dbdir)
 
 	graphs = io.load_graphs(options.transfile, graphnames)
