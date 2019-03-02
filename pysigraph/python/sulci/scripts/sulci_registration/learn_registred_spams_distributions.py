@@ -687,7 +687,7 @@ class LocalSpamLearner(SpamLearner):
                 print(res[i][0], res[i][1])
                 import traceback
                 traceback.print_exception(*res[i])
-                raise res[i][0], res[i][1], res[i][2]
+                raise (res[i][0], res[i][1], res[i][2])
             try:
                 transformations, spam = res[i]
                 spams.append(spam)

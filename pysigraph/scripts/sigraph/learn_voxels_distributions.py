@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 from __future__ import print_function
 import os, sys, numpy, pprint
 from optparse import OptionParser
@@ -119,7 +119,7 @@ def main():
 
 	# create output directory
 	try:	os.mkdir(dbdir)
-	except OSError, e:
+	except OSError as e:
 		print("warning: directory '%s' allready exists" % dbdir)
 
 	voxels_total = 0

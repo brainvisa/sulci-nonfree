@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import os
@@ -175,7 +175,7 @@ def parseOpts(argv):
 def checkfile(x):
     try:
         os.stat(x)
-    except OSError, err:
+    except OSError as err:
         import sys
         msg.error(str(err))
         sys.exit(1)
@@ -222,7 +222,7 @@ def main():
     trr = aims.TreeReader(conffile, synx)
     try:
         conf = trr.read()
-    except IOError, e:
+    except IOError as e:
         msg.error(str(e))
         sys.exit(1)
 

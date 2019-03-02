@@ -115,7 +115,7 @@ def main():
 
 	# create output directory
 	try:	os.mkdir(dbdir)
-	except OSError, e:
+	except OSError as e:
 		print("warning: directory '%s' allready exists" % dbdir)
 
 	nodes_total = 0

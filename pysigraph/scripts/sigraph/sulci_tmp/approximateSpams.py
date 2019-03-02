@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import re, os, sys, numpy
@@ -166,7 +166,7 @@ def main():
 	prefix = options.output_distrib
 	if not options.skip:
 		try:	os.mkdir(prefix)
-		except OSError, e:
+		except OSError as e:
 			print("warning: directory '%s' allready exists" % prefix)
 
 	level = input_distrib['level']

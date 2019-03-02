@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import os, sys, pprint, numpy
@@ -69,7 +69,7 @@ def main():
 
 	# create output directory
 	try:	os.mkdir(dbdir)
-	except OSError, e:
+	except OSError as e:
 		print("warning: directory '%s' already exists" % dbdir)
 
 	#clf_type = 'gaussian_crvm'

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 from __future__ import print_function
 import os, sys, numpy, pprint, re, glob
 from optparse import OptionParser
@@ -197,7 +197,7 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value,
     # create output directory
     prefix = distribdir
     try:    os.makedirs(prefix)
-    except OSError, e:
+    except OSError as e:
         print("warning: directory '%s' allready exists" % prefix)
     if options.depth_weighted:
         model_type = 'depth_weighted_spam'

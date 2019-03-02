@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import sys, os, numpy, pprint, re
@@ -320,7 +320,7 @@ def dbcreatorFactory(node_model_type, rel_model_type):
 def compute_database(graphs, dbdir, options):
     prefix = dbdir
     try:    os.mkdir(prefix)
-    except OSError, e:
+    except OSError as e:
         print("warning: directory '%s' already exists" % prefix)
 
     N, R = dbcreatorFactory(options.node_model_type, options.rel_model_type)

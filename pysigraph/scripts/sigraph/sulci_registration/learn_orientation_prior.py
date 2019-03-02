@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import sys, os, pprint, re
@@ -127,7 +127,7 @@ class Compute(object):
     def _init(self):
         prefix = self._distribdir
         try:    os.makedirs(prefix)
-        except OSError, e:
+        except OSErro as e:
             print("warning: directory '%s' already exists" % prefix)
 
     def compute_orientations(self):

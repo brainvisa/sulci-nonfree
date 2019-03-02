@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 from __future__ import print_function
 import sys, os, numpy
 from optparse import OptionParser
@@ -54,7 +54,7 @@ def main():
 			for feature in features:
 				try:
 					data.append(v[feature])
-				except KeyError, e:
+				except KeyError as e:
 					print("%s (%s) unknown feature %s" % \
 						(sulcus, v['index'], e))
 					data.append(numpy.nan)

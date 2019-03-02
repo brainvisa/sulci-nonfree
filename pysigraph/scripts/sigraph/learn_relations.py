@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 from __future__ import print_function
 import os, sys, numpy, pprint, re, glob, pickle
 from optparse import OptionParser
@@ -6,7 +6,7 @@ try:
 	import matplotlib
 	matplotlib.use('Qt4Agg')
 	import pylab
-except IOError, e:
+except IOError as e:
 	print("can't import matplotlib : ", e)
 import sigraph
 from soma import aims
@@ -48,7 +48,7 @@ def compute_relations(graphs, distribdir, input_motions,
 	# create output directory
 	prefix = distribdir
 	try:	os.mkdir(prefix)
-	except OSError, e:
+	except OSError as e:
 		print("warning: directory '%s' allready exists" % prefix)
 
 	if options.model_type == 'direction':

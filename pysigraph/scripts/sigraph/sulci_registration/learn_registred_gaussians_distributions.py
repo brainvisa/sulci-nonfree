@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import os, sys, pprint, re
@@ -46,7 +46,7 @@ def main():
 
 	# create output directory
 	try:	os.mkdir(prefix)
-	except OSError, e:
+	except OSError as e:
 		print("warning: directory '%s' allready exists" % prefix)
 
 	nodes_total = 0

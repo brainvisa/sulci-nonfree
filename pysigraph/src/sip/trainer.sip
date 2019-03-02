@@ -246,7 +246,7 @@ public:
   virtual void setPattern( const std::string & );
   virtual void setFiltAttributes( const set_STRING &, bool = false );
   virtual void save( sigraph::MGWriter & );
-  virtual const set_AdaptivePtr &usedAdap() const;
+  const set_AdaptivePtr &usedAdap() const;
 };
 
 };

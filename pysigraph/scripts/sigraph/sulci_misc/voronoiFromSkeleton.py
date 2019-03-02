@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import os, sys
@@ -29,7 +29,7 @@ def main():
 	fd = FG.FoldsGraphThickness(graph, skel, white_mesh, hemi_mesh)
 	# skip some parts
 	try:	fd.preProcess()
-	except Exception, e: pass
+	except Exception as e: pass
 	ttex = fd.gm_wm_tex
 	tex = ttex[0]
 	ind_max = 1
