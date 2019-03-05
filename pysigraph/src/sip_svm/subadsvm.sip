@@ -13,16 +13,16 @@ class SubAdSvm : sigraph::NonIncrementalSubAdaptive
 {
 %TypeHeaderCode
 #include <si/subadaptive/subadsvm.h>
-#if SIP_VERSION < 0x040700
-#include "sipaimssipvector_DOUBLE.h"
-#endif
 // SIP doesn't allow using the same namespace (sigraph) as in another module
 typedef sigraph::SubAdSvm SubAdSvm;
 %End
 
 %ConvertToSubClassCode
   if (dynamic_cast<sigraph::SubAdSvm *>(sipCpp))
-	sipClass = sipClass_SubAdSvm;
+  {
+    sipClass = sipClass_SubAdSvm;
+    *sipCppRet = dynamic_cast<sigraph::SubAdSvm *>( sipCpp );
+  }
   else
     sipClass = NULL;
 %End

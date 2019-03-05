@@ -10,9 +10,15 @@ class Clique : carto::GenericObject /Abstract/
 
 %ConvertToSubClassCode
   if( dynamic_cast<sigraph::VertexClique *>( sipCpp ) )
-        sipClass = sipClass_sigraph_VertexClique;
+  {
+    sipClass = sipClass_sigraph_VertexClique;
+    *sipCppRet = dynamic_cast<sigraph::VertexClique *>( sipCpp );
+  }
   else if( dynamic_cast<sigraph::Clique *>( sipCpp ) )
-        sipClass = sipClass_sigraph_Clique;
+  {
+    sipClass = sipClass_sigraph_Clique;
+    *sipCppRet = dynamic_cast<sigraph::Clique *>( sipCpp );
+  }
   else  sipClass = 0;
 %End
 

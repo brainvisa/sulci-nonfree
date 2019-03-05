@@ -27,17 +27,35 @@ typedef std::vector<std::string> vector_STRING;
 %ConvertToSubClassCode
   if( dynamic_cast<sigraph::AdapDescr *>( sipCpp ) )
     if( dynamic_cast<sigraph::FoldDescr5 *>( sipCpp ) )
+    {
       sipClass = sipClass_sigraph_FoldDescr5;
+      *sipCppRet = dynamic_cast<sigraph::FoldDescr5 *>( sipCpp );
+    }
     else if( dynamic_cast<sigraph::FoldDescr4 *>( sipCpp ) )
+    {
       sipClass = sipClass_sigraph_FoldDescr4;
+      *sipCppRet = dynamic_cast<sigraph::FoldDescr4 *>( sipCpp );
+    }
     else if( dynamic_cast<sigraph::FoldDescr3 *>( sipCpp ) )
+    {
       sipClass = sipClass_sigraph_FoldDescr3;
+      *sipCppRet = dynamic_cast<sigraph::FoldDescr3 *>( sipCpp );
+    }
     else if( dynamic_cast<sigraph::FoldDescr2 *>( sipCpp ) )
+    {
       sipClass = sipClass_sigraph_FoldDescr2;
+      *sipCppRet = dynamic_cast<sigraph::FoldDescr2 *>( sipCpp );
+    }
     else
+    {
       sipClass = sipClass_sigraph_AdapDescr;
+      *sipCppRet = dynamic_cast<sigraph::AdapDescr *>( sipCpp );
+    }
   else
-   sipClass = sipClass_sigraph_CliqueDescr;
+  {
+    sipClass = sipClass_sigraph_CliqueDescr;
+    *sipCppRet = dynamic_cast<sigraph::CliqueDescr *>( sipCpp );
+  }
 %End
 
 public:

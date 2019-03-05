@@ -22,21 +22,39 @@ class MGraph : Graph
   {
     if( dynamic_cast<sigraph::MGraph *>( sipCpp ) )
       if( dynamic_cast<sigraph::FRGraph *>( sipCpp ) )
+      {
         sipClass = sipClass_sigraph_FRGraph;
+        *sipCppRet = dynamic_cast<sigraph::FRGraph *>( sipCpp );
+      }
       else
+      {
         sipClass = sipClass_sigraph_MGraph;
+        *sipCppRet = dynamic_cast<sigraph::MGraph *>( sipCpp );
+      }
     else if( dynamic_cast<sigraph::CGraph *>( sipCpp ) )
       if( dynamic_cast<sigraph::FGraph *>( sipCpp ) )
+      {
         sipClass = sipClass_sigraph_FGraph;
+        *sipCppRet = dynamic_cast<sigraph::FGraph *>( sipCpp );
+      }
       else
+      {
         sipClass = sipClass_sigraph_CGraph;
+        *sipCppRet = dynamic_cast<sigraph::CGraph *>( sipCpp );
+      }
     else
+    {
       sipClass = sipClass_Graph;
+      *sipCppRet = dynamic_cast<Graph *>( sipCpp );
+    }
   }
   else if( dynamic_cast<Tree *>( sipCpp ) )
   {
     if( dynamic_cast<sigraph::Learner *>( sipCpp ) )
+    {
       sipClass = sipClass_sigraph_Learner;
+      *sipCppRet = dynamic_cast<sigraph::Learner *>( sipCpp );
+    }
     else
       sipClass = 0;
   }
