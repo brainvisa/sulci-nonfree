@@ -21,13 +21,25 @@ class Model /Abstract/
   if( dynamic_cast<sigraph::Adaptive *>( sipCpp ) )
   {
     if( dynamic_cast<sigraph::AdaptiveTree *>( sipCpp ) )
+    {
       sipClass = sipClass_sigraph_AdaptiveTree;
+      *sipCppRet = dynamic_cast<sigraph::AdaptiveTree *>( sipCpp );
+    }
     else if( dynamic_cast<sigraph::AdaptiveLeaf *>( sipCpp ) )
+    {
       sipClass = sipClass_sigraph_AdaptiveLeaf;
+      *sipCppRet = dynamic_cast<sigraph::AdaptiveLeaf *>( sipCpp );
+    }
     else if( dynamic_cast<sigraph::TopAdaptive *>( sipCpp ) )
+    {
       sipClass = sipClass_sigraph_TopAdaptive;
+      *sipCppRet = dynamic_cast<sigraph::TopAdaptive *>( sipCpp );
+    }
     else
+    {
       sipClass = sipClass_sigraph_Adaptive;
+      *sipCppRet = dynamic_cast<sigraph::Adaptive *>( sipCpp );
+    }
   }
   else
     sipClass = sipClass_sigraph_Model;
