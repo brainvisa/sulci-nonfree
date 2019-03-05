@@ -42,7 +42,10 @@ class Model /Abstract/
     }
   }
   else
+  {
     sipClass = sipClass_sigraph_Model;
+    *sipCppRet = dynamic_cast<sigraph::Model *>( sipCpp );
+  }
 %End
 
 public:
