@@ -5,6 +5,7 @@ import os, sys, re
 from soma import aims, aimsalgo
 import numpy, optparse, tempfile, soma.subprocess
 import sigraph
+import six
 
 
 # --- config variables
@@ -117,7 +118,7 @@ csv = open( csvfile,'w' )
 if subject:
   csv.write( 'subject ' )
 csv.write( 'label  side  mindistance  meandistance  ndist\n' )
-for label, stats in diststats.iteritems():
+for label, stats in six.iteritems(diststats):
   if label.endswith( '_left' ):
     side = 'left'
     ulabel = label[ : len(label)-5 ]

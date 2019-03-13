@@ -7,6 +7,7 @@ from soma import aims, aimsalgo
 import numpy, optparse, tempfile, soma.subprocess
 import sigraph
 import time, tempfile, errno
+import six
 
 
 # --- config variables
@@ -244,7 +245,7 @@ if csvfile:
   if nodewise:
     csv.write( ' mean_curvature_nodewise mean_curvature_points_nodewise' )
   csv.write( '\n' )
-for label, globval in globaverage.iteritems():
+for label, globval in six.iteritems(globaverage):
   bcks = globval[ 'ss' ]
   bck = bcks[0]
   for b in bcks[1:]:

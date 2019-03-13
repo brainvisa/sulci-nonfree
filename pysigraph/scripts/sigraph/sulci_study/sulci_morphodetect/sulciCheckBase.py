@@ -1,7 +1,8 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import sys, os
+import six
 
 if sys.argv[1] in ( '-h', '--help' ):
   print('usage:')
@@ -28,8 +29,8 @@ execfile( normalstats )
 detected = []
 
 for base in basestats:  
-  for subject, stats in base.iteritems():
-    for label, pot in stats.iteritems():
+  for subject, stats in six.iteritems(base):
+    for label, pot in six.iteritems(stats):
       s = totalstats.get( label )
       if s and s.has_key( 'std' ):
         stddev = s[ 'std' ]

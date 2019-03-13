@@ -1,12 +1,13 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import os, sys
+import six
 
 def csvPotentials( stats, outpotfile, stds ):
   f = open( outpotfile, 'w' )
   f.write( 'subject side label potential normpotential mean_pot stddev_pot numobs_pot\n' )
-  for sfile, pots in stats.iteritems():
+  for sfile, pots in six.iteritems(stats):
     side = 'none'
     subject = os.path.basename( sfile )
     if subject.endswith( '.arg' ):
@@ -23,7 +24,7 @@ def csvPotentials( stats, outpotfile, stds ):
       subject = subject[ :-7 ]
     if subject.endswith( '_default_session' ):
       subject = subject[ :-16 ]
-    for slabel, pot in pots.iteritems():
+    for slabel, pot in six.iteritems(pots):
       label = slabel
       if label.endswith( '_left' ):
         side = 'left'
