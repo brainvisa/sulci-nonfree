@@ -7,6 +7,7 @@ import numpy
 import optparse
 import sigraph
 import tempfile, soma.subprocess
+import six
 
 parser = optparse.OptionParser( description='calculates a distance map from ' \
   'a lesion in the brain, and mean distance from the lesion to all sulci. ' \
@@ -213,7 +214,7 @@ for gnum, graphfile in enumerate( graphfiles ):
               dist[ 'touching' ] = 1
       except:
         pass
-  for label, dist in distances.iteritems():
+  for label, dist in six.iteritems(distances):
     if dist[ 'ndist' ] > 0:
       dist[ 'dist' ] /= dist[ 'ndist' ]
     if csvfile:

@@ -9,6 +9,7 @@ import os, sys, exceptions, numpy
 USE_QT4=True
 import soma.qt_gui.qt_backend.QtGui as qt
 from optparse import OptionParser
+import six
 
 
 def print_csv_format():
@@ -109,7 +110,7 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
   if len( columns ) != 0:
     header_minf['X'] = columns
     header_minf['INF'] = \
-      [ i for i in xrange( len( labels ) ) if i not in columns ]
+      [i for i in six.moves.xrange(len(labels)) if i not in columns]
     if labelcol is not None:
       # label column at end
       header_minf['INF'].remove( labelcol )

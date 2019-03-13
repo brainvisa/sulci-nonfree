@@ -1,7 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 from __future__ import print_function
 import sys,os, math
+import six
+
 
 if sys.argv[1] in ( '-h', '--help' ):
   print('usage:')
@@ -16,8 +18,8 @@ statsfile = sys.argv[1]
 
 execfile( statsfile )
 
-for s,stats in subjectspotentials.iteritems():
-  for label,pot in stats.iteritems():
+for s,stats in six.iteritems(subjectspotentials):
+  for label,pot in six.iteritems(stats):
     st = totalstats.get( label )
     if st and st.has_key( 'std' ) and st[ 'number' ] >= 2:
       # remove this subject from stats
