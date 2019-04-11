@@ -66,7 +66,6 @@ nthread : number of parallel threads used to load all graphs
                     item[1][item[2]] = e
             finally:
                 q.task_done()
-            q.task_done()
 
     try:
         import queue
