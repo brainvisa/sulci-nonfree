@@ -53,7 +53,19 @@ nthread : number of parallel threads used to load all graphs
             if item is None:
                 q.task_done()
                 break
-            load_it(*item)
+            try:
+                sys.stdout.flush()
+                try:
+                    load_it(*item)
+                except Exception as e:
+                    print('error in worker:', e)
+                    import traceback
+                    traceback.print_exc()
+                    # put the exception in place of the result graph
+                    # so that it can be handled by the main thread
+                    item[1][item[2]] = e
+            finally:
+                q.task_done()
             q.task_done()
 
     try:
@@ -87,6 +99,10 @@ nthread : number of parallel threads used to load all graphs
     q.join()
     for w in workers:
         w.join()
+
+    errors = [x for x in graphs if isinstance(x, Exception)]
+    if len(errors) != 0:
+        raise errors[0]
 
     return graphs
 
