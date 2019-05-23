@@ -148,6 +148,10 @@ int main( int argc, const char** argv )
         vol->header().setProperty( "voxel_size", vvs );
       }
 
+      if( vol->header().hasProperty( "uuid" ) )
+        // the output is a new file, prevent "duplicate UUID" messages in Axon
+        vol->header().removeProperty( "uuid" );
+
       // adapt volume transforms
       {
         vector<string> refs;
