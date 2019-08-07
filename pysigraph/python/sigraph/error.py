@@ -62,12 +62,13 @@ Used by siErrorLightWrapper.py and recognition_error.py brainvisa process.
     return float(error_rate)
 
 
-def translate(lg, bg, labels_translation):
+def translate(lg, bg, labels_translation, lg_label=autolabel,
+              bg_label=manuallabel):
     ft = sigraph.FoldLabelsTranslator(labels_translation)
     ft.translate(lg)
-    ft.translate(lg, autolabel, autolabel)
+    ft.translate(lg, lg_label, autolabel)
     ft.translate(bg)
-    ft.translate(lg, manuallabel, manuallabel)
+    ft.translate(lg, bg_label, manuallabel)
 
 
 class SulciError(object):
@@ -212,7 +213,8 @@ dict : output of computeGlobalErrorRates function.
 
 
 def computeErrorRates(base_graph, labeled_graph,
-                      labels_translation, filtred_labels=None):
+                      labels_translation, filtred_labels=None,
+                      bg_label=manuallabel, lg_label=autolabel):
     r = aims.Reader()
     lg = r.read(labeled_graph)
     if labeled_graph == base_graph:
@@ -220,7 +222,7 @@ def computeErrorRates(base_graph, labeled_graph,
     else:
         bg = r.read(base_graph)
 
-    translate(lg, bg, labels_translation)
+    translate(lg, bg, labels_translation, lg_label, bg_label)
     local_errors = computeLocalErrorRates(lg, bg, filtred_labels)
     global_errors = computeGlobalErrorRates(local_errors)
     return local_errors, global_errors

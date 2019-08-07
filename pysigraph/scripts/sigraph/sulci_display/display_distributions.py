@@ -211,7 +211,7 @@ class BlocGaussianDisplay(Display):
 def addBorder(img_in, width=1, border_value=0., aims_border=False):
 	# init
 	dim_in = [img_in.dimX(), img_in.dimY(), img_in.dimZ(), 1]
-        outvol = aims.Volume(numpy.asarray(vol).dtype.type,
+        outvol = aims.Volume(numpy.asarray(img_in.volume()).dtype.type,
                 dim_in[0] + width * 2, dim_in[1] + width * 2,
                 dim_in[2] + width * 2, 1)
         numpy.asarray( outvol )[:] = border_value
