@@ -19,7 +19,7 @@
 #include <aims/mesh/curv.h>
 #include <aims/io/io_g.h>
 #include <aims/math/math_g.h>
-#include <aims/getopt/getopt.h>
+#include <aims/getopt/getopt2.h>
 #include <aims/vector/vector.h>
 #include <aims/mesh/texture.h>
 #include <aims/io/reader.h>
@@ -42,107 +42,108 @@ using namespace carto;
 using namespace std;
 
 
-typedef float float3[3];
-
-BEGIN_USAGE(usage)
-  "-------------------------------------------------------------------------",
-  "siMeshSulciProjection    -i[nput] <meshfilein>                           ",
-  "                         -m[odel]    <gyri model>			    ",
-  "                         -l[evel]    <level model>		            ",
-  "                         -s 		<sulci names>		            ",
-  "                         -g[raph] <sulcus graph>                         ",
-  "                         [-t[raduction] <traduction_file> default = traduction.txt]          ",
-  "                         [-n[umbercc] <number_connex_components> default = 4]        ",
-  "                         [-a[lpha_reg]    <estimation_ratio > default = 1]	    ",
-  "                         [-e[min]     <euclidean distance threshold> default = 5 mm]  ",        
-  "                         [-p[min]     <plane distance threshold> default = 2 mm]  ",        
-  "                         [-V[olume_radius] <closing volume radius> default = 1.5 mm ]    ",
-  "                         [-M[esh_radius] <closing radius for mesh > default = 1.5*r ]    ",
-  "                         [-o[utput] <output_sulc_texture>]               ",
-  "                         [--connexity <metric> default =mesh connexity",
-  "                         [-c[urvature] <curvature map>]                  ",
-  "                         [-K          <curvature  coef.> default = 2]    ",
-  "                         [-h[elp]]                                       ",
-  "-------------------------------------------------------------------------",
-  " Project sulcus bottom points (voxels) on mesh texture (nodes).          ",
-  " Only sulci present in the <gyri model> file  are projected.             ",
-  " Their label correspond to the hierarchy defined in the <level model> file",
-  " There are two alternative approach for the projection.   ",
-  " The first one uses a metric combining an euclidean distance and map (curvature or depth,..) information. ",
-  " The second one uses tangent plane.                                ",
-  "-------------------------------------------------------------------------",
-  "     meshfilein          : input *.tri or *.mesh file                    ",
-  "	gyri model          : Choice of the sulcus/sulcus relations         ",
-  "     level model         : Choice of the level of description file *.def ",
-  "     sulci name          : Attribute for the name of the sulci in the graph (name or label) ",
-  "     sulcus graph        : Graph of the sulci *.arg                      ",
-  "     traduction_file     : correspondance label string->short_label      ",
-  "                           required by siParcellation.		    ",
-  "     number_connex_components : minimal number of point in each connected component ",
-  "     estimation_ration   : Distance threshold for detecting outliers for affine projection estimation.",
-  "                           Only points closer than (estimation_ration * dmin) are used for the estimation",
-  "     dmin                : max distance between a voxel and its projection",
-  "     input_curvature     : input *.tex curvature                         ",
-  "     curvature coef.: influence of the curvature          ",
-  "	closing radius	    : Radius for the sulci closing in mm            ",
-  "     output_sulc_texture : Projected sulci texture *.tex                 ",
-  "     connexity           : Underlying mesh metric : euclidean/mesh connexity                 ",
-  "-------------------------------------------------------------------------",
-END_USAGE
-
-
-//
-// Usage
-//
-void Usage( void )
-{
-  AimsUsage( usage );
-}
-
-
-int main( int argc, char** argv )
+int main( int argc, const char** argv )
 {
   PluginLoader::load();
 
-  char  *volfile = 0,*sname = 0, *level = 0, *meshfile = 0,  *outtexfile = 0, *curvtexfile = 0, *modelfile=0, *gname = 0;
-  long  ncc = 4; 
-  float  K = 2, demin = 5,dpmin = 2, radius = 1.5,rmadius = 1.5* radius,alpha_reg = 1 ;
-  bool connexity = false;
-  char	*traductionfile = (char*)"traduction.txt";
+  Reader<AimsSurfaceTriangle> triR;
+  Reader<Graph>	fr;
+  Writer<TimeTexture<short> >	texW;
+  Reader<TimeTexture<float> > ctexR;
+  string modelfile, volfile, level, sname, translation_file;
+  long  ncc = 4;
+  float  K = 2, demin = 5,dpmin = 2, radius = 1.5, rmadius = 1.5 * radius,
+    alpha_reg = 1 ;
+  bool connectivity = false, proj_unknown = false;
+
   //
   // Parser of options
   //
-  AimsOption opt[] = {
-    { 'h',"help"         ,AIMS_OPT_FLAG  ,( void* )Usage           ,AIMS_OPT_CALLFUNC,0},
-    { 'i',"input"        ,AIMS_OPT_STRING,&meshfile       ,0                ,1},
-    { 'g',"graph"	 ,AIMS_OPT_STRING,&gname	  ,0                ,1},
-    { 'o',"output"       ,AIMS_OPT_STRING,&outtexfile     ,0                ,1},
-    { 'c',"curvature"    ,AIMS_OPT_STRING,&curvtexfile    ,0                ,0},
-    { 'm',"model"        ,AIMS_OPT_STRING,&modelfile      ,0                ,1},
-    { 'l',"level"        ,AIMS_OPT_STRING,&level          ,0                ,1},
-    { 'v',"volume"       ,AIMS_OPT_STRING,&volfile        ,0                ,1},
-    { 's',"sulciname"    ,AIMS_OPT_STRING,&sname          ,0                ,1},
-    { 'K',"K"            ,AIMS_OPT_FLOAT ,&K              ,0                ,0},
-    { 't',"traduction"   ,AIMS_OPT_STRING,&traductionfile ,0                ,0},
-    { 'e',"demin"        ,AIMS_OPT_FLOAT ,&demin          ,0                ,0},
-    { 'p',"dpmin"        ,AIMS_OPT_FLOAT ,&dpmin          ,0                ,0},
-    { 'V',"Volume_radius",AIMS_OPT_FLOAT ,&radius         ,0                ,0},
-    { 'M',"Mesh_radius"  ,AIMS_OPT_FLOAT ,&rmadius        ,0                ,0},
-    { 'a',"alpha"        ,AIMS_OPT_FLOAT ,&alpha_reg      ,0                ,0},
-    { ' ',"connexity"    ,AIMS_OPT_FLAG  ,&connexity      ,0                ,0},    
-    { 'n',"numbercc"     ,AIMS_OPT_INT   ,&ncc            ,0                ,0},
-    { 0  ,0              ,AIMS_OPT_END   ,0               ,0                ,0}};
+  AimsApplication app(
+    argc, argv,
+    "Project sulcus bottom points (voxels) on mesh texture (nodes). "
+    "If <gyri model> is specified, only sulci present in the <gyri model> "
+    "file  are projected. "
+    "Their label correspond to the hierarchy defined in the <level model> "
+    "file. "
+    "There are two alternative approach for the projection. "
+    "The first one uses a metric combining an euclidean distance and map "
+    "(curvature or depth,..) information. "
+    "The second one uses tangent plane." );
+  app.addOption( triR, "-i", "input mesh" );
+  app.addOption( fr, "-g", "input sulci graph" );
+  app.addOption( texW, "-o", "output sulci texture: projected sulci texture" );
+  app.addOption( ctexR, "-c", "input curvature texture", true );
+  app.addOption( modelfile, "-m",
+                 "input gyri model: Choice of the sulcus/sulcus relations",
+                 true );
+  app.addOption( level, "-l", "folds translation level model" );
+  app.addOption( volfile, "-v", "input MRI volume (just to get dimensions)" );
+  app.addOption( sname, "-s", "sulci attribute for labels (name or label)" );
+  app.addOption( K, "-K",
+                 "curvature coef: influence of the curvature. Default = 2",
+                 true );
+  app.addOption( translation_file, "-t",
+                 "output translation file: correspondance label "
+                 "string->short_label, required by siParcellation" );
+  app.addOption( demin, "-e",
+                 "euclidean distance threshold: max distance between a voxel "
+                 "and its projection. Default = 5 mm", true );
+  app.addOption( dpmin, "-p", "plane distance threshold. Default = 2 mm",
+                 true );
+  app.addOption( radius, "-V",
+                 "closing volume radius: radius for the sulci closing in mm. "
+                 "Default = 1.5 mm", true );
+  app.addOption( rmadius, "-M", "closing radius for mesh. Default = 2.25",
+                 true );
+  app.addOption( alpha_reg, "-a",
+                 "estimation_ratio: distance threshold for detecting outliers "
+                 "for affine projection estimation. Only points closer than "
+                 "(estimation_ratio * dmin) are used for the estimation. "
+                 "Default = 1", true );
+  app.addOption( connectivity, "--connectivity",
+                 "underlying mesh metric : mesh (default) or euclidean "
+                 "connexity", true );
+  app.addOption( ncc, "-n",
+                 "number_connex_components: minimal number of point in each "
+                 "connected component. Default = 4", true );
+  app.addOption( proj_unknown, "-u", "project unknown label", true );
 
-  AimsParseOptions( &argc, argv, opt, usage );
-  
+  app.alias( "--input", "-i" );
+  app.alias( "--graph", "-g" );
+  app.alias( "--output", "-o" );
+  app.alias( "--curvature", "-c" );
+  app.alias( "--model", "-m" );
+  app.alias( "--volume", "-v" );
+  app.alias( "--sulciname", "-s" );
+  app.alias( "--translation", "-t" );
+  app.alias( "--demin", "-e" );
+  app.alias( "--dpmin", "-p" );
+  app.alias( "--Volume_radius", "-V" );
+  app.alias( "--Mesh_radius", "-M" );
+  app.alias( "--alpha", "-a" );
+  app.alias( "--numbercc", "-n" );
+
+  try
+  {
+    app.initialize();
+  }
+  catch( user_interruption & )
+  {
+    return EXIT_FAILURE;
+  }
+  catch( exception & e )
+  {
+    cerr << e.what() << endl;
+    return EXIT_FAILURE;
+  }
 
   //
   // read triangulation
   //
   cout << "reading triangulation   : " << flush;
   AimsSurfaceTriangle surface;
-  Reader<AimsSurfaceTriangle> triR( meshfile );
-  triR >> surface;
+  triR.read( surface );
   cout << "done" << endl;
 
   //
@@ -183,9 +184,7 @@ int main( int argc, char** argv )
   try
     {
       //Read the graph
-      Reader<Graph>	fr( gname );
       fr.read( fg );
-      //fg.loadBuckets( gname, true );
       cout << "graph read\n";
 
       fg.getProperty( "anterior_commissure", CA );
@@ -234,7 +233,7 @@ int main( int argc, char** argv )
 	  VertexClique VC;
 	  unsigned nCC = 0;
 	  nCC = VC.connectivity(unknownV,&setCC,(string)"junction");
-	  cout << nCC << " connected component with the " << sname << " 'unknown' in the the fold graph \n"; 
+	  cout << nCC << " connected component with the " << sname << " 'unknown' in the the fold graph \n";
 	  cout << "Giving the " << sname << " "  << v << " to the biggest one \n";
 	  for (iscc = setCC.begin(), escc = setCC.end(); iscc != escc; ++iscc)
 	    if (sizeCC < (*iscc)->size() )
@@ -246,25 +245,22 @@ int main( int argc, char** argv )
 	  for ( icc = ventricleV.begin(), ecc = ventricleV.end(); icc != ecc; ++icc  )
 	    (*icc)->setProperty(sname,v); 
 	}
-      
-      
-      
 
       //Write translation file
-      ofstream	namefile( traductionfile );
+      ofstream	namefile( translation_file.c_str() );
       for( il=levelTrans.begin(); il!=fl; ++il )
 	slab.insert( (*il).second );
-      slab.insert("unknown");
       for( i = 1, is=slab.begin(); is!=fs; ++is, ++i )
 	{
 	  trans[*is] = i;
 	  transInv[i] = *is;
 	  namefile << *is << "\t" << i << endl;
 	}
+      slab.insert("unknown");
       trans["unknown"] = i;
       transInv[i] = "unknown";
       namefile << "unknown" << "\t" << i << endl;
-      cout << "Write " << (string)traductionfile << " file\n";
+      cout << "Write " << translation_file << " file\n";
       levelTrans.translate( fg, sname, "name" ); 
        
 
@@ -396,11 +392,25 @@ int main( int argc, char** argv )
   set<string>	labels;
   cout << "Read gyri model file \n";
   map<string,set<string> > GyriAndSulci;
-  GyriAndSulci = meshdistance::GyrusModel2GyriAndSulci(modelfile);
-  labels = meshdistance::GyrusModel2SetOfSulci(GyriAndSulci,slab);
-  //labels = meshdistance::GyrusModel2SetOfSulci(modelfile,slab);
+  if( !modelfile.empty() )
+  {
+    GyriAndSulci = meshdistance::GyrusModel2GyriAndSulci(modelfile);
+    labels = meshdistance::GyrusModel2SetOfSulci( GyriAndSulci, slab );
+    //labels = meshdistance::GyrusModel2SetOfSulci(modelfile,slab);
+    if( proj_unknown )
+      labels.insert( "unknown" );
+  }
+  else
+  {
+    // project all sulci
+      for( iv=fg.begin(); iv!=fv; ++iv )
+      {
+        (*iv)->getProperty( "name", name );
+        if( proj_unknown || name != "unknown" )
+          labels.insert( name );
+      }
+  }
 
-  
   //Order the triangulation nodes 
   vector< list<unsigned> > neighbourso(surface[0].vertex().size());
   cout << "Ordering the triangulation nodes (clockwise)" << flush;
@@ -411,35 +421,37 @@ int main( int argc, char** argv )
  cout << "mesh polygons : " << surface[0].polygon().size() << endl;
  TimeTexture<short>	outTex;
    
-  if (curvtexfile != 0)
-    {
-      //
-      // read input curv texture
-      //
-      cout << "reading curvature texture   : " << flush;
-      TimeTexture<float>	curvTex;
-      Reader<TimeTexture<float> > ctexR( curvtexfile );
-      ctexR >> curvTex;
-      cout << "done" << endl;
-      cout << "texture dim   : " << curvTex[0].nItem() << endl;
-      outTex = meshdistance::SulcusVolume2Texture( surface[0], curvTex[0], bottom_vol ,surface_vol,
-						    K , demin , ncc, transInv, labels,radius,rmadius,alpha_reg,
-						    connexity,neighbourso); 
-    }
+  if( !ctexR.fileName().empty() )
+  {
+    //
+    // read input curv texture
+    //
+    cout << "reading curvature texture   : " << flush;
+    TimeTexture<float>	curvTex;
+    ctexR.read( curvTex );
+    cout << "done" << endl;
+    cout << "texture dim   : " << curvTex[0].nItem() << endl;
+    outTex = meshdistance::SulcusVolume2Texture( surface[0], curvTex[0],
+                                                 bottom_vol ,surface_vol,
+                                                 K, demin , ncc, transInv,
+                                                 labels, radius, rmadius,
+                                                 alpha_reg, connectivity,
+                                                 neighbourso );
+  }
   else
-    {
-      ASSERT (dpmin != 0);
-      outTex = meshdistance::SulcusVolume2Texture( surface[0], bottom_vol ,surface_vol,Point3df(CA[0] * vsz[0],CA[1] * vsz[1],CA[2] * vsz[2]),
-						 demin , dpmin, ncc, transInv, labels,radius,rmadius,alpha_reg,
-						 connexity,neighbourso);  
-    }
+  {
+    ASSERT (dpmin != 0);
+    outTex = meshdistance::SulcusVolume2Texture(
+      surface[0], bottom_vol, surface_vol,
+      Point3df(CA[0] * vsz[0],CA[1] * vsz[1],CA[2] * vsz[2]), demin , dpmin,
+      ncc, transInv, labels,radius, rmadius,alpha_reg, connectivity,
+      neighbourso );
+  }
   cout << "writing texture : " << flush;
   TimeTexture<short> otex;
   otex[0] = outTex[0];
 
-  Writer<TimeTexture<short> >	texW( outtexfile);
-  texW << otex;
-  //texW << outTex;
+  texW.write( otex );
   cout << "done" << endl;
 
   return( 0 );
