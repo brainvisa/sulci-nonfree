@@ -67,11 +67,7 @@ nthread : number of parallel threads used to load all graphs
             finally:
                 q.task_done()
 
-    try:
-        import queue
-    except ImportError:
-        # python 2.6 and early 2.7.x
-        import Queue as queue
+    from six.moves import queue
     import threading
     import multiprocessing
 

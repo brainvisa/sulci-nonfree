@@ -6,11 +6,7 @@ from soma import aims
 from sulci.registration.procrust import vector_from_rotation
 from sulci.common import io
 from sulci.models import distribution, distribution_aims
-try:
-    import queue
-except ImportError:
-    # python 2.6 and early 2.7.x
-    import Queue as queue
+from six.moves import queue
 from soma import mpfork
 import tempfile
 import shutil
