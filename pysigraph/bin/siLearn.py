@@ -57,7 +57,7 @@ def saveModel(labels_filter, filter_mode):
     insave = 0
 
 
-class Param:
+class Param(object):
 
     def __init__(self):
         self.model = ''
