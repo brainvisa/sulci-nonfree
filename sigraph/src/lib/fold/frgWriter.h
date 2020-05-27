@@ -31,7 +31,7 @@ namespace sigraph
       LowLevelFRGArgWriter();
       virtual ~LowLevelFRGArgWriter();
       virtual void write( const std::string & filename, Graph & graph,
-                          bool forceglobal = false );
+                          SavingMode mode = Keep );
   };
 
 }

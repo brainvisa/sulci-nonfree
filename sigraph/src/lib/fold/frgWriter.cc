@@ -32,7 +32,7 @@ LowLevelFRGArgWriter::~LowLevelFRGArgWriter()
 
 
 void LowLevelFRGArgWriter::write( const string & filename, Graph & graph,
-                                  bool )
+                                  SavingMode )
 {
   FrgWriter	w( filename );
   w.write( reinterpret_cast<FRGraph &>( graph ) );
