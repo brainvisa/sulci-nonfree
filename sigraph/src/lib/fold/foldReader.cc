@@ -42,6 +42,7 @@ void FoldReader::read( FGraph & gr, long subobj )
   gr.clearAll();
 
   ExoticGraphReader::read( gr );
+  // TODO call storeTalairach(force=true)
   if( gr.getSyntax() != "CorticalFoldArg" )
     {
       cerr << "Input graph is not a cortical folds graph" << endl;
