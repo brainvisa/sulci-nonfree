@@ -36,7 +36,8 @@ nthread : number of parallel threads used to load all graphs
     '''
     # translation of labels
     ft = sigraph.FoldLabelsTranslator(transfile)
-    sigraph.si().setLabelsTranslPath(transfile)
+    # sigraph.si() is broken somewhere during sip import...
+    sigraph.sigraph.si().setLabelsTranslPath(transfile)
 
     def load_it(filename, graphs, i, label_mode, ft):
         g = aims.read(filename)
