@@ -70,6 +70,10 @@ del ExtendedImporter
 
 soma.aims.__fixsipclasses__(locals().items())
 
+# export namespace out of sigraphsip
+sigraph = sigraphsip.sigraph
+
+
 # load plugins
 __pluginsdir__ = os.path.join(os.path.dirname(__file__), 'plugins')
 __plugins__ = []
@@ -101,7 +105,7 @@ convertersObjectToPython = {
 }
 soma.aims.convertersObjectToPython.update(convertersObjectToPython)
 
-del soma, sigraph, convertersObjectToPython
+del soma, convertersObjectToPython
 
 
 class Settings(object):
