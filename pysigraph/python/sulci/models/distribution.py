@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import pickle, numpy, scipy.stats, scipy.special
+import six
 
 # from Gael Varoquaux
 def ledoit_wolf(x):
@@ -79,7 +80,7 @@ the factory at the end of this file
             fd = open(filename, 'r')
             obj = pickle.load(fd)
         except:
-            if sys.version_info[0] >= 3:
+            if not six.PY2:
                 # the distribution has been written from python2 in latin1 encoding
                 fd = open(filename, 'rb')
                 obj = pickle.load(fd, encoding='latin1')

@@ -3,12 +3,15 @@
 from __future__ import print_function
 import os
 import sys
+
 import numpy
+import six
+
 from sulci.models import distribution
 from sulci.registration.transformation import RigidTransformation, \
     LocalRigidTransformations
 
-if sys.version_info[0] >= 3:
+if not six.PY2:
     long = int
 
 #

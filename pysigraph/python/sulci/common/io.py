@@ -4,6 +4,9 @@ import sys
 import pprint
 from sulci.models import distribution, distribution_all, \
     classifier, classifier_all, sulci
+
+import six
+
 import sigraph
 from soma import aims
 try:
@@ -13,7 +16,7 @@ except ImportError as e:
     import traceback
     traceback.print_exc()
 
-if sys.version_info[0] >= 3:
+if not six.PY2:
     def execfile(filename, globals=None, locals=None):
         if globals is None:
             globals = sys._getframe(1).f_globals
