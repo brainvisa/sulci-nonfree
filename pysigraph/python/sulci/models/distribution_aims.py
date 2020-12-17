@@ -151,7 +151,8 @@ overlappe to each other.
         img_out = aims.AimsData_FLOAT(*bb_size_out)
         # input (anisotropic voxels)
         # -> output (isotropic voxels) in motion space
-        cls._resampler.resample(img, motion_t, 0, img_out, False)
+        cls._resampler.resample(img.volume(), motion_t, 0, img_out.volume(),
+                                False)
 
         return img_out
     _bucketmap_bb_to_img_bb_with_motion = \

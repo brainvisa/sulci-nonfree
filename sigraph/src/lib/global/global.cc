@@ -66,7 +66,7 @@ namespace
     return true;
   }
 
-  static bool _initSigraph = __initSigraph();
+  static bool _initSigraph __attribute__((unused)) = __initSigraph();
 }
 
 Si & sigraph::si()

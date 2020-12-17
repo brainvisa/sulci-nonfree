@@ -28,9 +28,9 @@ using namespace std;
 void usage( const char* name )
 {
   cerr << "usage : \n" << name << " resultfile.lyx resultfile.tre [dir]\n";
-  cerr << "dir: directory où seront écrites les images .eps\n\n";
+  cerr << "dir: directory oï¿½ seront ï¿½crites les images .eps\n\n";
   cerr << "Ecrit les tableaux d'erreurs dans un fichier au format LyX\n" 
-       << "Ces erreurs doivent avoir été calculées avec siErrorStats\n\n";
+       << "Ces erreurs doivent avoir ï¿½tï¿½ calculï¿½es avec siErrorStats\n\n";
   exit( 1 );
 }
 
@@ -82,7 +82,7 @@ void newFoldsTable( ostream & f, unsigned nfl, unsigned nperline,
       lines.push_back( "1 0" );		// 1ere ligne de chaque sillon
       for( j=1; j<lpf-1; ++j )
 	lines.push_back( "0 0" );	// lignes du milieu
-      lines.push_back( "0 1" );		// dernière ligne du sillon
+      lines.push_back( "0 1" );		// derniï¿½re ligne du sillon
     }
 
   newTable( f, lines.size(), cols.size() );
@@ -139,15 +139,15 @@ gnuplotErrGraph( const vector<float> & adds, const vector<float> & rejs,
 		 const string & psfile )
 {
   vector<float>	res;
-  unsigned	n = nb + nt + ng, i, j=0, c, ind;
+  unsigned	i, j=0, c, ind;
   unsigned	gr[3];
   string	datfile = "/tmp/gnuplot.dat";
   string	datfile2 = "/tmp/gnuplot2.dat";
   string	comfile = "/tmp/gnucom.txt";
   float		err, serr;
 
-  assert( n == adds.size() );
-  assert( n == rejs.size() );
+  assert( (nb + nt + ng) == adds.size() );
+  assert( (nb + nt + ng) == rejs.size() );
 
   gr[0] = nb;
   gr[1] = nt;
@@ -157,7 +157,7 @@ gnuplotErrGraph( const vector<float> & adds, const vector<float> & rejs,
   res.push_back( 0 );
   res.push_back( 0 );
 
-  //	fichiers de données pour gnuplot
+  //	fichiers de donnï¿½es pour gnuplot
 
   ofstream	datf( datfile.c_str() );
 
@@ -176,7 +176,7 @@ gnuplotErrGraph( const vector<float> & adds, const vector<float> & rejs,
 
   c = 0;
   ind = 0;
-  for( j=0; j<3; ++j )	// séries de graphes
+  for( j=0; j<3; ++j )	// sï¿½ries de graphes
     {
       serr = 0;
       for( i=0; i<gr[j]; ++i )
@@ -230,7 +230,7 @@ gnuplotErrGraph( const vector<float> & adds, const vector<float> & rejs,
   else
     cerr << "cannot write " << comfile << endl;
 
-  //	on efface les données
+  //	on efface les donnï¿½es
   remove( datfile.c_str() );
   remove( datfile2.c_str() );
 
@@ -242,18 +242,18 @@ void gnuplotSizeGraph( const vector<float> & sizes,
 		       unsigned nb, unsigned nt, unsigned ng, 
 		       const string & psfile )
 {
-  unsigned	n = nb + nt + ng, i, j=0, c, ind;
+  unsigned	i, j=0, c, ind;
   unsigned	gr[3];
   string	datfile = "/tmp/gnuplot.dat";
   string	comfile = "/tmp/gnucom.txt";
 
-  assert( n == sizes.size() );
+  assert( (nb + nt + ng) == sizes.size() );
 
   gr[0] = nb;
   gr[1] = nt;
   gr[2] = ng;
 
-  //	fichiers de données pour gnuplot
+  //	fichiers de donnï¿½es pour gnuplot
 
   ofstream	datf( datfile.c_str() );
 
@@ -265,7 +265,7 @@ void gnuplotSizeGraph( const vector<float> & sizes,
 
   c = 0;
   ind = 0;
-  for( j=0; j<3; ++j )	// séries de graphes
+  for( j=0; j<3; ++j )	// sï¿½ries de graphes
     {
       for( i=0; i<gr[j]; ++i, ++c, ++ind )
 	{
@@ -304,7 +304,7 @@ void gnuplotSizeGraph( const vector<float> & sizes,
   else
     cerr << "cannot write " << comfile << endl;
 
-  //	on efface les données
+  //	on efface les donnï¿½es
   remove( datfile.c_str() );
 }
 
@@ -418,7 +418,7 @@ int main( int argc, char** argv )
 
   assert( folds && graphs );
 
-  //	en-tête LyX
+  //	en-tï¿½te LyX
   f << "#This file was created by <siLyxErrors> Thu Jan 27 18:11:07 2000\n";
   f << "#LyX 1.1 http://www.lyx.org/\n";
   f << "\\lyxformat 218\n";
@@ -459,9 +459,9 @@ int main( int argc, char** argv )
   int					grlist[3], grnodes[3];
   float					grmass[3], grmerr[3], grEi[3], grEf[3];
   string				grtitle[3] 
-    = { "Base :", "Test :", "Gén. :" };
+    = { "Base :", "Test :", "Gï¿½n. :" };
 
-  //	tri par ordre alphabétique
+  //	tri par ordre alphabï¿½tique
 
   /*for( it=graphs->begin(), ft=graphs->end(); it!=ft; ++it )
     {
@@ -574,7 +574,7 @@ int main( int argc, char** argv )
       //      f << "\\series default\n";
     }
 
-  // moyennes générales
+  // moyennes gï¿½nï¿½rales
   mass = grmass[0] + grmass[1] + grmass[2];
   f << "<row topline=\"true\" bottomline=\"true\" newpage=\"false\">\n";
   f << "<cell>\n\\begin_inset Text\n";
@@ -636,7 +636,7 @@ int main( int argc, char** argv )
   set<string>			excludeLabels;
   set<string>::const_iterator	fex = excludeLabels.end();
 
-  //	tri par ordre alphabétique
+  //	tri par ordre alphabï¿½tique
 
   errTr.getProperty( "graphs_count", ng );
   errs[0] = errs[1] = errs[2] = errs[3] = 0;
@@ -761,7 +761,7 @@ int main( int argc, char** argv )
 		      f << "\\end_inset\n</cell>\n";
 		    }
 		}
-	      for( ; j<ncols; ++j )	// compléter les lignes vides
+	      for( ; j<ncols; ++j )	// complï¿½ter les lignes vides
 		{
 		  for( c=0; c<colspercell; ++c )
 		    {
@@ -788,7 +788,7 @@ int main( int argc, char** argv )
       f << "Commencer le copier/coller ici.\n";
     }
 
-  // moyennes générales
+  // moyennes gï¿½nï¿½rales
 
   vector<string>	lines, cols;
 
@@ -815,10 +815,10 @@ int main( int argc, char** argv )
   f << "Test:\n";
   f << "\\end_inset\n</cell>\n";
   f << "<cell>\n\\begin_inset Text\n";
-  f << "Généralisation:\n";
+  f << "Gï¿½nï¿½ralisation:\n";
   f << "\\end_inset\n</cell>\n";
   f << "<cell>\n\\begin_inset Text\n";
-  f << "Général:\n";
+  f << "Gï¿½nï¿½ral:\n";
   f << "\\end_inset\n</cell>\n";
   f << "</row>\n";
 

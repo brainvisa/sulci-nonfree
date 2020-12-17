@@ -15,7 +15,7 @@ static bool initAnaFold()
   return( true );
 }
 
-static bool garbage = initAnaFold();
+static bool garbage __attribute__((unused)) = initAnaFold();
 
 
 AnaFold::AnaFold() : Module()

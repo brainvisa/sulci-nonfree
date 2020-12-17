@@ -55,7 +55,7 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
     order[ r ] = isg->first;
   }
 
-  // itération sur chaque groupe
+  // itï¿½ration sur chaque groupe
 
   map<double, string>::const_iterator	ig, fg=order.end();
   set<Vertex *>::const_iterator		isv, fsv;
@@ -76,7 +76,6 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
   map<double, CComponent *>::iterator     icc, fcc = ccm.end();
   map<long, CComponent *>                 ccord;
   map<long, CComponent *>::const_iterator ico, eco = ccord.end();
-  Vertex                                  *v;
   int                                     index;
   long                                    key;
 
@@ -93,6 +92,7 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
       cc.erase( cc.begin(), cend );
       ccm.erase( ccm.begin(), fcc );
       n = VertexClique::connectivity( sv, &cc, syntTypes );
+      n = n; // compilation warning...
 
       // reorder cc in a reproducible way
       ccord.clear();
@@ -144,7 +144,7 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
 	      //ef.vertices.push_back( *isv );
 	      changes[ *isv ] = label;
 	      (*isv)->setProperty( SIA_LABEL, _anneal->voidLabel() );
-	      // cliques concernées par les changements
+	      // cliques concernï¿½es par les changements
 	      if( (*isv)->getProperty( SIA_CLIQUES, sc ) )
 		{
 		  for( ic=sc->begin(), fc=sc->end(); ic!=fc; ++ic )
@@ -176,19 +176,19 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
 	    eE = 700;
 	  ef.expEnergy = exp( eE );
 
-	  //	décision
+	  //	dï¿½cision
 	  accept = false;
 
-	  if( _anneal->mode() == Anneal::ICM )	// déterministe
+	  if( _anneal->mode() == Anneal::ICM )	// dï¿½terministe
 	    {
 	      if( ef.energy < 0 )
 		accept = true;
 	    }
-	  else			// mode non-déterministe
+	  else			// mode non-dï¿½terministe
 	    {
 	      //	tirage
 	      limit = ef.expEnergy / (ef.expEnergy + 1);
-	      // technologie du DoubleTirage © JeffProd'00
+	      // technologie du DoubleTirage ï¿½ JeffProd'00
 	      if( ran1() < limit
 		  && ( !_anneal->doubleDrawingLots() || ran1() < limit ) )
 		accept = true;
@@ -203,7 +203,7 @@ void AnnealConnectVoidExtension::specialStep( unsigned )
 		  mf.update( cl, changes );
 		}
 
-	      //	Stats, traces de l'énergie
+	      //	Stats, traces de l'ï¿½nergie
 	      ++_ntrans;
 	      _stepDeltaE += ef.energy;
 	    }

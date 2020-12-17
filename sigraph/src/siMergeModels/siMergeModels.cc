@@ -60,7 +60,7 @@ int main( int argc, const char **argv )
       mr2 >> mg2;
       cout << "models read.\n";
 
-      Graph::iterator		iv, jv, ev = mg1.end(), fv = mg2.end();
+      Graph::iterator		iv, jv, ev = mg1.end();
       Vertex::iterator		ie, ee;
       set<Edge *>::iterator	je, fe;
       string			label1, label2, label3;

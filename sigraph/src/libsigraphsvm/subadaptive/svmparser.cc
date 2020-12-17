@@ -28,9 +28,9 @@ void SvmSAParser::buildSubSvm( AttributedObject* parent, Tree* ao,
                                const string & filename )
 {
   // cout << "SvmSAParser::buildSubSvm\n";
-  if( ao->size() != 0 )
+  if( ao->childrenSize() != 0 )
   {
-    cerr << "warning : SubAdSvm with children (" << ao->size() << ")\n";
+    cerr << "warning : SubAdSvm with children (" << ao->childrenSize() << ")\n";
   }
 
   if( parent )

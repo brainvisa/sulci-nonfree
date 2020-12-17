@@ -232,7 +232,6 @@ void SurfaceBasedFunctionalSketchFinder::initCliques( CGraph &data, bool /* verb
   std::vector<float>         bbmin_1, bbmin_2, bbmax_1, bbmax_2, bc1, bc2;
   double rec;
   float tmin_1, tmin_2, tmax_1, tmax_2;
-  int no_overlap=0;
   vector<int> vl;
   string			voidl = SIV_VOID_LABEL;
 
@@ -453,7 +452,6 @@ void SurfaceBasedFunctionalSketchFinder::initCliques( CGraph &data, bool /* verb
 
                           (*jv)->getProperty( "tmin", tmin_2);
                           (*jv)->getProperty( "tmax", tmax_2);
-                          no_overlap=0;
                           distMin=10000.0;
                           x=bc2[0];
                           y=bc2[1];
