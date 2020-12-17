@@ -94,7 +94,7 @@ public:
 	const std::vector<int>	&shape = sipCpp->getShape();
 	dims[1] = shape[1];
 	dims[0] = shape[0];
-	sipRes = PyArray_FromDimsAndData(2, dims, PyArray_FLOAT,
+	sipRes = PyArray_FromDimsAndData(2, dims, NPY_FLOAT,
 					(char *) &(sipCpp->getMatrix()[0]));
 	if(sipRes) sipRes = PyArray_Return((PyArrayObject *) sipRes);
 %End

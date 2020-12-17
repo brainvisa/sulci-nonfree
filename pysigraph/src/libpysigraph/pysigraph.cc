@@ -43,7 +43,7 @@ namespace sigraph
   PyArray_Descr	*NewDBLearnableInfoPyArrayDescr(void)
   {
     PyArray_Descr	*descr = NULL;
-    descr = PyArray_DescrNewFromType(PyArray_VOID);
+    descr = PyArray_DescrNewFromType(NPY_VOID);
     descr->f->getitem = (PyArray_GetItemFunc *) my_getitem;
     descr->f->setitem = (PyArray_SetItemFunc *) my_setitem;
     descr->elsize = sizeof(char *);
