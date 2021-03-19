@@ -72,6 +72,8 @@ soma.aims.__fixsipclasses__(locals().items())
 
 # export namespace out of sigraphsip
 sigraph = sigraphsip.sigraph
+# fix bad export
+si = sigraph.si
 
 
 # load plugins
