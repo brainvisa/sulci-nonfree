@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os
 import sys
 import signal
@@ -83,6 +84,7 @@ class Param(object):
         self.maxAppError = 0.25
         self.closeLearning = 0
         self.labelatt = None
+
 
 par = Param()
 
@@ -192,7 +194,7 @@ def graph_select_names_or_labels(g):
     # FIXME : right now, we use brutality (until a better system is
     #        done in LabelsTranslator).
     for v in g.vertices():
-        if v.has_key(todel):
+        if todel in v:
             del v[todel]
 
 
@@ -226,7 +228,7 @@ def main():
         msg.error(str(e))
         sys.exit(1)
 
-    ca = conf.keys()
+    ca = list(conf.keys())
     par.model = conf['modelFile']
     par.trainscheme = conf['trainschemeFile']
     if 'graphFiles' in ca:
@@ -320,7 +322,7 @@ def main():
         if not vc.ok:
             print('Warning: model / data graphs version mismatch')
             print(vc.message)
-            print
+            print()
             print(
                 'I will continue but wrong or inaccurate results can be achieved')
 
@@ -375,7 +377,7 @@ def main():
         citer += 1
         ad = tit.adaptive()
         if not ad:
-            tit.next()
+            next(tit)
             continue
         labels = [l for l in ad.significantLabels() if l != 'unknown']
         if not filtred(labels, options.labels_filter, options.filter_mode):
@@ -387,7 +389,7 @@ def main():
             w = sigraph.FrgWriter(par.model)
             w.dataDirectory(rg)
             w.parseModel(tit.model().parentAO())
-        tit.next()
+        next(tit)
 
     # close learning models
     if par.closeLearning:
@@ -407,6 +409,7 @@ def main_safe():
 def exit(exit_status):
     import datamind.ml
     datamind.ml.exit(exit_status)
+
 
 if __name__ == '__main__':
     main_safe()
