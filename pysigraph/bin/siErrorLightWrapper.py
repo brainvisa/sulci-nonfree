@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy
 from optparse import OptionParser
 import sigraph.error, sigraph.nrj
@@ -16,7 +17,7 @@ def addInfoToCSV(csvfilename, graphname, errors, nrj, append=False):
         mode = 'w'
     fd = open(csvfilename, mode)
     if fd.tell() == 0:
-        h = 'Subject\t%s\tEnergy\n' % '\t'.join(errors.keys())
+        h = 'Subject\t%s\tEnergy\n' % '\t'.join(list(errors.keys()))
         fd.write(h)
     errors_str = '\t'.join(str(x) for x in errors.values())
     fd.write('%s\t%s\t%s\n' % (graphname, errors_str, str(nrj)))

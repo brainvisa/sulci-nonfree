@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, exceptions, numpy
 import glob, re
 from scipy.interpolate.fitpack2 import BivariateSpline, dfitpack
@@ -11,6 +12,7 @@ import sigraph
 from sulci.common import io, add_translation_option_to_parser
 import anatomist.direct.api as anatomist
 from soma import aims
+from six.moves import range
 try:
 	import datamind.io.old_csvIO as csv_io
 except ImportError:
@@ -354,7 +356,7 @@ class GravityCentersDisplay(SegmentDisplay):
 		g = numpy.asarray(v['refgravity_center'].list())
 		s = aims.SurfaceGenerator.sphere(g, 1, 96)
 		name = v['name']
-		if self._meshes.has_key(name):
+		if name in self._meshes:
 			self._meshes[name] += s
 		else:	self._meshes[name] = s
 
@@ -664,10 +666,10 @@ class DataCorticalDisplay(CorticalDisplay):
 		dir = g2 - g1
 		size = numpy.sqrt((dir ** 2).sum())
 		s1, s2, c = self._shapeFactory.get(g1, dir, size)
-		if self._meshes.has_key(name1):
+		if name1 in self._meshes:
 			self._meshes[name1] += s1
 		else:	self._meshes[name1] = s1
-		if self._meshes.has_key(name2):
+		if name2 in self._meshes:
 			self._meshes[name2] += s2
 		else:	self._meshes[name2] = s2
 		info = {'g1' : g1, 'g2' : g2, 'dist' : size, 'dir' : dir}
@@ -698,7 +700,7 @@ class DataCorticalDisplay(CorticalDisplay):
 			d = (data - self._data_min) / \
 				(self._data_max - self._data_min)
 			ds = int(d * (img_size - 1))
-			if h.has_key(ds):
+			if ds in h:
 				h[ds] += mesh
 			else:	h[ds] = mesh
 		for d, mesh in h.items():
@@ -752,10 +754,10 @@ class DiffGravityCentersDisplay(CorticalDisplay):
 		c1, c2, c3, c4 = self._shapeFactory.get(g1, dir, size)
 		c1 += c3
 		c2 += c4
-		if self._meshes.has_key(name1):
+		if name1 in self._meshes:
 			self._meshes[name1] += c1
 		else:	self._meshes[name1] = c1
-		if self._meshes.has_key(name2):
+		if name2 in self._meshes:
 			self._meshes[name2] += c2
 		else:	self._meshes[name2] = c2
 
@@ -796,7 +798,7 @@ class MarkovRelationsDisplay(SegmentDisplay):
 		s = aims.SurfaceGenerator.sphere(g, 2, 96)
 		sulcus = v['name']
 		index = v['index']
-		if self._meshes.has_key(sulcus):
+		if sulcus in self._meshes:
 			self._meshes[sulcus] += s
 		else:	self._meshes[sulcus] = s
 		if self._rewrite_graphs:
@@ -811,7 +813,7 @@ class MarkovRelationsDisplay(SegmentDisplay):
 		g2 =  numpy.asarray(pfv2['refgravity_center'].list())
 		c = aims.SurfaceGenerator.cylinder(g1, g2, 0.2, 0.2, 6,
 							False, True)
-		if self._meshes.has_key('links'):
+		if 'links' in self._meshes:
 			self._meshes['links'] += c
 		else:	self._meshes['links'] = c
 
@@ -875,10 +877,10 @@ class IntersectionDisplay(JunctionDisplay):
 			g1, g2 = e1, e2
 		dir = g2 - g1
 		c1, c2 = self._shapeFactory.get(g, dir)
-		if self._meshes.has_key(name1):
+		if name1 in self._meshes:
 			self._meshes[name1] += c1
 		else:	self._meshes[name1] = c1
-		if self._meshes.has_key(name2):
+		if name2 in self._meshes:
 			self._meshes[name2] += c2
 		else:	self._meshes[name2] = c2
 
@@ -928,10 +930,10 @@ class GravityPureCorticalDisplay(PureCorticalDisplay):
 		g = (n1 + n2) / 2.
 		dir = g2 - g1
 		c1, c2 = self._shapeFactory.get(g, dir)
-		if self._meshes.has_key(name1):
+		if name1 in self._meshes:
 			self._meshes[name1] += c1
 		else:	self._meshes[name1] = c1
-		if self._meshes.has_key(name2):
+		if name2 in self._meshes:
 			self._meshes[name2] += c2
 		else:	self._meshes[name2] = c2
 
@@ -965,7 +967,7 @@ class ExtremityCloudsDisplay(CsvDisplay):
 		self._number = number
 
 	def _display_one_sulcus(self, csv, sulcus):
-		header_minf = { 'X' : range(29), 'Y' : [], 'INF': [] }
+		header_minf = { 'X' : list(range(29)), 'Y' : [], 'INF': [] }
 		db, header = self._reader.read(csv, header_minf)
 		labels = header['labels']
 		h = {}

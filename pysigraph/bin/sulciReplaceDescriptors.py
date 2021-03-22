@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import absolute_import
 from soma import aims
 import sigraph
 import sys, os, optparse
@@ -29,7 +30,7 @@ if rmodfile:
 
 if nmodfile:
   for vertex in mgraph.vertices():
-    if vertex.has_key( 'model' ):
+    if 'model' in vertex:
       oldm = vertex[ 'model' ]
       otm = oldm.topModel()
       if otm is not None:
@@ -49,11 +50,11 @@ if nmodfile:
 
 if rmodfile:
   voidl = 'unknown'
-  if mgraph.has_key( 'void_label' ):
+  if 'void_label' in mgraph:
     voidl = mgraph[ 'void_label' ]
 
   for edge in mgraph.edges():
-    if edge.has_key( 'model' ):
+    if 'model' in edge:
       oldm = edge[ 'model' ]
       otm = oldm.topModel()
       if otm is not None:

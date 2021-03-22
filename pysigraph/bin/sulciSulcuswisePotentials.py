@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sigraph
 from soma import aims
 from optparse import OptionParser
+from six.moves import range
 
 parser = OptionParser( description = 'Records sulcuswise potential (including relations) in a CSV file' )
 parser.add_option( '-o', '--output', dest='output', help='output CSV file' )
@@ -45,27 +47,27 @@ for ig, gn in enumerate( options.graphs ):
   print('cliques:', graph.cliques().size(), ', energy:', energy)
   cliques = graph.cliques()
   for c in cliques:
-    if not c.has_key( 'potential' ):
+    if 'potential' not in c:
       print('no pot for clique', c)
     pot = c[ 'potential' ]
-    if c.has_key( 'label' ):
+    if 'label' in c:
       label = c[ 'label' ]
-      if not sulci.has_key( label ):
+      if label not in sulci:
         sulci[ label ] = [ 0 ] * ng
       sulci[ label ][ ig ] += pot
-    elif c.has_key( 'label1' ) and c.has_key( 'label2' ):
+    elif 'label1' in c and 'label2' in c:
       label = c[ 'label1' ]
-      if not sulci.has_key( label ):
+      if label not in sulci:
         sulci[ label ] = [ 0 ] * ng
       sulci[ label ][ ig ] += pot
       label = c[ 'label2' ]
-      if not sulci.has_key( label ):
+      if label not in sulci:
         sulci[ label ] = [ 0 ] * ng
       sulci[ label ][ ig ] += pot
 
 print('labels:', len( sulci ))
 
-snames = sulci.keys()
+snames = list(sulci.keys())
 snames.sort()
 wf = open( options.output, 'w' )
 print('subject,', ', '.join( snames ), file=wf)

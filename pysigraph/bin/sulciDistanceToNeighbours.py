@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, re
 from soma import aims, aimsalgo
 import numpy, optparse, tempfile, soma.subprocess
@@ -55,7 +56,7 @@ def distanceToNeighbours( vertex, label ):
       other = e.vertices()[1]
     else:
       other = e.vertices()[0]
-    if not other.has_key( labelatt ):
+    if labelatt not in other:
       continue
     olabel = other[ labelatt ]
     if olabel == label:
@@ -79,7 +80,7 @@ def distanceToNeighbours( vertex, label ):
 r = aims.Reader( options={ 'subobjectsfilter' : 0 } )
 graph = r.read( graphfile )
 if labelatt is None:
-  if graph.has_key( 'label_property' ):
+  if 'label_property' in graph:
     labelatt = graph[ 'label_property' ]
   else:
     labelatt = 'label'
@@ -97,7 +98,7 @@ labelsfilter = re.compile( labelsfilter )
 diststats = {}
 
 for v in graph.vertices():
-  if v.has_key( labelatt ):
+  if labelatt in v:
     label = v[ labelatt ]
     print(label)
     if labelsfilter.match( label ):

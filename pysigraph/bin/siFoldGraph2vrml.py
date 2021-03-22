@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys
 import numpy
 
@@ -45,9 +46,9 @@ def writeExtendedMaterial(fd, vertex, name=None):
 	fd.write('\t\t\tfields [ SFLong index, ' + \
 		'SFString label, SFString name ]\n')
 	fd.write('\t\t\tindex %d\n' % vertex["index"])
-	if vertex.has_key('label'):
+	if 'label' in vertex:
 		fd.write('\t\t\tlabel "%s"\n' % vertex['label'])
-	if vertex.has_key('name'):
+	if 'name' in vertex:
 		fd.write('\t\t\tname "%s"\n' % vertex["name"])
 	fd.write('\t\t}\n')
 

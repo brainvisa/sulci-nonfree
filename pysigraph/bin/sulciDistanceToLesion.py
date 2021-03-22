@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys
 from soma import aims, aimsalgo
 import numpy
@@ -81,7 +82,7 @@ else:
   wh = aims.AimsData_S16( lgw + rgw, 1 )
   dh = dict( lgw.header() )
   for x in [ 'volume_dimension', 'sizeX', 'sizeY', 'sizeZ', 'sizeT' ]:
-    if dh.has_key( x ):
+    if x in dh:
       del dh[x]
   wh.header().update( dh )
   wharr = numpy.array( wh.volume(), copy=False )
@@ -113,7 +114,7 @@ else:
       for bucket in ( 'aims_ss', 'aims_bottom', 'aims_other' ):
         try:
           bck = v[ bucket ]
-          barr[ numpy.column_stack( [ bck[0].keys(),
+          barr[ numpy.column_stack( [ list(bck[0].keys()),
             numpy.zeros( ( bck[0].size(), 1 ) ) ] ) ] = 0
         except:
           pass
@@ -179,7 +180,7 @@ for gnum, graphfile in enumerate( graphfiles ):
     graph = aims.read( graphfile )
   labelatt2 = labelatt
   if labelatt is None:
-    if graph.has_key( 'label_property' ):
+    if 'label_property' in graph:
       labelatt2 = graph[ 'label_property' ]
     else:
       labelatt2 = 'label'

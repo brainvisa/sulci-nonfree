@@ -1,11 +1,15 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from __future__ import absolute_import
 import sigraph
 import anatomist.direct.api as anatomist
+from six.moves import range
+# something gets changed in sigraph for functions - fixing...
+sigraph.si = sigraph.sigraph.si
 from soma import aims
 import datamind.io.old_csvIO as io
-import os, sys, exceptions, numpy
+import os, sys, numpy
 USE_QT4=True
 import soma.qt_gui.qt_backend.QtGui as qt
 from optparse import OptionParser
@@ -72,7 +76,7 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
   if 'side' in labels2:
     sidecol = labels2.index( 'side' )
   if subjectcol is not None and labelcol is not None:
-    header_minf['X'] = range(len(labels))
+    header_minf['X'] = list(range(len(labels)))
     header_minf['X'].remove(labelcol)
     header_minf['X'].remove(subjectcol)
     header_minf['INF'] = [subjectcol, labelcol]
@@ -83,7 +87,7 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
       header_minf['X'].remove( sidecol )
   elif subjectcol is not None:
     # header_minf['X'] = range(labelcol+1, len(labels))
-    header_minf['X'] = range(len(labels))
+    header_minf['X'] = list(range(len(labels)))
     header_minf['X'].remove(subjectcol)
     header_minf['INF'] = [subjectcol]
     mode = labels2[subjectcol]
@@ -94,7 +98,7 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
       olabels.remove( labels[sidecol] )
       infsidecol = 0
   elif labelcol is not None:
-    header_minf['X'] = range(len(labels))
+    header_minf['X'] = list(range(len(labels)))
     header_minf['X'].remove(labelcol)
     header_minf['INF'] = [labelcol]
     mode = labels2[labelcol]
@@ -135,7 +139,7 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
     for i, s in enumerate( sulci ):
       side = inf[i, infsidecol]
       if side and side != 'both':
-        s += '_' + side
+        s += b'_' + side
         sulci[i] = s
   if hasattr( numpy, 'unique1d' ):
     uniq_sulci = numpy.unique1d(sulci)
@@ -147,7 +151,7 @@ def read_csv(csvfilename, columns=[], operator='mean', filterCol=None,
     X2m = getattr(X2, operator)(axis=0)
     X2s = X2.std(axis=0)
     X2sum = X2.sum(axis=0)
-    if s.startswith( "'" ) and s.endswith( "'" ):
+    if s.startswith( b"'" ) and s.endswith( b"'" ):
       s = s[1:-1]
     sulci_data[s] = X2m, X2s, X2sum
   X3 = numpy.vstack([data[0] for data in sulci_data.values()])
@@ -221,13 +225,14 @@ def parseOpts(argv):
   return parser, parser.parse_args(argv)
 
 def getdata( sulci_data, label ):
+  label = six.ensure_binary(label)
   try:
     data = sulci_data[ label ]
     return data
   except:
-    if label.endswith( '_left' ):
+    if label.endswith( b'_left' ):
       label = label[:-5]
-    elif label.endswith( '_right' ):
+    elif label.endswith( b'_right' ):
       label = label[:-6]
     else:
       raise
@@ -280,6 +285,10 @@ def csvMapGraph( options, agraphs=None, window=None, displayProp=None,
     write_summary_csv(options.summarycsvfilename,
       labels, sulci_data, mode)
 
+  print('labels:', labels)
+  print('sulci_data:', sulci_data)
+  print('mode:', mode)
+
   # graph
   if not options.graphname: return
   from soma import aims
@@ -309,11 +318,11 @@ def csvMapGraph( options, agraphs=None, window=None, displayProp=None,
           l = v[options.label_attribute]
           data = getdata( sulci_data,
             v[options.label_attribute] )
-        except exceptions.KeyError:
+        except KeyError:
           continue
       elif mode == 'nodes':
         try: data = getdata( sulci_data, str(int(v['index'])) )
-        except exceptions.KeyError: continue
+        except KeyError: continue
       for i, h in enumerate(labels):
         v[propPrefix + '_mean_' + h] = data[0][i]
         if options.log and data[0][i] != 0:

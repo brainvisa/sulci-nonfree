@@ -1,5 +1,7 @@
 #!/usr/bin/env python2
 
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 from soma import aims
 import datamind.ml
@@ -10,6 +12,7 @@ import sigraph.learning as learning
 import sigraph.test_models as test_models
 from optparse import OptionParser
 from datamind.tools import *
+from six.moves import range
 
 # Options parser
 def parseOpts(argv):
@@ -66,11 +69,11 @@ def adaptiveleaf_cover_test(al, user_data):
 	db = datamind.ml.database.DbSi(database)
 	split = database.getSplit()
 	if user_data['use_train']:
-		trainview = db.select(range(split))
+		trainview = db.select(list(range(split)))
 		view = learning.convertView(trainview)
 	
 	else:
-		testview = db.select(range(split, database.size()))
+		testview = db.select(list(range(split, database.size())))
 		view = learning.convertView(testview)
 	clf = user_data['models'][to_key(al.topModel().significantLabels())]	
 
@@ -119,7 +122,7 @@ def main():
 	msg.write_list([(' * ', 'bold_yellow'), 'Test models :\n'])
 	cover(test_model, test_fundict, test_data,
 		options.labels_filter, options.filter_mode)
-	print
+	print()
 
 	# synthetize test
 	test_models.resume_errors_info(test_data)

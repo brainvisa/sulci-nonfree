@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import absolute_import
 import os, numpy, sigraph, sigraph.cover, sigraph.models
 from soma import aims
 from optparse import OptionParser

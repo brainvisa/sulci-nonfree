@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os
 import numpy, exceptions
 from optparse import OptionParser
 from datamind.tools import *
 import datamind.io as io
 import datamind.core
+from six.moves import range
 
 train = ['caca', 'cronos', 'dionysos2', 'jah2', 'morphee', 'jupiter', 'neptune',
 	'ammon', 'horus', 'osiris', 'ra', 'ares', 'hades', 'jason', 'poseidon',
@@ -51,7 +53,7 @@ def old_read_csv_result(filename):
 	data = {}
 	for d in data_list:
 		res = Result(*[float(v) for v in d[1:]])
-		if data.has_key(d[0]):
+		if d[0] in data:
 			data[d[0]].append(res)
 		else:	data[d[0]] = [res]
 	fd.close()
@@ -63,7 +65,7 @@ def old_compute_all_info(filename, details):
 	data = old_read_csv_result(filename)
 	if data == {}:
 		msg.write("\t(skip)", 'thin_gray')
-		print
+		print()
 		return
 	msg.write_list([(' * ', 'bold_yellow'), "Rates and Energies :\n"])
 	infos = {'train' : compute_db_info(data, train),
@@ -101,16 +103,16 @@ def old_compute_all_info(filename, details):
 			msg.write("(skip %s)\t" % n, 'thin_gray')
 			for name in skipped:
 				msg.write("%s " % name, 'thin_gray')
-			print
+			print()
 	if not details: return
 	numbers = compute_number_of_results(data)
 	for (n, db) in [('train', train), ('test', test), ('gen', gen)]:
-		print
+		print()
 		msg.write_list(['----- ', (n, 'green'), ' -----'])
 		cor = compute_correlations_synth_info(data, db)
 		subject_cor, mean_cor, std_cor = \
 			compute_correlations_subject_info(data, db)
-		print
+		print()
 		msg.write_list([(' * ', 'bold_yellow'),
 			"Total correlation rate / energy : %s\n" % cor])
 		msg.write_list([(' * ', 'bold_yellow'),
@@ -125,7 +127,7 @@ def old_compute_all_info(filename, details):
 				correlation, numbers[subject][0]))
 		subject_std, mean_rates_std, mean_energies_std = \
 			compute_std_subject_info(data, db)
-		print
+		print()
 		msg.write_list([(' * ', 'bold_yellow'),
 			"Subjectwise mean std rate, energy (qty) :\n\t",
 			"\t%f\t%f\n" % (mean_rates_std, mean_energies_std)])
@@ -142,7 +144,7 @@ def old_compute_best_info(filename):
 	data = old_read_csv_result(filename)
 	if data == {}:
 		msg.write("\t(skip)", 'thin_gray')
-		print
+		print()
 		return
 	msg.write_list([(' * ', 'bold_yellow'), "Rates and Energies :\n"])
 	infos = {'train' : compute_db_best_info(data, train),
@@ -221,7 +223,7 @@ def compute_db_info(data, db):
 def compute_correlations_synth_info(data, db):
 	db_res = []
 	for name in db:
-		if data.has_key(name):
+		if name in data:
 			for r in data[name]: db_res.append(r.to_list())
 	db_res = numpy.array(db_res)
 	if db_res.shape[0] == 0: return numpy.nan
@@ -239,7 +241,7 @@ def compute_correlations_subject_info(data, db):
 	'''
 	correlations = {}
 	for name in db:
-		if not data.has_key(name):
+		if name not in data:
 			c = numpy.nan
 		else:
 			db_res = []
@@ -251,7 +253,7 @@ def compute_correlations_subject_info(data, db):
 			else: c = compute_correlation(db_res[:, 0],
 							db_res[:, 1])
 		correlations[name] = c
-	c = numpy.array(correlations.values())
+	c = numpy.array(list(correlations.values()))
 	return correlations, c.mean(), c.std()
 
 
@@ -263,7 +265,7 @@ def compute_std_subject_info(data, db):
 	'''
 	stds = {}
 	for name in db:
-		if not data.has_key(name):
+		if name not in data:
 			stds[name] = numpy.nan, numpy.nan
 		else:
 			db_res = []
@@ -280,7 +282,7 @@ def compute_std_subject_info(data, db):
 				std_nrj = db_nrj.std()
 			else:	std_nrj = numpy.nan
 			stds[name] = std_rates, std_nrj
-	c = numpy.array(stds.values())
+	c = numpy.array(list(stds.values()))
 	return stds, c[:, 0].mean(), c[:, 1].mean()
 
 
@@ -290,7 +292,7 @@ def compute_number_of_results(data):
 	'''
 	n = {}
 	for name in train + test + gen:
-		if not data.has_key(name):
+		if name not in data:
 			n[name] = 0, 0, 0
 		else:
 			db_res = []

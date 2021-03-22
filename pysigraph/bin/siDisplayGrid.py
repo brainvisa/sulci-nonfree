@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 from __future__ import print_function
+from __future__ import absolute_import
 from soma import aims
 from sigraph import *
 from sigraph.cover import *
@@ -106,7 +107,7 @@ class DataSynthesizer(object):
 				return
 		else:	self.info = (names, ranges)
 		best_values = self.best(a, ranges)
-		if self.best_parameters.has_key(best_values):
+		if best_values in self.best_parameters:
 			self.best_parameters[best_values] += 1
 		else :	self.best_parameters[best_values] = 1
 		if self.options.all:

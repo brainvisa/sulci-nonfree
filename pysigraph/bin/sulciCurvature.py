@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, re
 from soma import aims, aimsalgo
 import numpy, optparse, tempfile, soma.subprocess
@@ -79,7 +80,7 @@ if not graphfile:
 
 
 def makearrayfrombucket( bucket ):
-  pts = bucket[0].keys()
+  pts = list(bucket[0].keys())
   vs = numpy.array( [ bucket.sizeX(), bucket.sizeY(), bucket.sizeZ() ] )
   arr = numpy.zeros( ( len( pts ), 3 ) )
   i = 0
@@ -152,7 +153,7 @@ def cleanmeshcurv( mesh, boundaries, inhibitbounds=[] ):
 graph = aims.read( graphfile )
 
 if labelatt is None:
-  if graph.has_key( 'label_property' ):
+  if 'label_property' in graph:
     labelatt = graph[ 'label_property' ]
   else:
     labelatt = 'label'
@@ -169,9 +170,9 @@ node = 0
 globaverage = {}
 labelsfilter = re.compile( labelsfilter )
 for v in graph.vertices():
-  if v.has_key( labelatt ):
+  if labelatt in v:
     label = v[ labelatt ]
-    if v.has_key( meshatt ) and labelsfilter.match( label ):
+    if meshatt in v and labelsfilter.match( label ):
       mesh = v[ meshatt ]
       boundaries = [ ( makearrayfrombucket( v[ bottomatt ] ), bottommindist ) ]
       bck = v[ bottomatt ]

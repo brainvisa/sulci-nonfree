@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os, numpy
 from optparse import OptionParser
 from sulci.common import io, add_translation_option_to_parser
@@ -59,7 +60,7 @@ def main():
 						(sulcus, v['index'], e))
 					data.append(numpy.nan)
 			data = numpy.array(data)
-			if not h.has_key(sulcus):
+			if sulcus not in h:
 				h[sulcus] = [data]
 			else:	h[sulcus].append(data)
 	h_mean = {}

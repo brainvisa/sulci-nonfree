@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import absolute_import
 from optparse import OptionParser
 import numpy
 from soma import aims
@@ -7,6 +8,8 @@ from sigraph import *
 from sigraph.cover import *
 from datamind.tools import *
 import sigraph.test_models as test_models
+from six.moves import map
+from six.moves import zip
 
 
 # error related functions
@@ -61,15 +64,15 @@ def main():
 	cover(model, fundict, data, options.labels_filter, options.filter_mode)
 
 	# fiter definition
-	nofilter = lambda (k, v) : (k, v)
-	filter_fifty_percent_rate = lambda (k, v) : \
-		(k, filter(lambda x : x != 0.5, v))
+	nofilter = lambda k_v : (k_v[0], k_v[1])
+	filter_fifty_percent_rate = lambda k_v1 : \
+		(k_v1[0], [x for x in k_v1[1] if x != 0.5])
 
 	error_filter = nofilter
 	if options.filter :
 		error_filter = filter_fifty_percent_rate
 	data_filtered = {}
-	for k, v in map(error_filter, data.items()):
+	for k, v in map(error_filter, list(data.items())):
 		data_filtered[k] = v
 	test_models.resume_errors_info(data_filtered)
 	if options.hist :

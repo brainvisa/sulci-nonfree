@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+from __future__ import absolute_import
 from soma import aims
 from sigraph import *
 from sigraph.cover import *
@@ -101,7 +102,7 @@ def parseOpts(argv):
         help='(default : ' + autofind_email() + ')')
     parser.add_option('-p', '--parallelism-mode', dest='parallelmode',
         metavar = 'MODE', action='store', default = 'duch',
-        help='%s' % repr(commands.keys()) +' (default : %default)')
+        help='%s' % repr(list(commands.keys())) +' (default : %default)')
     parser.add_option('-o', '--output', dest='output',
         metavar = 'FILE', action='store', default = 'learningtasks',
         help='''output file name storing tasks (default : %default) or
@@ -136,9 +137,9 @@ def main():
 
     # read options
     options, args = parseOpts(sys.argv)
-    if not options.parallelmode in commands.keys():
+    if not options.parallelmode in list(commands.keys()):
         msg.error('parallel mode must be one of ' + \
-            repr(commands.keys()))
+            repr(list(commands.keys())))
         sys.exit(1)
     if options.parallelmode == 'cath':
         msg.error('mode cath : not implemented yet')
