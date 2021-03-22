@@ -85,6 +85,7 @@ class Param(object):
         self.closeLearning = 0
         self.labelatt = None
 
+
 par = Param()
 
 
@@ -408,6 +409,7 @@ def main_safe():
 def exit(exit_status):
     import datamind.ml
     datamind.ml.exit(exit_status)
+
 
 if __name__ == '__main__':
     main_safe()
