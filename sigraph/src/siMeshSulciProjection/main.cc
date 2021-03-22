@@ -182,210 +182,212 @@ int main( int argc, const char** argv )
   vector<int>					CA;
 
   try
+  {
+    //Read the graph
+    fr.read( fg );
+    cout << "graph read\n";
+
+    fg.getProperty( "anterior_commissure", CA );
+    ASSERT( fg.getProperty( "voxel_size", vsz ) );
+    bottom_vol.setSizeXYZT( vsz[0], vsz[1], vsz[2], 1. );
+    bottom_vol = 0;
+    bottom_vol.fillBorder(0);
+    cout << "CA: " << Point3df(CA[0] * vsz[0],CA[1] * vsz[1],CA[2] * vsz[2])  << endl;
+
+    //Check if there is some ventricule in the graph
+    //otherwise,  the biggest (graph) connected component is labelled ventricule_left or right
+    set< CComponent * > setCC;
+    set< CComponent * >::iterator iscc,escc;
+    CComponent  ventricleV;
+    CComponent unknownV;
+    CComponent::iterator icc,ecc;
+    bool ventricleIn = false ;
+    string v = "ventricle";
+    unsigned sizeCC = 0;
+    for ( iv = fg.begin(); iv != fv; ++iv )
     {
-      //Read the graph
-      fr.read( fg );
-      cout << "graph read\n";
-
-      fg.getProperty( "anterior_commissure", CA );
-      ASSERT( fg.getProperty( "voxel_size", vsz ) );
-      bottom_vol.setSizeXYZT( vsz[0], vsz[1], vsz[2], 1. );
-      bottom_vol = 0;
-      bottom_vol.fillBorder(0);
-      cout << "CA: " << Point3df(CA[0] * vsz[0],CA[1] * vsz[1],CA[2] * vsz[2])  << endl;
-      
-      //Check if there is some ventricule in the graph
-      //otherwise,  the biggest (graph) connected component is labelled ventricule_left or right
-      set< CComponent * > setCC;
-      set< CComponent * >::iterator iscc,escc;
-      CComponent  ventricleV;
-      CComponent unknownV;
-      CComponent::iterator icc,ecc;
-      bool ventricleIn = false ;
-      string v = "ventricle";
-      unsigned sizeCC = 0;
-      for ( iv = fg.begin(); iv != fv; ++iv )
-	 {
-	   (*iv)->getProperty(sname,name );
-	   if ( name == "ventricle_left" ||   name == "ventricle_right")
-	       ventricleIn = true;
-	   if ( name == "unknown" ||   name == "unknown")	      
-	       unknownV.insert(*iv);
-	   slab.insert(name);
-	 }  
-      
-      for ( is = slab.begin(), fs = slab.end(); is != fs; ++is   )
-	if (is->rfind("left") != string::npos)
-	  {
-	    v += "_left";
-	    break;
-	  }
-	else
-	  if (is->rfind("right") != string::npos)
-	    {
-	      v += "_right";
-	      break;
-	    }
-
-	slab.clear();
-	if (!ventricleIn)
-	{
-	  VertexClique VC;
-	  unsigned nCC = 0;
-	  nCC = VC.connectivity(unknownV,&setCC,(string)"junction");
-	  cout << nCC << " connected component with the " << sname << " 'unknown' in the the fold graph \n";
-	  cout << "Giving the " << sname << " "  << v << " to the biggest one \n";
-	  for (iscc = setCC.begin(), escc = setCC.end(); iscc != escc; ++iscc)
-	    if (sizeCC < (*iscc)->size() )
-	      {
-		ventricleV = *(*iscc);
-		sizeCC = (*iscc)->size();
-	      }
-	  cout << ventricleV.size() << " " << sizeCC << endl;
-	  for ( icc = ventricleV.begin(), ecc = ventricleV.end(); icc != ecc; ++icc  )
-	    (*icc)->setProperty(sname,v); 
-	}
-
-      //Write translation file
-      ofstream	namefile( translation_file.c_str() );
-      for( il=levelTrans.begin(); il!=fl; ++il )
-	slab.insert( (*il).second );
-      for( i = 1, is=slab.begin(); is!=fs; ++is, ++i )
-	{
-	  trans[*is] = i;
-	  transInv[i] = *is;
-	  namefile << *is << "\t" << i << endl;
-	}
-      slab.insert("unknown");
-      trans["unknown"] = i;
-      transInv[i] = "unknown";
-      namefile << "unknown" << "\t" << i << endl;
-      cout << "Write " << translation_file << " file\n";
-      levelTrans.translate( fg, sname, "name" ); 
-       
-
-      //Def volume of sulcal lines
-      cout << "Definition of the volume of labels...\n";
-      Vertex::const_iterator ie, fe;
-      for( iv=fg.begin(); iv!=fv; ++iv )
-	{
-	  ASSERT( (*iv)->getProperty( "name", name ) );
-	  i = trans[name];
-	  if( i != 0 )
-	    {
-	      if( (*iv)->getProperty( bname, bck ) )
-		{
-		  if( ( synt.empty() || (*iv)->getSyntax() == synt ) )
-		    {
-		      BucketMap<Void>::Bucket	& bl = (*bck)[0];
-		      for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
-			{
-			  pos = ib->first;
-			  bottom_vol( pos[0], pos[1], pos[2] ) = i;
-			}
-		    }
-		}
-	      else
-		{
-		  for( ie=(*iv)->begin(), fe=(*iv)->end(); ie!=fe; ie++)
-		    {
-		      if( ( synt.empty() || (*ie)->getSyntax() == synt )
-			  && (*ie)->getProperty( bname, bck ) )
-			{
-			  BucketMap<Void>::Bucket	& bl = (*bck)[0];
-			  for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
-			    {
-			      pos = ib->first;
-			      bottom_vol( pos[0], pos[1], pos[2] ) = i;
-			    }
-			}
-		    }
-		}
-	    }
-	}
-
-      //Def volume of sulcal surface (sulci)
-      surface_vol = bottom_vol.clone();
-      for( iv=fg.begin(); iv!=fv; ++iv )
-	{
-	  ASSERT( (*iv)->getProperty( "name", name ) );
-	  i = trans[name];
-	  if( i != 0 )
-	    {
-	      if( (*iv)->getProperty( ssname, bck ) )
-		{
-		  if( ( synt.empty() || (*iv)->getSyntax() == synt ) )
-		    {
-		      BucketMap<Void>::Bucket	& bl = (*bck)[0];
-		      for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
-			{
-			  pos = ib->first;
-			  surface_vol( pos[0], pos[1], pos[2] ) = i;
-			}
-		    }
-		}
-	      else
-		{
-		  for( ie=(*iv)->begin(), fe=(*iv)->end(); ie!=fe; ie++)
-		    {
-		      if( ( synt.empty() || (*ie)->getSyntax() == synt )
-			  && (*ie)->getProperty( ssname, bck ) )
-			{
-			  BucketMap<Void>::Bucket	& bl = (*bck)[0];
-			  for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
-			    {
-			      pos = ib->first;
-			      surface_vol( pos[0], pos[1], pos[2] ) = i;
-			    }
-			}
-		    }
-		}
-	    }
-	}
-
-      for( iv=fg.begin(); iv!=fv; ++iv )
-	{
-	  ASSERT( (*iv)->getProperty( "name", name ) );
-	  i = trans[name];
-	  if( i != 0 )
-	    {
-	      if( (*iv)->getProperty( othername, bck ) )
-		{
-		  if( ( synt.empty() || (*iv)->getSyntax() == synt ) )
-		    {
-		      BucketMap<Void>::Bucket	& bl = (*bck)[0];
-		      for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
-			{
-			  pos = ib->first;
-			  surface_vol( pos[0], pos[1], pos[2] ) = i;
-			}
-		    }
-		}
-	      else
-		{
-		  for( ie=(*iv)->begin(), fe=(*iv)->end(); ie!=fe; ie++)
-		    {
-		      if( ( synt.empty() || (*ie)->getSyntax() == synt )
-			  && (*ie)->getProperty( othername, bck ) )
-			{
-			  BucketMap<Void>::Bucket	& bl = (*bck)[0];
-			  for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
-			    {
-			      pos = ib->first;
-			      surface_vol( pos[0], pos[1], pos[2] ) = i;
-			    }
-			}
-		    }
-		}
-	    }
-	}
-
+      (*iv)->getProperty(sname,name );
+      if( name == "ventricle_left" || name == "ventricle_right")
+          ventricleIn = true;
+      if( name == "unknown" || name == "unknown")
+          unknownV.insert(*iv);
+      slab.insert(name);
     }
+
+    for( is = slab.begin(), fs = slab.end(); is != fs; ++is )
+      if (is->rfind("left") != string::npos)
+      {
+        v = "ventricle_left";
+        break;
+      }
+      else if (is->rfind("right") != string::npos)
+      {
+        v = "ventricle_right";
+        break;
+      }
+
+    cout << "v: " << v << endl;
+    cout << "ventricleIn: " << ventricleIn << endl;
+
+    slab.clear();
+    if (!ventricleIn)
+    {
+      VertexClique VC;
+      unsigned nCC = 0;
+      nCC = VC.connectivity(unknownV,&setCC,(string)"junction");
+      cout << nCC << " connected component with the " << sname << " 'unknown' in the the fold graph \n";
+      cout << "Giving the " << sname << " "  << v << " to the biggest one \n";
+      for (iscc = setCC.begin(), escc = setCC.end(); iscc != escc; ++iscc)
+        if (sizeCC < (*iscc)->size() )
+          {
+        ventricleV = *(*iscc);
+        sizeCC = (*iscc)->size();
+          }
+      cout << ventricleV.size() << " " << sizeCC << endl;
+      for ( icc = ventricleV.begin(), ecc = ventricleV.end(); icc != ecc; ++icc  )
+        (*icc)->setProperty(sname,v);
+    }
+
+    //Write translation file
+    ofstream	namefile( translation_file.c_str() );
+    for( il=levelTrans.begin(); il!=fl; ++il )
+    slab.insert( (*il).second );
+    for( i = 1, is=slab.begin(); is!=fs; ++is, ++i )
+    {
+      trans[*is] = i;
+      transInv[i] = *is;
+      namefile << *is << "\t" << i << endl;
+    }
+    slab.insert("unknown");
+    trans["unknown"] = i;
+    transInv[i] = "unknown";
+    namefile << "unknown" << "\t" << i << endl;
+    cout << "Write " << translation_file << " file\n";
+    levelTrans.translate( fg, sname, "name" );
+
+
+    //Def volume of sulcal lines
+    cout << "Definition of the volume of labels...\n";
+    Vertex::const_iterator ie, fe;
+    for( iv=fg.begin(); iv!=fv; ++iv )
+    {
+      ASSERT( (*iv)->getProperty( "name", name ) );
+      i = trans[name];
+      if( i != 0 )
+      {
+        if( (*iv)->getProperty( bname, bck ) )
+        {
+          if( ( synt.empty() || (*iv)->getSyntax() == synt ) )
+          {
+            BucketMap<Void>::Bucket	& bl = (*bck)[0];
+            for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
+            {
+              pos = ib->first;
+              bottom_vol( pos[0], pos[1], pos[2] ) = i;
+            }
+          }
+        }
+        else
+        {
+          for( ie=(*iv)->begin(), fe=(*iv)->end(); ie!=fe; ie++)
+          {
+            if( ( synt.empty() || (*ie)->getSyntax() == synt )
+                && (*ie)->getProperty( bname, bck ) )
+            {
+              BucketMap<Void>::Bucket	& bl = (*bck)[0];
+              for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
+              {
+                pos = ib->first;
+                bottom_vol( pos[0], pos[1], pos[2] ) = i;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    //Def volume of sulcal surface (sulci)
+    surface_vol = bottom_vol.clone();
+    for( iv=fg.begin(); iv!=fv; ++iv )
+    {
+      ASSERT( (*iv)->getProperty( "name", name ) );
+      i = trans[name];
+      if( i != 0 )
+      {
+        if( (*iv)->getProperty( ssname, bck ) )
+        {
+          if( ( synt.empty() || (*iv)->getSyntax() == synt ) )
+          {
+            BucketMap<Void>::Bucket	& bl = (*bck)[0];
+            for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
+            {
+              pos = ib->first;
+              surface_vol( pos[0], pos[1], pos[2] ) = i;
+            }
+          }
+        }
+        else
+        {
+          for( ie=(*iv)->begin(), fe=(*iv)->end(); ie!=fe; ie++)
+          {
+            if( ( synt.empty() || (*ie)->getSyntax() == synt )
+                && (*ie)->getProperty( ssname, bck ) )
+            {
+              BucketMap<Void>::Bucket	& bl = (*bck)[0];
+              for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
+              {
+                pos = ib->first;
+                surface_vol( pos[0], pos[1], pos[2] ) = i;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for( iv=fg.begin(); iv!=fv; ++iv )
+    {
+      ASSERT( (*iv)->getProperty( "name", name ) );
+      i = trans[name];
+      if( i != 0 )
+      {
+        if( (*iv)->getProperty( othername, bck ) )
+        {
+          if( ( synt.empty() || (*iv)->getSyntax() == synt ) )
+          {
+            BucketMap<Void>::Bucket	& bl = (*bck)[0];
+            for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
+            {
+              pos = ib->first;
+              surface_vol( pos[0], pos[1], pos[2] ) = i;
+            }
+          }
+        }
+        else
+        {
+          for( ie=(*iv)->begin(), fe=(*iv)->end(); ie!=fe; ie++)
+          {
+            if( ( synt.empty() || (*ie)->getSyntax() == synt )
+                && (*ie)->getProperty( othername, bck ) )
+            {
+              BucketMap<Void>::Bucket	& bl = (*bck)[0];
+              for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
+              {
+                pos = ib->first;
+                surface_vol( pos[0], pos[1], pos[2] ) = i;
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
   catch( exception & e )
-    {
-      cerr << e.what() << endl;
-      exit( 1 );
-    }
+  {
+    cerr << e.what() << endl;
+    exit( 1 );
+  }
 
 
   // read gyri model 
@@ -417,9 +419,9 @@ int main( int argc, const char** argv )
   neighbourso = AimsMeshOrderNode(surface[0]);
   cout << "done\n";
 
- cout << "mesh vertices : " << surface[0].vertex().size() << endl;
- cout << "mesh polygons : " << surface[0].polygon().size() << endl;
- TimeTexture<short>	outTex;
+  cout << "mesh vertices : " << surface[0].vertex().size() << endl;
+  cout << "mesh polygons : " << surface[0].polygon().size() << endl;
+  TimeTexture<short>	outTex;
    
   if( !ctexR.fileName().empty() )
   {
