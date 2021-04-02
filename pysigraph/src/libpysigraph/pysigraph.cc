@@ -26,7 +26,7 @@ namespace sigraph
     if (temp == NULL) return -1;
 
 #if PY_VERSION_HEX >= 0x03000000
-    ptr = PyUnicode_AsUTF8AndSize( temp, &len );
+    ptr = const_cast< char* >( PyUnicode_AsUTF8AndSize( temp, &len ) );
     if( !ptr )
 #else
     if (PyString_AsStringAndSize(temp, &ptr, &len) == -1)
