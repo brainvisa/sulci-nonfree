@@ -101,8 +101,18 @@ void FoldWriter::write( Graph & ao )
     {
   */
   aims::AimsGraphWriter	gw( name() );
+  cout << "writing elements...\n";
   gw.writeElements( ao );
-  GraphWriter::write( ao );
+  cout << "elements writen.\n";
+  try
+  {
+    GraphWriter::write( ao );
+  }
+  catch( exception & e )
+  {
+    cout << "exception: " << e.what() << endl;
+    throw;
+  }
   //  }
 }
 
