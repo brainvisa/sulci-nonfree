@@ -241,7 +241,7 @@ int main( int argc, const char** argv )
         t2g.makeGraph(k,brain,braintex[0],trans_inv);
 
         cout << "Computing the volumic  graph " << agw2.fileName() << "\n";
-        Graph		*h = GraphManip::graphFromVolume(gyriVol,(short)0, &trans_inv);
+        Graph		*h = GraphManip::graphFromVolume(carto::VolumeRef<short>(gyriVol.volume()),(short)0, &trans_inv);
         GraphManip::volume2Buckets(*h);
         std::map<string,float> gyrusVolume;
         eg = gyrusVolume.end();
