@@ -235,7 +235,7 @@ int main( int argc, const char** argv )
 
         cout << "Computing 3D parcellisation" << endl;
         Graph		k("RoiArg");
-        AimsData<short>    gyriVol;
+        VolumeRef<short>    gyriVol;
         gyriVol = MeshParcellation2Volume( greyVol,outTex[1],surface[0],(short)val_domain,0 );
         braintex[0] = VolumeParcellation2MeshParcellation(gyriVol,brain[0],0);
         t2g.makeGraph(k,brain,braintex[0],trans_inv);
@@ -247,7 +247,9 @@ int main( int argc, const char** argv )
         eg = gyrusVolume.end();
         map <short, float>     stat_gyri_vol;
         map <short,float>::iterator istf,estf;
-        stat_gyri_vol = VolumeParcel(gyriVol);
+        // <short> is needed for auto conversion VolumeRef -> AimsData,
+        // otherwise the compiler can't find a conversion.
+        stat_gyri_vol = VolumeParcel<short>( gyriVol );
         for (istf = stat_gyri_vol.begin(), estf=stat_gyri_vol.end(); istf != estf; ++istf)
           if ( istf->first != val_domain )
             gyrusVolume[ trans_inv[istf->first]  ] = istf->second;
