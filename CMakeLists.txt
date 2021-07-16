@@ -17,6 +17,11 @@ set( SIGRAPH_RELATIVE_SIP_DIRECTORY
 #set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall" )
 
 add_subdirectory( neuron )
+
+# don't warn on obsolete classes within this library: we still provide obsolete
+# features so we have to build them without warnings
+add_definitions( "-DAIMSDATA_CLASS_NO_DEPREC_WARNING=1" )
+
 add_subdirectory( sigraph )
 
 if( AIMS_PYAIMS_LIBRARY )
