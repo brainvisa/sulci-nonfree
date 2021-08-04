@@ -1,6 +1,8 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import numpy
 from soma import aims
+from six.moves import zip
 
 #
 # Main class
@@ -245,7 +247,7 @@ return {(y - x) for x in X for y in Y}
                 r1, r2 = r2, r1
             key = (r1, r2)
             syntax = e.getSyntax()
-            if edges.has_key(key):
+            if key in edges:
                 edges[key][1][syntax] = e
             else:
                 edges[key] = (v1, v2), {syntax: e}
@@ -281,7 +283,7 @@ potential : True store -log(likelihood(data(edge))) for each label pair.
                     relation, inverse = (l_2, l_1), True
                 else:
                     relation, inverse = (l_1, l_2), False
-                if not distribs.has_key(relation):
+                if relation not in distribs:
                     if l_1 == l_2:
                         relation = 'default_intra'
                     else:
@@ -319,7 +321,7 @@ potential : True store -log(likelihood(data(edge))) for each label pair.
                 if name1 > name2:
                     name1, name2 = name2, name1
                 key = (name1, name2)
-                if data.has_key(key):
+                if key in data:
                     data[key].append(d2)
                     count[key] += 1
                 else:
@@ -362,10 +364,10 @@ class MinDistanceRelationDescriptor(RelationDescriptor):
         self._name = 'min_distance'
 
     def data_edges(self, motion, edges):
-        if edges.has_key('plidepassage') or edges.has_key('junction'):
+        if 'plidepassage' in edges or 'junction' in edges:
             pi = numpy.array([0, 0, 0])
             pj = numpy.array([0, 0, 0])
-        elif edges.has_key('cortical'):
+        elif 'cortical' in edges:
             edge = edges['cortical']
             pi = edge['refSS1nearest'].arraydata()
             pj = edge['refSS2nearest'].arraydata()
@@ -399,7 +401,7 @@ if l1 == l2 : only related (through relations edges) segments are considered
             if v.getSyntax() != 'fold':
                 continue
             label = v['name']
-            if group.has_key(label):
+            if label in group:
                 group[label].append(v)
             else:
                 group[label] = [v]
@@ -464,8 +466,8 @@ if l1 == l2 : only related (through relations edges) segments are considered
                                            motion, s1, s2)
                     C[i, j] = d
             # take min according to each sulci
-            l = zip(numpy.arange(size1), C.argmin(axis=1))
-            l += zip(C.argmin(axis=0), numpy.arange(size2))
+            l = list(zip(numpy.arange(size1), C.argmin(axis=1)))
+            l += list(zip(C.argmin(axis=0), numpy.arange(size2)))
             s = set(l)
             for ind in s:
                 dist.append(C[ind])
@@ -538,7 +540,7 @@ if l1 == l2 : only related (through relations edges) segments are considered
                     if D is None:
                         continue
                     key = (name1, name2)
-                    if data.has_key(key):
+                    if key in data:
                         data[key] += D
                         count[key] += 1
                     else:
@@ -567,7 +569,7 @@ a set of n voxels of s1 with a set of n voxels of s2.
         self._synth = aims.set_STRING(["junction", "plidepassage"])
 
     def data_edges(self, motion, edges):
-        if edges.has_key('cortical'):
+        if 'cortical' in edges:
             edge = edges['cortical']
             return edge['refmean_connected_dist']
         else:
@@ -726,7 +728,7 @@ class ConnexionLengthRelationDescriptor(RelationDescriptor):
         self._name = 'connexion_length'
 
     def data_edges(self, motion, edges):
-        if edges.has_key('junction'):
+        if 'junction' in edges:
             return edges['junction']['reflength']
         else:
             return None
@@ -748,7 +750,7 @@ class ConnexionLengthRelationDescriptor(RelationDescriptor):
                 r1, r2 = r2, r1
             key = (r1, r2)
             syntax = e.getSyntax()
-            if edges.has_key(key):
+            if key in edges:
                 edges[key][1][syntax] = e
             else:
                 edges[key] = (v1, v2), {syntax: e}
@@ -772,7 +774,7 @@ class AllDirectionsPairRelationDescriptor(RelationDescriptor):
         return s * data
 
     def data_potential_edges(self, motion, edges):
-        e = edges.values()[0]
+        e = list(edges.values())[0]
         v1, v2 = e.vertices()
         name1, name2 = v1['name'], v2['name']
         g1 = v1['refgravity_center'].arraydata()
@@ -785,7 +787,7 @@ class AllDirectionsPairRelationDescriptor(RelationDescriptor):
         return None
 
     def data_edges(self, motion, edges):
-        e = edges.values()[0]
+        e = list(edges.values())[0]
         v1, v2 = e.vertices()
 
         # get voxels
@@ -832,7 +834,7 @@ class GravityCentersDirections(RelationDescriptor):
         return s * data
 
     def data_edges(self, motion, edges):
-        e = edges.values()[0]
+        e = list(edges.values())[0]
         v1, v2 = e.vertices()
         name1, name2 = v1['name'], v2['name']
         g1 = v1['refgravity_center'].arraydata()
@@ -865,7 +867,7 @@ a set of n voxels of s1 with a set of n voxels of s2.
         return s * data
 
     def data_potential_edges(self, motion, edges):
-        e = edges.values()[0]
+        e = list(edges.values())[0]
         v1, v2 = e.vertices()
         name1, name2 = v1['name'], v2['name']
         g1 = v1['refgravity_center'].arraydata()
@@ -938,7 +940,7 @@ class AllDistancesPairRelationDescriptor(RelationDescriptor):
         self._name = 'all_distances_pair'
 
     def data_edges(self, motion, edges):
-        e = edges.values()[0]
+        e = list(edges.values())[0]
         v1, v2 = e.vertices()
 
         map1 = v1['aims_ss'].get()
@@ -1133,7 +1135,7 @@ class RegistredSulciDescriptor(SulciDescriptor):
         # in cache ?
         cache_key = tuple(sorted(segments.keys()))
         cache_label = self._cache[label]
-        if cache_label.has_key(cache_key):
+        if cache_key in cache_label:
             return cache_label[cache_key]
         # not in cache
         X = []

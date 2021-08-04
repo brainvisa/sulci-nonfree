@@ -33,6 +33,7 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from __future__ import print_function
+from __future__ import absolute_import
 import numpy
 import sigraph
 from soma import aims
@@ -156,11 +157,11 @@ def computeLocalErrorRates(lg, bg, filtred_labels):
             tp, fn = 0, size
         else:
             tp, fn = size, 0
-        if not sulci_errors.has_key(name):
+        if name not in sulci_errors:
             sulci_errors[name] = SulciError()
         sulci_errors[name].update_name(tp, fn)
         if label != name:
-            if not sulci_errors.has_key(label):
+            if label not in sulci_errors:
                 sulci_errors[label] = SulciError()
             sulci_errors[label].update_label(fn)
     # at the end : labels not in sulci_errors, does not appear

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import anatomist.direct.api as ana
 from soma import aims
 import os, sys,numpy
+from six.moves import range
 
 def loadMorpho( wdir ):
   morpho = {}
@@ -20,7 +22,7 @@ def loadMorpho( wdir ):
       label = l1[1]
       side = l1[2]
       label += '_' + side
-      n = numpy.loadtxt( fn, skiprows=1, usecols=range(3,ncols) ).reshape( ( -1, ncols-3 ) )
+      n = numpy.loadtxt( fn, skiprows=1, usecols=list(range(3,ncols)) ).reshape( ( -1, ncols-3 ) )
       subjects = numpy.loadtxt( fn, skiprows=1, usecols=[0], dtype=str ).reshape( ( n.shape[0], ) )
       morpho[ label ] = [ hdr[3:], n, subjects ]
   return morpho
@@ -30,12 +32,12 @@ def loadstat( file ):
   hdr = f.readline().strip().split()
   f.close()
   ncols = len( hdr )
-  mean = numpy.loadtxt( file, skiprows=1, usecols=range(2,ncols) )
+  mean = numpy.loadtxt( file, skiprows=1, usecols=list(range(2,ncols)) )
   meant = {}
   f = open( file )
   f.readline()
   i = 0
-  for l in f.xreadlines():
+  for l in f:
     l = l.strip().split()
     label = l[0]
     side = l[1]
@@ -47,7 +49,7 @@ def loadstat( file ):
 def mapProperty( graph, statprop, prop, subject, labelprop, morpho, means, std ):
   vert = graph.vertices()
   for v in vert:
-    if v.has_key( labelprop ):
+    if labelprop in v:
       label = v[ labelprop ]
       measures = morpho.get( label )
       if measures:

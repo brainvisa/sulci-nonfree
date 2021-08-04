@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys
 import numpy
 from soma import aims, aimsalgo
@@ -37,7 +38,7 @@ def main():
 	indices = []
 	for i, x in enumerate(tex):
 		v = tex[i]
-		if h.has_key(v):
+		if v in h:
 			ind = h[v]
 		else:
 			h[v] = ind = ind_max

@@ -19,6 +19,8 @@
 """
 from __future__ import print_function
 
+from __future__ import absolute_import
+from six.moves import range
 __docformat__ = 'restructuredtext'
 
 __all__ = ['whiten', 'vq', 'kmeans', 'kmeans2']
@@ -502,7 +504,7 @@ def kmeans2(data, k, weights, iter=10, thresh=1e-5, minit='random',
 
     """
     weights = asarray(weights) / weights.sum()
-    if missing not in _valid_miss_meth.keys():
+    if missing not in list(_valid_miss_meth.keys()):
         raise ValueError("Unkown missing method: %s" % str(missing))
     # If data is rank 1, then we have 1 dimension problem.
     nd = N.ndim(data)

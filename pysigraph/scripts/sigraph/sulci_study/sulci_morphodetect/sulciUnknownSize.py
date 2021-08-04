@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys
 
 if sys.argv[1] in ( '-h', '--help' ):
@@ -24,10 +25,10 @@ for s in subjectsfiles:
   sz = 0.
   gr = aims.read( s )
   for v in gr.vertices():
-    if v.has_key( 'label' ):
+    if 'label' in v:
       label = v[ 'label' ]
       if label == 'unknown':
-        if v.has_key( 'size' ):
+        if 'size' in v:
           sz += v[ 'size' ]
   del v
   sum += sz

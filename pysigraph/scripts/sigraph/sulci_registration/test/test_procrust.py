@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, vtk
 import numpy
 import sulci.registration as S
 import sulci.registration.vtk_helpers as V
 from sulci.models import distribution
+from six.moves import range
 
-def update_cloud(procrust, (Y, pcX, tcl, vec, plotter)):
+def update_cloud(procrust, data):
+	(Y, pcX, tcl, vec, plotter) = data
 	X = procrust._X
 	t = procrust._t
 	R = procrust._R
@@ -84,7 +87,8 @@ def test1():
 
 
 
-def update_cloud2(procrust, (Y, pcX, fgl, vec, plotter)):
+def update_cloud2(procrust, data):
+	(Y, pcX, fgl, vec, plotter) = data
 	X = procrust._X
 	t = procrust._t
 	R = procrust._R

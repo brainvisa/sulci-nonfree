@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pprint, re, glob
 from optparse import OptionParser
 import sigraph
 from soma import aims
 from sulci.common import io, add_translation_option_to_parser
 from sulci.models import distribution, distribution_aims
+from six.moves import range
 
 
 ################################################################################
 def update_sulci_set(sulci_set, i, filename, name, v, w=None):
-    if sulci_set.has_key(name):
+    if name in sulci_set:
         h = sulci_set[name]
-        if h.has_key(i):
+        if i in h:
             h[i]['vertices'].append(v)
             if w: h[i]['weights'].append(w)
         else:
@@ -147,11 +149,11 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value,
                     p_out = motion.transform(p_in)
                     X.append(p_out)
                     if options.depth_weighted: D.append(d)
-                if data[-1].has_key(name):
+                if name in data[-1]:
                     data[-1][name].append(X)
                 else:    data[-1][name] = [X]
                 if options.depth_weighted:
-                    if data_depth[-1].has_key(name):
+                    if name in data_depth[-1]:
                         data_depth[-1][name] += D
                     else:    data_depth[-1][name] = D
     # extraction of 5% deepest value of voxels position per subject
@@ -170,16 +172,16 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value,
                 if options.depth_weighted:
                     Dlist = data_depthi[sulcus]
                     D = numpy.array(Dlist)
-                if data2.has_key(sulcus):
+                if sulcus in data2:
                     data2[sulcus].append(X)
                 else:    data2[sulcus]= [X]
                 if options.depth_weighted:
-                    if data_depth2.has_key(sulcus):
+                    if sulcus in data_depth2:
                         data_depth2[sulcus] += Dlist
                     else:    data_depth2[sulcus] = Dlist
                     th = numpy.sort(D)[int(len(D) * 0.95)]
                     Ds = D[D > th]
-                    if data_pct.has_key(sulcus):
+                    if sulcus in data_pct:
                         data_pct[sulcus] += Ds.tolist()
                     else:    data_pct[sulcus] = Ds.tolist()
         data = {}

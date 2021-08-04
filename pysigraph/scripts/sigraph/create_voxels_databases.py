@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os, numpy, pprint
 from optparse import OptionParser
 import sigraph
@@ -22,7 +23,7 @@ def compute(graph_list):
 			if v.getSyntax() != 'fold': continue
 			label = v['name']
 			voxels = vertex2voxels(motion, v)
-			if voxels_dict.has_key(label):
+			if label in voxels_dict:
 				voxels_dict[label] += voxels
 			else:	voxels_dict[label] = voxels
 	return voxels_dict

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os, pprint, numpy
 from optparse import OptionParser
 import sigraph
@@ -16,7 +17,7 @@ def parseOpts(argv):
 
 def read_graphmodel(filename):
 	try:
-		execfile(filename)
+		exec(compile(open(filename, "rb").read(), filename, 'exec'))
 		o = locals()['graphmodel']
 		return o
 	except Exception as e:

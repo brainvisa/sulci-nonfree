@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, exceptions, numpy
 from optparse import OptionParser
 
 import soma.qt_gui.qt_backend.QtGui as qt
+from six.moves import range
+from six.moves import zip
 qt4 = True
 
 import sigraph
@@ -455,7 +458,7 @@ def main():
 		d = r.read(options.sulci_weights_filename)
 		errors = numpy.asarray(d[:, 'size_errors'])
 		sulci = d[:, 'sulci'].tolist()
-		sulci_weights = dict(zip(sulci, errors))
+		sulci_weights = dict(list(zip(sulci, errors)))
 	else:	sulci_weights = None
 
 	hie = aims.Reader().read(options.hierarchy)

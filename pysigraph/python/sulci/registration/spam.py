@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import scipy.optimize
 from .procrust import Registration, MixtureGlobalRegistration, \
     MixtureLocalRegistration

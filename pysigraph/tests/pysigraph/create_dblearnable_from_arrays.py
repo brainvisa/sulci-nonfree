@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import numpy, os, pylab, sys, svm
 from soma import aims
 import sigraph.datamind_backend
 
 from  datamind.ml import plugins
 from  datamind.ml import reader
+from six.moves import range
 
 plugins.plugin_manager.load_plugin('Sigraph')
 
@@ -23,7 +25,7 @@ def fun(db):
 	global glob
 	X, Y, I = db.getX(), db.getY(), None
 	db2 = sigraph.DBLearnable(X, Y, None)
-	v = aims.vector_U32(range(db2.size()))
+	v = aims.vector_U32(list(range(db2.size())))
 	view = sigraph.DBLearnableView(db2, v, None)
 
 	return db2, view

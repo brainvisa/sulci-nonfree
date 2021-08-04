@@ -32,11 +32,13 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import absolute_import
 from datamind.ml.database import DbNumpy
 from datamind.tools import msg
 from datamind.ml import wip
 from datamind.ml.database import iterators
 from datamind.ml.database import selectors
+from six.moves import range
 
 
 class DbSi(DbNumpy):
@@ -114,8 +116,8 @@ split :    split data in train / test database according to sigraph split
         outp = Y[:, 0][:, numpy.newaxis]
         class_id = Y[:, 1][:, numpy.newaxis]
         size = X.shape[0]
-        train_ind = range(split)
-        test_ind = range(split, size)
+        train_ind = list(range(split))
+        test_ind = list(range(split, size))
         train_groups = class_id[train_ind].ravel()
         test_groups = class_id[test_ind].ravel()
         if mode is "outp":

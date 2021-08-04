@@ -34,12 +34,14 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os
 import sys
 import numpy
 import sigraph
 import datamind
 from soma import aims
+from six.moves import range
 if sigraph.Settings.debug:
     datamind.Settings.debug = True
 import datamind.ml.classifier.optimizers
@@ -47,7 +49,7 @@ from sigraph.grid_io import *
 from datamind.tools import *
 
 # datamind plugin registration
-import datamind_backend
+from . import datamind_backend
 # datamind plugin loading
 datamind_backend.SigraphDataMindPlugin().load()
 import datamind.ml.model
@@ -268,7 +270,7 @@ class OptimizedSvm(datamind.ml.model.Model):
         self._print_info(train)
         # shuffle data
         X = train.getX()
-        rrange = range(X.shape[0])
+        rrange = list(range(X.shape[0]))
         numpy.random.shuffle(rrange)
         X2 = X[rrange]
         Y2 = train.getY()[rrange]
@@ -325,7 +327,7 @@ class OptimizedSvm(datamind.ml.model.Model):
         gw = GridWriter()
         pr = self.parameters_ranges()
         gw.write(filename, gridres['array res']['val'],
-                 pr.keys(), pr.values())
+                 list(pr.keys()), list(pr.values()))
         msg.write_list([' * ', ('best params', 'green'),
                         ' = ', gridres['best_params'], '\n'])
 
@@ -1699,7 +1701,7 @@ or feature transformation + ranking (linear transformation).'''
     dim = train.getX().shape[1]
 
     errors = numpy.zeros(dim) + float('inf')
-    dimrange = range(1, dim)
+    dimrange = list(range(1, dim))
 
     for d in dimrange:
         # dimension reduction
@@ -1765,7 +1767,7 @@ def ForwardBackwardOptimizedDim(model, train, test, opt):
     prefix = opt['prefix']
 
     dim = train.getX().shape[1]
-    kept_dims = range(dim)
+    kept_dims = list(range(dim))
     remove_dims = []
     new_error = old_error = eval(prefix, train, test, kept_dims, opt)
     dims_changed = True

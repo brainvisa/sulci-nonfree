@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os
 import sys
 import numpy
@@ -18,6 +19,7 @@ from sulci.registration import MixtureGlobalRegistration, \
 from sulci.registration.common import save_transformation
 from sulci.registration.transformation import SulcusWiseRigidTransformations
 import sulci.registration.spam
+from six.moves import range
 
 
 class Tagger(object):

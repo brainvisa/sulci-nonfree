@@ -33,6 +33,7 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 
+from __future__ import absolute_import
 def computeNrj(model, labeled_graph, labels_translation):
     '''
 Used by siErrorLightWrapper.py and recognition_error.py brainvisa process.

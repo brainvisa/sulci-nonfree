@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
 import os, sys, numpy
 from optparse import OptionParser
 from sulci.common import io
@@ -55,7 +56,7 @@ def main():
 	s = 'sulci\tentropy\n'
 	for sulcus, entropy in entropies.items():
 		s += '%s\t%2.2f\n' % (sulcus, entropy)
-	s += 'all\t%2.2f\n' % numpy.sum(entropies.values())
+	s += 'all\t%2.2f\n' % numpy.sum(list(entropies.values()))
 	fd.write(s)
 	fd.close()
 

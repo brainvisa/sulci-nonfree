@@ -1,6 +1,8 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import numpy
 import re
+from six.moves import zip
 
 sulcus_surface = ['F.Cal.ant.-Sc.Cal.', 'F.C.M.ant.', 'F.C.M.post.', 'F.Coll.',
                   'F.I.P.', 'F.I.P.Po.C.inf.', 'F.I.P.r.int.1', 'F.I.P.r.int.2', 'F.P.O.',
@@ -23,9 +25,9 @@ sulcus_buried = ['F.C.L.r.retroC.tr.', 'F.C.L.r.sc.ant.', 'F.C.L.r.sc.post.']
 
 orientations_map = {}
 orientations_map.update(
-    zip(sulcus_surface, ['surface'] * len(sulcus_surface)))
-orientations_map.update(zip(sulcus_buried, ['buried'] * len(sulcus_buried)))
-orientations_map.update(zip(sulcus_broca, ['broca'] * len(sulcus_broca)))
+    list(zip(sulcus_surface, ['surface'] * len(sulcus_surface))))
+orientations_map.update(list(zip(sulcus_buried, ['buried'] * len(sulcus_buried))))
+orientations_map.update(list(zip(sulcus_broca, ['broca'] * len(sulcus_broca))))
 
 
 def get_sulcus_rotation_axe(vertex):

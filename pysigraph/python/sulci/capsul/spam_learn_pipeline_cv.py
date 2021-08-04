@@ -1,6 +1,8 @@
+from __future__ import absolute_import
 from capsul.api import Pipeline
 import traits.api as traits
 import os
+from six.moves import range
 
 
 class SpamLearnPipelineCV(Pipeline):

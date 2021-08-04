@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import absolute_import
+from __future__ import print_function
 import sys, os, pprint, numpy
 from optparse import OptionParser
 import sigraph
@@ -10,7 +12,7 @@ def create_graphmodel(graphs):
     hv, he = {}, set()
     i = 0
     size = len(graphs)
-    print
+    print()
     sys.stdout.write("\rvertices... %d/%d" % (i, size))
     sys.stdout.flush()
     for g in graphs:
@@ -22,7 +24,7 @@ def create_graphmodel(graphs):
         sys.stdout.write("\rvertices... %d/%d" % (i, size))
         sys.stdout.flush()
     i = 0
-    print
+    print()
     sys.stdout.write("\redges... %d/%d" % (i, size))
     sys.stdout.flush()
     for g in graphs:
@@ -40,7 +42,7 @@ def create_graphmodel(graphs):
             hv[labels[1]].add(labels[0])
         sys.stdout.write("\redges... %d/%d" % (i, size))
         sys.stdout.flush()
-    print
+    print()
     # set -> list
     for k in hv.keys(): hv[k] = list(hv[k])
     return {'edges' : list(he), 'vertices' : hv}

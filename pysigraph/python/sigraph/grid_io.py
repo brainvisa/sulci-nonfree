@@ -33,11 +33,13 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sigraph
 import datamind.ml.classifier.optimizers
 import string
 import os
 import sys
+from six.moves import range
 
 
 class GridPlotter(object):
@@ -54,8 +56,8 @@ class GridPlotter(object):
         labels2 = self._ranges2labels(ranges[1])
 
         f = pylab.figure(1)
-        pylab.xticks(range(len(labels1)), labels1)
-        pylab.yticks(range(len(labels2)), labels2)
+        pylab.xticks(list(range(len(labels1))), labels1)
+        pylab.yticks(list(range(len(labels2))), labels2)
         pylab.imshow(a[numpy.arange(len(a), 0, -1) - 1],
                      interpolation='nearest')
         if a.min() != a.max():
@@ -98,14 +100,14 @@ class GridPlotter(object):
 class GridReader(object):
 
     def read(self, filename):
-        import cPickle
-        return cPickle.load(open(filename))
+        import six.moves.cPickle
+        return six.moves.cPickle.load(open(filename))
 
 
 class GridWriter(object):
     # Fichier : Liste de (nom/range) + array
 
     def write(self, filename, a, names, ranges):
-        import cPickle
+        import six.moves.cPickle
         o = (filename, a, names, ranges)
-        cPickle.dump(o, open(filename, 'w'))
+        six.moves.cPickle.dump(o, open(filename, 'w'))

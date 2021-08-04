@@ -1,6 +1,8 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
 import os, sys, numpy
 from optparse import OptionParser
+from six.moves import range
 
 
 def parseOpts(argv):
@@ -32,7 +34,7 @@ def main():
 
 	# cv :
 	size = len(lines)
-	ind = range(size)
+	ind = list(range(size))
 	fold_size = size / folds_n
 	s1 = (size - fold_size) / (folds_n - 1)
 	for i in range(folds_n):

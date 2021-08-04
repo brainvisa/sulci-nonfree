@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy
 from optparse import OptionParser
 from soma import aims
@@ -10,6 +11,8 @@ from six.moves import queue
 from soma import mpfork
 import tempfile
 import shutil
+from six.moves import range
+from six.moves import zip
 
 ################################################################################
 
@@ -115,7 +118,7 @@ def main():
                 tmp = copy_trm(filename, temps[0])
                 motion = aims.read(tmp)
                 print(i)
-                if data.has_key(sulcus):
+                if sulcus in data:
                     data[sulcus].append(motion)
                 else:    data[sulcus] = [motion]
             i += 1
@@ -137,7 +140,7 @@ def main():
         for t, motions_local in zip(transformations, motions_local_all):
             for sulcus in motions_local.keys():
                 motion = aims.AffineTransformation3d(res[shunk][i])
-                if data.has_key(sulcus):
+                if sulcus in data:
                     data[sulcus].append(motion)
                 else:    data[sulcus] = [motion]
                 i += 1

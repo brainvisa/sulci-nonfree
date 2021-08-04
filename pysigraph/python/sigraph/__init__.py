@@ -54,6 +54,7 @@ Main specialized classes:
 
 from __future__ import print_function
 
+from __future__ import absolute_import
 import soma.aims
 from sigraph import sigraphsip
 import string
@@ -68,7 +69,7 @@ ExtendedImporter().importInModule(
 
 del ExtendedImporter
 
-soma.aims.__fixsipclasses__(locals().items())
+soma.aims.__fixsipclasses__(list(locals().items()))
 
 # export namespace out of sigraphsip
 sigraph = sigraphsip.sigraph
@@ -80,9 +81,8 @@ si = sigraph.si
 __pluginsdir__ = os.path.join(os.path.dirname(__file__), 'plugins')
 __plugins__ = []
 sys.path.insert(0, __pluginsdir__)
-pf = filter(lambda x: x.endswith('.py')
-            or os.path.isdir(os.path.join(__pluginsdir__, x)),
-            os.listdir(__pluginsdir__))
+pf = [x for x in os.listdir(__pluginsdir__) if x.endswith('.py')
+            or os.path.isdir(os.path.join(__pluginsdir__, x))]
 for x in pf:
     p = os.path.basename(x)
     if not os.path.isdir(os.path.join(__pluginsdir__, x)):

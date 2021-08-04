@@ -1,4 +1,5 @@
+from __future__ import absolute_import
 try:
-    import classifier_datamind
+    from . import classifier_datamind
 except ImportError:
     pass

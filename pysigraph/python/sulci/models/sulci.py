@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import six
 
 
@@ -20,7 +21,7 @@ class SulciModel(object):
         if self._segments_distrib:
             return list(six.iterkeys(self._segments_distrib['vertices']))
         elif self._relations_distrib:
-            pairs = self._segments_distrib['vertices'].keys()
+            pairs = list(self._segments_distrib['vertices'].keys())
             return set([pairs[0] for x in l] + [pairs[1] for x in l])
         else:
             print("error : not implemented")

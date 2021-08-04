@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys
 from collections import defaultdict
 import numpy
@@ -74,7 +75,7 @@ def main():
 					graph, hie, selected_sulci)
 
 def main_labels_mode(options, gaussians_distrib, graph, hie, selected_sulci):
-	sulci = gaussians_distrib.keys()
+	sulci = list(gaussians_distrib.keys())
 	meshes = {}
 	r = 1 # cylinder radius
 	for v in graph.vertices():
@@ -96,7 +97,7 @@ def main_labels_mode(options, gaussians_distrib, graph, hie, selected_sulci):
 		aims.Writer().write(m, '%s_%d.mesh' % (sulcus, ind))
 
 def main_labels_mean_mode(options, gaussians_distrib, graph, hie, selected_sulci):
-	sulci = gaussians_distrib.keys()
+	sulci = list(gaussians_distrib.keys())
 	r = 1 # cylinder radius
 	coords = defaultdict(list)
 	sizes = defaultdict(list)
@@ -136,7 +137,7 @@ def main_posterior_mode(options, gaussians_distrib, graph, hie, selected_sulci):
 	r = datamind.io.ReaderCsv()
 	X = r.read(options.posterior)
 	colnames = [s.strip('proba_') for s in X.colnames()]
-	sulci = gaussians_distrib.keys()
+	sulci = list(gaussians_distrib.keys())
 	meshes = {}
 	r = 1 # cylinder radius
 	for v in graph.vertices():

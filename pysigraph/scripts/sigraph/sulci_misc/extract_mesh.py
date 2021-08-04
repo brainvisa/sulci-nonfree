@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import re, os, sys
 from optparse import OptionParser
 from soma import aims
@@ -101,7 +102,7 @@ def main():
 		sys.stdout.write('\rgraphs : %d/%d' % (i + 1, len(graphnames)))
 		sys.stdout.flush()
 		extract_sulci_from_graph(graphname, options.sulci)
-	print
+	print()
 
 
 if __name__ == '__main__': main()

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os, numpy, pprint, re
 from optparse import OptionParser
 import sigraph
@@ -9,6 +10,7 @@ from sulci.common import io, add_translation_option_to_parser
 from datamind.tools import *
 import datamind.io.old_csvIO as datamind_io
 from datamind.ml.database import DbNumpy
+from six.moves import range
 
 
 
@@ -131,7 +133,7 @@ class GravityCentersNodeDatabaseCreator(NodeDatabaseCreator):
         label = v['name']
         if self._sulcus_filter is not None and \
             label != self._sulcus_filter: return
-        if not h.has_key(label):
+        if label not in h:
             csvname, minfname = \
                 io.sulci2databasename(self._prefix, label)
             d = {    'subjects' : {}, 'files' : (csvname, minfname)}
@@ -140,7 +142,7 @@ class GravityCentersNodeDatabaseCreator(NodeDatabaseCreator):
             h[label] = d
         else:
             subjects = h[label]['subjects']
-            if not subjects.has_key(subject):
+            if subject not in subjects:
                 subjects[subject] = { 'refgravity_center' : \
                             [gc], 'number' : 1}
             else:
@@ -207,7 +209,7 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
 
     def _get_saving_location(self, subject, labels):
         h = self._h
-        if not h.has_key(labels):
+        if labels not in h:
             csvname, minfname = \
                 io.relation2databasename(self._prefix, labels)
             d = {    'subjects' : {},
@@ -216,7 +218,7 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
             h[labels] = d
         else:
             subjects = h[labels]['subjects']
-            if not subjects.has_key(subject):
+            if subject not in subjects:
                 subjects[subject] = {'number' : 1}
             else:
                 s = subjects[subject]
@@ -224,7 +226,7 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
         return h[labels]['subjects'][subject]
 
     def _saving_location_add(self, loc, name, data):
-        if loc.has_key(name):
+        if name in loc:
             loc[name].append(data)
         else:    loc[name] = [data]
 
@@ -280,7 +282,7 @@ class MinDistanceRelDatabaseCreator(RelDatabaseCreator):
 
     def _add_relation(self, loc, xi, xj):
         edges = self._find_xij(xi, xj)
-        if 'cortical' in edges.keys():
+        if 'cortical' in list(edges.keys()):
             xij = edges['cortical']
             pi = xij['refSS1nearest'].arraydata()
             pj = xij['refSS2nearest'].arraydata()
@@ -305,10 +307,10 @@ def dbcreatorFactory(node_model_type, rel_model_type):
         'delta_gravity_centers' : DeltaGravityCentersRelDatabaseCreator,
         'min_distance' : MinDistanceRelDatabaseCreator,
     }
-    if node_model_type and not nodeh.has_key(node_model_type):
+    if node_model_type and node_model_type not in nodeh:
         print("invalid node model type '%s'" % node_model_type)
         sys.exit(1)
-    if rel_model_type and not relh.has_key(rel_model_type):
+    if rel_model_type and rel_model_type not in relh:
         print("invalid relation model type '%s'" % rel_model_type)
         sys.exit(1)
 

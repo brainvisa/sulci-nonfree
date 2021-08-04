@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pprint
 from optparse import OptionParser
 from soma import aims, aimsalgo
@@ -26,7 +27,7 @@ def getSize(img):
 	return img.dimX(), img.dimY(), img.dimZ(), img.dimT()
 
 def select_priors(models, priors_distribs=None, selected_sulci=None):
-	sulci = models.keys()
+	sulci = list(models.keys())
 	sulci_n = len(sulci)
 	if priors_distribs:
 		map = {}

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 from optparse import OptionParser
 import os, sys, numpy
 import sigraph
@@ -54,7 +55,7 @@ def compute_descriptors(mf, graphs, sulcus):
 			mod = mf.selectModel(cl)['model']
 			pot = mod.printDescription(cl, True)
 			descr = cl['pot_vector']
-			if descriptors.has_key(labels):
+			if labels in descriptors:
 				descriptors[labels].append(descr)
 			else:
 				names = list(cl['descriptor_names'].get())

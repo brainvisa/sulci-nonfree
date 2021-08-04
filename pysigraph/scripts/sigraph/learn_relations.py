@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pprint, re, glob, pickle
 from optparse import OptionParser
+from six.moves import range
 try:
 	import matplotlib
 	matplotlib.use('Qt4Agg')

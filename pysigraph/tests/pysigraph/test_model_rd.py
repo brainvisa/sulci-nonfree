@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import numpy, os, pylab, sys, svm
 import datamind
 import sigraph.datamind_backend
@@ -11,6 +12,8 @@ from datamind.ml.classifier import ofunc
 from datamind.ml import plugins
 from datamind.ml import dimreduction
 from datamind.ml import database
+from six.moves import range
+from six.moves import zip
 
 plugins.plugin_manager.load_plugin('Sigraph')
 plugins.plugin_manager.load_plugin('libsvm')

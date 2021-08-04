@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os, types
 import pylab
 
 def plotSulcus( label, subjectspotentials ):
   points = [ 'bo', 'ro', 'go', 'yo' ]
-  if type( subjectspotentials ) not in ( types.TupleType, types.ListType ):
+  if type( subjectspotentials ) not in ( tuple, list ):
     subjectspotentials = [ subjectspotentials ]
   i = 0
   pylab.figure()
@@ -14,7 +15,7 @@ def plotSulcus( label, subjectspotentials ):
   for group in subjectspotentials:
     table = []
     for subj, st in group.items():
-      if st.has_key( label ):
+      if label in st:
         table.append( st[ label ] )
     pylab.plot( table, points[ i % len(points) ] )
     i += 1
@@ -23,7 +24,7 @@ def loadSubjectsPotentials( files ):
   sp = []
   for statsfile in files:
     gl = {}
-    execfile( statsfile, gl, gl )
+    exec(compile(open( statsfile, "rb" ).read(), statsfile, 'exec'), gl, gl)
     sp.append( gl[ 'subjectspotentials' ] )
   return sp
 

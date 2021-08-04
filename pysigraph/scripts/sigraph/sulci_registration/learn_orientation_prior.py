@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os, pprint, re
 import numpy
 from optparse import OptionParser
@@ -10,6 +11,7 @@ from sulci.registration import orientation
 from sulci.models.distribution import VonMisesFisher, Kent
 from sulci.models.distribution_aims import Bingham, MatrixBingham, \
                         MatrixVonMisesFisher
+from six.moves import range
 
 
 
@@ -388,7 +390,7 @@ def main():
     # reading
     graphmodel = io.read_graphmodel(options.graphmodelname)
     graphs = io.load_graphs(options.transfile, graphnames, nthread=0)
-    sulci = graphmodel['vertices'].keys()
+    sulci = list(graphmodel['vertices'].keys())
 
     opt =  (sulci, graphs, skelnames, selected_sulci, options)
     if skelnames:

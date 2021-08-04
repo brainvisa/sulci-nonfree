@@ -32,6 +32,7 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import absolute_import
 from datamind.ml import plugins
 
 
@@ -39,13 +40,13 @@ class SigraphDataMindPlugin(plugins.Plugin):
     name = 'Sigraph'
 
     def databases(self):
-        import dbSi
+        from . import dbSi
         return [dbSi.DbSi]
 
     def classifiers(self):
-        import modelsSi
+        from . import modelsSi
         return [modelsSi.MlpSi, modelsSi.SvcSi, modelsSi.SvrSi]
 
     def readers(self):
-        import readerSi
+        from . import readerSi
         return [readerSi.ReaderSi]

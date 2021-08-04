@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy
 from optparse import OptionParser
 from sulci.common import io, add_translation_option_to_parser
@@ -53,7 +54,7 @@ def main():
 	# reading
 	graph = io.load_graph(options.transfile, options.graphname)
 	graphmodel = io.read_graphmodel(options.graphmodelname)
-	sulci = graphmodel['vertices'].keys()
+	sulci = list(graphmodel['vertices'].keys())
 
 	# compute and save
 	M = compute_mixup_matrix(sulci, graph)

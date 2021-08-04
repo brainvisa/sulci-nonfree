@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys
 import six
 
@@ -51,11 +52,11 @@ if __name__ == '__main__':
 
   statsfile = sys.argv[1]
   outcsv = sys.argv[2]
-  execfile( statsfile )
+  exec(compile(open( statsfile, "rb" ).read(), statsfile, 'exec'))
   if len( sys.argv) > 3:
     altstats = sys.argv[3]
     x = {}
-    execfile( altstats, x, x )
+    exec(compile(open( altstats, "rb" ).read(), altstats, 'exec'), x, x)
     totalstats = x[ 'totalstats' ]
   csvPotentials( subjectspotentials, outcsv, totalstats )
 

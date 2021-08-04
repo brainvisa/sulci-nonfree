@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, pprint, numpy
 from optparse import OptionParser
 import datamind.io.old_csvIO as datamind_io
@@ -8,6 +9,7 @@ from datamind.tools import msg
 from sulci.models import distribution
 from sulci.common import io
 from sulci.features import fd3
+from six.moves import range
 		
 
 def parseOpts(argv):

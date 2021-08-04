@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
 import os, sys, numpy, pprint
 from optparse import OptionParser
 import sigraph
@@ -20,7 +21,7 @@ def compile_sulci(g):
 	for v in g.vertices():
 		if v.getSyntax() != 'fold': continue
 		sulcus = v['name']
-		if h.has_key(sulcus):
+		if sulcus in h:
 			h[sulcus].append(v)
 		else:	h[sulcus] = [v]
 	return h
@@ -60,7 +61,7 @@ def compute_size(h):
 
 def tag_neighbours(v, idmap, id, syntax_filters):
 	r = v['index']
-	if idmap.has_key(r): return
+	if r in idmap: return
 	idmap[r] = id
 	idmap[r] = id
 	for e in v.edges():
@@ -83,9 +84,9 @@ def compute_components_number(h):
 			tag_neighbours(v, idmap, id, \
 				['junction', 'plidepassage'])
 		if hasattr( numpy, 'unique1d' ):
-			n[sulcus] = len(numpy.unique1d(idmap.values()))
+			n[sulcus] = len(numpy.unique1d(list(idmap.values())))
 		else:
-			n[sulcus] = len(numpy.unique(idmap.values()))
+			n[sulcus] = len(numpy.unique(list(idmap.values())))
 	return n
 
 

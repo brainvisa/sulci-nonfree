@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os
 from optparse import OptionParser
 from soma import aims, aimsalgo
@@ -52,7 +53,7 @@ def main():
 		normal = v['refnormal'].arraydata()
 		o = orientation.get_sulci_rotation_axe(v)
 		data = (g, edir, dir, o, hull_normal, depth_direction, normal)
-		if h.has_key(label):
+		if label in h:
 			h[label].append(data)
 		else:	h[label] = [data]
 

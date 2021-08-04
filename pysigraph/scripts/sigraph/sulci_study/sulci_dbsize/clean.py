@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import glob, sys, os, numpy, collections, shutil
 from optparse import OptionParser
 from datamind.io import csvIO
@@ -34,7 +35,7 @@ def reformat_and_clean(directories, to_rename={},
 			if src != dst: print("move %s -> %s" % (src, dst))
 		if not print_only:
 			if src != dst: shutil.move(src, dst)
-	ignore_indices = to_rename.values()
+	ignore_indices = list(to_rename.values())
 	kept_all_files = ['test_global.csv', 'test_graphs.dat',
 		'test_local.csv', 'train_graphs.dat', 'bayesian_angle_distribs',
 		'bayesian_angle_distribs.dat', 'bayesian_direction_distribs',

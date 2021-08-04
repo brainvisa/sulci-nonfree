@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import re, os, sys, numpy
 import sigraph
 from sulci.common import io, add_translation_option_to_parser
@@ -38,7 +39,7 @@ def read_graph(graphname, ft, selected_sulci):
 				if vox_n is not None and \
 					((selected_sulci is None) or \
 					(sulcus in selected_sulci)):
-					if voxels_n.has_key(sulcus):
+					if sulcus in voxels_n:
 						voxels_n[sulcus].append(vox_n)
 					else:	voxels_n[sulcus] = [vox_n]
 				sulcus = 'none'
@@ -91,10 +92,10 @@ def main():
 		voxels_n = read_graph(graphname, ft, options.selected_sulci)
 		for sulcus, numbers in voxels_n.items():
 			n = numpy.sum(numbers)
-			if resume.has_key(sulcus):
+			if sulcus in resume:
 				resume[sulcus] += n
 			else:	resume[sulcus] = n
-	print
+	print()
 	print("voxels_number = ", resume)
 
 

@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy
 from optparse import OptionParser
 from soma import aims
 from sulci.common import io
 from sulci.models import distribution, distribution_aims
+from six.moves import range
 
 
 ################################################################################
@@ -115,7 +117,7 @@ def main():
 
 	# read
 	model = io.read_segments_distrib(options.distribname)
-	sulci = model['vertices'].keys()
+	sulci = list(model['vertices'].keys())
 	distribs = []
 	for sulcus in sulci:
 		distrib = model['vertices'][sulcus]

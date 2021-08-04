@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys,os, math
 import six
 
@@ -16,12 +17,12 @@ if sys.argv[1] in ( '-h', '--help' ):
 
 statsfile = sys.argv[1]
 
-execfile( statsfile )
+exec(compile(open( statsfile, "rb" ).read(), statsfile, 'exec'))
 
 for s,stats in six.iteritems(subjectspotentials):
   for label,pot in six.iteritems(stats):
     st = totalstats.get( label )
-    if st and st.has_key( 'std' ) and st[ 'number' ] >= 2:
+    if st and 'std' in st and st[ 'number' ] >= 2:
       # remove this subject from stats
       sum = st[ 'sum' ] - pot
       sqsum = st[ 'squaresum' ] - pot*pot

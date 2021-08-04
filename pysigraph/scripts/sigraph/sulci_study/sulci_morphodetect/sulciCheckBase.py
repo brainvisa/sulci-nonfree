@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os
 import six
 
@@ -17,14 +18,14 @@ normalstats = sys.argv[1]
 threshold = float( sys.argv[2] )
 basesstatsfiles = sys.argv[3:]
 
-execfile( normalstats )
+exec(compile(open( normalstats, "rb" ).read(), normalstats, 'exec'))
 basestats = []
 
 for base in basesstatsfiles:
-  execfile( base )
+  exec(compile(open( base, "rb" ).read(), base, 'exec'))
   basestats.append( subjectspotentials )
 
-execfile( normalstats )
+exec(compile(open( normalstats, "rb" ).read(), normalstats, 'exec'))
 
 detected = []
 
@@ -32,7 +33,7 @@ for base in basestats:
   for subject, stats in six.iteritems(base):
     for label, pot in six.iteritems(stats):
       s = totalstats.get( label )
-      if s and s.has_key( 'std' ):
+      if s and 'std' in s:
         stddev = s[ 'std' ]
         if stddev != 0:
           score = ( pot - s[ 'mean' ] ) / stddev

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, scipy.stats
 from optparse import OptionParser
 import datamind.io as datamind_io
 from sulci.common import io as sulci_io, add_translation_option_to_parser
+from six.moves import range
 
 
 

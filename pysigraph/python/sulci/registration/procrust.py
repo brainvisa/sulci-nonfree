@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os
 import sys
 
@@ -10,6 +11,7 @@ import six
 from sulci.models import distribution
 from sulci.registration.transformation import RigidTransformation, \
     LocalRigidTransformations
+from six.moves import range
 
 if not six.PY2:
     long = int
@@ -119,7 +121,7 @@ k : number of clusters
         self._k = k
 
     def init_centers(self, verbose=False):
-        indices = range(len(self._X))
+        indices = list(range(len(self._X)))
         numpy.random.shuffle(indices)
         indices = indices[:self._k]
         C = numpy.array([self._X[ind] for ind in indices])
@@ -527,7 +529,7 @@ scheme in SE(3) Riemannian Tangent space of Identity matrix.
                 dgw, dgt = dg[:3], dg[3:]
                 theta = numpy.sqrt(dgw.T * dgw)[0, 0]
                 if theta:
-                    k = long(theta / (2 * numpy.pi))
+                    k = int(theta / (2 * numpy.pi))
                     if (theta - 2. * k * numpy.pi) > \
                             numpy.pi:
                         k += 1
@@ -577,7 +579,7 @@ scheme in SE(3) Riemannian Tangent space of local Rotation matrix.
                 dgw, dgt = dg[:3], dg[3:]
                 theta = numpy.sqrt(dgw.T * dgw)[0, 0]
                 if theta:
-                    k = long(theta / (2 * numpy.pi))
+                    k = int(theta / (2 * numpy.pi))
                     if (theta - 2. * k * numpy.pi) \
                             > numpy.pi:
                         k += 1
@@ -637,7 +639,7 @@ scheme in SE(3) Riemannian Tangent space of local Rotation matrix.
             self._w = numpy.asmatrix(x[:3]).T
             theta = numpy.sqrt(self._w.T * self._w)[0, 0]
             if theta:
-                k = long(theta / (2 * numpy.pi))
+                k = int(theta / (2 * numpy.pi))
                 if (theta - 2. * k * numpy.pi) > numpy.pi:
                     k += 1
                 self._w *= (1. - 2. * k * numpy.pi / theta)
@@ -667,7 +669,7 @@ scheme in SE(3) Riemannian Tangent space of local Rotation matrix.
         def get_rot(w):
             theta = numpy.sqrt(w.T * w)[0, 0]
             if theta:
-                k = long(theta / (2 * numpy.pi))
+                k = int(theta / (2 * numpy.pi))
                 if (theta - 2. * k * numpy.pi) > numpy.pi:
                     k += 1
                 w *= (1. - 2. * k * numpy.pi / theta)

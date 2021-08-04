@@ -1,5 +1,6 @@
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pprint, re
 from optparse import OptionParser
 import sigraph
@@ -7,6 +8,7 @@ from soma import aims
 from datamind.tools import *
 from sulci.common import io, add_translation_option_to_parser
 from sulci.models import distribution
+from six.moves import range
 
 
 ################################################################################
@@ -170,7 +172,7 @@ def parseOpts(argv):
     add_translation_option_to_parser(parser)
     parser.add_option('--type', dest='prior_type',
         metavar = 'FILE', action='store', default = 'label_frequency',
-        help='type : one among %s ,' % str(prior_map.keys()) + \
+        help='type : one among %s ,' % str(list(prior_map.keys())) + \
         '- label : at node level\n- size : at resized voxel level,\n' +\
         '- frequency : P(L) = prod P(L_i) = prod(f_i) with ' +\
         'f_i = #(L_i) / (sum #(L_i))\n' + \
@@ -204,7 +206,7 @@ def main():
     if len(graphnames) == 0:
         print("give at least one graph")
         error_parsing = True
-    if not (options.prior_type in prior_map.keys()):
+    if not (options.prior_type in list(prior_map.keys())):
         print("unknown prior type '%s'" % options.prior_type)
     if error_parsing:
         parser.print_help()

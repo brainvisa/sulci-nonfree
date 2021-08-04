@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import pickle
 import numpy
 import scipy.stats
 import scipy.special
+from six.moves import range
 try:
     import fff.GMM
 except:
@@ -42,7 +44,7 @@ type : full, diagonal, spherical
         # hack for small size databases
         if len(X) / kmax <= 2:
             kmax = len(X) / 5
-        kvals = range(2, kmax)
+        kvals = list(range(2, kmax))
         gmm = fff.GMM.GMM(dim=X.shape[1], prec_type=self._prec_type)
         labels, logli, bic = gmm.optimize_with_BIC(X, kvals,
                                                    ninit=5, verbose=0)

@@ -34,6 +34,7 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from __future__ import print_function
+from __future__ import absolute_import
 from datamind.ml import classifier
 from datamind.ml import database
 from datamind.tools import *
@@ -52,9 +53,8 @@ weights :       dictionary of (classes, weights). Weights are double values
             ex : {'0' : 10., '1' : 1.}
         '''
         if not isinstance(adaptiveleaf, sigraph.AdaptiveLeaf):
-            raise (ValueError,
-                   ValueError("'adaptiveleaf' parameter should be "
-                              "an AdaptiveLeaf instance."))
+            raise ValueError("'AdaptiveLeaf' parameter should be "
+                             "an AdaptiveLeaf instance.")
         self._adaptiveleaf = adaptiveleaf
         self._weights = weights
         self._user_data = user_data

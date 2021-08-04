@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import glob, sys, os, numpy, collections
 from optparse import OptionParser
 from datamind.io import csvIO
+from six.moves import map
 
 # -- global --
 def get_global_errors(filename):
@@ -96,10 +98,10 @@ def subjects_local_error(dir):
 	errors = numpy.vstack(errors)
 	if hasattr( numpy, 'unique1d' ):
 		subjects = numpy.unique1d(errors[:, 0])
-		sulci = map(decode, numpy.unique1d(errors[:, 1]))
+		sulci = list(map(decode, numpy.unique1d(errors[:, 1])))
 	else:
 		subjects = numpy.unique(errors[:, 0])
-		sulci = map(decode, numpy.unique(errors[:, 1]))
+		sulci = list(map(decode, numpy.unique(errors[:, 1])))
 	res = {}
 	sulci_col = errors[:, 1]
 	for subject in subjects:
@@ -156,7 +158,7 @@ def main():
 		if len(error) == 1:
 			print("error: %s" % error[0])
 		else:	print('error:\n    - ' + '\n    - '.join(error))
-		print
+		print()
 		parser.print_help()
 		sys.exit(1)
 	# compute errors

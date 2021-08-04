@@ -2,12 +2,14 @@
 
 # standard
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, pickle
 import numpy, scipy.stats
 from optparse import OptionParser
 
 # matplotlib
 import matplotlib
+from six.moves import range
 matplotlib.use('QtAgg')
 import pylab
 
@@ -132,7 +134,7 @@ def main():
 				if name != options.classname]
 	X = numpy.asarray(M[:, indices])
 	Y = numpy.asarray(M[:, options.classname])
-	if options.classname in classes_map.keys():
+	if options.classname in list(classes_map.keys()):
 		# select subject with authorized classes
 		sel = False
 		for c in classes_map[options.classname]: # logical OR

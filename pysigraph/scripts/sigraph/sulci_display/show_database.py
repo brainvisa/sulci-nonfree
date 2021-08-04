@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys
 import pylab, matplotlib, numpy
+from six.moves import range
 
 def read_graph(filename):
 	import exceptions
 	try:
-		execfile(filename)
+		exec(compile(open(filename, "rb").read(), filename, 'exec'))
 		graph2 = locals()['graph']
 		return graph2
 	except exceptions as e:

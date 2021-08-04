@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os, pprint
 import numpy
 from optparse import OptionParser
 from soma import aims, aimsalgo
 from sulci.common import io, add_translation_option_to_parser
 from sulci.models.distribution import VonMisesFisher
+from six.moves import range
+from six.moves import zip
 
 
 ################################################################################
@@ -140,7 +143,7 @@ def compute_orientation(subject, splitmode, sulci, hie, graph,
 			if write_data:
 				mmesh += aims.SurfaceGenerator.arrow( \
 					c - g * 10, c, 1., 2., 10, 0.3)
-		orientations[sulcus] = zip(gs, weights)
+		orientations[sulcus] = list(zip(gs, weights))
 		if not write_data: continue
 		mmesh.header()['material'] = go
 		filename = '%s_grad_mean_%s.mesh' % (subject, sulcus)
@@ -216,7 +219,7 @@ def main_subject(parser, options, args):
 	hie = aims.Reader().read(hie_filename)
 
 	# init
-	sulci = graphmodel['vertices'].keys()
+	sulci = list(graphmodel['vertices'].keys())
 	subject = os.path.splitext(os.path.basename(\
 			graph['aims_reader_filename']))[0]
 	depthmapname = '%s_depth.ima' % subject
@@ -249,7 +252,7 @@ def main_mean(parser, options, args):
 		orientations = io.numpy_read_from_exec(f, 'orientations')
 		for label, list in orientations.items():
 			for (grad, weight) in list:
-				if res.has_key(label):
+				if label in res:
 					res[label][0].append(grad)
 					res[label][1].append(weight)
 				else:	res[label] = ([grad], [weight])

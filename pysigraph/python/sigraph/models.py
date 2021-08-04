@@ -33,10 +33,12 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from __future__ import print_function
+from __future__ import absolute_import
 import numpy
 from soma import aims
 import sigraph
 import sigraph.cover
+from six.moves import zip
 
 
 def to_key(labels):
@@ -145,9 +147,9 @@ class ModelDifferentiator(object):
         d2 = self._infos_list[1]
         if len(d2) == 0:
             d2 = dict([(v, (0., 0., 0., 0.)) for v in d1])
-        for r in [k for k in d1.keys() if not k in d2.keys()]:
+        for r in [k for k in d1.keys() if not k in list(d2.keys())]:
             del d1[r]
-        for r in [k for k in d2.keys() if not k in d1.keys()]:
+        for r in [k for k in d2.keys() if not k in list(d1.keys())]:
             del d2[r]
         k1, a1 = self._dict_to_array(d1)
         k2, a2 = self._dict_to_array(d2)
@@ -162,7 +164,7 @@ class ModelDifferentiator(object):
         self._diff = DiffData(keys, di, (a1, a2))
 
     def print_diff(self, mode, pct, cmp_modes):
-        keys = self._diff.keys()
+        keys = list(self._diff.keys())
         n = int(pct * len(keys) / 100)
         for c in cmp_modes:
             di = self._get_selected_diff(mode,
@@ -181,7 +183,7 @@ class ModelDifferentiator(object):
         bad_value = 1.
         if name == 'unknown':
             return name, bad_value
-        ind = numpy.argwhere(self._diff.keys() == name)
+        ind = numpy.argwhere(list(self._diff.keys()) == name)
         if name == 'ventricle':
             print('name = ', name, ind)
         if numpy.shape(ind) == (1, 1):

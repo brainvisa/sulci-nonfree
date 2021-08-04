@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import pickle
 import numpy
 import scipy.stats
@@ -9,6 +10,7 @@ from soma import aims, aimsalgo
 from . import distribution
 from .distribution import Distribution, MixtureModel, distribution_map
 import six
+from six.moves import range
 
 #
 # SPAM
@@ -216,7 +218,7 @@ overlappe to each other.
                 bucket_name = 'aims_bottom'
             bucketmaps_in = [v[bucket_name].get() for v in vertices]
             self._nodes_n += len(vertices)
-            n = numpy.sum([len(b[0].keys()) for b in bucketmaps_in])
+            n = numpy.sum([len(list(b[0].keys())) for b in bucketmaps_in])
             if n == 0:
                 print("warning : in file "
                       "'%s', " % graphinfo['name'] +
@@ -264,7 +266,7 @@ overlappe to each other.
         for (id, graphinfo) in self._infos.items():
             motion = self._motions[id]
             # when a subject has no buckets
-            if not bucketmaps.has_key(id):
+            if id not in bucketmaps:
                 continue
             bucketmap = bucketmaps[id]
             bb_subject_offset, bb_subject_size = bb_subjects[id]
@@ -407,7 +409,7 @@ write_count : output filename to write image of sulci counting.
         for (x, y) in index_tricks.ndindex(*bb_talairach_size[:2]):
             # all z in one pass
             v = numpy.array([x, y, 0]) + bb_talairach_offset
-            Z = range(img_count.dimZ())
+            Z = list(range(img_count.dimZ()))
             V = v[None].repeat(img_count.dimZ(), 0)
             V[:, 2] += Z
             D, ID = kd.query(V, k)
@@ -661,7 +663,7 @@ bounding box.
         size_in = numpy.array([ss_map.sizeX(), ss_map.sizeY(),
                                ss_map.sizeZ()])
         loglikelihood = 0.
-        voxels_n = len(ss_map[0].keys())
+        voxels_n = len(list(ss_map[0].keys()))
         img = aims.AimsData_FLOAT(*self._bb_talairach_size)
         Ax = img.volume()
         A = Ax.get().arraydata()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy
 from optparse import OptionParser
 from datamind.tools import *
@@ -8,6 +9,7 @@ from sulci.models import check_same_distribution, distribution, \
 				distribution_aims, distribution_fff
 from sulci.registration import procrust
 from soma import aims
+from six.moves import range
 
 
 ################################################################################
@@ -21,7 +23,7 @@ class GlobalModelDisplay(object):
 		self._output = output
 		self._selected_sulci = selected_sulci
 		self._sulci = set()
-		self._sulci.update(gaussians_distrib['vertices'].keys())
+		self._sulci.update(list(gaussians_distrib['vertices'].keys()))
 
 	def display_one(self, sulcus, gd, ld):
 		color = self._hie.find_color(sulcus)
@@ -71,7 +73,7 @@ class RelationsDisplay(GlobalModelDisplay):
 
 	def display(self):
 		print("compute meshes...")
-		relations = self._local_distrib['edges'].keys()
+		relations = list(self._local_distrib['edges'].keys())
 		bar = ProgressionBarPct(len(relations), '#', color = 'blue')
 		for i, relation in enumerate(relations):
 			# skip : intra/inter global models

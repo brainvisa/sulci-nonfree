@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+from __future__ import absolute_import
 import vtk
 import numpy
+from six.moves import range
 
 
 def gen_data_gmm(centers, covariances, n):

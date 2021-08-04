@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 from soma import aims
 import sigraph
 import math
@@ -22,7 +23,7 @@ else:
   outgraphfile = ''
 
 model = aims.read( modelfile )
-execfile( statsfile )
+exec(compile(open( statsfile, "rb" ).read(), statsfile, 'exec'))
 
 gr = aims.read( input )
 mf = model.modelFinder()
@@ -36,24 +37,24 @@ cl = gr.cliques()
 sulcires = {}
 
 for c in cl:
-  if c.has_key( 'label' ):
+  if 'label' in c:
     label = c[ 'label' ]
     p = c[ 'potential' ]
-    if not sulcires.has_key( label ):
+    if label not in sulcires:
       sulcires[ label ] = { 'sulcus_pot': p, 'sulcus_std_ratio' : 0., 'total_pot' : p }
     else:
       sr = sulcires[ label ]
       sr[ 'sulcus_pot' ] += p
       sr[ 'total_pot' ] += p
     cs = nodecliquestats.get( label )
-    if not cs or not cs.has_key( 'std' ):
+    if not cs or 'std' not in cs:
       print('no stats for sulcus', label)
     else:
       s = cs[ 'std' ]
       if s != 0:
         sulcires[ label ][ 'sulcus_std_ratio' ] = ( p - cs[ 'mean' ] ) / s
       else: print('null std for', label)
-  elif c.has_key( 'label1' ):
+  elif 'label1' in c:
     l = [ c[ 'label1' ], c['label2'] ]
     l.sort()
     l = tuple( l )
@@ -64,24 +65,24 @@ for c in cl:
     if not cs:
       print('no stats for rel', l)
     else:
-      if not sulcires.has_key( label1 ):
+      if label1 not in sulcires:
         sulcires[ label1 ] = { 'sulcus_pot': 0., 'sulcus_std_ratio' : 0., 'total_pot' : 0. }
-      if not sulcires.has_key( label2 ):
+      if label2 not in sulcires:
         sulcires[ label2 ] = { 'sulcus_pot': 0., 'sulcus_std_ratio' : 0., 'total_pot' : 0. }
       sulcires[ label1 ][ 'total_pot' ] += p
       sulcires[ label2 ][ 'total_pot' ] += p
 for label, c in sulcires.items():
   cs = totalstats[ label ]
-  if cs.has_key( 'std' ):
+  if 'std' in cs:
     s = cs[ 'std' ]
     if s != 0:
       c[ 'total_std_ratio' ] =  ( p - cs[ 'mean' ] ) / s
 
 for v in gr.vertices():
-  if v.has_key( labelatt ):
+  if labelatt in v:
     label = v[ labelatt ]
     cs = sulcires.get( label )
-    if cs and cs.has_key( 'total_std_ratio' ):
+    if cs and 'total_std_ratio' in cs:
       v[ 'custom_num_val' ] = cs[ 'total_std_ratio' ]
 
 print(sulcires)

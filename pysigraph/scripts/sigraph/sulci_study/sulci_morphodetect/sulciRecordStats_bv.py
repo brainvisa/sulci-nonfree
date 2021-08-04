@@ -1,4 +1,5 @@
 
+from __future__ import absolute_import
 from neuroProcesses import *
 import neuroConfig
 import sys, os

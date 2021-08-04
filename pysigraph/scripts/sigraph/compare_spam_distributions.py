@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy
 import matplotlib
+from six.moves import zip
 matplotlib.use('Qt4Agg')
 import pylab
 from optparse import OptionParser
@@ -163,7 +165,7 @@ def main():
 		names.append(name)
 
 	infos = {}
-	sulci = model['vertices'].keys()
+	sulci = list(model['vertices'].keys())
 	pcts = []
 	for sulcus in sulci:
 		print("*** %s ***" % sulcus)

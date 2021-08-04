@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import absolute_import
 import os
 import sys
 import pprint
@@ -9,6 +10,8 @@ import six
 
 import sigraph
 from soma import aims
+from six.moves import range
+from six.moves import zip
 try:
     import datamind.io.old_csvIO as datamind_io
 except ImportError as e:
@@ -140,7 +143,7 @@ def read_database_sulci(prefix, sulci):
 
 def read_from_exec(filename, var):
     try:
-        execfile(filename)
+        exec(compile(open(filename, "rb").read(), filename, 'exec'))
         o = locals()[var]
         return o
     except Exception as e:
@@ -156,7 +159,7 @@ def numpy_read_from_exec(filename, var):
     for v in dir(numpy):
         locals()[v] = numpy.__getattribute__(v)
     try:
-        execfile(filename)
+        exec(compile(open(filename, "rb").read(), filename, 'exec'))
         o = locals()[var]
         return o
     except Exception as e:
@@ -203,7 +206,7 @@ def create_segments_distrib_several_datatypes(prefix, distrib,
         distribname = distrib['files'][datatype]
         subdistrib = read_distribution_models(distribname)
         subdistribs[datatype] = subdistrib
-        sulci.update(subdistrib['files'].keys())
+        sulci.update(list(subdistrib['files'].keys()))
 
     for sulcus in sulci:
         distribs = {}
@@ -277,7 +280,7 @@ def create_relations_distrib_several_datatypes(prefix, distrib,
         distribname = os.path.join(prefix, distrib['files'][datatype])
         subdistrib = read_distribution_models(distribname)
         subdistribs[datatype] = subdistrib
-        relations.update(subdistrib['files'].keys())
+        relations.update(list(subdistrib['files'].keys()))
     for datatype in datatypes:
         distrib['edges'][datatype] = {}
     for rel in relations:
@@ -288,7 +291,7 @@ def create_relations_distrib_several_datatypes(prefix, distrib,
                     (sulcus2 not in selected_sulci):
                         continue
         for datatype, subdistrib in subdistribs.items():
-            if not subdistrib['files'].has_key(rel):
+            if rel not in subdistrib['files']:
                 continue
             (model_type, distribfile) = subdistrib['files'][rel]
             Distribution = distribution.distributionFactory(

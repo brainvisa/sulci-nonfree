@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 from soma import aims
 import sigraph
 import math, sys
@@ -28,7 +29,7 @@ def sulciRecordStats( inputs, modelfile, output ):
     cl = gr.cliques()
     totstats_persubject = {}
     for c in cl:
-      if c.has_key( 'label' ):
+      if 'label' in c:
         label = c[ 'label' ]
         cs = nodecliquestats.get( label )
         if cs is None:
@@ -43,7 +44,7 @@ def sulciRecordStats( inputs, modelfile, output ):
           totstats_persubject[ label ] = p
         else:
           totstats_persubject[ label ] += p
-      elif c.has_key( 'label1' ):
+      elif 'label1' in c:
         l = [ c[ 'label1' ], c['label2'] ]
         l.sort()
         l = tuple( l )

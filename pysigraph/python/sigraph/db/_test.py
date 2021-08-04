@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 from sigraph import *
 from numpy import *
+from six.moves import range
 
 
 def test_optimizer():

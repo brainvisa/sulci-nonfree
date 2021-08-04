@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pickle, time, copy
 from optparse import OptionParser, OptionGroup
 import random
@@ -8,6 +9,7 @@ from soma import aims
 import sigraph
 from sulci.common import io, add_translation_option_to_parser
 from sulci.features.descriptors import descriptorFactory
+from six.moves import range
 
 
 ################################################################################
@@ -501,9 +503,9 @@ class Tagger(object):
 				if weighting_mode == 'sizes':
 					w = v1['refsize'] * v2['refsize']
 				elif weighting_mode == 'contact_area':
-					if edges.has_key('cortical'):
+					if 'cortical' in edges:
 						w = edges['cortical']['reflength']
-					elif edges.has_key('junction'):
+					elif 'junction' in edges:
 					# note : some buried segments may have cortical
 					# relation missing because the voronoi used to
 					# define the relation is only define in surface.

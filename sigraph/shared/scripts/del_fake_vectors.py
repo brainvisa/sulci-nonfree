@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import sys, os, shutil, re
 
 def read_minf(file):
@@ -9,7 +10,7 @@ def read_minf(file):
 		print("skip '%s' (read minf)" % file)
 		return
 	code = '\n'.join(fd.readlines())
-	exec code
+	exec(code)
 	size = attributes['size']
 	split = attributes['sigraph']['split']
 	data = os.path.join(os.path.dirname(file), attributes['data'])

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, pprint, numpy
 from optparse import OptionParser
 import datamind.io.old_csvIO as datamind_io
@@ -68,7 +69,7 @@ def main():
 		sigma = numpy.sqrt(det ** (1. / 3.))
 		h['sulci'][sulcus] = sigma
 
-	if not h['sulci'].has_key('unknown'): h['sulci']['unknown'] = 2.
+	if 'unknown' not in h['sulci']: h['sulci']['unknown'] = 2.
 
 	# write a file with all sigma
 	fd = open(options.output, 'w')

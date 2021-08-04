@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy
 from optparse import OptionParser
 import sigraph
 from soma import aims
 from sulci.common import io
 from datamind.tools import *
+from six.moves import range
+from six.moves import zip
 
 
 keep_python_wrappers = []
@@ -209,7 +212,7 @@ class PythonDistribSulcusOnlyAdaptive(PythonSulcusOnlyAdaptive):
 		# freq if missing sulcus
 		nb = self._mgraph['nbase_graphs']
 		ao = self.graphObject()
-		if ao.has_key('noinstance_count'):
+		if 'noinstance_count' in ao:
 			p = ao['noinstance_count']
 			f = 1. - (p / nb)
 		else:	f = 1.
@@ -288,7 +291,7 @@ class PythonNodeAdaptive(sigraph.AdaptiveLeaf):
 		for v in vertices:
 			if v['label'] != label: continue
 			ind = v['index']
-			if cache.has_key((ind, label)):
+			if (ind, label) in cache:
 				neglogli -= cache[(ind, label)]
 			else:
 				logli, li = self._distr.likelihood(\
@@ -354,8 +357,8 @@ class WeightedRelationAdaptive(sigraph.AdaptiveLeaf):
 		return self._relation_model.graphObject()
 
 
-def replace_models(datagraph, mgraph, (nodes_model, sulci_model),
-					prior, weights, nodes_weights):
+def replace_models(datagraph, mgraph, model, prior, weights, nodes_weights):
+	(nodes_model, sulci_model) = model
 	sulci_models = sulci_model['vertices']
 	sulci_model_type = sulci_model['type']
 	if nodes_model: nodes_models = nodes_model['vertices']
@@ -372,7 +375,7 @@ def replace_models(datagraph, mgraph, (nodes_model, sulci_model),
 		sulcus = v['label']
 		sulcus_model = sulci_models[sulcus]
 		if nodes_models:
-			if nodes_models.has_key(sulcus):
+			if sulcus in nodes_models:
 				node_model = nodes_models[sulcus]
 			else:	node_model = None
 		else:	node_model = None
@@ -426,7 +429,7 @@ def merge_nodes_and_sulci(datagraph, mgraph, nodes_model, prior,
 		if not oldmodel.isAdaptive(): continue
 		sulcus = v['label']
 		if nodes_models:
-			if nodes_models.has_key(sulcus):
+			if sulcus in nodes_models:
 				node_model = nodes_models[sulcus]
 			else:   node_model = None
 		else:	node_model = None
@@ -593,7 +596,7 @@ def main():
 		d = r.read(options.nodes_weights_filename)
 		errors = numpy.asarray(d[:, 'size_errors'])
 		sulci = d[:, 'sulci'].tolist()
-		nodes_weights = dict(zip(sulci, errors))
+		nodes_weights = dict(list(zip(sulci, errors)))
 	else:	nodes_weights = None
 
 	

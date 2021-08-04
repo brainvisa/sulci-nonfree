@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sigraph, os, sys
 from soma import aims
 from optparse import OptionParser
+from six.moves import zip
 
 def printDescriptors( dg ):
   c = dg.cliques()
@@ -20,14 +22,14 @@ def printDescriptors( dg ):
       descr = []
       dnames = []
     sumpot += pot
-    if cl.has_key( 'label' ):
+    if 'label' in cl:
       l = cl[ 'label' ]
       print('sulcus clique:', l, ', pot:', pot)
-    elif cl.has_key( 'label1' ) and cl.has_key( 'label2' ):
+    elif 'label1' in cl and 'label2' in cl:
       l1 = cl[ 'label1' ]
       l2 = cl[ 'label2' ]
       print('relation clique:', (l1, l2), 'pot:', pot)
-    print(zip( dnames, descr ))
+    print(list(zip( dnames, descr )))
 
   print('energy:', sumpot)
 

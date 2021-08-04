@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pprint, re
 from optparse import OptionParser
 import sigraph
@@ -10,6 +11,7 @@ from sulci.common import io, add_translation_option_to_parser
 from sulci.models import check_same_distribution
 from sulci.models.distribution import UniformFrequency
 from sulci.features.descriptors import descriptorFactory
+from six.moves import range
 
 ################################################################################
 class Tagger(object):

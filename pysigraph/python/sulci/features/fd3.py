@@ -1,3 +1,5 @@
+from six.moves import range
+from six.moves import zip
 def sulci_fd3():
     names = ['valid', 'extremitiesValid',
              'extremity1x', 'extremity1y', 'extremity1z',
@@ -11,13 +13,13 @@ def sulci_fd3():
              'plisDePassage', 'hullJunctionsSize', 'surface']
 
     groups = {
-        'extremity1': range(2, 5),
-            'extremity2': range(5, 8),
-            'extremities': range(2, 8),
-            'gravity': range(8, 11),
-            'normal': range(12, 15),
-            'direction': range(15, 18),
-            'others': range(18, 28)}
+        'extremity1': list(range(2, 5)),
+            'extremity2': list(range(5, 8)),
+            'extremities': list(range(2, 8)),
+            'gravity': list(range(8, 11)),
+            'normal': list(range(12, 15)),
+            'direction': list(range(15, 18)),
+            'others': list(range(18, 28))}
 
-    hash = dict(zip(range(len(names)), names))
+    hash = dict(list(zip(list(range(len(names))), names)))
     return {'names': names, 'groups': groups, 'indices': hash}

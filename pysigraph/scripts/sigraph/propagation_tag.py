@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pylab
 from optparse import OptionParser
 import sigraph
@@ -8,6 +9,7 @@ from soma import aims
 from datamind.tools import *
 from sulci.common import io, add_translation_option_to_parser
 from sulci.models import distribution
+from six.moves import range
 
 eps = 10e-200
 
@@ -17,7 +19,7 @@ class VertexModel(object):
 	def __init__(self, graph_data, bayesian_model, priors):
 		self._graph_data = graph_data
 		self._bayesian_model = bayesian_model
-		self._states = bayesian_model['graph_model']['vertices'].keys()
+		self._states = list(bayesian_model['graph_model']['vertices'].keys())
 		self._states_n = len(self._states)
 		if priors:
 			pn = bayesian_model['priors_nodes_hash']
@@ -263,7 +265,7 @@ class MinDistanceEdgeModel(EdgeModel):
 
 	def _transmat(self, xi, xj):
 		edges = self._find_xij(xi, xj)
-		if 'cortical' in edges.keys():
+		if 'cortical' in list(edges.keys()):
 			xij = edges['cortical']
 			pi = xij['refSS1nearest'].arraydata()
 			pj = xij['refSS2nearest'].arraydata()
@@ -322,7 +324,7 @@ class StickDistanceEdgeModel(EdgeModel):
 
 	def _transmat(self, xi, xj):
 		edges = self._find_xij(xi, xj)
-		if 'cortical' in edges.keys():
+		if 'cortical' in list(edges.keys()):
 			xij = edges['cortical']
 			pi = xij['refSS1nearest'].arraydata()
 			pj = xij['refSS2nearest'].arraydata()

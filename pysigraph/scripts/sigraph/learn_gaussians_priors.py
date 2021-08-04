@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pprint
 from optparse import OptionParser
 import sigraph
@@ -8,6 +9,7 @@ from soma import aims
 import datamind.io.old_csvIO as datamind_io
 from sulci.common import io, add_translation_option_to_parser
 from sulci.models import distribution
+from six.moves import range
 
 
 ################################################################################
@@ -50,7 +52,7 @@ def main():
 
 	print("compute likelihoods...")
 	gv = bayesian_model['vertices']
-	states = gv.keys()
+	states = list(gv.keys())
 	pn = bayesian_model['priors_nodes_hash']
 	prior_ind = pn['nodes_number']
 	data_n = distribs['priors_nodes_total'][0]

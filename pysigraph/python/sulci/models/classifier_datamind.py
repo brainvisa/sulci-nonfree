@@ -1,8 +1,9 @@
+from __future__ import absolute_import
 import pickle
 import numpy
 import scipy.stats
 
-from classifier import Classifier, classifier_map
+from .classifier import Classifier, classifier_map
 import datamind.ml.classif
 
 #

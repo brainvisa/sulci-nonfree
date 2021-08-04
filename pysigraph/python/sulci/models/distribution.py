@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import pickle, numpy, scipy.stats, scipy.special
 import six
+from six.moves import range
 
 # from Gael Varoquaux
 def ledoit_wolf(x):
@@ -2255,7 +2257,7 @@ normalize_weights:  True:  add constraint: sum_i w_i = 1
                        E = ||KW - Y||^2 + lambda (sum_i w_i -1)
                  False: no constraint
         '''
-        import my_vq
+        from . import my_vq
         import scipy.cluster as C
         # select uniformly data in spam bounding box
         t = numpy.array(spam._bb_talairach_offset)
@@ -2371,7 +2373,7 @@ verbose:  verbosity level. 0: no message. >0: more and more messages.
 
 Return Value : BIC
         '''
-        import my_vq
+        from . import my_vq
         import scipy.cluster as C
 
         # init E-step with kmeans

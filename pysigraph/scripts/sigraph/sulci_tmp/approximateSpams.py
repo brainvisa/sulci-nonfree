@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import re, os, sys, numpy
 from optparse import OptionParser
 import sigraph
@@ -8,6 +9,7 @@ from soma import aims
 from sulci.common import io, add_translation_option_to_parser
 from sulci.models import distribution, distribution_aims
 from sulci.models import check_same_distribution
+from six.moves import range
 
 ################################################################################
 # FIXME : rbf ?
@@ -22,7 +24,8 @@ from sulci.models import check_same_distribution
 #			interpolation=False, normalize_weights=True)
 #	return rbf
 
-def autofit_rec(spam, n, kmin, kmax, side, (kbest, bic_best), h):
+def autofit_rec(spam, n, kmin, kmax, side, test, h):
+	(kbest, bic_best) = test
 	print("[%d %d]" % (kmin, kmax))
 	k0 = 1
 	if side == 1:
@@ -37,7 +40,7 @@ def autofit_rec(spam, n, kmin, kmax, side, (kbest, bic_best), h):
 			if k < kmin: break
 		klist.append(k)
 		print("\tk = ", k)
-		if not h.has_key(k):
+		if k not in h:
 			gmm, bic = fit_gmm(spam, n, k)
 			h[k] = gmm, bic
 		else:	gmm, bic = h[k]

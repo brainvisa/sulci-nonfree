@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, pprint, re
 from optparse import OptionParser
 import numpy
@@ -11,6 +12,7 @@ from sulci.common import io
 from sulci.models import distribution
 from sulci.registration import ProcrustMetricField
 from sulci.registration.common import save_transformation
+from six.moves import range
 
 def parseOpts(argv):
 	description = 'Learn gaussian models.'

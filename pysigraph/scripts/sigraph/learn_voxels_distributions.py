@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pprint
 from optparse import OptionParser
 import sigraph
@@ -108,9 +109,9 @@ def main():
 		'gmm_spherical' : (0, 'gmm', learn_gmm_spherical),
 		'fixed_bgmm_diag' : (1, 'fixed_bgmm',learn_fixed_bgmm_diagonal),
 	}
-	if not models_table.has_key(type):
+	if type not in models_table:
 		msg.error("invalid type'%s', valid types are : %s" % \
-			(type, str(models_table.keys())))
+			(type, str(list(models_table.keys()))))
 		sys.exit(1)
 	nb_params, model_type, learn = models_table[type]
 	if nb_params != len(params):

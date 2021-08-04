@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+from __future__ import absolute_import
 import os, sys, numpy, pprint, copy
 from optparse import OptionParser
 import sigraph
@@ -16,13 +17,15 @@ import threading
 from soma import mpfork
 import numpy as np
 import time
+from six.moves import range
+from six.moves import zip
 
 
 ################################################################################
 def update_sulci_set(sulci_set, i, filename, name, v, c, s, w=None):
-    if sulci_set.has_key(name):
+    if name in sulci_set:
         h = sulci_set[name]
-        if h.has_key(i):
+        if i in h:
             h[i]['vertices'].append(v)
             if w: h[i]['weights'].append(w)
             h[i]['gravity_center'][0].append(c)
@@ -198,14 +201,14 @@ class SpamLearner(object):
                     X.append(p_out)
                 if segments_weights_g is None:
                     if X != []:
-                        if data.has_key(name):
+                        if name in data:
                             data[name].append(X)
                         else:    data[name] = [X]
                 else:
                     data.append(X)
                     data_weights.append(weights)
             for sulcus, h in sulci_set.items():
-                if not h.has_key(i): continue
+                if i not in h: continue
                 d = h[i]
                 C = d['gravity_center'][0]
                 W = d['gravity_center'][1]
@@ -262,7 +265,7 @@ class GlobalSpamLearner(SpamLearner):
                 voxels_size = len(segment)
                 for k, label in enumerate(self._labels):
                     w = subweights[k]
-                    if data_weights[j].has_key(label):
+                    if label in data_weights[j]:
                         w += [data_weights[j][label]]
                     else:    w += [0.]
                 subject_voxels += segment
@@ -650,7 +653,7 @@ class LocalSpamLearner(SpamLearner):
 
     def learn(self, optimized_gravity_centers,
         miniter=0., maxiter=numpy.inf, verbose=0):
-        d = dict(zip(self._labels, [None] * len(self._labels)))
+        d = dict(list(zip(self._labels, [None] * len(self._labels))))
         local_graph_trans = [copy.copy(d) for i in self._graphs]
         global_graph_trans = [copy.copy(d) for i in self._graphs]
         spams = []
@@ -683,7 +686,7 @@ class LocalSpamLearner(SpamLearner):
                 print(res[i][0], res[i][1])
                 import traceback
                 traceback.print_exception(*res[i])
-                raise (res[i][0], res[i][1], res[i][2])
+                raise res[i][0]
             try:
                 transformations, spam = res[i]
                 spams.append(spam)
@@ -717,7 +720,7 @@ class LocalSpamLearner(SpamLearner):
         global_trans = [SulcusWiseRigidTransformations(t) \
                     for t in global_graph_trans]
         mixture = distribution_aims.SpamMixtureModel(spams, None)
-        return zip(local_trans, global_trans), mixture
+        return list(zip(local_trans, global_trans)), mixture
 
 
 class LocalSpamLearnerLoo(LocalSpamLearner):
