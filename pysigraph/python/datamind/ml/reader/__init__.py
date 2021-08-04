@@ -32,23 +32,33 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+
 from __future__ import absolute_import
-from datamind.ml import plugins
+class Reader(object):
 
+    def __init__(self, backend):
+        '''
+backend :  - name of a plugin if plugin has only one reader.
+        - database backend instance (datamind.ml.database.Db)
+'''
+        from datamind.ml import plugins
 
-class NumpyPlugin(plugins.Plugin):
-    name = 'numpy'
+        if isinstance(backend, str):
+            readers = plugins.plugin_manager[backend].readers()
+            n = len(readers)
+            if n == 1:
+                self._reader = readers[0]()
+            elif n == 0:
+                raise plugins.PluginError("plugin '%s' "
+                                          "have not any reader." % backend)
+            else:
+                raise plugins.PluginError("plugin '%s' have more "
+                                          "than one reader." % backend)
+        else:
+            self._reader = backend.reader()
+            if self._reader == None:
+                raise plugins.PluginError(
+                    'backen have no reader.')
 
-    def databases(self):
-        from . import dbNumpy
-        return [dbNumpy.DbNumpy]
-
-    #def classifiers(self):
-        #from . import modelsNumpy as m
-        #return [m.LdaNumpy, m.Pls1Numpy, m.LRNumpy, m.SRDA, m.LDA, m.SVM_CSVC, m.SVM_eSVR, m.Elasticnet, m.Linear_model]
-
-    #def dimreductors(self):
-        #from . import dimreductionNumpy as dr
-        #return [dr.SvdNumpy, dr.CcaNumpy, dr.FeatureExtractionLdaNumpy,
-                #dr.FeatureExtractionPls1Numpy,  dr.FeatureExtractionANOVA,
-                #dr.SRDANumpy, dr.LDANumpy, dr.MultiStepwiseHybrid, dr.multiForward]
+    def read(self, filename):
+        return self._reader.read(filename)

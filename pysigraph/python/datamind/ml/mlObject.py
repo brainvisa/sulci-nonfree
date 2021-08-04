@@ -32,23 +32,30 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+
 from __future__ import absolute_import
-from datamind.ml import plugins
+from datamind.ml import wip
 
 
-class NumpyPlugin(plugins.Plugin):
-    name = 'numpy'
+class MlObject(object):
 
-    def databases(self):
-        from . import dbNumpy
-        return [dbNumpy.DbNumpy]
+    '''
+Root class of most of Ml class.
+Implement here what is common to most class.'''
 
-    #def classifiers(self):
-        #from . import modelsNumpy as m
-        #return [m.LdaNumpy, m.Pls1Numpy, m.LRNumpy, m.SRDA, m.LDA, m.SVM_CSVC, m.SVM_eSVR, m.Elasticnet, m.Linear_model]
+    def __init__(self, **keywords):
+        # FIXME : not implemented
+        pass
 
-    #def dimreductors(self):
-        #from . import dimreductionNumpy as dr
-        #return [dr.SvdNumpy, dr.CcaNumpy, dr.FeatureExtractionLdaNumpy,
-                #dr.FeatureExtractionPls1Numpy,  dr.FeatureExtractionANOVA,
-                #dr.SRDANumpy, dr.LDANumpy, dr.MultiStepwiseHybrid, dr.multiForward]
+    def getArguments(self, asStr=False):
+        '''
+Return a dictionnary of all 'public' fields
+if asStr is True return a string representation of this dictonnary.'''
+        wip.not_implemented()
+
+    def getSignature(self, args=None, asStr=True, ):
+        '''
+if args is not provided call getArguments
+Return a dictionnary args plus the name of the class
+if asStr is True return a string representation of this dictonnary.'''
+        wip.not_implemented()

@@ -32,21 +32,57 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
+from __future__ import print_function
+
 
 from __future__ import absolute_import
-from datamind.ml import plugins
+class WipError(Exception):
+    pass
 
 
-class LibSvmPlugin(plugins.Plugin):
-    name = 'libsvm'
+def not_implemented(msg='', function=''):
+    '''
+Print a msg stressing that a function is not implemented yet.
 
-    def readers(self):
-        from . import readerSvm
-        return [readerSvm.ReaderSvm]
+msg :		additional message
+function :	function name'''
+    import datamind.tools as tools
+    fixme = tools.msg.string('FIXME', 'bold_yellow')
+    if function == '':
+        raise WipError('%s : not implemented yet\n%s' % (fixme, msg))
+    else:
+        raise WipError("%s : function '%s' isn't "
+                       "implemented yet\n%s" % (fixme, function, msg))
 
-    def databases(self):
-        return []
 
-    def classifiers(self):
-        from . import modelsSvm
-        return [modelsSvm.ESvrLibSvm, modelsSvm.CSvcLibSvm]
+def fixme(msg=''):
+    '''
+Print 'FIXME' and an additional message specified by 'msg' parameter.'''
+    import datamind.tools as tools
+    fixme = tools.msg.string('FIXME', 'bold_yellow')
+    if msg == '':
+
+        print(fixme)
+    else:
+        print(fixme, ':', msg)
+
+
+def warning(msg):
+    '''
+Print a warning message.
+
+msg :     message'''
+    import datamind.tools as tools
+    tools.msg.warning(msg)
+
+
+def todo(msg, priority='low', user='unknown'):
+    '''
+Print a todo message.
+
+msg :         defition of the task.
+priority :    priority of task (suggestions : low, high, medium).
+user :        name of people who ask this task.'''
+    import datamind.tools as tools
+    todo = tools.msg.string('TODO', 'bold_yellow')
+    print(todo, '(' + user + ' : ' + priority + '):', msg)

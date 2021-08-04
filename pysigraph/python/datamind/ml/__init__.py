@@ -59,8 +59,19 @@ __doc__ = '''
 # from . import wip
 from .mlObject import *
 from . import plugins
-from . import database, classifier, dimreduction
-from . import classif, resampling, dimred
+from . import database
+try:
+    from . import classifier
+except ImportError:
+    pass
+try:
+    from . import dimreduction
+except ImportError:
+    pass
+try:
+    from . import classif, resampling, dimred
+except ImportError:
+    pass
 
 
 def test_import(module):

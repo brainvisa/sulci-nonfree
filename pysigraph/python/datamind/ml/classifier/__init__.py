@@ -32,23 +32,5 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from __future__ import absolute_import
-from datamind.ml import plugins
 
-
-class NumpyPlugin(plugins.Plugin):
-    name = 'numpy'
-
-    def databases(self):
-        from . import dbNumpy
-        return [dbNumpy.DbNumpy]
-
-    #def classifiers(self):
-        #from . import modelsNumpy as m
-        #return [m.LdaNumpy, m.Pls1Numpy, m.LRNumpy, m.SRDA, m.LDA, m.SVM_CSVC, m.SVM_eSVR, m.Elasticnet, m.Linear_model]
-
-    #def dimreductors(self):
-        #from . import dimreductionNumpy as dr
-        #return [dr.SvdNumpy, dr.CcaNumpy, dr.FeatureExtractionLdaNumpy,
-                #dr.FeatureExtractionPls1Numpy,  dr.FeatureExtractionANOVA,
-                #dr.SRDANumpy, dr.LDANumpy, dr.MultiStepwiseHybrid, dr.multiForward]
+from .classifier import *

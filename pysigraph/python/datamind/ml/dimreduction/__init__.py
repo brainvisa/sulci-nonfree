@@ -32,23 +32,4 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from __future__ import absolute_import
-from datamind.ml import wip
-from datamind.ml import reader
-
-
-class ReaderSvm(reader.Reader):
-
-    def __init__(self): pass
-
-    def read(self, filename):
-        from datamind.ml import database
-        import numpy
-
-        f = open(filename)
-        lines = f.readlines()
-        lines = [l.split(' ') for l in lines]
-        Y = numpy.array([[float(l[0]) for l in lines]]).transpose()
-        X = numpy.array([[float(x.split(':')[1])
-                          for x in l[1:]] for l in lines])
-        return database.DbNumpy(X, Y)
+from .dimreduction import *
