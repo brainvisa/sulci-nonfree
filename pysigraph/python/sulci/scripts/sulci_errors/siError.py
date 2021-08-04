@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import absolute_import
-import os, sys, exceptions, numpy
+import os, sys, numpy
 from optparse import OptionParser
 import sigraph
 import sigraph.error
