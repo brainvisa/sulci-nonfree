@@ -43,12 +43,12 @@ class NumpyPlugin(plugins.Plugin):
         from . import dbNumpy
         return [dbNumpy.DbNumpy]
 
-    #def classifiers(self):
-        #from . import modelsNumpy as m
-        #return [m.LdaNumpy, m.Pls1Numpy, m.LRNumpy, m.SRDA, m.LDA, m.SVM_CSVC, m.SVM_eSVR, m.Elasticnet, m.Linear_model]
+    def classifiers(self):
+        from . import modelsNumpy as m
+        return [m.LdaNumpy, m.Pls1Numpy, m.LRNumpy, m.SRDA, m.LDA, m.SVM_CSVC, m.SVM_eSVR, m.Elasticnet, m.Linear_model]
 
-    #def dimreductors(self):
-        #from . import dimreductionNumpy as dr
-        #return [dr.SvdNumpy, dr.CcaNumpy, dr.FeatureExtractionLdaNumpy,
-                #dr.FeatureExtractionPls1Numpy,  dr.FeatureExtractionANOVA,
-                #dr.SRDANumpy, dr.LDANumpy, dr.MultiStepwiseHybrid, dr.multiForward]
+    def dimreductors(self):
+        from . import dimreductionNumpy as dr
+        return [dr.SvdNumpy, dr.CcaNumpy, dr.FeatureExtractionLdaNumpy,
+                dr.FeatureExtractionPls1Numpy,  dr.FeatureExtractionANOVA,
+                dr.SRDANumpy, dr.LDANumpy, dr.MultiStepwiseHybrid, dr.multiForward]

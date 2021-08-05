@@ -7,15 +7,6 @@ import os, sys, glob, re
 import numpy
 from optparse import OptionParser
 
-# matplotlib
-import matplotlib
-matplotlib.use('QtAgg')
-import pylab
-
-# trick to use fff2 instead of fff in datamind
-import fff, fff2
-sys.modules['fff'] = fff2
-
 # datamind / soma
 from datamind.io import DF 
 from datamind.io import ReaderCsv, WriterCsv

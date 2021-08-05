@@ -7,22 +7,17 @@ import os, sys, pickle
 import numpy, scipy.stats
 from optparse import OptionParser
 
-# matplotlib
-import matplotlib
-from six.moves import range
-matplotlib.use('QtAgg')
-import pylab
-
-# trick to use fff2 instead of fff in datamind
-import fff, fff2
-sys.modules['fff'] = fff2
-
 # datamind / soma
 from datamind.io import ReaderCsv
 from datamind.io import DF 
 import datamind.ml.classif as CLF
 import datamind.ml.resampling as resample
 import datamind.ml.func as F
+
+'''
+This script needs the obsolete datamind modules which have not been moved to morphologist/pysigraph. Thus it will not work as is. But it seems to be never used anywhere and anyway we don't remember what it was meant for.
+We have not removed it just in case but it is dead code.
+'''
 
 
 ################################################################################

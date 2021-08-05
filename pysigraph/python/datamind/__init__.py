@@ -32,6 +32,11 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 __doc__ = '''
+    This package is obsolete but is still used in sulci SPAM models tools.
+    It was formerly the datamind project, which is obsolete and unmaintained.
+    Thus we moved the used (? at least loaded) code here and left the rest
+    in the former datamind project which should not be used anywhere.
+
     core :  ?
     data :  Data generator Module : small toysets usefull for tests, playing
             with machine learning methods and demo.
