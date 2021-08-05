@@ -45,8 +45,8 @@ int main( int argc, const char** argv )
   Writer<TimeTexture<short> > texW;
   Writer<Graph>	agw2;
   Reader<TimeTexture<short> > texR;
-  Writer<AimsData<short> > imaW;
-  Reader<AimsData<short> > triGV;
+  Writer<Volume<short> > imaW;
+  Reader<Volume<short> > triGV;
 
   string model;
   float dist = FLT_MAX;
@@ -225,8 +225,7 @@ int main( int argc, const char** argv )
         TimeTexture<short> braintex;
 
         cout << "Reading cortex volume   : " << triGV.fileName() << endl;
-        AimsData<short> greyVol;
-        triGV >> greyVol;
+        VolumeRef<short> greyVol( triGV.read() );
 
         cout << "reading brain triangulation   : " << flush;
         AimsSurfaceTriangle brain;
@@ -285,7 +284,7 @@ int main( int argc, const char** argv )
           }
 
         cout << "Write gyri volume\n";
-        imaW <<  gyriVol ;
+        imaW.write( *gyriVol );
 
       }
     else

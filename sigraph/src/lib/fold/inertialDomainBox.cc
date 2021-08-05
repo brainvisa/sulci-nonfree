@@ -16,11 +16,11 @@ using namespace std;
 
 
 InertialDomainBox::InertialDomainBox()
-  : DomainBox(), _inertia( 3, 3 ), _gravity( 3 ), _rotation( 3, 3 ),
-    _eigenValues( 3 ), _npoints( 0 ), _transfUpToDate( false ), _tolMargin( 0 )
+  : DomainBox(), _inertia( 3, 3 ), _gravity( 0, 0, 0 ), _rotation( 3, 3 ),
+    _eigenValues( 0. ), _npoints( 0 ), _transfUpToDate( false ),
+    _tolMargin( 0 )
 {
   _inertia = 0;
-  _gravity = 0;
 }
 
 
@@ -37,9 +37,7 @@ bool InertialDomainBox::canBeFound( double x, double y, double z )
 void InertialDomainBox::firstPass()
 {
   _transfUpToDate = false;
-  _gravity[0] *= _npoints;
-  _gravity[1] *= _npoints;
-  _gravity[2] *= _npoints;
+  _gravity *= _npoints;
 }
 
 
@@ -48,7 +46,7 @@ void InertialDomainBox::reset()
   DomainBox::reset();
   _transfUpToDate = false;
   _inertia = 0;
-  _gravity = 0;
+  _gravity = Point3df( 0, 0, 0 );
   _npoints = 0;
 }
 
@@ -203,30 +201,29 @@ void InertialDomainBox::learnTalVoxel( double x2, double y2, double z2 )
 
 void InertialDomainBox::diagonalize()
 {
-  _rotation = _inertia.clone();
+  _rotation = _inertia.deepcopy();
   AimsEigen<float>	eigen;
   //eigen.setSymmetricMatrix();
-  AimsData<float> m_eigenValues = eigen.doit( _rotation );
-  _eigenValues = AimsData<float>( 3 );
-  _eigenValues(0) = m_eigenValues(0,0);
-  _eigenValues(1) = m_eigenValues(1,1);
-  _eigenValues(2) = m_eigenValues(2,2);
+  VolumeRef<float> m_eigenValues = eigen.doit( _rotation );
+  _eigenValues[0] = m_eigenValues(0,0);
+  _eigenValues[1] = m_eigenValues(1,1);
+  _eigenValues[2] = m_eigenValues(2,2);
   // check that the referential is direct
-  AimsData<float>	pvec(3);
-  pvec[0] = _rotation( 1, 0 ) *  _rotation( 2, 1 )
-    - _rotation( 2, 0 ) *  _rotation( 1, 1 );
-  pvec[1] = _rotation( 2, 0 ) * _rotation( 0, 1 )
-    - _rotation( 0, 0 ) * _rotation( 2, 1 );
-  pvec[2] = _rotation( 0, 0 ) * _rotation( 1, 1 )
-    - _rotation( 1, 0 ) * _rotation( 0, 1 );
-  if( fabs( pvec[0] - _rotation( 0, 2 ) ) > 1e-5
-      || fabs( pvec[1] - _rotation( 1, 2 ) ) > 1e-5
-      || fabs( pvec[2] - _rotation( 2, 2 ) ) > 1e-5 )
+  Point3df	pvec(3);
+  pvec[0] = _rotation.at( 1, 0 ) *  _rotation.at( 2, 1 )
+    - _rotation.at( 2, 0 ) *  _rotation.at( 1, 1 );
+  pvec[1] = _rotation.at( 2, 0 ) * _rotation.at( 0, 1 )
+    - _rotation.at( 0, 0 ) * _rotation.at( 2, 1 );
+  pvec[2] = _rotation.at( 0, 0 ) * _rotation.at( 1, 1 )
+    - _rotation.at( 1, 0 ) * _rotation.at( 0, 1 );
+  if( fabs( pvec[0] - _rotation.at( 0, 2 ) ) > 1e-5
+      || fabs( pvec[1] - _rotation.at( 1, 2 ) ) > 1e-5
+      || fabs( pvec[2] - _rotation.at( 2, 2 ) ) > 1e-5 )
   {
     cout << "indirect referential\n";
-    if( fabs( pvec[0] + _rotation( 0, 2 ) ) > 1e-5
-      || fabs( pvec[1] + _rotation( 1, 2 ) ) > 1e-5
-      || fabs( pvec[2] + _rotation( 2, 2 ) ) > 1e-5 )
+    if( fabs( pvec[0] + _rotation.at( 0, 2 ) ) > 1e-5
+      || fabs( pvec[1] + _rotation.at( 1, 2 ) ) > 1e-5
+      || fabs( pvec[2] + _rotation.at( 2, 2 ) ) > 1e-5 )
       cout << "La transformation ne marche pas : " << _rotation( 0, 2 )
         << ", " << _rotation( 1, 2 ) << ", " << _rotation( 2, 2 )
         << " au lieu de " << pvec[0] << ", " << pvec[1] << ", "
@@ -247,26 +244,23 @@ void InertialDomainBox::diagonalize()
       _rotation( 2, 0 ) = _rotation( 2, 2 );
       _rotation( 2, 2 ) = t;
       //	et des valeurs propres associ�es
-      t = _eigenValues(0);
-      _eigenValues(0) = _eigenValues(2);
-      _eigenValues(2) = t;
+      t = _eigenValues[0];
+      _eigenValues[0] = _eigenValues[2];
+      _eigenValues[2] = t;
     }
   }
   else cout << "direct referential\n";
 
   if( _npoints )
-    {
-      _gravity[0] /= _npoints;
-      _gravity[1] /= _npoints;
-      _gravity[2] /= _npoints;
-    }
+    _gravity /= _npoints;
   _transfUpToDate = true;
 }
 
 
 void InertialDomainBox::changeRef( double & x, double & y, double & z )
 {
-  double x2 = x - _gravity[0], y2 = y - _gravity[1], z2 = z - _gravity[2];
+  double x2 = x - _gravity[0], y2 = y - _gravity[1],
+    z2 = z - _gravity[2];
 
   /*x = _rotation( 0, 0 ) * x2 + _rotation( 0, 1 ) * y2 + _rotation( 0, 2 ) * z2;
   y = _rotation( 1, 0 ) * x2 + _rotation( 1, 1 ) * y2 + _rotation( 1, 2 ) * z2;
@@ -410,9 +404,7 @@ void InertialDomainBox::buildInertialDomBox( Tree*, Tree* tr )
   else
     {
       idb->_transfUpToDate = false;
-      idb->_gravity[0] *= idb->_npoints;
-      idb->_gravity[1] *= idb->_npoints;
-      idb->_gravity[2] *= idb->_npoints;
+      idb->_gravity *= idb->_npoints;
     }
 }
 

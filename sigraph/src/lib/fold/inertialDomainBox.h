@@ -4,7 +4,7 @@
 
 
 #include <si/fold/domainBox.h>
-#include <aims/data/data.h>
+#include <cartodata/volume/volume.h>
 
 
 namespace sigraph
@@ -56,14 +56,14 @@ namespace sigraph
     void learnTalVoxel( double x, double y, double z );
 
     ///	Matrice d'inertie
-    AimsData<float>	_inertia;
+    carto::VolumeRef<float>	_inertia;
     ///	Centre de gravité
-    AimsData<float>	_gravity;
+    Point3df	_gravity;
     ///	Matrice de rotation
-    AimsData<float>	_rotation;
+    carto::VolumeRef<float>	_rotation;
     ///	Valeurs propres de la matrice d'inertie
-    AimsData<float>	_eigenValues;
-    unsigned		_npoints;
+    Point3df	_eigenValues;
+    unsigned	_npoints;
     ///	Flag
     bool		_transfUpToDate;
     ///	Marge de tolérence supplémentaire

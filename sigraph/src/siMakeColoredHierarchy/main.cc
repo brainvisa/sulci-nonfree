@@ -172,15 +172,15 @@ int main(int argc, const char **argv)
  
       // read palette
       cout << "Reading palette   : " << palettefile << "..." ;
-      AimsData<AimsRGB> palette;
-      Reader<AimsData<AimsRGB> > pal( palettefile );
-      pal >> palette;
+      VolumeRef<AimsRGB> palette;
+      Reader<Volume<AimsRGB> > pal( palettefile );
+      palette.reset( pal.read() );
       cout << "done \n";
   
       vector<AimsRGB> colors;
-      unsigned lengthPalette = palette.dimX();
+      unsigned lengthPalette = palette.getSizeX();
       for (unsigned i = 0 ; i < lengthPalette ; ++i )
-        colors.push_back( palette(i,0,0) );
+        colors.push_back( palette.at(i,0,0) );
 
       //Build hierarchy
       int r,g,b;

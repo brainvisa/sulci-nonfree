@@ -165,7 +165,8 @@ int main( int argc, const char** argv )
   string					bname = "aims_bottom",ssname = "aims_ss",othername= "aims_other";
   string					synt;
   FGraph					fg;
-  AimsData<short>				surface_vol( bb[0],bb[1],bb[2],1,1 ),bottom_vol( bb[0],bb[1],bb[2],1,1 );
+  VolumeRef<short>			surface_vol( bb[0], bb[1], bb[2],1,1 ),
+    bottom_vol( bb[0], bb[1], bb[2], 1, 1 );
   map<string,short>				trans;
   map <short,string>    			transInv;
   Graph::iterator				iv, fv=fg.end();
@@ -189,8 +190,8 @@ int main( int argc, const char** argv )
 
     fg.getProperty( "anterior_commissure", CA );
     ASSERT( fg.getProperty( "voxel_size", vsz ) );
-    bottom_vol.setSizeXYZT( vsz[0], vsz[1], vsz[2], 1. );
-    bottom_vol = 0;
+    bottom_vol.setVoxelSize( vsz[0], vsz[1], vsz[2], 1. );
+    bottom_vol.fill( 0 );
     bottom_vol.fillBorder(0);
     cout << "CA: " << Point3df(CA[0] * vsz[0],CA[1] * vsz[1],CA[2] * vsz[2])  << endl;
 
@@ -283,7 +284,7 @@ int main( int argc, const char** argv )
             for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
             {
               pos = ib->first;
-              bottom_vol( pos[0], pos[1], pos[2] ) = i;
+              bottom_vol.at( pos[0], pos[1], pos[2] ) = i;
             }
           }
         }
@@ -298,7 +299,7 @@ int main( int argc, const char** argv )
               for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
               {
                 pos = ib->first;
-                bottom_vol( pos[0], pos[1], pos[2] ) = i;
+                bottom_vol.at( pos[0], pos[1], pos[2] ) = i;
               }
             }
           }
@@ -307,7 +308,7 @@ int main( int argc, const char** argv )
     }
 
     //Def volume of sulcal surface (sulci)
-    surface_vol = bottom_vol.clone();
+    surface_vol.reset( new Volume<short>( *bottom_vol ) );
     for( iv=fg.begin(); iv!=fv; ++iv )
     {
       ASSERT( (*iv)->getProperty( "name", name ) );
@@ -322,7 +323,7 @@ int main( int argc, const char** argv )
             for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
             {
               pos = ib->first;
-              surface_vol( pos[0], pos[1], pos[2] ) = i;
+              surface_vol.at( pos[0], pos[1], pos[2] ) = i;
             }
           }
         }
@@ -337,7 +338,7 @@ int main( int argc, const char** argv )
               for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
               {
                 pos = ib->first;
-                surface_vol( pos[0], pos[1], pos[2] ) = i;
+                surface_vol.at( pos[0], pos[1], pos[2] ) = i;
               }
             }
           }
@@ -359,7 +360,7 @@ int main( int argc, const char** argv )
             for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
             {
               pos = ib->first;
-              surface_vol( pos[0], pos[1], pos[2] ) = i;
+              surface_vol.at( pos[0], pos[1], pos[2] ) = i;
             }
           }
         }
@@ -374,7 +375,7 @@ int main( int argc, const char** argv )
               for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
               {
                 pos = ib->first;
-                surface_vol( pos[0], pos[1], pos[2] ) = i;
+                surface_vol.at( pos[0], pos[1], pos[2] ) = i;
               }
             }
           }
@@ -434,7 +435,7 @@ int main( int argc, const char** argv )
     cout << "done" << endl;
     cout << "texture dim   : " << curvTex[0].nItem() << endl;
     outTex = meshdistance::SulcusVolume2Texture( surface[0], curvTex[0],
-                                                 bottom_vol ,surface_vol,
+                                                 bottom_vol, surface_vol,
                                                  K, demin , ncc, transInv,
                                                  labels, radius, rmadius,
                                                  alpha_reg, connectivity,

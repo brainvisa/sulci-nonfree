@@ -462,10 +462,10 @@ void AFGraph::setColorsNodePot()
   int			ind = 0;
   getOrCreatePalette();
   AObjectPalette	*objpal = palette();
-  AimsData<AimsRGBA>	*cols = objpal->colors();
+  VolumeRef<AimsRGBA>	cols = *objpal->colors();
   float			cmin = objpal->min1(), cmax = objpal->max1();
   float			scale, mp, Mp, fmin, fmax;
-  unsigned		ncol = cols->dimX();
+  unsigned		ncol = cols->getSizeX();
   GLComponent::TexExtrema & ex = glTexExtrema();
 
   float minPot = FLT_MAX;
@@ -545,7 +545,7 @@ void AFGraph::setColorsNodePot()
                               pot0AlphaUsed() ? pot0Alpha() : mat.Diffuse( 3 ) );
 	    else
 	      {
-		const AimsRGBA	& rgb = (*cols)( ind );
+		const AimsRGBA	& rgb = cols->at( ind );
 		mat.SetDiffuse( (float) rgb.red()   / 256, 
 				(float) rgb.green() / 256, 
 				(float) rgb.blue()  / 256, 
@@ -583,7 +583,7 @@ void AFGraph::setColorsNodePot()
                             pot0AlphaUsed() ? pot0Alpha() : mat.Diffuse( 3 ) );
           else
           {
-            const AimsRGBA  & rgb = (*cols)( ind );
+            const AimsRGBA  & rgb = cols->at( ind );
             mat.SetDiffuse( (float) rgb.red()   / 256,
                              (float) rgb.green() / 256,
                              (float) rgb.blue()  / 256,

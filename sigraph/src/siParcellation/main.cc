@@ -9,32 +9,16 @@
  */
 
 #include <aims/distancemap/meshparcellation.h>
-#include <aims/distancemap/meshdistance.h>
 #include <aims/distancemap/projection.h>
-#include <aims/data/data_g.h>
-#include <aims/io/io_g.h>
-#include <aims/math/math_g.h>
-#include <iomanip>
 #include <aims/getopt/getopt2.h>
-#include <aims/vector/vector.h>
 #include <aims/mesh/texture.h>
 #include <aims/io/reader.h>
 #include <aims/io/writer.h>
 #include <aims/connectivity/meshcc.h>
-#include <fstream>
-#include <float.h>
 #include <si/fold/labelsTranslator.h>
-#include <si/global/global.h>
-#include <aims/mesh/tex2graph_d.h>
-#include <aims/io/aimsGraphW.h>
-#include <aims/def/path.h>
-#include <graph/graph/graph.h>
-#include <graph/graph/gwriter.h>
-#include <graph/graph/greader.h>
-#include <cartobase/object/sreader.h>
-#include <cartobase/plugin/plugin.h>
-#include <si/fold/foldReader.h>
+#include <aims/mesh/tex2graph.h>
 #include <aims/graph/graphmanip.h>
+#include <cfloat>
 
 using namespace aims;
 using namespace aims::meshdistance;
@@ -50,9 +34,9 @@ int main( int argc, const char** argv )
   Reader<TimeTexture<short> > texR;
   Writer<Graph> agw2;
   Writer<TimeTexture<short> > texW;
-  Writer<AimsData<short> > imaW;
+  Writer<Volume<short> > imaW;
   string model;
-  Reader<AimsData<short> > triGV;
+  Reader<Volume<short> > triGV;
   float dist = FLT_MAX;
   map< set<short>,set<unsigned>,SetCompare<short> > label_sulci_Vert;
   bool connexity = false, graph=false;
@@ -311,8 +295,7 @@ int main( int argc, const char** argv )
       TimeTexture<short> braintex;
 
       cout << "Reading cortex volume   : " << triGV.fileName() << endl;
-      AimsData<short> greyVol;
-      triGV >> greyVol;
+      VolumeRef<short> greyVol( triGV.read() );
 
       cout << "reading brain triangulation   : " << flush;
       AimsSurfaceTriangle brain;
@@ -376,7 +359,7 @@ int main( int argc, const char** argv )
       if( !imaW.fileName().empty() )
       {
         cout << "Write gyri volume\n";
-        imaW <<  gyriVol ;
+        imaW.write( *gyriVol );
       }
 
     }

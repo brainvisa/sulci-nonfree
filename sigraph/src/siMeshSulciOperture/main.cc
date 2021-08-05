@@ -40,7 +40,7 @@ int main( int argc, const char** argv )
 {
   Reader<AimsSurfaceTriangle> triR;
   Reader<AimsSurfaceTriangle> triR2;
-  Writer<AimsData<float> > texV;
+  Writer<Volume<float> > texV;
 
   string mrifile, outvolfile, sname, level, modelfile, gname;
   float  demin = 10, dpmin = 2;
@@ -114,7 +114,7 @@ int main( int argc, const char** argv )
     string					bname = "aims_bottom",ssname = "aims_ss",othername= "aims_other";
     string					synt;
     FGraph					fg;
-    AimsData<short>				surface_vol( bb[0],bb[1],bb[2],1,1 );
+    VolumeRef<short>		surface_vol( bb[0], bb[1], bb[2], 1, 1 );
     map<string,short>				trans;
     map <short,string>    			transInv;
     Graph::iterator				iv, fv=fg.end();
@@ -145,10 +145,9 @@ int main( int argc, const char** argv )
         fg.loadBuckets( gname, true );
 
         ASSERT( fg.getProperty( "voxel_size", vsz ) );
-        surface_vol.setSizeXYZT( vsz[0], vsz[1], vsz[2], 1. );
-        surface_vol = 0;
+        surface_vol.setVoxelSize( vsz[0], vsz[1], vsz[2], 1. );
+        surface_vol.fill( 0 );
         surface_vol.fillBorder(0);
-
 
         for( il=levelTrans.begin(); il!=fl; ++il )
           {
@@ -166,7 +165,6 @@ int main( int argc, const char** argv )
 
 
         //Def volume of sulcal surface (sulci)
-        surface_vol = surface_vol.clone();
         for( iv=fg.begin(); iv!=fv; ++iv )
           {
             ASSERT( (*iv)->getProperty( "name", name ) );
@@ -181,7 +179,7 @@ int main( int argc, const char** argv )
                         for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
                           {
                             pos = ib->first;
-                            surface_vol( pos[0], pos[1], pos[2] ) = i;
+                            surface_vol.at( pos[0], pos[1], pos[2] ) = i;
                           }
                       }
                   }
@@ -196,7 +194,7 @@ int main( int argc, const char** argv )
                             for( ib=bl.begin(), fb=bl.end(); ib!=fb; ++ib )
                               {
                                 pos = ib->first;
-                                surface_vol( pos[0], pos[1], pos[2] ) = i;
+                                surface_vol.at( pos[0], pos[1], pos[2] ) = i;
                               }
                           }
                       }
@@ -267,10 +265,8 @@ int main( int argc, const char** argv )
     map<Point3df, pair<float,float> , Point3dfCompare > sulci2gw;
     //map<Point3df, pair<float,float> , Point3dfCompare > sulci2wlcr;
 
-    AimsData<float>    vol(surface_vol.dimX(),surface_vol.dimY(),surface_vol.dimZ(),1);
-    float sx = surface_vol.sizeX(),sy = surface_vol.sizeY(),sz = surface_vol.sizeZ(), st = surface_vol.sizeT() ;
-    vol.setSizeXYZT(sx,sy,sz,st);
-    ASSERT(sx * sy * sz != 0);
+    VolumeRef<float>    vol( surface_vol.getSize() );
+    vol.setVoxelSize( surface_vol.getVoxelSize() );
 
 
     meshdistance::SulcusOperture( gw_surface[0],sulci2gw,surface_vol,
@@ -287,7 +283,7 @@ int main( int argc, const char** argv )
 
 
     cout << "writing volume : " << flush;
-    texV << vol;
+    texV.write( *vol );
     cout << "done" << endl;
 
 

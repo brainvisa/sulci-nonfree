@@ -222,11 +222,11 @@ bool InterFoldDescr5::makeVectorElements( const Clique* cl,
 
     mom.orientation();
 
-    AimsData<double> eigenValues = mom.eigenValue();
+    VolumeRef<double> eigenValues = mom.eigenValue();
 
-    vec.push_back( eigenValues( 0, 0 ) );
-    vec.push_back( eigenValues( 1, 1 ) );
-    vec.push_back( eigenValues( 2, 2 ) );
+    vec.push_back( eigenValues.at( 0, 0 ) );
+    vec.push_back( eigenValues.at( 1, 1 ) );
+    vec.push_back( eigenValues.at( 2, 2 ) );
   }
 
   return true;
