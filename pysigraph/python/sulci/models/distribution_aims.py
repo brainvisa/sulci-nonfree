@@ -19,7 +19,7 @@ inf = numpy.inf
 
 
 class PySpam(Distribution):
-    _converter = aims.Converter_BucketMap_FLOAT_AimsData_FLOAT()
+    _converter = aims.Converter_BucketMap_FLOAT_rc_ptr_Volume_FLOAT()
     _resampler = aimsalgo.LinearResampler_FLOAT()
     _neighbourhood = numpy.array([
         [-1, -1, -1],
@@ -148,13 +148,12 @@ overlappe to each other.
         motion_t = motion_t2 * motion_r * motion_t1
 
         # buket -> img avec translation
-        img = aims.AimsData_FLOAT(*bb_size_in)
+        img = aims.Volume_FLOAT(*bb_size_in)
         cls._converter.convert(bucketmap, img)
         img_out = aims.AimsData_FLOAT(*bb_size_out)
         # input (anisotropic voxels)
         # -> output (isotropic voxels) in motion space
-        cls._resampler.resample(img.volume(), motion_t, 0, img_out.volume(),
-                                False)
+        cls._resampler.resample(img, motion_t, 0, img_out.volume(), False)
 
         return img_out
     _bucketmap_bb_to_img_bb_with_motion = \

@@ -262,7 +262,7 @@ for label, globval in six.iteritems(globaverage):
     bck = bcks[0]
     for b in bcks[1:]:
         bck.merge(b)
-    vol = aims.Converter_BucketMap_VOID_AimsData_S16()(bck)
+    vol = aims.Converter_BucketMap_VOID_rc_ptr_Volume_S16()(bck)
     tf = tempfile.mkstemp('vol.nii', 'sulcus')
     os.close(tf[0])
     tmpvolfile = tf[1]
