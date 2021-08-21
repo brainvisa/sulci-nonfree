@@ -62,7 +62,7 @@ def make_atlas_deterministic(models, priors, bb, threshold,
 	for i, (sulcus, spam) in enumerate(models.items()):
 		img_density = spam.img_density()
 		off_spam, size_spam = spam.bb_talairach()
-		li = img_density.volume().get().arraydata() * priors[i]
+		li = img_density.arraydata() * priors[i]
 		# limits
 		doff = (off_spam - off).astype('int')
 		pi, pa = doff, (doff + size_spam).astype('int')
@@ -127,7 +127,7 @@ def make_atlas_probabilistic(models, priors, bb, threshold,
 		P.fill(0.)
 		img_density = spam.img_density()
 		off_spam, size_spam = spam.bb_talairach()
-		li = img_density.volume().get().arraydata() * priors[i]
+		li = img_density.arraydata() * priors[i]
 		# limits
 		doff = (off_spam - off).astype('int')
 		pi, pa = doff, (doff + size_spam).astype('int')

@@ -61,7 +61,7 @@ def compute_entropy2(spams, bb, is_exp):
 	for spam in spams:
 		img_density = spam.img_density()
 		off_spam, size_spam = spam.bb_talairach()
-		li = img_density.volume().get().arraydata() #FIXME * prior
+		li = img_density.arraydata() #FIXME * prior
 		# limits
 		doff = (off_spam - off).astype('int')
 		pi, pa = doff, (doff + size_spam).astype('int')
@@ -74,7 +74,7 @@ def compute_entropy2(spams, bb, is_exp):
 	for spam in spams:
 		img_density = spam.img_density()
 		off_spam, size_spam = spam.bb_talairach()
-		li = img_density.volume().get().arraydata() #FIXME * prior
+		li = img_density.arraydata() #FIXME * prior
 		# limits
 		doff = (off_spam - off).astype('int')
 		pi, pa = doff, (doff + size_spam).astype('int')

@@ -84,7 +84,7 @@ def update_spam(spam, distr):
 	'''
     update likelihoods of spam from distr
 	'''
-	img = spam._img_density.volume().arraydata()
+	img = spam._img_density.arraydata()
 	t = numpy.array(spam._bb_talairach_offset)
 	s = numpy.array(spam._bb_talairach_size)
 	from numpy.lib import index_tricks

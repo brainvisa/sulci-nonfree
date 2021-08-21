@@ -241,8 +241,7 @@ class SpamDisplay(Display):
 
 		bb_talairach_offset, bb_talairach_size = spam.bb_talairach()
 		img_density = self._get_data(sulcus, spam)
-		try:	array = img_density.volume().get().arraydata()
-		except:	array = img_density.arraydata()
+		array = img_density.arraydata()
 		if spam.is_fromlog(): array = numpy.exp(array)
 			
 		if numpy.isnan(array).sum():

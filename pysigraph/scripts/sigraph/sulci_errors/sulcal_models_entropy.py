@@ -9,7 +9,7 @@ from sulci.models import distribution, distribution_aims
 ################################################################################
 def compute_entropy(sulcus, spam):
 	img_density = spam.img_density()
-	array = img_density.volume().get().arraydata()
+	array = img_density.np
 	array = array[array > 0]
 	entropy = -(array * numpy.log(array)).sum()
 	return entropy
