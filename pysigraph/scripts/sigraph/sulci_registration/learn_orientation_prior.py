@@ -32,12 +32,9 @@ def get_orientations_from_skeletons(sulci, graphs, skelnames,
             os.path.exists(gZname):
             reader = aims.Reader()
             print("find grad X,Y,Z maps for subject '%s'" % subject)
-            gradsX = reader.read(gXname)
-            gradsX = aims.AimsData_FLOAT(gradsX)
-            gradsY = reader.read(gYname)
-            gradsY = aims.AimsData_FLOAT(gradsY)
-            gradsZ = reader.read(gZname)
-            gradsZ = aims.AimsData_FLOAT(gradsZ)
+            gradsX = reader.read(gXname).astype('FLOAT')
+            gradsY = reader.read(gYname).astype('FLOAT')
+            gradsZ = reader.read(gZname).astype('FLOAT')
         else:
             print("compute grad X,Y,Z maps for subject '%s'" % \
                                 subject)

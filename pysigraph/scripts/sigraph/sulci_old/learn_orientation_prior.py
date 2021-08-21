@@ -23,11 +23,11 @@ def compute_depthmap(subject, graph, skel, write_data=False):
 	sZ = depth.dimZ()
 	sT = depth.dimT()
 	converter = aims.Converter_Volume_S16_Volume_FLOAT()
-	depth2 = aims.AimsData_FLOAT(sX, sY, sZ, sT)
+	depth2 = aims.Voloume_FLOAT(sX, sY, sZ, sT)
 	converter.convert(depth, depth2)
 	depth = depth2
-	depth.volume().arraydata()[:] /= depth_factor
-	if write_data: aims.Writer().write(depth, '%s_depth.ima' % subject)
+	depth[:] /= depth_factor
+	if write_data: aims.write(depth, '%s_depth.ima' % subject)
 	return depth
 
 
@@ -35,7 +35,7 @@ def compute_depthmap(subject, graph, skel, write_data=False):
 def compute_orientation(subject, splitmode, sulci, hie, graph,
 			skel, depth, write_data=False):
 	motion = aims.GraphManip.talairach(graph)
-	motion2 = aims.Motion(motion)
+	motion2 = aims.AffineTransformation3d(motion)
 	motion2.setTranslation([0, 0, 0])
 	writer = aims.Writer()
 
@@ -49,11 +49,11 @@ def compute_orientation(subject, splitmode, sulci, hie, graph,
 	gX.header()['voxel_size'] = voxel_size
 	gY.header()['voxel_size'] = voxel_size
 	gZ.header()['voxel_size'] = voxel_size
-	agX = gX.volume().arraydata()
-	agY = gY.volume().arraydata()
-	agZ = gZ.volume().arraydata()
+	agX = gX.arraydata()
+	agY = gY.arraydata()
+	agZ = gZ.arraydata()
 
-	depth_array = depth.volume().arraydata()
+	depth_array = depth.arraydata()
 	grads = {}
 	positions = {}
 	centers = {}
@@ -70,9 +70,8 @@ def compute_orientation(subject, splitmode, sulci, hie, graph,
 		P = []
 		D = []
 		label = v['name']
-		ss_map = v['aims_ss'].get()
-		size_in = numpy.array([ss_map.sizeX(), ss_map.sizeY(),
-							ss_map.sizeZ()])
+		ss_map = v['aims_ss']
+		size_in = numpy.array(ss_map.getSize()[:3])
 		c = numpy.array(motion.transform(v['gravity_center'] * size_in))
 		for i, p in enumerate(ss_map[0].keys()):
 			p2 = (0, p[2], p[1], p[0])
@@ -225,8 +224,7 @@ def main_subject(parser, options, args):
 	depthmapname = '%s_depth.ima' % subject
 	if os.path.exists(depthmapname):
 		print("find depthmap '%s'" % depthmapname)
-		depth = aims.Reader().read(depthmapname)
-		depth = aims.AimsData_FLOAT(depth)
+		depth = aims.read(depthmapname)
 	else:	depth = compute_depthmap(subject, graph,
 				skel, options.write_data)
 

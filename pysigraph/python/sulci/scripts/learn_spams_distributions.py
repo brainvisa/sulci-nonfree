@@ -65,10 +65,8 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value,
             if options.mode != 'loo' :
                 depthmapname = os.path.join('..', depthmapname)
             if os.path.exists(depthmapname):
-                reader = aims.Reader()
                 print("find depthmap for subject '%s'" % subject)
-                depthmap = reader.read(depthmapname)
-                depthmap = aims.AimsData_FLOAT(depthmap)
+                depthmap = aims.read(depthmapname)
             else:
                 print("compute depthmap for subject '%s'" % \
                                 subject)
@@ -136,7 +134,7 @@ def compute_spams(graphs, segments_weights, distribdir, sigma_value,
                 update_sulci_set(sulci_set, i, \
                     filename, name, v, None)
 
-            ss_map = v[bucket_name].get()
+            ss_map = v[bucket_name]
             size_in = numpy.array([ss_map.sizeX(),
                 ss_map.sizeY(), ss_map.sizeZ()])
             if need_data:

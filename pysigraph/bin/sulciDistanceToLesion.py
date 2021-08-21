@@ -81,17 +81,18 @@ else:
     for graphfile in graphfiles:
         graphs.append(aims.read(graphfile))
 
-    wh = aims.AimsData_S16(lgw + rgw, 1)
+    wh = aims.Volume_S16(lgw.getSize(), [1, 1, 1])  # alloc border
+    wh[:] = lgw.np + rg0w.np
     dh = dict(lgw.header())
     for x in ['volume_dimension', 'sizeX', 'sizeY', 'sizeZ', 'sizeT']:
         if x in dh:
             del dh[x]
     wh.header().update(dh)
-    wharr = numpy.array(wh.volume(), copy=False)
+    wharr = wh.np
     wharr[wharr == 100] = 0  # erase grey matter
     # close WM one voxel to link both hemispheres
     wh = aimsalgo.AimsMorphoClosing(wh, wh.header()['voxel_size'][0])
-    wharr = numpy.array(wh.volume(), copy=False)
+    wharr = wh.np
 
     # erode GM a bit on each hemisphere so that they avoid touching from one
     # hemisphere to the other
@@ -99,7 +100,7 @@ else:
     rer = aimsalgo.AimsMorphoErosion(rgw, 1)
     eroded = ler + rer
     del ler, rer
-    barr = numpy.array(eroded.volume(), copy=False)
+    barr = eroded.np
     # merge with connected WM
     barr[numpy.where(wharr != 0)] = 32767
 
@@ -116,16 +117,17 @@ else:
             for bucket in ('aims_ss', 'aims_bottom', 'aims_other'):
                 try:
                     bck = v[bucket]
-                    barr[numpy.column_stack([list(bck[0].keys()),
-                                             numpy.zeros((bck[0].size(), 1))])] = 0
+                    barr[numpy.column_stack(
+                        [list(bck[0].keys()),
+                         numpy.zeros((bck[0].size(), 1))])] = 0
                 except:
                     pass
 
     fm = aims.FastMarching()
-    dist = fm.doit(eroded.volume(), [32767], [1])
+    dist = fm.doit(eroded, [32767], [1])
 
     # remove FLT_MAX values
-    darr = numpy.array(dist, copy=False)
+    darr = dist.np
     darr[numpy.where(darr > 1e4)] = -1
     # set lesion to distance 0
     darr[larr != 0] = 0

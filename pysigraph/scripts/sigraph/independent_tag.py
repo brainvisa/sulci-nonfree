@@ -196,7 +196,6 @@ def main():
 			sys.exit(1)
 		print("find depthmap for subject '%s'" % subject)
 		depthmap = reader.read(depthmapname)
-		depthmap = aims.AimsData_FLOAT(depthmap)
 		descriptor.setDepthMap(depthmap)
 
 	# sulci tag

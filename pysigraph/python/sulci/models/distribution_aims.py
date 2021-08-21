@@ -148,12 +148,12 @@ overlappe to each other.
         motion_t = motion_t2 * motion_r * motion_t1
 
         # buket -> img avec translation
-        img = aims.Volume_FLOAT(*bb_size_in)
+        img = aims.Volume_FLOAT(bb_size_in)
         cls._converter.convert(bucketmap, img)
-        img_out = aims.AimsData_FLOAT(*bb_size_out)
+        img_out = aims.Volume_FLOAT(bb_size_out)
         # input (anisotropic voxels)
         # -> output (isotropic voxels) in motion space
-        cls._resampler.resample(img, motion_t, 0, img_out.volume(), False)
+        cls._resampler.resample(img, motion_t, 0, img_out, False)
 
         return img_out
     _bucketmap_bb_to_img_bb_with_motion = \
@@ -215,7 +215,7 @@ overlappe to each other.
                 bucket_name = 'aims_ss'
             else:
                 bucket_name = 'aims_bottom'
-            bucketmaps_in = [v[bucket_name].get() for v in vertices]
+            bucketmaps_in = [v[bucket_name] for v in vertices]
             self._nodes_n += len(vertices)
             n = numpy.sum([len(list(b[0].keys())) for b in bucketmaps_in])
             if n == 0:
@@ -259,7 +259,7 @@ overlappe to each other.
         bb_talairach_size = [(s + 10) for s in bb_talairach_size]
 
         # 2) Transform data and count :
-        img_count = aims.AimsData_FLOAT(*bb_talairach_size)
+        img_count = aims.Volume_FLOAT(bb_talairach_size)
         img_count.fill(0.)
         # For each subjects
         for (id, graphinfo) in self._infos.items():
@@ -274,7 +274,7 @@ overlappe to each other.
                     (bb_subject_offset, bb_subject_size),
                     (bb_talairach_offset, bb_talairach_size))
             img_count += img_talairach
-        array = img_count.volume().get().arraydata()
+        array = img_count.np
         array /= array.sum()
         if write_count:
             aims.write(img_count, write_count)
@@ -283,7 +283,7 @@ overlappe to each other.
         d = self._gaussian_std
         smoothing = aimsalgo.Gaussian3DSmoothing_FLOAT(d, d, d)
         img_blur = smoothing.doit(img_count)
-        array = img_blur.volume().get().arraydata()
+        array = img_blur.arraydata()
         # apply correction if needed
         array[array < 0.] = 0.
         # avoid null values
@@ -327,9 +327,9 @@ write_count : output filename to write image of sulci counting.
         bb_talairach_offset = [(s - 5) for s in bb_talairach_offset]
         bb_talairach_size = [(s + 10) for s in bb_talairach_size]
 
-        img_count = aims.AimsData_FLOAT(*bb_talairach_size)
+        img_count = aims.Volume_FLOAT(bb_talairach_size)
         img_count.fill(0.)
-        array = img_count.volume().get().arraydata()[0]  # first timestep
+        array = img_count.arraydata()[0]  # first timestep
         # invert positions of X, Y et Z (data representation python/C)
         X = (X - numpy.array(bb_talairach_offset)).T[::-1].T
         for i, pos in enumerate(X):
@@ -353,7 +353,7 @@ write_count : output filename to write image of sulci counting.
         d = self._gaussian_std
         smoothing = aimsalgo.Gaussian3DSmoothing_FLOAT(d, d, d)
         img_blur = smoothing.doit(img_count)
-        array = img_blur.volume().get().arraydata()
+        array = img_blur.arraydata()
         # apply correction if needed
         array[array < 0.] = 0.
         # avoid null values
@@ -397,7 +397,7 @@ write_count : output filename to write image of sulci counting.
         bb_talairach_offset = [(s - 5) for s in bb_talairach_offset]
         bb_talairach_size = [(s + 10) for s in bb_talairach_size]
 
-        img_count = aims.AimsData_FLOAT(*bb_talairach_size)
+        img_count = aims.Volume_FLOAT(bb_talairach_size)
 
         # with scipy
         import scipy.spatial
@@ -408,8 +408,8 @@ write_count : output filename to write image of sulci counting.
         for (x, y) in index_tricks.ndindex(*bb_talairach_size[:2]):
             # all z in one pass
             v = numpy.array([x, y, 0]) + bb_talairach_offset
-            Z = list(range(img_count.dimZ()))
-            V = v[None].repeat(img_count.dimZ(), 0)
+            Z = list(range(img_count.getSizeZ()))
+            V = v[None].repeat(img_count.getSizeZ(), 0)
             V[:, 2] += Z
             D, ID = kd.query(V, k)
             for i in range(len(D)):
@@ -432,7 +432,7 @@ write_count : output filename to write image of sulci counting.
         # db.init(X)
         # aimsalgo.AimsGeneralizedKnnParzenPdf(db, img_count, k)
         # aimsalgo.AimsKnnPdf(db, img_count, k)
-        array = img_count.volume().get().arraydata()
+        array = img_count.arraydata()
         # apply correction if needed
         array[array < 0.] = 0.
         # avoid null values
@@ -447,7 +447,7 @@ write_count : output filename to write image of sulci counting.
             array[notz] = numpy.log(array[notz])
             array[z] = -100
         if write_count:
-            aims.Writer().write(img_count, write_count)
+            aims.write(img_count, write_count)
         self._bb_talairach_offset = bb_talairach_offset
         self._bb_talairach_size = bb_talairach_size
         self._img_density = img_count
@@ -458,13 +458,12 @@ write_count : output filename to write image of sulci counting.
         header['missing_energy'] = self._missing_energy
         header['from_log'] = self._fromlog
         header['ss'] = self._ss
-        aims.Writer().write(self._img_density, filename)
+        aims.write(self._img_density, filename)
 
     def read(self, filename):
-        img = aims.Reader().read(filename)
-        img = aims.AimsData_FLOAT(img)
+        img = aims.read(filename)
         header = img.header()
-        self._bb_talairach_size = img.dimX(), img.dimY(), img.dimZ()
+        self._bb_talairach_size = img.getSize()[!:3]
         self._img_density = img
         try:
             l = header['bb_talairach_offset']
@@ -509,8 +508,8 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
                        lj
 
         '''
-        Px = self._img_density.volume()
-        P = Px.get().arraydata()
+        Px = self._img_density
+        P = Px.arraydata()
         t = numpy.array(self._bb_talairach_offset)
         s = numpy.array(self._bb_talairach_size)
         X = numpy.array(X - t, dtype='int')
@@ -556,8 +555,8 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
                        lj
 
         '''
-        Px = self._img_density.volume()
-        P = Px.get().arraydata()
+        Px = self._img_density
+        P = Px.arraydata()
         t = numpy.array(self._bb_talairach_offset)
         s = numpy.array(self._bb_talairach_size)
         X = numpy.array(X - t, dtype='int')
@@ -580,8 +579,8 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
         return loglikelihoods, likelihoods
 
     def weighted_prodlikelihoods(self, X, weights, shift=10.):
-        Px = self._img_density.volume()
-        P = Px.get().arraydata()
+        Px = self._img_density
+        P = Px.arraydata()
         t = numpy.array(self._bb_talairach_offset)
         s = numpy.array(self._bb_talairach_size)
         X = numpy.array(X - t, dtype='int')
@@ -616,8 +615,8 @@ bounding box of size 100x100x100. So the local energy in each voxel is equal
 to : E_ext / n with n = number of voxels in the difference between the two
 bounding box.
         '''
-        Px = self._img_density.volume()
-        P = Px.get().arraydata()
+        Px = self._img_density
+        P = Px.arraydata()
         # volume big bb = 200^3
         # n = (volume big bb) - (volume sulcus bb)
         n = 8000000. - numpy.prod(P.shape)
@@ -630,8 +629,8 @@ bounding box.
         return int + ext
 
     def powered_img_density(self, alpha):
-        Px = self._img_density.volume()
-        P = Px.get().arraydata()
+        Px = self._img_density
+        P = Px.arraydata()
         array = (P ** alpha)
         # volume big bb = 200^3
         # n = (volume big bb) - (volume sulcus bb)
@@ -649,23 +648,22 @@ bounding box.
         '''only for debug'''
         motion = aims.GraphManip.talairach(graph)
 
-        Px = self._img_density.volume()
-        P = Px.get().arraydata()
+        Px = self._img_density
+        P = Px.arraydata()
 
         if self._ss:
             bucket_name = 'aims_ss'
         else:
             bucket_name = 'aims_bottom'
-        ss_map = vertex[bucket_name].get()
+        ss_map = vertex[bucket_name]
         t = numpy.array(self._bb_talairach_offset)
         s = numpy.array(self._bb_talairach_size)
         size_in = numpy.array([ss_map.sizeX(), ss_map.sizeY(),
                                ss_map.sizeZ()])
         loglikelihood = 0.
         voxels_n = len(list(ss_map[0].keys()))
-        img = aims.AimsData_FLOAT(*self._bb_talairach_size)
-        Ax = img.volume()
-        A = Ax.get().arraydata()
+        img = aims.Volume_FLOAT(self._bb_talairach_size)
+        A = img.arraydata()
         A[:] = P[:]
         for p_in in ss_map[0].keys():
             p_in = aims.Point3df(p_in * size_in)
@@ -679,7 +677,7 @@ bounding box.
             A[pos] = 0.0001
         loglikelihood /= voxels_n
         likelihood = numpy.exp(numpy.longdouble(loglikelihood) + 10)
-        aims.Writer().write(img, "img_%s.ima" % sulci)
+        aims.write(img, "img_%s.ima" % sulci)
         del P
         del Px
         return loglikelihood, likelihood
@@ -724,7 +722,7 @@ class Spam(PySpam):
                 self._c_spam = aims.SpamFromLikelihood()
         self._c_spam.set_bb_talairach_offset(self._bb_talairach_offset)
         self._c_spam.set_bb_talairach_size(self._bb_talairach_size)
-        self._c_spam.set_img_density(self._img_density.volume().get())
+        self._c_spam.set_img_density(self._img_density)
 
     def read(self, filename):
         PySpam.read(self, filename)

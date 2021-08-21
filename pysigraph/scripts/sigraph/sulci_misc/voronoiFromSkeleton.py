@@ -45,9 +45,9 @@ def main():
 			indices.append(v)
 			ind_max += 1
 		tex[i] = ind
-	vol2 = aims.AimsData_S16(fd.voronoi_vol)
-	avol = fd.voronoi_vol.arraydata()
-	avol2 = vol2.volume().arraydata()
+	vol2 = aims.Voume_S16(fd.voronoi_vol)
+	avol = fd.voronoi_vol.np
+	avol2 = vol2.np
 	for i, ind in enumerate(indices):
 		avol2[avol == ind] = i
 	print("indices = ", indices)

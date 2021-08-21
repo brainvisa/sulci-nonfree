@@ -13,14 +13,9 @@ import sigraph
 import anatomist.direct.api as anatomist
 from soma import aims, aimsalgo
 from datamind.tools import *
-try:
-  import fff.GMM
-except:
-  print('warning, fff is not here or does not work. GMM will not be usable')
 
 from sulci.common import io
-from sulci.models import check_same_distribution, distribution, \
-				distribution_aims, distribution_fff
+from sulci.models import check_same_distribution, distribution
 
 qApp = qt.QApplication(sys.argv)
 a = anatomist.Anatomist()
@@ -213,110 +208,17 @@ class BlocGaussianDisplay(Display):
 
 def addBorder(img_in, width=1, border_value=0., aims_border=False):
 	# init
-	dim_in = [img_in.dimX(), img_in.dimY(), img_in.dimZ(), 1]
-        outvol = aims.Volume(numpy.asarray(img_in.volume()).dtype.type,
+	dim_in = [img_in.getSizeX(), img_in.getSizeY(), img_in.getSizeZ(), 1]
+        outvol = aims.Volume(img_in.np.dtype.type,
                 dim_in[0] + width * 2, dim_in[1] + width * 2,
                 dim_in[2] + width * 2, 1)
-        numpy.asarray( outvol )[:] = border_value
-        outvol2 = outvol.__class__(aims.rc_ptr_Volume_S16(outvol),
-                aims.Volume_S16.Position4Di(width, width, width, 0),
-                aims.Volume_S16.Position4Di(*dim_in))
-        numpy.asarray(outvol2)[:] = numpy.asarray(img_in.volume())
-        return aims.AimsData_S16( outvol2 )
-	#print('dim_in:', dim_in, ', width:', width)
-	#if aims_border:
-		#dim_out = dim_in + [1, width]
-	#else:	dim_out = [(d + width * 2) for d in dim_in]
-	#print('dim_out:', dim_out)
-	## call Aims constructor with border (5th param)
-	#img_out = img_in.__class__(*dim_out)
-	#a_in = img_in.volume().get().arraydata()
-	#a_out = img_out.volume().get().arraydata()
-	
-	## create mask
-	#mask = numpy.zeros(a_out.shape, dtype='bool')
-	#mask[:] = True
-	#r1 = numpy.arange(width)
-	#r2 = -numpy.arange(width) - 1
-	#mask[0, r1, :, :] = mask[0, r2, :, :] = \
-		#mask[0, :, r1, :] = mask[0, :, r2, :] = \
-		#mask[0, :, :, r1] = mask[0, :, :, r2] = 0
-	## apply
-	#print('a_in:', a_in.shape, a_in.flatten().shape)
-	#print('mask:', mask.shape)
-	#print('a_out:', a_out.shape, a_out[mask].shape)
-	#a_out[mask] = a_in.flatten()
-	#a_out[mask == 0] = border_value
-
-	#return img_out
-
-# Old Gmm display
-#class GmmDisplay(Display):
-#	def __init__(self, *args, **kwargs):
-#		Display.__init__(self, *args, **kwargs)
-#		self._probs = [0.3, 0.6, 0.8]
-#		self._alphas = [1, 0.6, 0.2]
-#		self._mesher = aimsalgo.Mesher()
-#
-#	def _sample(self, gmm, gd, shape):
-#		array = gmm.sample(gd, None, verbose=0).reshape(shape)
-#		return numpy.exp(array)
-#
-#	def _display_one(self, sulcus, gmm):
-#		gmm = gmm._gmm
-#		n = gmm.k
-#		#limits = []
-#		# find bounding box of 2 std limits border of each gaussian
-#		# weights are not considered
-#		#for k in range(n):
-#		#	c  = gmm.centers[k]
-#		#	w = gmm.weights[k]
-#		#	if gmm.prec_type == 0:
-#		#		metric = gmm.precision[k].reshape(3, 3)
-#		#	elif gmm.prec_type == 1:
-#		#		metric = numpy.diag(gmm.precision[k])
-#		#	eigval, eigvect = numpy.linalg.eig(metric)
-#		#	for i in range(3):
-#		#		l, v = eigval[i], eigvect[i]
-#		#		v = 2 * numpy.sqrt(1./l) * v * w
-#		#		limits += [c + v, c - v]
-#		#limits = numpy.vstack(limits)
-#		c = (numpy.asarray(gmm.centers) * \
-#			gmm.weights[None].T).sum(axis=0)
-#		e1 = numpy.array([40, 0, 0])
-#		e2 = numpy.array([0, 40, 0])
-#		e3 = numpy.array([0, 0, 40])
-#		limits = numpy.array([c + e1, c + e2, c + e3,
-#					c - e1, c - e2, c - e3])
-#		xmin, ymin, zmin = limits.min(axis=0)
-#		xmax, ymax, zmax = limits.max(axis=0)
-#		gd = fff.GMM.grid_descriptor(3)
-#		shape = [int(xmax - xmin), int(ymax - ymin), int(zmax - zmin)]
-#		shape = numpy.array(shape)
-#		#shape /= min(30, shape.min())
-#		gd.getinfo([xmin, xmax, ymin, ymax, zmin, zmax], shape)
-#		array = self._sample(gmm, gd, shape)
-#		array /= array.sum() # spurious normalization
-#		shape = array.shape
-#		img_density = aims.AimsData_FLOAT(*array.shape)
-#		img_density.volume().arraydata()[:] = array.T
-#		if self._generate_all:
-#			self._writer.write(img_density, 'img_%s.ima' % sulcus)
-#		meshes, img_thresholds = distributionArray3DToMeshes(\
-#				self._mesher, (xmin, ymin, zmin),
-#				img_density, array, self._probs)
-#		color = self._hie.find_color(sulcus)
-#		self._aobjects += colorMeshes(meshes, color, self._alphas)
-#		for i, mesh in enumerate(meshes):
-#			self._writer.write(mesh, 'gmm_%s_%d.mesh' %(sulcus, i))
-#		if self._generate_all:
-#			for i, img_threshold in enumerate(img_thresholds):
-#				self._writer.write(img_threshold,
-#					'img_threshold_%s_%d.ima' % (sulcus, i))
-
-#class BGmmDisplay(GmmDisplay):
-#	def _sample(self, gmm, gd, shape):
-#		return gmm.VB_sample(gd, None).reshape(shape)
+        outvol[:] = border_value
+        outvol2 = aims.VolumeView(
+            outvol,
+            aims.Volume_S16.Position4Di(width, width, width, 0),
+            aims.Volume_S16.Position4Di(*dim_in))
+        outvol2[:] = img_in.np
+        return outvol2
 
 
 class SpamDisplay(Display):

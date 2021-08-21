@@ -38,7 +38,7 @@ def anat2func(a, tr_a, f, tr_f, options):
 	# convert input
 	sX, sY, sZ, sT = getSize(a)
 	if not options.float:
-		a2 = aims.AimsData_S16(sX, sY, sZ, sT)
+		a2 = aims.Volume_S16(sX, sY, sZ, sT)
 		converter = aims.Converter_Volume_U8_Volume_S16()
 		converter.convert(a, a2)
 	else:	a2 = aims.Volume_FLOAT(a)
@@ -46,15 +46,15 @@ def anat2func(a, tr_a, f, tr_f, options):
 	# create output
 	sX, sY, sZ, sT = getSize(f)
 	if not options.float:
-		b = aims.AimsData_S16(sX, sY, sZ, sT)
-	else:	b = aims.AimsData_FLOAT(sX, sY, sZ, sT)
+		b = aims.Volume_S16(sX, sY, sZ, sT)
+	else:	b = aims.Volume_FLOAT(sX, sY, sZ, sT)
 	if not options.float:
 		resampler = aimsalgo.NearestNeighborResampler_S16()
 	else:	resampler = aimsalgo.NearestNeighborResampler_FLOAT()
 
 	# resample
 	resampler.resample(a2, tr, 0, b, False)
-	bheader = b.volume().header()
+	bheader = b.header()
 	bheader['voxel_size'] = f.header()['voxel_size']
 	s = aims.vector_STRING()
 	s.append('Talairach-MNI template-SPM')
@@ -76,8 +76,8 @@ def func2tal_global(bb, tr_a, f, tr_f, options):
 		f2 = f
 	else:
 		sX, sY, sZ, sT = getSize(f)
-		f2 = aims.AimsData_FLOAT(sX, sY, sZ, sT)
-		header = f2.volume().header()
+		f2 = aims.Volume_FLOAT(sX, sY, sZ, sT)
+		header = f2.header()
 		header['voxel_size'] = f.header()['voxel_size']
 		converter = aims.Converter_Volume_S16_Volume_FLOAT()
 		converter.convert(f, f2)
@@ -88,8 +88,8 @@ def func2tal_global(bb, tr_a, f, tr_f, options):
 	sY /= 3
 	sZ /= 3
 	sT = 1
-	f3 = aims.AimsData_FLOAT(sX, sY, sZ, sT)
-	header = f3.volume().header()
+	f3 = aims.Volume_FLOAT(sX, sY, sZ, sT)
+	header = f3.header()
 	header['voxel_size'] = f.header()['voxel_size']
 	s = aims.vector_STRING()
 	s.append('Talairach-AC/PC-Anatomist')

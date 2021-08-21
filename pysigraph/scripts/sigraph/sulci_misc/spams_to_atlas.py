@@ -24,7 +24,7 @@ def compute_bb(models):
 	return off, size
 
 def getSize(img):
-	return img.dimX(), img.dimY(), img.dimZ(), img.dimT()
+	return img.getSize()[:4]
 
 def select_priors(models, priors_distribs=None, selected_sulci=None):
 	sulci = list(models.keys())
@@ -78,26 +78,24 @@ def make_atlas_deterministic(models, priors, bb, threshold,
 	L[P < threshold * numpy.exp(shift)] = 0
 
 	# add motion
-	trans = aims.Motion()
+	trans = aims.AffineTransformation3d()
 	trans.setTranslation(off)
 	del L
 	del P
-	labels = aims.AimsData_U8(labels)
+	labels = aims.Volume_U8(labels)
 
 	# resample
-	tr = aims.Motion()
+	tr = aims.AffineTransformation3d()
 	tr.setToIdentity()
 	if voxels_size != 1:
 		sX, sY, sZ, sT = getSize(labels)
-		labels2 = aims.AimsData_S16(sX, sY, sZ, sT)
+		labels2 = aims.Volume_S16(sX, sY, sZ, sT)
 		converter = aims.Converter_Volume_U8_Volume_S16()
 		converter.convert(labels, labels2)
 		sX /= voxels_size
 		sY /= voxels_size
 		sZ /= voxels_size
-		#labels2 = aims.AimsData_U8(sX, sY, sZ, sT)
-		labels3 = aims.AimsData_S16(sX, sY, sZ, sT)
-		#resampler = aimsalgo.NearestNeighborResampler_U8()
+		labels3 = aims.Volume_S16(sX, sY, sZ, sT)
 		resampler = aimsalgo.NearestNeighborResampler_S16()
 		tr.scale([1.] * 3, [voxels_size] *3)
 		resampler.resample(labels2, tr, 0, labels3, False)
@@ -124,7 +122,7 @@ def make_atlas_probabilistic(models, priors, bb, threshold,
 
 	# normalization factor
 	for i, (sulcus, spam) in enumerate(models.items()):
-		proba = aims.Volume_FLOAT(*size)
+		proba = aims.Volume_FLOAT(size)
 		P = proba.arraydata()
 		P.fill(0.)
 		img_density = spam.img_density()
@@ -147,7 +145,6 @@ def make_atlas_probabilistic(models, priors, bb, threshold,
 		trans = aims.Motion()
 		trans.setTranslation(off)
 		del P
-		proba = aims.AimsData_FLOAT(proba)
 
 
 		# resample
@@ -158,7 +155,7 @@ def make_atlas_probabilistic(models, priors, bb, threshold,
 			sX /= voxels_size
 			sY /= voxels_size
 			sZ /= voxels_size
-			proba2 = aims.AimsData_FLOAT(sX, sY, sZ, sT)
+			proba2 = aims.Volume_FLOAT(sX, sY, sZ, sT)
 			resampler = aimsalgo.NearestNeighborResampler_FLOAT()
 			tr.scale([1.] * 3, [voxels_size] *3)
 			resampler.resample(proba, tr, 0, proba2, False)
@@ -171,7 +168,7 @@ def make_atlas_probabilistic(models, priors, bb, threshold,
 		header['transformations'] = [(trans * tr.inverse()).toVector()]
 
 		# write
-		aims.Writer().write(proba2,output[0] + "_" + sulcus + output[1])
+		aims.write(proba2, output[0] + "_" + sulcus + output[1])
 		del header
 		del proba
 		del proba2
