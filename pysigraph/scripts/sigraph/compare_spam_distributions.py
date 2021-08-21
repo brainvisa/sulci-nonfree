@@ -17,7 +17,7 @@ thresholds = [0.2, 0.5, 0.75, 0.9, 0.95, 0.99]
 ################################################################################
 def compute_volume(sulcus, spam):
 	img_density = spam.img_density()
-	array = img_density.volume().get().arraydata()
+	array = img_density.np
 	array_sort = numpy.sort(array.flatten())[::-1]
 	weights = array_sort.cumsum()
 	delta = weights[1:] - weights[:-1]
@@ -108,8 +108,8 @@ def kullback_leibler(spam1, spam2):
 	
 	density1 = spam1.img_density()
 	density2 = spam2.img_density()
-	a1 = density1.volume().get().arraydata()
-	a2 = density2.volume().get().arraydata()
+	a1 = density1.arraydata()
+	a2 = density2.arraydata()
 
 	doff1 = (off - off1).astype('int')
 	doff2 = (off - off2).astype('int')
