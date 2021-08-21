@@ -276,18 +276,6 @@ for label, globval in six.iteritems(globaverage):
     os.unlink(tmpvolfile)
     os.unlink(tmpvolfile + '.minf')
     vol.fillBorder(-1)
-    # vol2 = aims.Volume_S16( vol.dimX()+2, vol.dimY()+2, vol.dimZ()+2 )
-    # vol2.fill( -1 )
-    # h = {}
-    # h.update( vol.header() )
-    # del h[ 'sizeX' ]
-    # del h[ 'sizeY' ]
-    # del h[ 'sizeZ' ]
-    # del h[ 'sizeT' ]
-    # vol2.header().update( h )
-    # vol2.header()[ '_borderWidth' ] = 1
-    # numpy.array( vol2, copy=False )[ 1:-1, 1:-1, 1:-1,: ] \
-    #   = vol.np
     m = aimsalgo.Mesher()
     m.setDecimation(100, 5, 3, 180)
     m.setMinFacetNumber(50)

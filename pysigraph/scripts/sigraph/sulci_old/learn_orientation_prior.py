@@ -18,10 +18,7 @@ def compute_depthmap(subject, graph, skel, write_data=False):
 	fat.prepareDepthMap()
 	depth = fat.getDepth()
 	depth_factor = fat.getDepthfactor()
-	sX = depth.dimX()
-	sY = depth.dimY()
-	sZ = depth.dimZ()
-	sT = depth.dimT()
+	sX, sY, sZ, sT = depth.getSize()[:4]
 	converter = aims.Converter_Volume_S16_Volume_FLOAT()
 	depth2 = aims.Voloume_FLOAT(sX, sY, sZ, sT)
 	converter.convert(depth, depth2)
