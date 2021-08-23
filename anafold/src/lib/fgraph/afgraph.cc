@@ -462,7 +462,7 @@ void AFGraph::setColorsNodePot()
   int			ind = 0;
   getOrCreatePalette();
   AObjectPalette	*objpal = palette();
-  VolumeRef<AimsRGBA>	cols = *objpal->colors();
+  Volume<AimsRGBA>	*cols = objpal->colors();
   float			cmin = objpal->min1(), cmax = objpal->max1();
   float			scale, mp, Mp, fmin, fmax;
   unsigned		ncol = cols->getSizeX();
