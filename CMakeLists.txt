@@ -3,6 +3,8 @@ find_package( brainvisa-cmake REQUIRED )
 BRAINVISA_PROJECT()
 
 BRAINVISA_FIND_PACKAGE( aims-free REQUIRED )
+BRAINVISA_FIND_PACKAGE( brainvisa-share QUIET )
+
 include( "${AIMS-FREE_USE_FILE}" )
 
 find_package( SVM )
@@ -43,7 +45,25 @@ BRAINVISA_DEPENDENCY( DEV DEPENDS "aims-free" DEV ">= ${aims-free_VERSION};<< ${
 if( SVM_FOUND )
   BRAINVISA_DEPENDENCY( RUN DEPENDS "libsvm2" RUN )
 endif()
-BRAINVISA_DEPENDENCY( RUN RECOMMENDS "sulci-models" RUN )
+
+# add install rules for zipped packages
+
+set( SULCI_MODELS_DOWNLOAD_SOURCE "ftp:///ftp.cea.fr/pub/dsv/anatomist/data" CACHE FILEPATH "URL for sulci models data download" )
+
+set( version_maj ${BRAINVISA_PACKAGE_VERSION_MAJOR} )
+set( version_min ${BRAINVISA_PACKAGE_VERSION_MINOR} )
+if( brainvisa_share_FOUND )
+  set( version_maj ${brainvisa-share_VERSION_MAJOR} )
+  set( version_min ${brainvisa-share_VERSION_MINOR} )
+endif()
+
+set( get_models_cmd
+  "${CMAKE_CURRENT_SOURCE_DIR}/pysigraph/scripts/sigraph/bv_get_sulci_models.py" )
+add_custom_target( install-sulci-models-data
+  COMMAND "${PYTHON_HOST_EXECUTABLE}" "${get_models_cmd}" "-o" "$(BRAINVISA_INSTALL_PREFIX)/share/brainvisa-share-${version_maj}.${version_min}" "-i" "${SULCI_MODELS_DOWNLOAD_SOURCE}" "--no-update"
+  )
+
+add_dependencies( install-sulci-private install-sulci-models-data )
 
 BRAINVISA_CREATE_CMAKE_CONFIG_FILES()
 
