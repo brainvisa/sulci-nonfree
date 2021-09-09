@@ -310,7 +310,8 @@ int main( int argc, const char** argv )
       t2g2.makeGraph(k,brain,braintex[0],GyriLabel2GyriName);
 
       cout << "Computing the volumic gyrus graph " << agw2.fileName() << "\n";
-      Graph		*h = GraphManip::graphFromVolume(carto::VolumeRef<short>(gyriVol.volume()),(short)0, &GyriLabel2GyriName);
+      Graph		*h = GraphManip::graphFromVolume<short>(
+        gyriVol, (short)0, &GyriLabel2GyriName );
       GraphManip::volume2Buckets(*h);
 
       //Compute volume of the gyri
