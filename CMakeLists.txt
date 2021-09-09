@@ -13,7 +13,7 @@ find_package( SWIG )
 find_package( Doxygen )
 
 set( SIGRAPH_RELATIVE_SIP_DIRECTORY
-     "share/sulci-private-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}/sip" )
+     "share/sulci-nonfree-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}/sip" )
 
 #set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wall" )
 #set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall" )
@@ -63,7 +63,7 @@ add_custom_target( install-sulci-models-data
   COMMAND "${PYTHON_HOST_EXECUTABLE}" "${get_models_cmd}" "-o" "$(BRAINVISA_INSTALL_PREFIX)/share/brainvisa-share-${version_maj}.${version_min}" "-i" "${SULCI_MODELS_DOWNLOAD_SOURCE}" "--no-update"
   )
 
-add_dependencies( install-sulci-private install-sulci-models-data )
+add_dependencies( install-sulci-nonfree install-sulci-models-data )
 
 BRAINVISA_CREATE_CMAKE_CONFIG_FILES()
 
