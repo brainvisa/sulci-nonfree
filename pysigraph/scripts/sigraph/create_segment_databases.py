@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-import sys, os, numpy, pprint, re
+import sys
+import os
+import numpy
+import pprint
+import re
 from optparse import OptionParser
 import sigraph
 from soma import aims
@@ -9,8 +13,6 @@ from sulci.common import io, add_translation_option_to_parser
 from datamind.tools import *
 import datamind.io.old_csvIO as datamind_io
 from datamind.ml.database import DbNumpy
-
-
 
 
 ################################################################################
@@ -34,8 +36,10 @@ class DatabaseCreator(object):
 
     def save_to_csv(self, summary_file):
         # save each database in csv
-        if self._node_dbcreator: self._node_dbcreator.save_to_csv()
-        if self._rel_dbcreator:    self._rel_dbcreator.save_to_csv()
+        if self._node_dbcreator:
+            self._node_dbcreator.save_to_csv()
+        if self._rel_dbcreator:
+            self._rel_dbcreator.save_to_csv()
 
         # summary file
         minf = {}
@@ -46,10 +50,10 @@ class DatabaseCreator(object):
         if self._rel_dbcreator:
             minf.update(self._rel_dbcreator.getMinfFiles())
             datatype.append(self._rel_dbcreator.datatype())
-        if len(datatype) == 1: datatype = datatype[0]
-        h = { 'data' : datatype, 'files' : minf}
+        if len(datatype) == 1:
+            datatype = datatype[0]
+        h = {'data': datatype, 'files': minf}
         io.write_databases(summary_file, h)
-
 
 
 ################################################################################
@@ -63,9 +67,9 @@ class AbstractDatabaseCreator(object):
         minf = {}
         for label, d in self._h.items():
             filename = d['files'][1]
-            relfilename = re.sub('^%s%s' % \
-                (os.path.dirname(self._prefix), \
-                os.path.sep), '', filename)
+            relfilename = re.sub('^%s%s' %
+                                 (os.path.dirname(self._prefix),
+                                  os.path.sep), '', filename)
             minf[label] = relfilename
         return minf
 
@@ -86,7 +90,7 @@ class NodeDatabaseCreator(AbstractDatabaseCreator):
 
     def save_to_csv(self):
         print("save node databases...")
-        bar = ProgressionBarPct(len(self._h), '#', color = 'blue')
+        bar = ProgressionBarPct(len(self._h), '#', color='blue')
         for i, (label, d) in enumerate(self._h.items()):
             bar.display(i)
             subjects = []
@@ -99,7 +103,7 @@ class NodeDatabaseCreator(AbstractDatabaseCreator):
             INF[:, 0] = label
             db = DbNumpy(X, Y, INF)
             csvname, minfname = d['files']
-            header = { 'INF' : ['sulci', 'subject'] }
+            header = {'INF': ['sulci', 'subject']}
             header['X'] = self._get_Xheader()
             self._writer.write(csvname, db, header, minfname)
 
@@ -120,7 +124,8 @@ class GravityCentersNodeDatabaseCreator(NodeDatabaseCreator):
 
     def add_graph(self, g, subject):
         for v in g.vertices():
-            if v.getSyntax() != 'fold': continue
+            if v.getSyntax() != 'fold':
+                continue
             self._add_node(v, subject)
 
     def _add_node(self, v, subject):
@@ -130,19 +135,20 @@ class GravityCentersNodeDatabaseCreator(NodeDatabaseCreator):
         gc = numpy.asarray(v['refgravity_center'].list())
         label = v['name']
         if self._sulcus_filter is not None and \
-            label != self._sulcus_filter: return
+                label != self._sulcus_filter:
+                return
         if not h.has_key(label):
             csvname, minfname = \
                 io.sulci2databasename(self._prefix, label)
-            d = {    'subjects' : {}, 'files' : (csvname, minfname)}
-            d['subjects'][subject] = {'refgravity_center' : [gc],
-                                'number' : 1}
+            d = {'subjects': {}, 'files': (csvname, minfname)}
+            d['subjects'][subject] = {'refgravity_center': [gc],
+                                      'number': 1}
             h[label] = d
         else:
             subjects = h[label]['subjects']
             if not subjects.has_key(subject):
-                subjects[subject] = { 'refgravity_center' : \
-                            [gc], 'number' : 1}
+                subjects[subject] = {'refgravity_center':
+                                     [gc], 'number': 1}
             else:
                 s = subjects[subject]
                 s['refgravity_center'].append(gc)
@@ -161,7 +167,7 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
 
     def save_to_csv(self):
         print("save relation databases...")
-        bar = ProgressionBarPct(len(self._h), '#', color = 'blue')
+        bar = ProgressionBarPct(len(self._h), '#', color='blue')
         for i, (labels, d) in enumerate(self._h.items()):
             bar.display(i)
             subjects = []
@@ -175,19 +181,21 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
             INF[:, 2] = subjects
             db = DbNumpy(X, Y, INF)
             csvname, minfname = d['files']
-            header = { 'INF' : ['sulci1', 'sulci2', 'subject'] }
+            header = {'INF': ['sulci1', 'sulci2', 'subject']}
             header['X'] = self._get_Xheader()
             self._writer.write(csvname, db, header, minfname)
 
     def add_graph(self, g, subject):
         for xi in g.vertices():
-            if xi.getSyntax() != 'fold': continue
+            if xi.getSyntax() != 'fold':
+                continue
             for xj in xi.neighbours():
-                if xj.getSyntax() != 'fold': continue
+                if xj.getSyntax() != 'fold':
+                    continue
                 labels = xi['name'], xj['name']
                 if self._sulcus_filter is not None and \
-                    (labels[0] != self._sulcus_filter and \
-                    labels[1] != self._sulcus_filter):
+                    (labels[0] != self._sulcus_filter and
+                     labels[1] != self._sulcus_filter):
                     continue
                 # relations are symetrics
                 if (xi, xj) in self._rel_done:
@@ -200,24 +208,25 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
                 if labels[0] > labels[1]:
                     labels = labels[1], labels[0]
                     v1, v2 = xj, xi
-                else:    v1, v2 = xi, xj
+                else:
+                    v1, v2 = xi, xj
                 loc = self._get_saving_location(subject, labels)
                 self._add_relation(loc, v1, v2)
-                #FIXME
+                # FIXME
 
     def _get_saving_location(self, subject, labels):
         h = self._h
         if not h.has_key(labels):
             csvname, minfname = \
                 io.relation2databasename(self._prefix, labels)
-            d = {    'subjects' : {},
-                'files' : (csvname, minfname)}
-            d['subjects'][subject] = {'number' : 1}
+            d = {'subjects': {},
+                 'files': (csvname, minfname)}
+            d['subjects'][subject] = {'number': 1}
             h[labels] = d
         else:
             subjects = h[labels]['subjects']
             if not subjects.has_key(subject):
-                subjects[subject] = {'number' : 1}
+                subjects[subject] = {'number': 1}
             else:
                 s = subjects[subject]
                 s['number'] += 1
@@ -226,7 +235,8 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
     def _saving_location_add(self, loc, name, data):
         if loc.has_key(name):
             loc[name].append(data)
-        else:    loc[name] = [data]
+        else:
+            loc[name] = [data]
 
     def _find_xij(self, xi, xj):
         ri = xi['index']
@@ -238,6 +248,7 @@ class RelDatabaseCreator(AbstractDatabaseCreator):
             if (ri == r1 and rj == r2) or (ri == r2 and rj == r1):
                 edges[e.getSyntax()] = e
         return edges
+
 
 class DeltaGravityCentersRelDatabaseCreator(RelDatabaseCreator):
     def __init__(self):
@@ -259,10 +270,11 @@ class DeltaGravityCentersRelDatabaseCreator(RelDatabaseCreator):
 
         # vector from gc2 to gc1
         delta_gc = gi - gj
-        self._saving_location_add(loc, 'delta_gravity_centers',delta_gc)
+        self._saving_location_add(loc, 'delta_gravity_centers', delta_gc)
 
     def datatype(self):
         return 'delta_gravity_centers'
+
 
 class MinDistanceRelDatabaseCreator(RelDatabaseCreator):
     def __init__(self):
@@ -294,16 +306,14 @@ class MinDistanceRelDatabaseCreator(RelDatabaseCreator):
         return 'min_distance'
 
 
-
-
 ################################################################################
 def dbcreatorFactory(node_model_type, rel_model_type):
     nodeh = {
-        'refgravity_center' : GravityCentersNodeDatabaseCreator,
+        'refgravity_center': GravityCentersNodeDatabaseCreator,
     }
     relh = {
-        'delta_gravity_centers' : DeltaGravityCentersRelDatabaseCreator,
-        'min_distance' : MinDistanceRelDatabaseCreator,
+        'delta_gravity_centers': DeltaGravityCentersRelDatabaseCreator,
+        'min_distance': MinDistanceRelDatabaseCreator,
     }
     if node_model_type and not nodeh.has_key(node_model_type):
         print("invalid node model type '%s'" % node_model_type)
@@ -317,32 +327,38 @@ def dbcreatorFactory(node_model_type, rel_model_type):
     return NodeDbC, RelDbC
 
 ################################################################################
+
+
 def compute_database(graphs, dbdir, options):
     prefix = dbdir
-    try:    os.mkdir(prefix)
+    try:
+        os.mkdir(prefix)
     except OSError as e:
         print("warning: directory '%s' already exists" % prefix)
 
     N, R = dbcreatorFactory(options.node_model_type, options.rel_model_type)
 
-    if N:    node_dbcreator = N()
-    else:    node_dbcreator = None
-    if R:    rel_dbcreator = R()
-    else:    rel_dbcreator = None
+    if N:
+        node_dbcreator = N()
+    else:
+        node_dbcreator = None
+    if R:
+        rel_dbcreator = R()
+    else:
+        rel_dbcreator = None
 
     # fill databases
     creator = DatabaseCreator(prefix, options.sulcus,
-            node_dbcreator, rel_dbcreator)
+                              node_dbcreator, rel_dbcreator)
 
     print("create databases...")
-    bar = ProgressionBarPct(len(graphs), '#', color = 'purple')
+    bar = ProgressionBarPct(len(graphs), '#', color='purple')
     for i, g in enumerate(graphs):
         bar.display(i)
         creator.add_graph(g)
     print("write csv...")
     summary_file = prefix + '.dat'
     creator.save_to_csv(summary_file)
-
 
 
 ################################################################################
@@ -355,34 +371,34 @@ def parseOpts(argv):
     parser = OptionParser(description)
     add_translation_option_to_parser(parser)
     parser.add_option('-d', '--dbdir', dest='dbdir',
-        metavar = 'FILE', action='store',
-        default = 'bayesian_gaussian_databases',
-        help='output databases directory (default : %default).' \
-            'A file named FILE.dat is created to store ' \
-            'labels/databases links.')
+                      metavar='FILE', action='store',
+                      default='bayesian_gaussian_databases',
+                      help='output databases directory (default : %default).'
+                      'A file named FILE.dat is created to store '
+                      'labels/databases links.')
     parser.add_option('-s', '--sulcus', dest='sulcus',
-        metavar = 'NAME', action='store', default = None,
-        help='Compute gaussian only for nodes and relations related ' \
-        'to the specified sulcus (default : compute for all sulci)')
+                      metavar='NAME', action='store', default=None,
+                      help='Compute gaussian only for nodes and relations related '
+                      'to the specified sulcus (default : compute for all sulci)')
     parser.add_option('--node-model-type', dest='node_model_type',
-        metavar = 'TYPE', action='store', default = None,
-        help='default : nothing\n'
-        'refgravity_center : learn gravity centers of sulci nodes\n')
+                      metavar='TYPE', action='store', default=None,
+                      help='default : nothing\n'
+                      'refgravity_center : learn gravity centers of sulci nodes\n')
     parser.add_option('--relation-model-type', dest='rel_model_type',
-        metavar = 'TYPE', action='store', default = None,
-        help='default : nothing\n'
-        'delta_gravity_centers : learn gravity centers '
-        'differencies of 2 related sulci nodes\n'
-        'min_distance : learn minimum distance between 2 related '
-        'sulci nodes\n')
+                      metavar='TYPE', action='store', default=None,
+                      help='default : nothing\n'
+                      'delta_gravity_centers : learn gravity centers '
+                      'differencies of 2 related sulci nodes\n'
+                      'min_distance : learn minimum distance between 2 related '
+                      'sulci nodes\n')
     parser.add_option('--mode', dest='mode',
-        metavar = 'FILE', action='store', default = 'normal',
-        help="'normal' : compute spams on given graphs, 'loo' : " + \
-        "leave one out on graphs : create several models " + \
-        "(default : %default), all given reference FILE options " + \
-        "must be located in './all/' relative directory and similar " +\
-        "data can be found in './cv_*/' directories relative to " + \
-        "leave one out graphs folds.")
+                      metavar='FILE', action='store', default='normal',
+                      help="'normal' : compute spams on given graphs, 'loo' : " +
+                      "leave one out on graphs : create several models " +
+                      "(default : %default), all given reference FILE options " +
+                      "must be located in './all/' relative directory and similar " +
+                      "data can be found in './cv_*/' directories relative to " +
+                      "leave one out graphs folds.")
 
     return parser, parser.parse_args(argv)
 
@@ -397,9 +413,9 @@ def main():
 
     graphs = io.load_graphs(options.transfile, graphnames)
 
-    if options.mode == 'normal' :
+    if options.mode == 'normal':
         compute_database(graphs, options.dbdir, options)
-    elif options.mode == 'loo' :
+    elif options.mode == 'loo':
         print("-- all --")
         dbdir = os.path.join('all', options.dbdir)
         compute_database(graphs, dbdir, options)
@@ -413,5 +429,5 @@ def main():
         print("error : '%s' unknown mode" % options.mode)
 
 
-
-if __name__ == '__main__' : main()
+if __name__ == '__main__':
+    main()

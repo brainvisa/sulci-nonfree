@@ -107,7 +107,7 @@ class Tagger(object):
         return ((self._selected_sulci is not None) and
                 (sulcus not in self._selected_sulci)) or \
                ((self._node_index is not None and
-                node_index != self._node_index))
+                 node_index != self._node_index))
 
     def _get_priors(self):
         labels_prior_distrib = self._sulcimodel.labels_prior()
@@ -120,13 +120,13 @@ class Tagger(object):
                 if self._states != prior_labels:
                     if len(self._states) != \
                             len(prior_labels):
-                        print("error : labels size " + \
-                            "differs between " + \
-                            "sulcimodel and prior.")
+                        print("error : labels size " +
+                              "differs between " +
+                              "sulcimodel and prior.")
                         sys.exit(1)
-                    print("warning : labels order differs" +\
-                        " between sulcimodel and " + \
-                        "prior : order fixed.")
+                    print("warning : labels order differs" +
+                          " between sulcimodel and " +
+                          "prior : order fixed.")
                     indices = [numpy.argwhere(p == x)[0, 0]
                                for x in s]
                     priors = numpy.asarray(priors)[0][indices]
@@ -516,6 +516,7 @@ def main():
     graph['filename_base'] = '*'
     w = sigraph.FoldWriter(options.output_graphname)
     w.write(graph)
+
 
 if __name__ == '__main__':
     try:

@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import os, sys, exceptions, numpy
+import os
+import sys
+import numpy
 from optparse import OptionParser
 
 import soma.qt_gui.qt_backend.QtGui as qt
@@ -11,13 +13,13 @@ import anatomist.direct.api as anatomist
 from soma import aims, aimsalgo
 from datamind.tools import *
 try:
-  import fff.GMM
+    import fff.GMM
 except:
-  print('warning, fff is not here or does not work. GMM will not be usable')
+    print('warning, fff is not here or does not work. GMM will not be usable')
 
 from sulci.common import io
 from sulci.models import check_same_distribution, distribution, \
-                distribution_aims, distribution_fff
+    distribution_aims, distribution_fff
 
 qApp = qt.QApplication(sys.argv)
 a = anatomist.Anatomist()
@@ -25,7 +27,7 @@ inf = numpy.inf
 
 
 def distributionArray3DToMeshes(mesher, bb_talairach_offset,
-                img_density, array, prob):
+                                img_density, array, prob):
     meshes, img_thresholds = [], []
 
     # distribution analyse
@@ -38,16 +40,17 @@ def distributionArray3DToMeshes(mesher, bb_talairach_offset,
     mesher.setMinFacetNumber(50)
     for i in range(3):
         ind = numpy.argwhere(array_cum >= prob[i])
-        if len(ind) == 0: continue
-        ind = ind[0,0]
+        if len(ind) == 0:
+            continue
+        ind = ind[0, 0]
         t = array_sort[ind]
 
         # threshold with border
-        thresholder = aims.AimsThreshold_FLOAT_S16(\
+        thresholder = aims.AimsThreshold_FLOAT_S16(
             aims.AIMS_GREATER_OR_EQUAL_TO, t)
         img_threshold = thresholder.bin(img_density)
         img_threshold_border = addBorder(img_threshold,
-                        1, -1, True)
+                                         1, -1, True)
 
         # create mesh
         mesh = aims.AimsSurfaceTriangle()
@@ -67,6 +70,7 @@ def distributionArray3DToMeshes(mesher, bb_talairach_offset,
 
     return meshes, img_thresholds
 
+
 def colorMeshes(meshes, color, alphas):
     ameshes = []
     for mesh, alpha in zip(meshes, alphas):
@@ -74,7 +78,7 @@ def colorMeshes(meshes, color, alphas):
         amesh = a.toAObject(mesh)
         material = anatomist.cpp.Material()
         color2 = list(color) + [alpha]
-        go =  {'diffuse' : color2}
+        go = {'diffuse': color2}
         material.set(aims.Object(go).get())
         amesh.SetMaterial(material)
         mesh.header()['material'] = material.genericDescription()
@@ -84,7 +88,7 @@ def colorMeshes(meshes, color, alphas):
 
 class Display(object):
     def __init__(self, segments_distrib, hie, selected_sulci, generate_all,
-                    features, sulci_weights):
+                 features, sulci_weights):
         self._segments_distrib = segments_distrib
         self._hie = hie
         self._selected_sulci = selected_sulci
@@ -105,19 +109,22 @@ class Display(object):
             if self._selected_sulci is not None:
                 if not (sulcus in self._selected_sulci):
                     continue
-            else:    print("%2d/%d :  %s" % (i, s, sulcus))
+            else:
+                print("%2d/%d :  %s" % (i, s, sulcus))
             self._display_one(sulcus, distrib)
             i += 1
 
         a.addObjects(self._aobjects, [self._awin])
 
     def _handle_features(self):
-        msg.warning('feature option not available for this ' \
-                            'distribution')
+        msg.warning('feature option not available for this '
+                    'distribution')
 
     def find_color(self, sulcus):
-        if sulcus == 'error': return [0, 0.5, 1]
-        elif sulcus == 'ok': return [1, 0.5, 0]
+        if sulcus == 'error':
+            return [0, 0.5, 1]
+        elif sulcus == 'ok':
+            return [1, 0.5, 0]
         return self._hie.find_color(sulcus)
 
 
@@ -127,7 +134,7 @@ class GaussianDisplay(Display):
         self._ratio = [0.5, 1, 2]
         self._alpha = [1, 0.6, 0.2]
         self._unit_sphere = aims.SurfaceGenerator.sphere([0, 0, 0],
-                                1, 96)
+                                                         1, 96)
 
     def _generate_one(self, sulcus, mean, cov, scale=1):
         color = self.find_color(sulcus)
@@ -144,13 +151,13 @@ class GaussianDisplay(Display):
             flattrans = numpy.asarray(transformation).flatten()
             motion = aims.Motion(flattrans)
             if scale != 1:
-                motion.scale([1.] * 3, [scale] *3)
+                motion.scale([1.] * 3, [scale] * 3)
             motion.setTranslation(mean3df)
             aims.SurfaceManip.meshTransform(mesh, motion)
             mesh.updateNormals()
             asphere = a.toAObject(mesh)
             material = anatomist.cpp.Material()
-            go =  {'diffuse' : color2}
+            go = {'diffuse': color2}
             material.set(aims.Object(go).get())
             asphere.SetMaterial(material)
             self._aobjects += [asphere]
@@ -160,14 +167,15 @@ class GaussianDisplay(Display):
 
     def _display_one(self, sulcus, gaussian):
         if isinstance(gaussian, distribution.Dirac) or \
-            gaussian.type() == 'fake_gaussian' :
+                gaussian.type() == 'fake_gaussian':
             return
         mean = gaussian.mean()
         cov = gaussian.covariance()
         meshes = self._generate_one(sulcus, mean, cov)
         for i in range(3):
             self._writer.write(meshes[i],
-                'gaussian_%s_%d.mesh' % (sulcus, i))
+                               'gaussian_%s_%d.mesh' % (sulcus, i))
+
 
 class BlocGaussianDisplay(Display):
     def __init__(self, *args, **kwargs):
@@ -177,25 +185,26 @@ class BlocGaussianDisplay(Display):
     def _handle_features(self):
         available = ['extremities', 'gravity']
         if self._features not in available:
-            msg.error("'" + self._features + "' is not a valid " \
-                "feature, try one among : " + str(available))
+            msg.error("'" + self._features + "' is not a valid "
+                      "feature, try one among : " + str(available))
             sys.exit(1)
-        if self._features == 'help' :
+        if self._features == 'help':
             print("available features are : " + str(available))
             sys.exit(0)
 
     def _display_one(self, sulcus, gaussian):
         groups = gaussian.groups()
         h = {
-            'extremities' : self._display_one_extremities,
-            'gravity' : self._display_one_gravity }
+            'extremities': self._display_one_extremities,
+            'gravity': self._display_one_gravity}
         h[self._features](sulcus, groups)
 
     def _display_one_extremities(self, sulcus, groups):
         try:
             dim1, g1 = groups['extremity1']
             dim2, g2 = groups['extremity2']
-        except KeyError: return
+        except KeyError:
+            return
         self._gaussian_display._display_one(sulcus, g1)
         self._gaussian_display._display_one(sulcus, g2)
 
@@ -214,41 +223,42 @@ def addBorder(img_in, width=1, border_value=0., aims_border=False):
     outvol = aims.Volume(numpy.asarray(img_in.volume()).dtype.type,
                          dim_in[0] + width * 2, dim_in[1] + width * 2,
                          dim_in[2] + width * 2, 1)
-    numpy.asarray( outvol )[:] = border_value
+    numpy.asarray(outvol)[:] = border_value
     outvol2 = outvol.__class__(aims.rc_ptr_Volume_S16(outvol),
-            aims.Volume_S16.Position4Di(width, width, width, 0),
-            aims.Volume_S16.Position4Di(*dim_in))
+                               aims.Volume_S16.Position4Di(
+                                   width, width, width, 0),
+                               aims.Volume_S16.Position4Di(*dim_in))
     numpy.asarray(outvol2)[:] = numpy.asarray(img_in.volume())
-    return aims.AimsData_S16( outvol2 )
+    return aims.AimsData_S16(outvol2)
     #print('dim_in:', dim_in, ', width:', width)
-    #if aims_border:
-        #dim_out = dim_in + [1, width]
-    #else:    dim_out = [(d + width * 2) for d in dim_in]
+    # if aims_border:
+    #dim_out = dim_in + [1, width]
+    # else:    dim_out = [(d + width * 2) for d in dim_in]
     #print('dim_out:', dim_out)
-    ## call Aims constructor with border (5th param)
+    # call Aims constructor with border (5th param)
     #img_out = img_in.__class__(*dim_out)
     #a_in = img_in.volume().get().arraydata()
     #a_out = img_out.volume().get().arraydata()
 
-    ## create mask
+    # create mask
     #mask = numpy.zeros(a_out.shape, dtype='bool')
     #mask[:] = True
     #r1 = numpy.arange(width)
     #r2 = -numpy.arange(width) - 1
-    #mask[0, r1, :, :] = mask[0, r2, :, :] = \
-        #mask[0, :, r1, :] = mask[0, :, r2, :] = \
-        #mask[0, :, :, r1] = mask[0, :, :, r2] = 0
-    ## apply
+    # mask[0, r1, :, :] = mask[0, r2, :, :] = \
+    # mask[0, :, r1, :] = mask[0, :, r2, :] = \
+    #mask[0, :, :, r1] = mask[0, :, :, r2] = 0
+    # apply
     #print('a_in:', a_in.shape, a_in.flatten().shape)
     #print('mask:', mask.shape)
     #print('a_out:', a_out.shape, a_out[mask].shape)
     #a_out[mask] = a_in.flatten()
     #a_out[mask == 0] = border_value
 
-    #return img_out
+    # return img_out
 
 # Old Gmm display
-#class GmmDisplay(Display):
+# class GmmDisplay(Display):
 #    def __init__(self, *args, **kwargs):
 #        Display.__init__(self, *args, **kwargs)
 #        self._probs = [0.3, 0.6, 0.8]
@@ -311,7 +321,7 @@ def addBorder(img_in, width=1, border_value=0., aims_border=False):
 #                self._writer.write(img_threshold,
 #                    'img_threshold_%s_%d.ima' % (sulcus, i))
 
-#class BGmmDisplay(GmmDisplay):
+# class BGmmDisplay(GmmDisplay):
 #    def _sample(self, gmm, gd, shape):
 #        return gmm.VB_sample(gd, None).reshape(shape)
 
@@ -328,7 +338,8 @@ class SpamDisplay(Display):
             w = self._sulci_weights[sulcus]
             array = spam.powered_img_density(1. - w)
             img_density = aims.Volume_FLOAT(array)
-        else:    img_density = spam.img_density()
+        else:
+            img_density = spam.img_density()
         return img_density
 
     def _display_one(self, sulcus, spam):
@@ -336,30 +347,34 @@ class SpamDisplay(Display):
 
         bb_talairach_offset, bb_talairach_size = spam.bb_talairach()
         img_density = self._get_data(sulcus, spam)
-        try:    array = img_density.volume().get().arraydata()
-        except:    array = img_density.arraydata()
-        if spam.is_fromlog(): array = numpy.exp(array)
+        try:
+            array = img_density.volume().get().arraydata()
+        except:
+            array = img_density.arraydata()
+        if spam.is_fromlog():
+            array = numpy.exp(array)
 
         if numpy.isnan(array).sum():
-            msg.warning("skip mesh generation from sulcus " \
-                "'%s' : nan values found." % sulcus)
+            msg.warning("skip mesh generation from sulcus "
+                        "'%s' : nan values found." % sulcus)
             return
 
         if self._generate_all:
             # sulcus in subject axis
             self._writer.write(img_density,
-                    'img_density_%s.ima' % sulcus)
+                               'img_density_%s.ima' % sulcus)
 
-        meshes, img_thresholds = distributionArray3DToMeshes(\
-                self._mesher, bb_talairach_offset,
-                img_density, array, self._prob)
+        meshes, img_thresholds = distributionArray3DToMeshes(
+            self._mesher, bb_talairach_offset,
+            img_density, array, self._prob)
         self._aobjects += colorMeshes(meshes, color, self._alpha)
         for i, mesh in enumerate(meshes):
-            self._writer.write(mesh, 'spam_%s_%d.mesh' %(sulcus, i))
+            self._writer.write(mesh, 'spam_%s_%d.mesh' % (sulcus, i))
         if self._generate_all:
             for i, img_threshold in enumerate(img_thresholds):
                 self._writer.write(img_threshold,
-                    'img_threshold_%s_%d.ima' % (sulcus, i))
+                                   'img_threshold_%s_%d.ima' % (sulcus, i))
+
 
 class GmmFromSpamDisplay(SpamDisplay):
     def __init__(self, *args, **kwargs):
@@ -370,8 +385,8 @@ class GmmFromSpamDisplay(SpamDisplay):
 
         bb_talairach_offset = numpy.array(bb_talairach_offset)
         from numpy.lib import index_tricks
-        X = numpy.array([x for x in index_tricks.ndindex( \
-                    tuple(bb_talairach_size))])
+        X = numpy.array([x for x in index_tricks.ndindex(
+            tuple(bb_talairach_size))])
         X += bb_talairach_offset
         d = 100
         n = (X.shape[0] / d)
@@ -390,7 +405,6 @@ class GmmFromGaussians(Display):
         Display.__init__(self, *args, **kwargs)
         self._gaussian_display = GaussianDisplay(*args, **kwargs)
 
-
     def _display_one(self, sulcus, gaussian):
         all_meshes = []
         pimax = numpy.max(gaussian._pi)
@@ -401,47 +415,47 @@ class GmmFromGaussians(Display):
             self._gaussian_display._ratio = [1]
             self._gaussian_display._alpha = [scale / pimax]
             meshes = self._gaussian_display._generate_one(sulcus,
-                            mean, cov)
+                                                          mean, cov)
 
             all_meshes.append(meshes[0])
         for i, m in enumerate(all_meshes):
             self._writer.write(m, 'gmm_%s_%d.mesh' % (sulcus, i))
 
 
-
 ################################################################################
 def parseOpts(argv):
     hierarchy = os.path.join(aims.carto.Paths.shfjShared(),
-                    'nomenclature', 'hierarchy',
-                    'sulcal_root_colors.hie')
+                             'nomenclature', 'hierarchy',
+                             'sulcal_root_colors.hie')
     description = 'Display learned bayesian local models ' \
-            '(one for each sulci).'
+        '(one for each sulci).'
     parser = OptionParser(description)
     parser.add_option('-d', '--distrib', dest='distribname',
-        metavar = 'FILE', action='store', default = None,
-        help='input distribution models')
+                      metavar='FILE', action='store', default=None,
+                      help='input distribution models')
     parser.add_option('--hierarchy', dest='hierarchy',
-        metavar = 'FILE', action='store', default = hierarchy,
-        help='hierarchy (links between names and colors), ' + \
-        'default : %default')
+                      metavar='FILE', action='store', default=hierarchy,
+                      help='hierarchy (links between names and colors), ' +
+                      'default : %default')
     parser.add_option('-a', '--all', dest='all',
-        action='store_true', default = False,
-        help='generate all intermediate image needed to compute meshes')
+                      action='store_true', default=False,
+                      help='generate all intermediate image needed to compute meshes')
     parser.add_option('-s', '--sulci', dest='sulci',
-        metavar = 'LIST', action='store', default = None,
-        help='tag only specified manually tagged sulci.')
+                      metavar='LIST', action='store', default=None,
+                      help='tag only specified manually tagged sulci.')
     parser.add_option('-f', '--features', dest='features',
-        metavar = 'NAME', action='store', default = None,
-        help='Display specified features (depends on distrib) : try'\
-        '--feature help to see available features.')
+                      metavar='NAME', action='store', default=None,
+                      help='Display specified features (depends on distrib) : try'
+                      '--feature help to see available features.')
     parser.add_option('--sulci-weights', dest='sulci_weights_filename',
-        metavar='FILE', action='store', default=None,
-        help="csv storing sulci_weights : need 'sulci' and " \
-        "'size_errors' columns name")
+                      metavar='FILE', action='store', default=None,
+                      help="csv storing sulci_weights : need 'sulci' and "
+                      "'size_errors' columns name")
     parser.add_option('--repr-number', dest='repr_number',
-        metavar='INT', action='store', default=0, type='int',
-        help="number of the representation (default: %default)")
+                      metavar='INT', action='store', default=0, type='int',
+                      help="number of the representation (default: %default)")
     return parser, parser.parse_args(argv)
+
 
 def main():
     parser, (options, args) = parseOpts(sys.argv)
@@ -456,32 +470,36 @@ def main():
         errors = numpy.asarray(d[:, 'size_errors'])
         sulci = d[:, 'sulci'].tolist()
         sulci_weights = dict(zip(sulci, errors))
-    else:    sulci_weights = None
+    else:
+        sulci_weights = None
 
     hie = aims.Reader().read(options.hierarchy)
 
     print("read...")
     if options.sulci is None:
         selected_sulci = None
-    else:    selected_sulci = options.sulci.split(',')
-    sulcimodel = io.read_full_model(None,#options.graphmodelname,
-        segmentsdistribname=options.distribname,
-        selected_sulci=selected_sulci)
+    else:
+        selected_sulci = options.sulci.split(',')
+    sulcimodel = io.read_full_model(None,  # options.graphmodelname,
+                                    segmentsdistribname=options.distribname,
+                                    selected_sulci=selected_sulci)
     distribs = sulcimodel.segments_distrib()['vertices']
     val, model_types = check_same_distribution(distribs)
     if not val:
-        print("error: mix of different models is not handle, " + \
-            "%s found" % str(list(model_types)))
+        print("error: mix of different models is not handle, " +
+              "%s found" % str(list(model_types)))
         sys.exit(1)
     model_type = list(model_types)[0]
     if not (model_type in ['gaussian', 'spam', 'depth_weighted_spam',
-                        'gmm_from_spam']):
+                           'gmm_from_spam']):
         print("error : unhandle model type '%s'" % model_type)
         sys.exit(1)
-    else:    print("model type '%s' found" % model_type)
+    else:
+        print("model type '%s' found" % model_type)
     args = [sulcimodel.segments_distrib(), hie, selected_sulci,
             options.all, options.features, sulci_weights]
-    if model_type == 'gaussian' : d = GaussianDisplay(*args)
+    if model_type == 'gaussian':
+        d = GaussianDisplay(*args)
     #if model_type == 'bloc_gaussian' : d = BlocGaussianDisplay(*args)
     elif model_type == 'gmm_from_spam':
         if options.repr_number == 0:
@@ -497,4 +515,5 @@ def main():
         qt.qApp.exec_loop()
 
 
-if __name__ == '__main__' : main()
+if __name__ == '__main__':
+    main()

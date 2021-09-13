@@ -3,7 +3,6 @@ from __future__ import print_function
 from __future__ import absolute_import
 import os
 import sys
-import exceptions
 import numpy
 import glob
 import re

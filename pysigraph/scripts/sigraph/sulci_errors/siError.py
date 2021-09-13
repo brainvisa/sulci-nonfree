@@ -3,4 +3,3 @@
 from sulci.scripts.sulci_errors import siError
 
 siError.main()
-

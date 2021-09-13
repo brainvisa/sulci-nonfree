@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
-import os, sys, pprint
+import os
+import sys
+import pprint
 from optparse import OptionParser
 import datamind.io.old_csvIO as datamind_io
 from sulci.common import io
@@ -13,20 +15,21 @@ def parseOpts(argv):
     description = 'Learn gaussian models.'
     parser = OptionParser(description)
     parser.add_option('-b', '--database', dest='database',
-        metavar = 'FILE', action='store',
-        default = 'bayesian_gaussian_databases.dat',
-        help='databases summary file (default : %default).')
+                      metavar='FILE', action='store',
+                      default='bayesian_gaussian_databases.dat',
+                      help='databases summary file (default : %default).')
     parser.add_option('-d', '--distribdir', dest='distribdir',
-        metavar = 'FILE', action='store',
-        default = 'bayesian_gaussian_distribs',
-        help='output distribution directory (default : %default).' \
-            'A file named FILE.dat is created to store ' \
-            'labels/databases links.')
+                      metavar='FILE', action='store',
+                      default='bayesian_gaussian_distribs',
+                      help='output distribution directory (default : %default).'
+                      'A file named FILE.dat is created to store '
+                      'labels/databases links.')
     parser.add_option('-r', '--robust', dest='robust',
-        action='store_true', default = False,
-        help='use riemanian robust mean of bootstrap covariance')
+                      action='store_true', default=False,
+                      help='use riemanian robust mean of bootstrap covariance')
 
     return parser, parser.parse_args(argv)
+
 
 def main():
     parser, (options, args) = parseOpts(sys.argv)
@@ -37,40 +40,46 @@ def main():
     if not (isinstance(datatypes, list) or isinstance(datatypes, tuple)):
         datatypes = [datatypes]
     authorized_datatypes = ['refgravity_center', 'delta_gravity_centers',
-        'min_distance']
+                            'min_distance']
     datatype_error = False
     for dt in datatypes:
         if not (dt in authorized_datatypes):
             datatype_error = True
     if datatype_error:
-        print("at least one datatype is incorrect among : " + \
-            str(datatypes))
+        print("at least one datatype is incorrect among : " +
+              str(datatypes))
         sys.exit(1)
 
     # create output directory
-    try:    os.mkdir(prefix)
+    try:
+        os.mkdir(prefix)
     except OSError as e:
         print("warning: directory '%s' allready exists" % prefix)
 
     # db => mean/cov
     # bayesian_*.minf => bayesian_density_*.minf
-    h = {'data_type' : databases['data'], 'files' : {},
-        'level' : 'segments'}
+    h = {'data_type': databases['data'], 'files': {},
+         'level': 'segments'}
     for labels, minfname in databases['files'].items():
         minfname = os.path.join(os.path.dirname(options.database), minfname)
         db, header = datamind_io.ReaderMinfCsv().read(minfname)
         size = len(db)
         print(minfname, ':', size)
-        if db.getX().std(axis=0).sum() == 0: # all values equal
+        if db.getX().std(axis=0).sum() == 0:  # all values equal
             g = distribution.Dirac()
-        elif size < 4:    g = distribution.FakeGaussian(10e-100)
+        elif size < 4:
+            g = distribution.FakeGaussian(10e-100)
         elif options.robust:
             g = distribution.RobustGaussian()
         else:
-            if size < 8: g = distribution.SphericalGaussianFewDots()
-            elif size < 12: g = distribution.SphericalGaussian()
-            elif size < 18:    g = distribution.DiagonalGaussian()
-            else:    g = distribution.Gaussian()
+            if size < 8:
+                g = distribution.SphericalGaussianFewDots()
+            elif size < 12:
+                g = distribution.SphericalGaussian()
+            elif size < 18:
+                g = distribution.DiagonalGaussian()
+            else:
+                g = distribution.Gaussian()
         if isinstance(labels, list) or isinstance(labels, tuple):
             l1, l2 = labels
             # handle relation intra-label (ex: SC-SC)
@@ -90,5 +99,5 @@ def main():
     fd.close()
 
 
-
-if __name__ == '__main__' : main()
+if __name__ == '__main__':
+    main()

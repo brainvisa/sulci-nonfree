@@ -4,7 +4,6 @@ from __future__ import absolute_import
 import sys
 import os
 import numpy
-import exceptions
 from optparse import OptionParser
 from datamind.tools import *
 import datamind.io as io
