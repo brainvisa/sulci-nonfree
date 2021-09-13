@@ -252,8 +252,6 @@ class SpamDisplay(Display):
         bb_talairach_offset, bb_talairach_size = spam.bb_talairach()
         img_density = self._get_data(sulcus, spam)
         array = img_density.arraydata()
-        except:
-            array = img_density.arraydata()
         if spam.is_fromlog():
             array = numpy.exp(array)
 
@@ -277,7 +275,6 @@ class SpamDisplay(Display):
             for i, img_threshold in enumerate(img_thresholds):
                 self._writer.write(img_threshold,
                                    'img_threshold_%s_%d.ima' % (sulcus, i))
-
 
 class GmmFromSpamDisplay(SpamDisplay):
     def __init__(self, *args, **kwargs):
