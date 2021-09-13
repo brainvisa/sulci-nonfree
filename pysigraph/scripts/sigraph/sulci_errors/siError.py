@@ -4,4 +4,3 @@ from __future__ import absolute_import
 from sulci.scripts.sulci_errors import siError
 
 siError.main()
-

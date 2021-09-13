@@ -211,13 +211,9 @@ filter_mode : filter mode (see filtred doc).'''
         try:
             mod = e['model']
         except TypeError:
-            import exceptions
-            raise exceptions.RuntimeError('invalid model type ' +
-                                          'for ' + str(labels))
+            raise RuntimeError('invalid model type for ' + str(labels))
         if not mod:
-            import exceptions
-            raise exceptions.RuntimeError('no model for ' +
-                                          str(labels))
+            raise RuntimeError('no model for ' + str(labels))
         if type(mod) == sigraph.Model:
             continue
         res.append(mod.cover(fundict, user_data))
