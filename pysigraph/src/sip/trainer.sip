@@ -24,7 +24,7 @@ public:
 };
 
 
-class Trainer
+class Trainer /NoDefaultCtors/
 {
 %TypeHeaderCode
 #include <si/learner/trainer.h>
@@ -228,7 +228,7 @@ public:
 };
 
 
-class SelectiveTrainer : sigraph::Trainer
+class SelectiveTrainer : sigraph::Trainer /NoDefaultCtors/
 {
 %TypeHeaderCode
 #include <si/learner/selectiveTrainer.h>
