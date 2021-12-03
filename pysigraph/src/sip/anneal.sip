@@ -2,7 +2,7 @@
 namespace sigraph
 {
 
-class Anneal
+class Anneal /NoDefaultCtors/
 {
 %TypeHeaderCode
 #include <si/graph/anneal.h>
