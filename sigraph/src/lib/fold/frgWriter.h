@@ -10,7 +10,7 @@
 namespace sigraph
 {
 
-  /**	Classe FrgWriter : écriture de graphes aléatoires de sillons
+  /**	FrgWriter : writing random filds graphs
    */
   class FrgWriter : public MGWriter
   {
@@ -31,7 +31,8 @@ namespace sigraph
       LowLevelFRGArgWriter();
       virtual ~LowLevelFRGArgWriter();
       virtual void write( const std::string & filename, Graph & graph,
-                          SavingMode mode = Keep );
+                          SavingMode mode = Keep,
+                          bool saveOnlyModified = true );
   };
 
 }
