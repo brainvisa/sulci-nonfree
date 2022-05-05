@@ -102,14 +102,7 @@ public:
   AnnealConfigurator();
   virtual ~AnnealConfigurator();
 
-%If (SIPTHROW_BUG)
-  virtual bool loadConfig( const std::string & filename )
-    throw ( );
-%End
-%If (!SIPTHROW_BUG)
-  virtual bool loadConfig( const std::string & filename )
-    throw ( std::exception, carto::io_error );
-%End
+  virtual bool loadConfig( const std::string & filename ) throw ();
   virtual void saveConfig( const std::string & filename );
   virtual void init();
   virtual bool processParams();
