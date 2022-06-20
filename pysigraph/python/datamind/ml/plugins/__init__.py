@@ -107,7 +107,10 @@ class PluginManager(object):
                 classifiers = plugin.classifiers()
                 dimreductors = plugin.dimreductors()
                 readers = plugin.readers()
-            except:
+            except Exception as e:
+                print('exception in load:', plugin, ':', e)
+                import traceback
+                traceback.print_exc()
                 six.reraise(PluginError,
                             PluginError("Can't load plugin "
                                         "'%s'" % plugin.name),

@@ -34,7 +34,6 @@
 
 from __future__ import absolute_import
 from datamind.ml import dimreduction
-from datamind.ml import dimred
 from datamind.ml import database
 import numpy
 from six.moves import range
@@ -553,51 +552,3 @@ class LDANumpy(dimreduction.DimensionReduction):
     def getTransformation(self):
         return self._lda.getTransformation()
 
-
-class MultiStepwiseHybrid(dimreduction.DimensionReduction):
-
-    def __init__(self, func, verbose=False, select_func=numpy.argmax):
-        self._dr = dimred.MultiStepwiseHybrid(func, verbose, select_func)
-
-    def fit(self, train):
-        X = train.getX()
-        Y = train.getY()
-        self._dr.fit(X, Y)
-
-    def reduce(self, test, n=-1, copy=False):
-        X = test.getX()
-        Y = test.getY()
-        db = test.share_or_copy(copy)
-        db.setX(self._dr.reduce(X))
-        return db
-
-    def getSelectedFeatures(self):
-        return self._dr.getSelectedFeatures()
-
-    def getFunc(self):
-        return self._dr.getFunc()
-
-
-class multiForward(dimreduction.DimensionReduction):
-
-    def __init__(self, func, nb_features=-1, verbose=False, select_func=numpy.argmax, delta=0.1):
-        self._dr = dimred.multiForward(
-            func, nb_features, verbose, select_func, delta)
-
-    def fit(self, train):
-        X = train.getX()
-        Y = train.getY()
-        self._dr.fit(X, Y)
-
-    def reduce(self, test, n=-1, copy=False):
-        X = test.getX()
-        Y = test.getY()
-        db = test.share_or_copy(copy)
-        db.setX(self._dr.reduce(X))
-        return db
-
-    def getSelectedFeatures(self):
-        return self._dr.getSelectedFeatures()
-
-    def getFunc(self):
-        return self._dr.getFunc()

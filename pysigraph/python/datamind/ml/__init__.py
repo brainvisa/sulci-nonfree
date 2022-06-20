@@ -33,8 +33,8 @@
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
 from __future__ import print_function
-
 from __future__ import absolute_import
+
 __doc__ = '''
     Machine Learning Module
 
@@ -68,23 +68,26 @@ try:
     from . import dimreduction
 except ImportError:
     pass
-try:
-    from . import classif, resampling, dimred
-except ImportError:
-    pass
+#try:
+    #from . import classif, resampling, dimred
+#except ImportError as e:
+    #print('error in import classif, resampling, dimred:', e)
+    #import traceback
+    #traceback.print_exc()
+    #pass
 
 
 def test_import(module):
     '''
 Try to import a module and return True if it was a success or
-False otherwise.
+False otherwise.classif
 
 module : name of the module.'''
     try:
         __import__(module)
         del module
         return True
-    except:
+    except Exception as e:
         return False
 
 
