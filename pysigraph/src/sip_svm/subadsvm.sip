@@ -1,8 +1,6 @@
 
 %ModuleCode
-#if SIP_VERSION >= 0x040700
 #include <si/subadaptive/subadsvm.h>
-#endif
 %End
 
 
@@ -20,11 +18,11 @@ typedef sigraph::SubAdSvm SubAdSvm;
 %ConvertToSubClassCode
   if (dynamic_cast<sigraph::SubAdSvm *>(sipCpp))
   {
-    sipClass = sipClass_SubAdSvm;
+    sipType = sipType_SubAdSvm;
     *sipCppRet = dynamic_cast<sigraph::SubAdSvm *>( sipCpp );
   }
   else
-    sipClass = NULL;
+    sipType = NULL;
 %End
 
 public:

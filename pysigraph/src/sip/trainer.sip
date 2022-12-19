@@ -72,7 +72,7 @@ public:
     {
       po = PySequence_ITEM( a0, i );
       Py_DECREF( po );
-      if( !PyObject_TypeCheck( po, (PyTypeObject *) sipClass_sigraph_CGraph ) )
+      if( !PyObject_TypeCheck( po, (PyTypeObject *) sipTypeAsPyTypeObject( sipType_sigraph_CGraph ) ) )
       {
         sipIsErr = 1;
         std::ostringstream s;
@@ -81,12 +81,12 @@ public:
         PyErr_SetString( PyExc_TypeError, s.str().c_str() );
         break;
       }
-      ptr = sipForceConvertToInstance( po, sipClass_sigraph_CGraph, 0, 0, 0,
-                                       &sipIsErr );
+      ptr = sipForceConvertToType( po, sipType_sigraph_CGraph, 0, 0, 0,
+                                   &sipIsErr );
       if( ptr )
       {
         lrn.insert( reinterpret_cast<sigraph::CGraph *>( ptr ) );
-        // should call sipReleadeInstance() !
+        // should call sipReleaseType() !
       }
       else
         break;
@@ -98,8 +98,9 @@ public:
       {
         po = PySequence_ITEM( a1, i );
         Py_DECREF( po );
-        if( !PyObject_TypeCheck( po, 
-                                 (PyTypeObject *) sipClass_sigraph_CGraph ) )
+        if( !PyObject_TypeCheck(
+          po,
+          (PyTypeObject *) sipTypeAsPyTypeObject( sipType_sigraph_CGraph ) ) )
         {
           sipIsErr = 1;
           std::ostringstream s;
@@ -108,12 +109,12 @@ public:
           PyErr_SetString( PyExc_TypeError, s.str().c_str() );
           break;
         }
-        ptr = sipForceConvertToInstance( po, sipClass_sigraph_CGraph, 0, 0, 0,
-                                         &sipIsErr );
+        ptr = sipForceConvertToType( po, sipType_sigraph_CGraph, 0, 0, 0,
+                                     &sipIsErr );
         if( ptr )
         {
           tst.insert( reinterpret_cast<sigraph::CGraph *>( ptr ) );
-          // should call sipReleadeInstance() !
+          // should call sipReleaseType() !
         }
         else
           break;
@@ -150,7 +151,9 @@ public:
     {
       po = PySequence_ITEM( a0, i );
       Py_DECREF( po );
-      if( !PyObject_TypeCheck( po, (PyTypeObject *) sipClass_sigraph_CGraph ) )
+      if( !PyObject_TypeCheck(
+        po,
+        (PyTypeObject *) sipTypeAsPyTypeObject( sipType_sigraph_CGraph ) ) )
       {
         sipIsErr = 1;
         std::ostringstream s;
@@ -159,12 +162,12 @@ public:
         PyErr_SetString( PyExc_TypeError, s.str().c_str() );
         break;
       }
-      ptr = sipForceConvertToInstance( po, sipClass_sigraph_CGraph, 0, 0, 0,
-                                       &sipIsErr );
+      ptr = sipForceConvertToType( po, sipType_sigraph_CGraph, 0, 0, 0,
+                                   &sipIsErr );
       if( ptr )
       {
         lrn.insert( reinterpret_cast<sigraph::CGraph *>( ptr ) );
-        // should call sipReleadeInstance() !
+        // should call sipReleaseType() !
       }
       else
         break;
@@ -176,8 +179,9 @@ public:
       {
         po = PySequence_ITEM( a1, i );
         Py_DECREF( po );
-        if( !PyObject_TypeCheck( po, 
-                                 (PyTypeObject *) sipClass_sigraph_CGraph ) )
+        if( !PyObject_TypeCheck(
+          po,
+          (PyTypeObject *) sipTypeAsPyTypeObject( sipType_sigraph_CGraph ) ) )
         {
           sipIsErr = 1;
           std::ostringstream s;
@@ -186,12 +190,12 @@ public:
           PyErr_SetString( PyExc_TypeError, s.str().c_str() );
           break;
         }
-        ptr = sipForceConvertToInstance( po, sipClass_sigraph_CGraph, 0, 0, 0,
-                                         &sipIsErr );
+        ptr = sipForceConvertToType( po, sipType_sigraph_CGraph, 0, 0, 0,
+                                     &sipIsErr );
         if( ptr )
         {
           tst.insert( reinterpret_cast<sigraph::CGraph *>( ptr ) );
-          // should call sipReleadeInstance() !
+          // should call sipReleaseType() !
         }
         else
           break;

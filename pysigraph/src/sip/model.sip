@@ -1,10 +1,8 @@
 
 %ModuleCode
-#if SIP_VERSION >= 0x040700
 #include <si/model/adaptiveTree.h>
 #include <si/model/adaptiveLeaf.h>
 #include <si/model/topAdaptive.h>
-#endif
 %End
 
 namespace sigraph
@@ -22,28 +20,28 @@ class Model /Abstract/
   {
     if( dynamic_cast<sigraph::AdaptiveTree *>( sipCpp ) )
     {
-      sipClass = sipClass_sigraph_AdaptiveTree;
+      sipType = sipType_sigraph_AdaptiveTree;
       *sipCppRet = dynamic_cast<sigraph::AdaptiveTree *>( sipCpp );
     }
     else if( dynamic_cast<sigraph::AdaptiveLeaf *>( sipCpp ) )
     {
-      sipClass = sipClass_sigraph_AdaptiveLeaf;
+      sipType = sipType_sigraph_AdaptiveLeaf;
       *sipCppRet = dynamic_cast<sigraph::AdaptiveLeaf *>( sipCpp );
     }
     else if( dynamic_cast<sigraph::TopAdaptive *>( sipCpp ) )
     {
-      sipClass = sipClass_sigraph_TopAdaptive;
+      sipType = sipType_sigraph_TopAdaptive;
       *sipCppRet = dynamic_cast<sigraph::TopAdaptive *>( sipCpp );
     }
     else
     {
-      sipClass = sipClass_sigraph_Adaptive;
+      sipType = sipType_sigraph_Adaptive;
       *sipCppRet = dynamic_cast<sigraph::Adaptive *>( sipCpp );
     }
   }
   else
   {
-    sipClass = sipClass_sigraph_Model;
+    sipType = sipType_sigraph_Model;
     *sipCppRet = dynamic_cast<sigraph::Model *>( sipCpp );
   }
 %End
@@ -51,7 +49,7 @@ class Model /Abstract/
 public:
   virtual ~Model();
   virtual sigraph::Model* clone() const = 0 /Factory/;
-  virtual double prop( const sigraph::Clique *) = 0 /AutoGen/;
+  virtual double prop( const sigraph::Clique *) = 0;
   virtual bool isAdaptive() const;
 
   virtual void setParent(sigraph::Model* m);

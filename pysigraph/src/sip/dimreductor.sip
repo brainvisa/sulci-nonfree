@@ -19,17 +19,17 @@ class DimReductor /Abstract/
 %ConvertToSubClassCode
 if (dynamic_cast<sigraph::RanksDimReductor *>(sipCpp))
 {
-  sipClass = sipClass_sigraph_RanksDimReductor;
+  sipType = sipType_sigraph_RanksDimReductor;
   *sipCppRet = dynamic_cast<sigraph::RanksDimReductor *>( sipCpp );
 }
 else if (dynamic_cast<sigraph::MatrixDimReductor *>(sipCpp))
 {
-  sipClass = sipClass_sigraph_MatrixDimReductor;
+  sipType = sipType_sigraph_MatrixDimReductor;
   *sipCppRet = dynamic_cast<sigraph::MatrixDimReductor *>( sipCpp );
 }
 else
 {
-  sipClass = sipClass_sigraph_DimReductor;
+  sipType = sipType_sigraph_DimReductor;
   *sipCppRet = dynamic_cast<sigraph::DimReductor *>( sipCpp );
 }
 %End

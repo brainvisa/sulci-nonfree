@@ -1,10 +1,8 @@
 
 %ModuleCode
-#if SIP_VERSION >= 0x040700
 #include <si/fold/foldDescr3.h>
 #include <si/fold/foldDescr5.h>
 #include <si/fold/interFoldDescr5.h>
-#endif
 %End
 
 namespace sigraph
@@ -28,32 +26,32 @@ typedef std::vector<std::string> vector_STRING;
   if( dynamic_cast<sigraph::AdapDescr *>( sipCpp ) )
     if( dynamic_cast<sigraph::FoldDescr5 *>( sipCpp ) )
     {
-      sipClass = sipClass_sigraph_FoldDescr5;
+      sipType = sipType_sigraph_FoldDescr5;
       *sipCppRet = dynamic_cast<sigraph::FoldDescr5 *>( sipCpp );
     }
     else if( dynamic_cast<sigraph::FoldDescr4 *>( sipCpp ) )
     {
-      sipClass = sipClass_sigraph_FoldDescr4;
+      sipType = sipType_sigraph_FoldDescr4;
       *sipCppRet = dynamic_cast<sigraph::FoldDescr4 *>( sipCpp );
     }
     else if( dynamic_cast<sigraph::FoldDescr3 *>( sipCpp ) )
     {
-      sipClass = sipClass_sigraph_FoldDescr3;
+      sipType = sipType_sigraph_FoldDescr3;
       *sipCppRet = dynamic_cast<sigraph::FoldDescr3 *>( sipCpp );
     }
     else if( dynamic_cast<sigraph::FoldDescr2 *>( sipCpp ) )
     {
-      sipClass = sipClass_sigraph_FoldDescr2;
+      sipType = sipType_sigraph_FoldDescr2;
       *sipCppRet = dynamic_cast<sigraph::FoldDescr2 *>( sipCpp );
     }
     else
     {
-      sipClass = sipClass_sigraph_AdapDescr;
+      sipType = sipType_sigraph_AdapDescr;
       *sipCppRet = dynamic_cast<sigraph::AdapDescr *>( sipCpp );
     }
   else
   {
-    sipClass = sipClass_sigraph_CliqueDescr;
+    sipType = sipType_sigraph_CliqueDescr;
     *sipCppRet = dynamic_cast<sigraph::CliqueDescr *>( sipCpp );
   }
 %End
@@ -63,8 +61,8 @@ public:
   virtual sigraph::CliqueDescr *clone() const = 0;
   virtual vector_STRING descriptorsNames() const;
   virtual bool makeVector(const sigraph::Clique* cl, vector_DOUBLE & vec,
-		carto::GenericObject* model = 0) /AutoGen/;
-  virtual void preProcess(vector_DOUBLE &vec, carto::GenericObject* model = 0) /AutoGen/;
+		carto::GenericObject* model = 0);
+  virtual void preProcess(vector_DOUBLE &vec, carto::GenericObject* model = 0);
 };
 
 
