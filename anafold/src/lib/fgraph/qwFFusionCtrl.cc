@@ -33,7 +33,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   fusion->addObserver( this );
   setWindowTitle( ( string( name ) + " : " + fusion->name() ).c_str() );
   QHBoxLayout	*lay1 = new QHBoxLayout( this );
-  lay1->setMargin( 10 );
+  lay1->setContentsMargins( 10, 10, 10, 10 );
 
   // left panel
 
@@ -41,13 +41,13 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   fr1->setObjectName( "frame1" );
   fr1->setFrameStyle( QFrame::NoFrame );
   QVBoxLayout	*lay4 = new QVBoxLayout( fr1 );
-  lay4->setMargin( 0 );
+  lay4->setContentsMargins( 0, 0, 0, 0 );
   setLayout( lay1 );
   QGroupBox *bg = new QGroupBox( tr( "Node mapping mode" ), fr1 );
   QGroupBox *groupbox = bg;
   bg->setObjectName( "btngroup" );
   QVBoxLayout	*lay2 = new QVBoxLayout( bg );
-  lay2->setMargin( 10 );
+  lay2->setContentsMargins( 10, 10, 10, 10 );
   lay2->setSpacing( 10 );
   _groupBox = new QButtonGroup( bg );
   QRadioButton	*np = new QRadioButton( tr( "Node potentials" ), bg );
@@ -71,7 +71,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   QGroupBox *relgb = bg;
   bg->setObjectName( "relgroup" );
   QVBoxLayout	*lay5 = new QVBoxLayout( bg );
-  lay5->setMargin( 10 );
+  lay5->setContentsMargins( 10, 10, 10, 10 );
   lay5->setSpacing( 10 );
   _rpBtn = new QCheckBox( tr( "Show edge potentials" ), bg );
   _rpBtn->setObjectName( "relpot" );
@@ -83,7 +83,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   QFrame	*frrgt = new QFrame( this );
   frrgt->setObjectName( "rightPan" );
   QVBoxLayout	*lfrrgt = new QVBoxLayout( frrgt );
-  lfrrgt->setMargin( 0 );
+  lfrrgt->setContentsMargins( 0, 0, 0, 0 );
 
   QGroupBox *group2 = new QGroupBox( tr( "Modifiers" ), frrgt );
   group2->setObjectName( "btngroup2" );
@@ -95,7 +95,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   // right upper group : modifiers
 
   QVBoxLayout	*lay3 = new QVBoxLayout( group2 );
-  lay3->setMargin( 10 );
+  lay3->setContentsMargins( 10, 10, 10, 10 );
   lay3->setSpacing( 10 );
   _wtBtn = new QCheckBox( tr( "Weighted potentials" ), group2 );
   _wtBtn->setObjectName( "wtpot" );
@@ -108,7 +108,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   fr2->setObjectName( "fr2" );
   fr2->setFrameStyle( QFrame::NoFrame );
   QHBoxLayout	*lay6 = new QHBoxLayout( fr2 );
-  lay6->setMargin( 0 );
+  lay6->setContentsMargins( 0, 0, 0, 0 );
   _p0Btn = new QCheckBox( tr( "0 potential with different color : " ), fr2);
   _p0Btn->setObjectName( "pot0" );
   _p0Btn->setFixedSize( _p0Btn->sizeHint() );
@@ -125,7 +125,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   fr3->setObjectName( "fr3" );
   fr3->setFrameStyle( QFrame::NoFrame );
   QHBoxLayout	*lay7 = new QHBoxLayout( fr3 );
-  lay7->setMargin( 0 );
+  lay7->setContentsMargins( 0, 0, 0, 0 );
   QLabel	*lab1 = new QLabel( tr( "No potential color : " ), fr3);
   lab1->setObjectName( "lab1" );
   lab1->setFixedSize( lab1->sizeHint() );
@@ -149,7 +149,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   // right lower panel : model
 
   QVBoxLayout	*lmod = new QVBoxLayout( grgtbtm );
-  lmod->setMargin( 10 );
+  lmod->setContentsMargins( 10, 10, 10, 10 );
   lmod->setSpacing( 10 );
   QFrame	*frmodwt = new QFrame( grgtbtm );
   frmodwt->setObjectName( "frmodwt" );
@@ -158,7 +158,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   lmod->addWidget( frmodwt );
 
   QHBoxLayout	*lmodwt = new QHBoxLayout( frmodwt );
-  lmodwt->setMargin( 0 );
+  lmodwt->setContentsMargins( 0, 0, 0, 0 );
   lmodwt->setSpacing( 10 );
 
   QLabel	*lbmodwt = new QLabel( tr( "Contribution of edge numbers" ), 

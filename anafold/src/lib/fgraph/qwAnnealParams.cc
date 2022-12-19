@@ -120,13 +120,13 @@ QAnnealParams::QAnnealParams( QWidget* parent, const char*,
 
   QVBoxLayout	*lay1 = new QVBoxLayout; //( this, 10, -1, "QAnnealParamsLay1" );
   setLayout( lay1 );
-  lay1->setMargin( 10 );
-  lay1->setMargin( 5 );
+  lay1->setContentsMargins( 10, 10, 10, 10 );
+  lay1->setContentsMargins( 5, 5, 5, 5 );
   QWidget	*iobox = new QWidget( this );
   QHBoxLayout *iolay = new QHBoxLayout;
   iobox->setLayout( iolay );
   iolay->setSpacing( 10 );
-  iolay->setMargin( 5 );
+  iolay->setContentsMargins( 5, 5, 5, 5 );
   QPushButton	*loadBtn = new QPushButton( tr( "Load config" ), iobox );
   QPushButton	*saveBtn = new QPushButton( tr( "Save config" ), iobox );
   iolay->addWidget( loadBtn );
@@ -153,7 +153,7 @@ QAnnealParams::QAnnealParams( QWidget* parent, const char*,
   QGridLayout *parlay = new QGridLayout;
   parbox->setLayout( parlay );
   parlay->setSpacing( 3 );
-  parlay->setMargin( 0 );
+  parlay->setContentsMargins( 0, 0, 0, 0 );
   int row = 0;
   QLabel	*l = new QLabel( tr( "Initialize annealing :" ), parbox );
   parlay->addWidget( l, row, 0 );
