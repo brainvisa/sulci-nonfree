@@ -162,11 +162,12 @@ int main( int argc, const char** argv )
   
   //Read the graph and convert to labelled volume
   cout << "Read the graph\n";
-  string					bname = "aims_bottom",ssname = "aims_ss",othername= "aims_other";
-  string					synt;
-  FGraph					fg;
-  VolumeRef<short>			surface_vol( bb[0], bb[1], bb[2],1,1 ),
-    bottom_vol( bb[0], bb[1], bb[2], 1, 1 );
+  string                    bname = "aims_bottom", ssname = "aims_ss",
+                            othername= "aims_other";
+  string                    synt;
+  FGraph                    fg;
+  VolumeRef<short>          surface_vol( bb[0], bb[1], bb[2],1,1 ),
+                            bottom_vol( bb[0], bb[1], bb[2], 1, 1 );
   map<string,short>				trans;
   map <short,string>    			transInv;
   Graph::iterator				iv, fv=fg.end();
@@ -446,8 +447,8 @@ int main( int argc, const char** argv )
     ASSERT (dpmin != 0);
     outTex = meshdistance::SulcusVolume2Texture(
       surface[0], bottom_vol, surface_vol,
-      Point3df(CA[0] * vsz[0],CA[1] * vsz[1],CA[2] * vsz[2]), demin , dpmin,
-      ncc, transInv, labels,radius, rmadius,alpha_reg, connectivity,
+      Point3df(CA[0] * vsz[0], CA[1] * vsz[1], CA[2] * vsz[2]), demin , dpmin,
+      ncc, transInv, labels, radius, rmadius, alpha_reg, connectivity,
       neighbourso );
   }
   cout << "writing texture : " << flush;
