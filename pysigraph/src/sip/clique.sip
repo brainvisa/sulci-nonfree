@@ -11,15 +11,15 @@ class Clique : carto::GenericObject /Abstract/
 %ConvertToSubClassCode
   if( dynamic_cast<sigraph::VertexClique *>( sipCpp ) )
   {
-    sipClass = sipClass_sigraph_VertexClique;
+    sipType = sipType_sigraph_VertexClique;
     *sipCppRet = dynamic_cast<sigraph::VertexClique *>( sipCpp );
   }
   else if( dynamic_cast<sigraph::Clique *>( sipCpp ) )
   {
-    sipClass = sipClass_sigraph_Clique;
+    sipType = sipType_sigraph_Clique;
     *sipCppRet = dynamic_cast<sigraph::Clique *>( sipCpp );
   }
-  else  sipClass = 0;
+  else  sipType = 0;
 %End
 
 public:
@@ -54,39 +54,40 @@ class VertexClique : sigraph::Clique
 %End
 
 public:
-	VertexClique();
-	~VertexClique();
+  VertexClique();
+  ~VertexClique();
 
-	virtual sigraph::Clique* deepCopy() const;
+  virtual sigraph::Clique* deepCopy() const;
 
-	void addVertex(Vertex*);
-	void removeVertex(Vertex*);
-	const set_VertexPtr& vertices() const;
+  void addVertex(Vertex*);
+  void removeVertex(Vertex*);
+  const set_VertexPtr& vertices() const;
 
-	static sigraph::VertexClique* fromObject(carto::GenericObject);
+  static sigraph::VertexClique* fromObject(carto::GenericObject);
 %MethodCode
-	try
-	{
-		sipRes = a0->value<sigraph::VertexClique*>();
-	}
-	catch( std::exception & e )
-	{
-		sipIsErr = 1;
-		PyErr_SetString( PyExc_RuntimeError, e.what() );
-		sipRes = 0;
-	}
+  try
+  {
+    sipRes = a0->value<sigraph::VertexClique*>();
+  }
+  catch( std::exception & e )
+  {
+    sipIsErr = 1;
+    PyErr_SetString( PyExc_RuntimeError, e.what() );
+    sipRes = 0;
+  }
 %End
-	static SIP_PYLIST connectivity2( const set_VertexPtr & vx,
-		const set_STRING & syntTypes) /PyName=connectivity/;
+
+  static SIP_PYLIST connectivity2( const set_VertexPtr & vx,
+      const set_STRING & syntTypes) /PyName=connectivity/;
 %MethodCode
-	std::set<sigraph::CComponent *>	s;
-	std::set<sigraph::CComponent *>::const_iterator i, e;
-	unsigned int n = sigraph::VertexClique::connectivity(*a0, &s, *a1);
-	unsigned int ind = 0;
-	sipRes = PyList_New(n);
-	for (i = s.begin(), e = s.end(); i != e; ++i, ++ind)
-		PyList_SetItem(sipRes, ind, sipConvertFromInstance(*i,
-				sipClass_set_VertexPtr, Py_None));
+  std::set<sigraph::CComponent *>	s;
+  std::set<sigraph::CComponent *>::const_iterator i, e;
+  unsigned int n = sigraph::VertexClique::connectivity(*a0, &s, *a1);
+  unsigned int ind = 0;
+  sipRes = PyList_New(n);
+  for (i = s.begin(), e = s.end(); i != e; ++i, ++ind)
+    PyList_SetItem(sipRes, ind, sipConvertFromType(*i,
+                   sipType_set_VertexPtr, Py_None));
 %End
 };
 

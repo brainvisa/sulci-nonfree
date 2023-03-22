@@ -18,12 +18,12 @@ class Optimizer /Abstract/
 %ConvertToSubClassCode
 if (dynamic_cast<sigraph::GridOptimizer *>(sipCpp))
 {
-  sipClass = sipClass_sigraph_GridOptimizer;
+  sipType = sipType_sigraph_GridOptimizer;
   *sipCppRet = dynamic_cast<sigraph::GridOptimizer *>( sipCpp );
 }
 else
 {
-  sipClass = sipClass_sigraph_Optimizer;
+  sipType = sipType_sigraph_Optimizer;
   *sipCppRet = dynamic_cast<sigraph::Optimizer *>( sipCpp );
 }
 %End

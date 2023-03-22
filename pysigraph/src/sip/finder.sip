@@ -12,9 +12,9 @@ class ModelFinder /Abstract/
 public:
   /* virtual */ void initCliques(sigraph::CGraph &, bool=true, bool=false, 
                         bool=true, bool=true /*, 
-                        const aims::SelectionSet *=0 */ ) = 0 /AutoGen/;
-  virtual bool isAdaptive() const = 0 /AutoGen/;
-  carto::GenericObject* selectModel2(const sigraph::Clique*) /PyName=selectModel, AutoGen/;
+                        const aims::SelectionSet *=0 */ ) = 0;
+  virtual bool isAdaptive() const = 0;
+  carto::GenericObject* selectModel2(const sigraph::Clique*) /PyName=selectModel/;
 %MethodCode
   sipRes = sipCpp->selectModel(a0);
 %End

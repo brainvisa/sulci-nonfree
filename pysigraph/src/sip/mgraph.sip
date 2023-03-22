@@ -1,9 +1,7 @@
 
 %ModuleCode
-#if SIP_VERSION >= 0x040700
 #include <si/fold/frgraph.h>
 #include <si/fold/fgraph.h>
-#endif
 %End
 
 namespace sigraph
@@ -23,28 +21,28 @@ class MGraph : Graph
     if( dynamic_cast<sigraph::MGraph *>( sipCpp ) )
       if( dynamic_cast<sigraph::FRGraph *>( sipCpp ) )
       {
-        sipClass = sipClass_sigraph_FRGraph;
+        sipType = sipType_sigraph_FRGraph;
         *sipCppRet = dynamic_cast<sigraph::FRGraph *>( sipCpp );
       }
       else
       {
-        sipClass = sipClass_sigraph_MGraph;
+        sipType = sipType_sigraph_MGraph;
         *sipCppRet = dynamic_cast<sigraph::MGraph *>( sipCpp );
       }
     else if( dynamic_cast<sigraph::CGraph *>( sipCpp ) )
       if( dynamic_cast<sigraph::FGraph *>( sipCpp ) )
       {
-        sipClass = sipClass_sigraph_FGraph;
+        sipType = sipType_sigraph_FGraph;
         *sipCppRet = dynamic_cast<sigraph::FGraph *>( sipCpp );
       }
       else
       {
-        sipClass = sipClass_sigraph_CGraph;
+        sipType = sipType_sigraph_CGraph;
         *sipCppRet = dynamic_cast<sigraph::CGraph *>( sipCpp );
       }
     else
     {
-      sipClass = sipClass_Graph;
+      sipType = sipType_Graph;
       *sipCppRet = dynamic_cast<Graph *>( sipCpp );
     }
   }
@@ -52,14 +50,14 @@ class MGraph : Graph
   {
     if( dynamic_cast<sigraph::Learner *>( sipCpp ) )
     {
-      sipClass = sipClass_sigraph_Learner;
+      sipType = sipType_sigraph_Learner;
       *sipCppRet = dynamic_cast<sigraph::Learner *>( sipCpp );
     }
     else
-      sipClass = 0;
+      sipType = 0;
   }
   else
-    sipClass = 0;
+    sipType = 0;
 %End
 
 public:

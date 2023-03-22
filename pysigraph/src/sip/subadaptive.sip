@@ -1,11 +1,9 @@
 
 %ModuleCode
-#if SIP_VERSION >= 0x040700
 #include <si/subadaptive/subAdMlp.h>
 #include <si/subadaptive/subAdGauss.h>
 #include <si/subadaptive/subAdLogGauss.h>
 #include <si/subadaptive/subAdMixGauss.h>
-#endif
 %End
 
 namespace sigraph
@@ -20,7 +18,7 @@ class SubAdResponse
 %ConvertToSubClassCode
   if (dynamic_cast<sigraph::SubAdResponse *>(sipCpp))
   {
-    sipClass = sipClass_sigraph_SubAdResponse;
+    sipType = sipType_sigraph_SubAdResponse;
     *sipCppRet = dynamic_cast<sigraph::SubAdResponse *>( sipCpp );
   }
 %End
@@ -46,30 +44,30 @@ class SubAdaptive /Abstract/
 %ConvertToSubClassCode
   if (dynamic_cast<sigraph::SubAdMlp *>(sipCpp))
   {
-    sipClass = sipClass_sigraph_SubAdMlp;
+    sipType = sipType_sigraph_SubAdMlp;
     *sipCppRet = dynamic_cast<sigraph::SubAdMlp *>( sipCpp );
   }
   else if (dynamic_cast<sigraph::SubAdGauss *>(sipCpp))
   {
     if (dynamic_cast<sigraph::SubAdLogGauss *>(sipCpp))
     {
-      sipClass = sipClass_sigraph_SubAdLogGauss;
+      sipType = sipType_sigraph_SubAdLogGauss;
       *sipCppRet = dynamic_cast<sigraph::SubAdLogGauss *>( sipCpp );
     }
     else
     {
-      sipClass = sipClass_sigraph_SubAdGauss;
+      sipType = sipType_sigraph_SubAdGauss;
       *sipCppRet = dynamic_cast<sigraph::SubAdGauss *>( sipCpp );
     }
   }
   else if (dynamic_cast<sigraph::SubAdMixGauss *>(sipCpp))
   {
-    sipClass = sipClass_sigraph_SubAdMixGauss;
+    sipType = sipType_sigraph_SubAdMixGauss;
     *sipCppRet = dynamic_cast<sigraph::SubAdMixGauss *>( sipCpp );
   }
   else
   {
-    sipClass = sipClass_sigraph_SubAdaptive;
+    sipType = sipType_sigraph_SubAdaptive;
     *sipCppRet = dynamic_cast<sigraph::SubAdaptive *>( sipCpp );
   }
 %End
