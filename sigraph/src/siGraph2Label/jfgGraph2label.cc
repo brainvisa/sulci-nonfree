@@ -156,7 +156,7 @@ int main( int argc, const char** argv )
       {
         vector<string> refs;
         vector<vector<float> > vtrans;
-        AffineTransformation3d invtrans = transform.inverse();
+        AffineTransformation3d invtrans = *transform.inverse();
         if( vol->header().hasProperty( "referential" ) )
           vol->header().removeProperty( "referential" );
         if( !transform.isIdentity() )
