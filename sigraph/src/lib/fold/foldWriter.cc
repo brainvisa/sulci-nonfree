@@ -5,15 +5,23 @@
 #include <aims/bucket/bucket_g.h>
 #include <aims/def/def_g.h>
 #include <aims/io/aimsGraphW.h>
+#include <cartobase/config/paths.h>
 
 using namespace sigraph;
 using namespace aims;
+using namespace carto;
 using namespace std;
 
 
 FoldWriter::FoldWriter( const string & filename )
   : GraphWriter( filename, FoldReader::syntax )
 {
+  if( FoldReader::syntax.empty() )
+  {
+    FoldReader::syntax = FoldReader::initSyntax( Paths::findResourceFile(
+      "nomenclature/syntax/graph.stx", "aims" ) );
+    setSyntax( FoldReader::syntax );
+  }
 }
 
 
