@@ -229,7 +229,7 @@ class Tagger(object):
                 X.append(Xs)
                 groups += [id] * len(Xs)
             id += 1
-        return numpy.vstack(X), numpy.array(groups)
+        return numpy.vstack(X).astype(float), numpy.array(groups)
 
 
 class GaussianTagger(Tagger):
