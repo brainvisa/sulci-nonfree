@@ -18,11 +18,11 @@ namespace sigraph
   public:
     MReader( const std::string & filename, 
 	     const TreePostParser::FactorySet & fs = baseFactorySet(), 
-	     const carto::SyntaxSet & synt = syntax,
-	     const carto::AttributedReader::HelperSet& helpers_ = helpers);
+	     const carto::SyntaxSet & synt = syntax(),
+	     const carto::AttributedReader::HelperSet& helpers_ = helpers());
     MReader( const TreePostParser::FactorySet & fs = baseFactorySet(), 
-	     const carto::SyntaxSet & synt = syntax, 
-	     const carto::AttributedReader::HelperSet& helpers_ = helpers);
+	     const carto::SyntaxSet & synt = syntax(),
+	     const carto::AttributedReader::HelperSet& helpers_ = helpers());
     virtual ~MReader();
 
     virtual Model* readModel();
@@ -33,12 +33,14 @@ namespace sigraph
     /// replace factory dest by source (like dest=source)
     void aliasFactory( const std::string & dest, const std::string & source );
     const TreePostParser::FactorySet & factories();
-    static carto::AttributedReader::HelperSet	initHelpers();
-    static carto::PythonReader::HelperSet	initPythonHelpers();
 
-    static carto::SyntaxSet			syntax;
-    static carto::AttributedReader::HelperSet	helpers;
-    static carto::PythonReader::HelperSet	python_helpers;
+    static carto::AttributedReader::HelperSet *initHelpers();
+    static carto::PythonReader::HelperSet *initPythonHelpers();
+
+    static carto::PythonReader::HelperSet & python_helpers();
+    static carto::SyntaxSet & syntax();
+    static carto::AttributedReader::HelperSet & helpers();
+    static void delete_helpers();
 
   protected:
     virtual void parse( Tree* ao );
@@ -54,6 +56,9 @@ namespace sigraph
 			    const std::string & filename );
     static void parseModel( Model* mod, carto::AttributedObject* parent, 
 			    Tree* ao );
+    static carto::PythonReader::HelperSet *& python_helpers_p();
+    static carto::AttributedReader::HelperSet *& helpers_p();
+    static carto::SyntaxSet *& syntax_p();
 
     TreePostParser::FactorySet	_knownElems;
     bool			_isOpen;

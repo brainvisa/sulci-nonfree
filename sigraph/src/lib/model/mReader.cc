@@ -30,6 +30,7 @@
 #include <cartobase/exception/ioexcept.h>
 #include <cartobase/object/pythonwriter.h>
 #include <iostream>
+#include <cstdlib>
 #include <assert.h>
 
 using namespace carto;
@@ -38,11 +39,80 @@ using namespace sigraph;
 using namespace std;
 
 
-SyntaxSet MReader::syntax;
-AttributedReader::HelperSet MReader::helpers( MReader::initHelpers() );
+PythonReader::HelperSet * & MReader::python_helpers_p()
+{
+  static PythonReader::HelperSet *helpers = 0;
+  return helpers;
+}
 
-PythonReader::HelperSet
-MReader::python_helpers( MReader::initPythonHelpers() );
+
+AttributedReader::HelperSet * & MReader::helpers_p()
+{
+  static AttributedReader::HelperSet *helpers = 0;
+  return helpers;
+}
+
+
+SyntaxSet * & MReader::syntax_p()
+{
+  static SyntaxSet *syntax = 0;
+  return syntax;
+}
+
+
+PythonReader::HelperSet & MReader::python_helpers()
+{
+  PythonReader::HelperSet * & helpers = python_helpers_p();
+  if( helpers == 0 )
+  {
+    helpers = MReader::initPythonHelpers();
+    atexit( delete_helpers );  // cleanup when quitting the application
+  }
+  return *helpers;
+}
+
+
+AttributedReader::HelperSet & MReader::helpers()
+{
+  AttributedReader::HelperSet * & helpers = helpers_p();
+  if( helpers == 0 )
+    helpers = MReader::initHelpers();
+  return *helpers;
+}
+
+
+SyntaxSet & MReader::syntax()
+{
+  SyntaxSet * & syntax = syntax_p();
+  if( syntax == 0 )
+    syntax = new SyntaxSet;
+  return *syntax;
+}
+
+
+void MReader::delete_helpers()
+{
+  PythonReader::HelperSet * & phelpers = python_helpers_p();
+  if( phelpers != 0 )
+  {
+    delete phelpers;
+    phelpers = 0;
+  }
+
+  AttributedReader::HelperSet * & helpers = helpers_p();
+  if( helpers != 0 )
+  {
+    delete helpers;
+    helpers = 0;
+  }
+
+  SyntaxSet *& syntax = syntax_p();
+  if( syntax != 0 )
+  {
+    delete syntax;
+    syntax = 0;
+  }
+}
 
 
 MReader::MReader( const string & filename, 
@@ -51,13 +121,13 @@ MReader::MReader( const string & filename,
 		  const AttributedReader::HelperSet& helpers )
   : ExoticTreeReader( filename, synt, helpers), _knownElems( fs )
 {
-  if( syntax.empty() )
+  if( syntax().empty() )
   {
-    syntax = initSyntax( Path::singleton().syntax()
+    syntax() = initSyntax( Path::singleton().syntax()
       + FileUtil::separator() + "adap.stx" );
   }
   if( syntaxSet().empty() )
-    setSyntax( syntax );
+    setSyntax( syntax() );
 }
 
 
@@ -66,13 +136,13 @@ MReader::MReader( const TreePostParser::FactorySet & fs,
 		  const AttributedReader::HelperSet& helpers )
   : ExoticTreeReader( synt, helpers ), _knownElems( fs )
 {
-  if( syntax.empty() )
+  if( syntax().empty() )
   {
-    syntax = initSyntax( Path::singleton().syntax()
+    syntax() = initSyntax( Path::singleton().syntax()
     + FileUtil::separator() + "adap.stx" );
   }
   if( syntaxSet().empty() )
-    setSyntax( syntax );
+    setSyntax( syntax() );
 }
 
 
@@ -80,24 +150,23 @@ MReader::~MReader()
 {
 }
 
-static void	gridOptimizerParametersReader(GenericObject &object,
-			const std::string &semantic, carto::DataSource& is)
+static void	gridOptimizerParametersReader(
+  GenericObject &object, const std::string &semantic, carto::DataSource& is)
 {
-	rc_ptr<DataSource>	ds(&is);
-	PythonReader		pr(ds, MReader::syntax,
-                                   MReader::python_helpers);
-	AttributedObject	*val = NULL;
-	try {
-		val = new AttributedObject("grid_optimizer_parameters");
-		pr.readDictionary(*val);
+  rc_ptr<DataSource>	ds(&is);
+  PythonReader		pr(ds, MReader::syntax(), MReader::python_helpers());
+  AttributedObject	*val = NULL;
+  try {
+      val = new AttributedObject("grid_optimizer_parameters");
+      pr.readDictionary(*val);
 
-		ds.release();
-		//Object(val) : pointer own to an rcptr object
-		object.setProperty(semantic, Object(val));
-	} catch (exception &e) {
-		ds.release();
-		throw;
-	}
+      ds.release();
+      //Object(val) : pointer own to an rcptr object
+      object.setProperty(semantic, Object(val));
+  } catch (exception &e) {
+      ds.release();
+      throw;
+  }
 }
 
 static GenericObject * gridOptimizerParameterReader(GenericObject *,
@@ -115,22 +184,23 @@ static GenericObject * gridOptimizerParameterReader(GenericObject *,
 }
 
 
-AttributedReader::HelperSet	MReader::initHelpers()
+AttributedReader::HelperSet	*MReader::initHelpers()
 {
-	AttributedReader::HelperSet	hs =
-		carto::AttributedReader::HelperSet();
-	hs["grid_optimizer_parameters"] = &gridOptimizerParametersReader;
+  AttributedReader::HelperSet	*hs =
+      new carto::AttributedReader::HelperSet;
+  (*hs)["grid_optimizer_parameters"] = &gridOptimizerParametersReader;
 
-	return hs;
+  return hs;
 }
 
-PythonReader::HelperSet	MReader::initPythonHelpers()
-{
-	PythonReader::HelperSet	hs =
-		carto::PythonReader::HelperSet();
-	hs["grid_optimizer_parameter"] = &gridOptimizerParameterReader;
 
-	return hs;
+PythonReader::HelperSet *MReader::initPythonHelpers()
+{
+  PythonReader::HelperSet	*hs =
+      new carto::PythonReader::HelperSet;
+  (*hs)["grid_optimizer_parameter"] = &gridOptimizerParameterReader;
+
+  return hs;
 }
 
 
