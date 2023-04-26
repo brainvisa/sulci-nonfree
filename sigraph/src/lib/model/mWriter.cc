@@ -11,7 +11,7 @@ using namespace std;
 
 
 MWriter::MWriter( const string & filename, bool makedir )
-  : ExoticTreeWriter( filename, MReader::syntax, makedir )
+  : ExoticTreeWriter( filename, MReader::syntax(), makedir )
 {
 }
 
