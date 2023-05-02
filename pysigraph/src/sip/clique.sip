@@ -23,6 +23,7 @@ class Clique : carto::GenericObject /Abstract/
 %End
 
 public:
+  Clique();
   virtual ~Clique();
   virtual void clear();
   virtual sigraph::Clique* deepCopy() const = 0;
@@ -42,9 +43,9 @@ public:
 %End
 
 protected:
-  Clique();
   Clique( const sigraph::Clique & );
 };
+
 
 class VertexClique : sigraph::Clique
 {
