@@ -12,6 +12,10 @@ file( GLOB _sipSources "${CMAKE_CURRENT_SOURCE_DIR}/*.sip" )
 
 file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}" )
 
+if( SIP_MODULE )
+  set( extra_defs "-D" "SIP_MODULE=\"${SIP_MODULE}\"" )
+endif()
+
 execute_process( COMMAND "${PYTHON_HOST_EXECUTABLE}"
         "${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py"
         -s "${AIMS-FREE_SIP_DIRECTORY}"
@@ -22,6 +26,7 @@ execute_process( COMMAND "${PYTHON_HOST_EXECUTABLE}"
         -t "${CMAKE_CURRENT_SOURCE_DIR}/typessub.py"
         -l
         -P "${CMAKE_C_PREPROCESSOR}"
+        ${extra_defs}
   OUTPUT_VARIABLE _generatedSipFileList 
   RESULT_VARIABLE _returnValue )
 
