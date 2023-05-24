@@ -29,6 +29,7 @@ if( NOT _returnValue EQUAL 0 )
   message( SEND_ERROR "The sip generation from ${PROJECT_NAME} templates with \"${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py\" returned an error:\n${_generatedSipFileList}\n========================")
 endif( NOT _returnValue EQUAL 0 )
 
+string( STRIP "${_generatedSipFileList}" _generatedSipFileList )
 BRAINVISA_ADD_SIP_PYTHON_MODULE( sigraphsip
   sigraph 
   "${CMAKE_CURRENT_SOURCE_DIR}/sigraph.sip"
