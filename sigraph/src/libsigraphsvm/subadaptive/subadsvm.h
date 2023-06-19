@@ -22,12 +22,12 @@ namespace sigraph
         Regression, 
         Quality, 
         Decision, 
-	OneClass,
+        OneClass,
       };
 
     // SubAdSvm( const std::string name = "" );
     SubAdSvm( const std::string name, const std::string file, 
-	      const std::string filename );
+              const std::string filename );
     SubAdSvm( const SubAdSvm & sa );
     virtual ~SubAdSvm();
 
@@ -44,7 +44,7 @@ namespace sigraph
     virtual double learn(const SiDBLearnable &train);
     virtual double getLearnedLabel(const SiVectorLearnable &vl) const;
     virtual SubAdResponse *crossvalidation(const SiDBLearnable &train,
-		const unsigned int nbfolds);
+                                           const unsigned int nbfolds);
     virtual double prop( const std::vector<double> & );
     virtual double test(const SiVectorLearnable &vl);
     /// {\tt basename} doit être vide ou terminé par '/'
@@ -74,9 +74,8 @@ namespace sigraph
       { _netFileName = name; }
     virtual std::string fileNames() const { return( _netFileName ); }
     /** Set / Get svm parameters */
-    inline void setSvmWeight(int label, double weight) {
-	    _svm_param.weight[label] = weight;
-    };
+    inline void setSvmWeight(int label, double weight)
+    { _svm_param.weight[label] = weight; };
     void setGamma(double gamma) { _svm_param.gamma = gamma; };
     void setC(double c) { _svm_param.C = c; };
     void setEpsilon(double p) { _svm_param.p = p; };
@@ -92,32 +91,32 @@ namespace sigraph
     std::string _netFileName;
 
   private:
-    std::vector<double>		_inputs;
-    SvmMode			_svmmode;
-    float			_qualityslope;
-    bool			_qualityshifted;
-    struct svm_parameter	_svm_param;
-    struct svm_problem		_svm_prob;
-    struct svm_node		*_svm_nodes;
+    std::vector<double>   _inputs;
+    SvmMode               _svmmode;
+    float                 _qualityslope;
+    bool                  _qualityshifted;
+    struct svm_parameter  _svm_param;
+    struct svm_problem    _svm_prob;
+    struct svm_node       *_svm_nodes;
 
 
     static void parseSubSvm( carto::AttributedObject* parent, Tree* t, 
-			     SubAdSvm & sad );
+                             SubAdSvm & sad );
   };
 
 
-  //	Fonctions inline
+  // inline methods
   inline SubAdSvm & SubAdSvm::operator = ( const SubAdSvm & sa )
   {
     if( this != &sa )
-      {
-	NonIncrementalSubAdaptive::operator = ( sa );
+    {
+      NonIncrementalSubAdaptive::operator = ( sa );
 
-	_svm = svm_clone_model(sa._svm, sa._svm_nodes, &_svm_nodes);
-        _svmmode = sa._svmmode;
-	_netFileName = sa._netFileName;
-	_svm_param = sa._svm_param;
-      }
+      _svm = svm_clone_model(sa._svm, sa._svm_nodes, &_svm_nodes);
+      _svmmode = sa._svmmode;
+      _netFileName = sa._netFileName;
+      _svm_param = sa._svm_param;
+    }
     return( *this );
   }
 
