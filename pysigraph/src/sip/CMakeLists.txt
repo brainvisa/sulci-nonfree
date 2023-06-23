@@ -15,6 +15,11 @@ file( MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/${SIGRAPH_RELATIVE_SIP_DIRECTORY}" )
 if( SIP_MODULE )
   set( extra_defs "-D" "SIP_MODULE=\"${SIP_MODULE}\"" )
 endif()
+if( SIP_ABI )
+  string( REGEX MATCH "[^.]*" SIP_ABI_MAJOR_VERSION "${SIP_ABI}")
+  set( extra_defs "${extra_defs}" "-D"
+       "SIP_ABI_MAJOR_VERSION=${SIP_ABI_MAJOR_VERSION}")
+endif()
 
 execute_process( COMMAND "${PYTHON_HOST_EXECUTABLE}"
         "${AIMS-FREE_SIP_DIRECTORY}/maketemplates.py"
