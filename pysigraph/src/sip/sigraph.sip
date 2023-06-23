@@ -1,8 +1,13 @@
 %Import aims.sip
 
 %Module sigraph.sigraphsip
+
 %ModuleCode
 #include <pyaims/init.h>
+%End
+
+%ModuleHeaderCode
+#include <pyaims/sipnewtypedefs.h>
 %End
 
 %PostInitialisationCode
