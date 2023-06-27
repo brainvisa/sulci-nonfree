@@ -52,7 +52,7 @@ target_link_libraries( sigraphsip
   pysigraph
   "${AIMS_PYAIMS_LIB}" )
 BRAINVISA_INSTALL( TARGETS sigraphsip
-                   DESTINATION python/sigraph
+                   DESTINATION ${PYTHON_INSTALL_DIRECTORY}/sigraph
                    COMPONENT ${PROJECT_NAME} )
 
 # TODO: install .sip files in devel package

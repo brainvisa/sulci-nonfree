@@ -13,7 +13,7 @@ IF ( SWIG_FOUND )
   
   SWIG_LINK_LIBRARIES( _si_swig_libsvm "${PYTHON_LIBRARY}" sigraph_libsvm)
   
-  set_property( TARGET __si_swig_libsvm PROPERTY LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/python/sigraph )
+  set_property( TARGET __si_swig_libsvm PROPERTY LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PYTHON_INSTALL_DIRECTORY}/sigraph )
   set_property( TARGET __si_swig_libsvm PROPERTY OUTPUT_NAME _si_swig_libsvm )
   set_property( TARGET __si_swig_libsvm PROPERTY PREFIX "" )
   
