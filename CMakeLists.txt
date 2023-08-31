@@ -48,7 +48,7 @@ endif()
 
 # add install rules for zipped packages
 
-set( SULCI_MODELS_DOWNLOAD_SOURCE "ftp:///ftp.cea.fr/pub/dsv/anatomist/data" CACHE FILEPATH "URL for sulci models data download" )
+set( SULCI_MODELS_DOWNLOAD_SOURCE "https://brainvisa.info/download/data" CACHE FILEPATH "URL for sulci models data download" )
 
 set( version_maj ${BRAINVISA_PACKAGE_VERSION_MAJOR} )
 set( version_min ${BRAINVISA_PACKAGE_VERSION_MINOR} )
