@@ -179,7 +179,7 @@ def main():
         directions = []
         thetas = []
         for m in motions:
-            T = m.translation().arraydata().copy()
+            T = m.translation().np.copy()
             R = m.rotation().arraydata().copy()
             R = R.reshape(3, 3)
             w = vector_from_rotation(R)

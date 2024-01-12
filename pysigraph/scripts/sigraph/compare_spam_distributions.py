@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-from __future__ import print_function
-from __future__ import absolute_import
-import os
+
 import sys
 import numpy
 import matplotlib
-from six.moves import zip
+
+
 matplotlib.use('Qt4Agg')
 import pylab
 from optparse import OptionParser
@@ -113,18 +112,18 @@ def kullback_leibler(spam1, spam2):
 
     density1 = spam1.img_density()
     density2 = spam2.img_density()
-    a1 = density1.arraydata()
-    a2 = density2.arraydata()
+    a1 = density1.np
+    a2 = density2.np
 
     doff1 = (off - off1).astype('int')
     doff2 = (off - off2).astype('int')
 
-    p = a1[:, doff1[2]:doff1[2] + size[2],
+    p = a1[doff1[0]:doff1[0] + size[0],
            doff1[1]:doff1[1] + size[1],
-           doff1[0]:doff1[0] + size[0]]
-    q = a2[:, doff2[2]:doff2[2] + size[2],
+           doff1[2]:doff1[2] + size[2], :]
+    q = a2[doff2[0]:doff2[0] + size[0],
            doff2[1]:doff2[1] + size[1],
-           doff2[0]:doff2[0] + size[0]]
+           doff2[2]:doff2[2] + size[2], :]
     logp = numpy.log(p)
     logq = numpy.log(q)
     logp[numpy.isneginf(logp)] = -100.

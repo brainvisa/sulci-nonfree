@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import absolute_import
 import os
-import sys
 import re
 from soma import aims, aimsalgo
 import numpy
@@ -13,9 +10,7 @@ import tempfile
 import soma.subprocess
 import sigraph
 import time
-import tempfile
 import errno
-import six
 
 
 # --- config variables
@@ -123,7 +118,7 @@ def cleanmeshcurv(mesh, boundaries, inhibitbounds=[]):
     os.unlink(tmpmesh + '.minf')
     os.unlink(tmpcurv)
     os.unlink(tmpcurv + '.minf')
-    texarr = tex[0].arraydata()
+    texarr = tex[0].np
     vindex = 0
     average = 0.
     nav = 0
@@ -257,7 +252,7 @@ if csvfile:
     if nodewise:
         csv.write(' mean_curvature_nodewise mean_curvature_points_nodewise')
     csv.write('\n')
-for label, globval in six.iteritems(globaverage):
+for label, globval in globaverage.items():
     bcks = globval['ss']
     bck = bcks[0]
     for b in bcks[1:]:

@@ -283,7 +283,7 @@ overlappe to each other.
         d = self._gaussian_std
         smoothing = aimsalgo.Gaussian3DSmoothing_FLOAT(d, d, d)
         img_blur = smoothing.doit(img_count)
-        array = img_blur.arraydata()
+        array = img_blur.np
         # apply correction if needed
         array[array < 0.] = 0.
         # avoid null values
@@ -353,7 +353,7 @@ write_count : output filename to write image of sulci counting.
         d = self._gaussian_std
         smoothing = aimsalgo.Gaussian3DSmoothing_FLOAT(d, d, d)
         img_blur = smoothing.doit(img_count)
-        array = img_blur.arraydata()
+        array = img_blur.np
         # apply correction if needed
         array[array < 0.] = 0.
         # avoid null values
@@ -432,7 +432,7 @@ write_count : output filename to write image of sulci counting.
         # db.init(X)
         # aimsalgo.AimsGeneralizedKnnParzenPdf(db, img_count, k)
         # aimsalgo.AimsKnnPdf(db, img_count, k)
-        array = img_count.arraydata()
+        array = img_count.np
         # apply correction if needed
         array[array < 0.] = 0.
         # avoid null values
@@ -509,7 +509,7 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
 
         '''
         Px = self._img_density
-        P = Px.arraydata()
+        P = Px.np
         t = numpy.array(self._bb_talairach_offset)
         s = numpy.array(self._bb_talairach_size)
         X = numpy.array(X - t, dtype='int')
@@ -519,7 +519,7 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
             if (p_out < 0).sum() or (p_out >= s).sum():
                 loglikelihood += -50
                 continue
-            pos = tuple([0] + p_out[::-1].tolist())
+            pos = tuple(p_out.tolist() + [0])
             val = P[pos]
             if val:
                 loglikelihood += numpy.log(P[pos])
@@ -556,7 +556,7 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
 
         '''
         Px = self._img_density
-        P = Px.arraydata()
+        P = Px.np
         t = numpy.array(self._bb_talairach_offset)
         s = numpy.array(self._bb_talairach_size)
         X = numpy.array(X - t, dtype='int')
@@ -566,7 +566,7 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
             if (p_out < 0).sum() or (p_out >= s).sum():
                 loglikelihoods.append(-50)
                 continue
-            pos = tuple([0] + p_out[::-1].tolist())
+            pos = tuple(p_out.tolist() + [0])
             val = P[pos]
             if val:
                 loglikelihoods.append(numpy.log(P[pos]))
@@ -580,7 +580,7 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
 
     def weighted_prodlikelihoods(self, X, weights, shift=10.):
         Px = self._img_density
-        P = Px.arraydata()
+        P = Px.np
         t = numpy.array(self._bb_talairach_offset)
         s = numpy.array(self._bb_talairach_size)
         X = numpy.array(X - t, dtype='int')
@@ -591,7 +591,7 @@ shift :    return likelihood = exp(log(P(Xi|Li=li) + shift)
             if (p_out < 0).sum() or (p_out >= s).sum():
                 loglikelihood += w * (-50)
                 continue
-            pos = tuple([0] + p_out[::-1].tolist())
+            pos = tuple(p_out.tolist() + [0])
             val = P[pos]
             if val:
                 loglikelihood += w * numpy.log(P[pos])
@@ -616,7 +616,7 @@ to : E_ext / n with n = number of voxels in the difference between the two
 bounding box.
         '''
         Px = self._img_density
-        P = Px.arraydata()
+        P = Px.np
         # volume big bb = 200^3
         # n = (volume big bb) - (volume sulcus bb)
         n = 8000000. - numpy.prod(P.shape)
@@ -630,7 +630,7 @@ bounding box.
 
     def powered_img_density(self, alpha):
         Px = self._img_density
-        P = Px.arraydata()
+        P = Px.np
         array = (P ** alpha)
         # volume big bb = 200^3
         # n = (volume big bb) - (volume sulcus bb)
@@ -649,7 +649,7 @@ bounding box.
         motion = aims.GraphManip.talairach(graph)
 
         Px = self._img_density
-        P = Px.arraydata()
+        P = Px.np
 
         if self._ss:
             bucket_name = 'aims_ss'
@@ -663,7 +663,7 @@ bounding box.
         loglikelihood = 0.
         voxels_n = len(list(ss_map[0].keys()))
         img = aims.Volume_FLOAT(self._bb_talairach_size)
-        A = img.arraydata()
+        A = img.np
         A[:] = P[:]
         for p_in in ss_map[0].keys():
             p_in = aims.Point3df(p_in * size_in)
@@ -672,7 +672,7 @@ bounding box.
             if (p_out < 0).sum() or (p_out >= s).sum():
                 loglikelihood += -30
                 continue
-            pos = tuple([0] + p_out[::-1].tolist())
+            pos = tuple(p_out.tolist() + [0])
             loglikelihood += numpy.log(P[pos])
             A[pos] = 0.0001
         loglikelihood /= voxels_n

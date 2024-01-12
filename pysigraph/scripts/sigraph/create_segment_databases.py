@@ -1,20 +1,14 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
-from __future__ import absolute_import
 import sys
 import os
 import numpy
-import pprint
 import re
 from optparse import OptionParser
-import sigraph
-from soma import aims
 from sulci.common import io, add_translation_option_to_parser
 from datamind.tools import *
 import datamind.io.old_csvIO as datamind_io
 from datamind.ml.database import DbNumpy
-from six.moves import range
 
 
 ################################################################################
@@ -132,7 +126,7 @@ class GravityCentersNodeDatabaseCreator(NodeDatabaseCreator):
 
     def _add_node(self, v, subject):
         h = self._h
-        if not 'refgravity_center' in v:
+        if 'refgravity_center' not in v:
             return
         gc = numpy.asarray(v['refgravity_center'].list())
         label = v['name']
@@ -296,8 +290,8 @@ class MinDistanceRelDatabaseCreator(RelDatabaseCreator):
         edges = self._find_xij(xi, xj)
         if 'cortical' in list(edges.keys()):
             xij = edges['cortical']
-            pi = xij['refSS1nearest'].arraydata()
-            pj = xij['refSS2nearest'].arraydata()
+            pi = xij['refSS1nearest'].np
+            pj = xij['refSS2nearest'].np
         else:
             pi = numpy.array([0, 0, 0])
             pj = numpy.array([0, 0, 0])

@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
-from __future__ import absolute_import
-import os
-import sys
-import numpy
-from soma import aims, aimsalgo
+from soma import aims
 from soma.wip.aimsalgo import foldsgraphthickness as FG
 
 
@@ -23,7 +18,7 @@ def main():
     white_mesh = reader.read(white_mesh_name)
     hemi_mesh = reader.read(hemi_mesh_name)
 
-    askel = skel.arraydata()
+    askel = skel.np
     outside_label = askel[0, 0, 0, 0]
     askel[askel != outside_label] = 100   # Grey Matter label
     askel[askel == outside_label] = 0     # outside label
@@ -33,7 +28,7 @@ def main():
     # skip some parts
     try:
         fd.preProcess()
-    except Exception as e:
+    except Exception:
         pass
     ttex = fd.gm_wm_tex
     tex = ttex[0]
