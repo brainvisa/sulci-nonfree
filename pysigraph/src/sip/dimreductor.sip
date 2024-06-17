@@ -90,12 +90,14 @@ public:
 
 	SIP_PYOBJECT getMatrix() /Factory/;
 %MethodCode
-	int				*dims = (int *) malloc(sizeof(int) * 2);
+	npy_intp *dims = (npy_intp *) malloc(sizeof(npy_intp) * 2);
 	const std::vector<int>	&shape = sipCpp->getShape();
 	dims[1] = shape[1];
 	dims[0] = shape[0];
-	sipRes = PyArray_FromDimsAndData(2, dims, NPY_FLOAT,
-					(char *) &(sipCpp->getMatrix()[0]));
+	sipRes = PyArray_SimpleNewFromData(
+	  2, dims, NPY_FLOAT,
+	// sipRes = PyArray_FromDimsAndData(2, dims, NPY_FLOAT,
+	  (char *) &(sipCpp->getMatrix()[0]));
 	if(sipRes) sipRes = PyArray_Return((PyArrayObject *) sipRes);
 %End
 

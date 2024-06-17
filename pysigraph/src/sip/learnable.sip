@@ -70,20 +70,20 @@ public:
 
   SIP_PYOBJECT getX() /Factory/;
 %MethodCode
-  int		*dims = (int *) malloc(sizeof(int) * 2);
+  npy_intp *dims = (npy_intp *) malloc(sizeof(npy_intp) * 2);
   dims[1] = sipCpp->getXcolsNumber();
   dims[0] = sipCpp->size();
-  sipRes = PyArray_FromDimsAndData( 2, dims, NPY_DOUBLE,
+  sipRes = PyArray_SimpleNewFromData( 2, dims, NPY_DOUBLE,
                                     (char *) sipCpp->getX() );
   if(sipRes) sipRes = PyArray_Return((PyArrayObject *) sipRes);
 %End
 
   SIP_PYOBJECT getY() /Factory/;
 %MethodCode
-  int		*dims = (int *) malloc(sizeof(int) * 2);
+  npy_intp *dims = (npy_intp *) malloc(sizeof(npy_intp) * 2);
   dims[1] = sipCpp->getYcolsNumber();
   dims[0] = sipCpp->size();
-  sipRes = PyArray_FromDimsAndData( 2, dims, NPY_DOUBLE,
+  sipRes = PyArray_SimpleNewFromData( 2, dims, NPY_DOUBLE,
                                     (char *) sipCpp->getY() );
   if(sipRes) sipRes = PyArray_Return((PyArrayObject *) sipRes);
 %End
@@ -92,13 +92,15 @@ public:
 %MethodCode
   PyArray_Descr   *descr = (PyArray_Descr*) malloc(sizeof(PyArray_Descr));
   memcpy(descr, PyArray_DescrFromType(NPY_STRING), sizeof(PyArray_Descr));
+#if NPY_API_VERSION <= NPY_1_21_API_VERSION
   descr->elsize = 32;
+#endif
 
-  int             *dims = (int *) malloc(sizeof(int) * 2);
+  npy_intp *dims = (npy_intp *) malloc(sizeof(npy_intp) * 2);
   dims[0] = sipCpp->size();
   dims[1] = sipCpp->getINFcolsNumber();
-  sipRes = PyArray_FromDimsAndDataAndDescr(2, dims, descr,
-	(char *) sipCpp->getINF());
+  sipRes = PyArray_NewFromDescr(descr->typeobj, descr, 2, dims, 0,
+                                (char *) sipCpp->getINF(), 0, 0 );
   if(sipRes) sipRes = PyArray_Return((PyArrayObject *) sipRes);
 %End
 
