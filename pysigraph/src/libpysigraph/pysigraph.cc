@@ -45,11 +45,11 @@ namespace sigraph
     PyArray_Descr	*descr = NULL;
     descr = PyArray_DescrNewFromType(NPY_VOID);
 
-#if NPY_API_VERSION <= NPY_1_21_API_VERSION
+#if NPY_ABI_VERSION < 0x02000000
     descr->f->getitem = (PyArray_GetItemFunc *) my_getitem;
     descr->f->setitem = (PyArray_SetItemFunc *) my_setitem;
-    descr->elsize = sizeof(char *);
 #endif
+    PyDataType_SET_ELSIZE( descr, sizeof(char *) );
     //PyArray_RegisterDataType(descr);
     //FIXME : marche pas
     std::cerr << "error : NewDBLearnableInfoPyArrayDescr doesn't work!"
