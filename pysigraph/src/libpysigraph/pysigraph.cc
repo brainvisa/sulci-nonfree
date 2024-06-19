@@ -48,6 +48,9 @@ namespace sigraph
 #if NPY_ABI_VERSION < 0x02000000
     descr->f->getitem = (PyArray_GetItemFunc *) my_getitem;
     descr->f->setitem = (PyArray_SetItemFunc *) my_setitem;
+#else
+    PyDataType_GetArrFuncs(descr)->getitem = reinterpret_cast<PyObject * (*)(void *, void *)>( my_getitem );
+    PyDataType_GetArrFuncs(descr)->setitem = reinterpret_cast<int (*)(PyObject *, void *, void *)>( my_setitem );
 #endif
     PyDataType_SET_ELSIZE( descr, sizeof(char *) );
     //PyArray_RegisterDataType(descr);
