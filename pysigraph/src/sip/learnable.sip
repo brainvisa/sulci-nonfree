@@ -92,9 +92,7 @@ public:
 %MethodCode
   PyArray_Descr   *descr = (PyArray_Descr*) malloc(sizeof(PyArray_Descr));
   memcpy(descr, PyArray_DescrFromType(NPY_STRING), sizeof(PyArray_Descr));
-#if NPY_API_VERSION <= NPY_1_21_API_VERSION
-  descr->elsize = 32;
-#endif
+  PyDataType_SET_ELSIZE( descr, 32 );
 
   npy_intp *dims = (npy_intp *) malloc(sizeof(npy_intp) * 2);
   dims[0] = sipCpp->size();
