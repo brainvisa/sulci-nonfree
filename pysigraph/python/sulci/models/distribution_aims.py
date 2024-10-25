@@ -462,6 +462,9 @@ write_count : output filename to write image of sulci counting.
 
     def read(self, filename):
         img = aims.read(filename)
+        self.set_img_density(img)
+
+    def set_img_density(self, img):
         header = img.header()
         self._bb_talairach_size = img.getSize()[:3]
         self._img_density = img

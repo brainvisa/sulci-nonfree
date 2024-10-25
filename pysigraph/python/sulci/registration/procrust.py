@@ -649,7 +649,7 @@ scheme in SE(3) Riemannian Tangent space of local Rotation matrix.
                 user_func(self, user_data)
             self._energy = self.energy()
             if self._verbose > 0:
-                print("powell, en = %f " % (self._energy))
+                print("powell, en = %f " % (self._energy), self._w.T, self._t.T)
             self._n += 1
             return self._energy
         w = vector_from_rotation(self._R)
