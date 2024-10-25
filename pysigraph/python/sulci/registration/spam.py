@@ -252,7 +252,7 @@ def move_image_slightly(data, axis, angle, translation, gravity_center):
 
 
 def spam_register(spam_vol, skel_data, do_mask=True, eps=1e-5,
-                  R_angle_var=np.square(np.pi / 8), t_var=np.square(5.),
+                  R_angle_var=np.pi / 8, t_var=5.,
                   in_log=True, calibrate_distrib=None, verbose=False):
     ''' Register data using SPAM maps.
     Data may be a graph or a binary image (skeleton).
@@ -266,8 +266,9 @@ def spam_register(spam_vol, skel_data, do_mask=True, eps=1e-5,
     ----------
     spam_vol: Volume_FLOAT
         SPAM probability map
-    skel_data: Volume or Graph object
-        data to be registered
+    skel_data: Volume or Graph object or numpy array
+        data to be registered. Can be a numpy coordinates array (vox x 3)
+        in mm.
     do_mask: bool
         if True, a mask will be made from the SPAM volume, dilated 5mm, and
         data to be registered which are out of this mask is erased in order to
@@ -310,11 +311,16 @@ def spam_register(spam_vol, skel_data, do_mask=True, eps=1e-5,
     mode = 'powell'
     # shift = np.exp(-50)
 
-    mc = aims.MassCenters_FLOAT(spam_vol)
-    mc.doit()
-    gravity_center = np.expand_dims(np.array(mc.infos()['0'][0][0]), axis=1)
 
-    X, groups = create_data_matrix(skel_data)
+    if isinstance(skel_data, np.ndarray):
+        X = skel_data
+        gravity_center = np.expand_dims(np.average(X, axis=0), axis=1)
+    else:
+        X, groups = create_data_matrix(skel_data)
+        mc = aims.MassCenters_FLOAT(spam_vol)
+        mc.doit()
+        gravity_center = np.expand_dims(np.array(mc.infos()['0'][0][0]),
+                                        axis=1)
 
     if do_mask:
         mask = dilate_spam_mask(spam_vol)
