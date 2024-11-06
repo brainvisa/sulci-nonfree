@@ -656,8 +656,10 @@ scheme in SE(3) Riemannian Tangent space of local Rotation matrix.
         x0 = numpy.hstack([numpy.asarray(w).ravel(),
                            numpy.asarray(self._t).ravel()])
         import scipy.optimize
+        direc = getattr(self, '_optim_direc', None)
         res = scipy.optimize.fmin_powell(func, x0,
-                                         args=(self, user_func, user_data), disp=0, ftol=eps)
+                                         args=(self, user_func, user_data),
+                                         disp=0, ftol=eps, direc=direc)
         func(res, self, user_func, user_data)
         user_func(self, user_data)
         return self._R, self._t

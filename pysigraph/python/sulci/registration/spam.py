@@ -54,6 +54,8 @@ if None value are specified the corresponding prior is removed.
             self._t_prior = distribution.Gaussian()
             id = numpy.identity(3)
             self._t_prior.setMeanCov(numpy.zeros(3), t_var * id)
+            self._optim_direc = np.eye(6, 6)
+            self._optim_direc[3:, 3:] *= t_var
 
     def setPriors(self, translation_prior, direction_prior, angle_prior):
         self._t_prior = translation_prior
@@ -344,7 +346,7 @@ def spam_register(spam_vol, skel_data, do_mask=True, eps=1e-5,
             w = calibrate_distrib / li
         else:
             w = calibrate_distrib / logli
-        spam_vol *= w
+        spam_vol[:] *= w
         spam.set_img_density(spam_vol)
         spam.update()
 
