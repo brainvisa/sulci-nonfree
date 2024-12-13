@@ -201,7 +201,7 @@ QFFoldCtrl::QFFoldCtrl( QWidget* parent, const char* name, AFGraph* fusion )
   update( _fusion );
 
   resize( minimumSizeHint() );
-  connect( _groupBox, SIGNAL( buttonClicked( int ) ), this,
+  connect( _groupBox, SIGNAL( idClicked( int ) ), this,
            SLOT( btnClick( int ) ) );
   connect( _rpBtn, SIGNAL( clicked() ), this, SLOT( relPotBtnClicked() ) );
   connect( _wtBtn, SIGNAL( clicked() ), this, SLOT( weightButtonClicked() ) );
