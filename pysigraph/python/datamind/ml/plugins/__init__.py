@@ -1,4 +1,4 @@
-#from datamind.ml import wip
+
 import sys
 import six
 
@@ -40,8 +40,7 @@ class PluginManager(object):
         elif (datamind.Settings.plugins == 'all'):
             return list(six.iterkeys(self._plugins))
         else:
-            msg.warning('bad plugins settings, check '
-                        'datamind.Settings.plugins')
+            print('bad plugins settings, check datamind.Settings.plugins')
 
     def plugin_from_name(cls, name): return cls._plugins[name]
     plugin_from_name = classmethod(plugin_from_name)
@@ -182,14 +181,17 @@ class Plugin(object):
 
 
 def init():
-    import imp
+    import importlib
     import os
     dir = os.path.dirname(__file__)
     for p in os.listdir(dir):
         if not os.path.isdir(os.path.join(dir, p)) \
                 or p.startswith('__'):
             continue
-        n = imp.find_module(p, [dir])
-        m = imp.load_module(p, *n)
+        spec = importlib.util.spec_from_file_location(p, os.path.join(dir, p))
+        m = importlib.util.module_from_spec(spec)
+        sys.modules[p] = m
+        spec.loader.exec_module(m)
+
 
 plugin_manager = PluginManager()
