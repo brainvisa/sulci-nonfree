@@ -28,9 +28,9 @@ class PluginManager(object):
             msg.info("can't find any plugin :(")
         else:
             msg.info("loaded plugins : %s" %
-                     str(list(six.iterkeys(self._loaded_plugins))))
+                     str(list(self._loaded_plugins.keys())))
 
-    def list(cls): return list(six.iterkeys(cls._plugins))
+    def list(cls): return list(cls._plugins.keys())
     list = classmethod(list)
 
     def plugins_to_load(self):
@@ -38,7 +38,7 @@ class PluginManager(object):
         if isinstance(datamind.Settings.plugins, list):
             return datamind.Settings.plugins
         elif (datamind.Settings.plugins == 'all'):
-            return list(six.iterkeys(self._plugins))
+            return list(self._plugins.keys())
         else:
             print('bad plugins settings, check datamind.Settings.plugins')
 
@@ -82,10 +82,10 @@ class PluginManager(object):
             return databases, classifiers, dimreductors, readers
 
         import datamind
-        if isinstance(plugin, six.string_types):
+        if isinstance(plugin, str):
             try:
                 plugin = self.plugin_from_name(plugin)
-            except KeyError as e:
+            except KeyError:
                 from datamind.tools import msg
                 msg.error("unknown plugin '%s'\n"
                           "Try one among : " + str(self.list()))
@@ -188,10 +188,7 @@ def init():
         if not os.path.isdir(os.path.join(dir, p)) \
                 or p.startswith('__'):
             continue
-        spec = importlib.util.spec_from_file_location(p, os.path.join(dir, p))
-        m = importlib.util.module_from_spec(spec)
-        sys.modules[p] = m
-        spec.loader.exec_module(m)
+        importlib.import_module('.'.join([__package__, p]), __package__)
 
 
 plugin_manager = PluginManager()
