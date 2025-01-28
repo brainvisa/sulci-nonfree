@@ -32,11 +32,11 @@
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL license version 2 and that you accept its terms.
 
-from __future__ import print_function
-from __future__ import absolute_import
 import numpy
 import sigraph
 from soma import aims
+import shutil
+
 
 autolabel, manuallabel = 'label', 'name'
 
@@ -48,10 +48,9 @@ def computeErrorRate_with_siError(labeled_graph,
     '''
 Used by siErrorLightWrapper.py and recognition_error.py brainvisa process.
     '''
-    import distutils.spawn
     import sys
     import popen2
-    pgm = distutils.spawn.find_executable('siError')
+    pgm = shutil.which('siError')
     cmd = [pgm, labeled_graph, labels_translation, base_graph]
     p = popen2.Popen3(cmd)
     p.wait()

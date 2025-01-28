@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import absolute_import
 from soma import aims
 from sigraph import *
 from sigraph.cover import *
-import distutils.spawn
+import shutil
 from optparse import OptionParser
 
 
@@ -159,7 +157,7 @@ def main():
     if options.parallelmode == 'cath':
         msg.error('mode cath : not implemented yet')
         sys.exit(1)
-    options.bin = distutils.spawn.find_executable(options.bin)
+    options.bin = shutil.which(options.bin)
 
     # read model
     r = aims.Reader()

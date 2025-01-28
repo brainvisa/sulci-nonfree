@@ -1,9 +1,9 @@
-from __future__ import print_function
-from __future__ import absolute_import
+
 import os
 import numpy
 from soma import aims
 import socket
+import shutil
 import six
 
 
@@ -26,7 +26,6 @@ def vertex2voxels(motion, vertex, data_type):
     return vox
 
 import os
-import distutils.spawn
 import importlib
 import time
 import getpass
@@ -35,7 +34,7 @@ StringIO = six.moves
 
 
 def import_from(filename):
-    modulename = distutils.spawn.find_executable(filename)
+    modulename = shutil.which(filename)
     if modulename is None:
         raise ImportError(filename)
     path, file = os.path.split(modulename)
