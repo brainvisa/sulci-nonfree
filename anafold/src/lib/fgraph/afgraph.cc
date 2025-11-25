@@ -1497,9 +1497,9 @@ void AFGraph::createDefaultPalette( const string & name  )
 }
 
 
-bool AFGraph::render( PrimList & prim, const ViewState & state )
+bool AFGraph::render( PrimList & prim, RenderContext & context )
 {
-  return _folds->render( prim, state );
+  return _folds->render( prim, context );
 }
 
 

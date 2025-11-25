@@ -59,7 +59,7 @@ namespace anatomist
     virtual void SetMaterial( const Material & mat );
     virtual void setPalette( const AObjectPalette & pal );
     virtual void internalUpdate();
-    virtual bool render( PrimList &, const ViewState & );
+    virtual bool render( PrimList &, RenderContext & );
 
     AGraph* model() const { return( _model ); }
     AGraph* folds() const { return( _folds ); }
