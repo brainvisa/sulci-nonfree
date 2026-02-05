@@ -22,8 +22,10 @@ def makeSpamGraph(level, meshdir):
         label = os.path.basename(mesh)[5:-7]
         if label.endswith('left'):
             side = 'L'
+            graph['boundingbox_min'][0] = 0
         elif label.endswith('right'):
             side = 'R'
+            graph['boundingbox_max'][0] = 0
         m = aims.read(mesh)
         vert = graph.addVertex('fold')
         vert['point_number'] = 0

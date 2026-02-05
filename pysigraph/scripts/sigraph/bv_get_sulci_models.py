@@ -33,7 +33,7 @@ class Context(object):
 
 
 download_url = 'https://brainvisa.info/download/data'
-modelsversion = '4.2'
+modelsversion = '4.2.1'
 
 parser = OptionParser(
     'get and unzip SPAM-based sulci models in a given directory')
