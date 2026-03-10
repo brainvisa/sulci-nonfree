@@ -36,7 +36,7 @@ using namespace aims;
 using namespace std;
 
 
-FRGraph	rg;	// global pour permettre l'acc�s dans une interruption
+FRGraph	*rg;	// global pour permettre l'acces dans une interruption
 
 
 struct Params
@@ -374,10 +374,11 @@ int main( int argc, const char** argv )
       mr.aliasFactory( is->first, is->second );
 
     FrgReader	rr( par.model, mr );
+    rg = new FRGraph;
 
     try
     {
-      rr >> rg;
+      rr >> *rg;
       cout << "Read FRGraph OK." << endl;
     }
     catch( exception & e )
@@ -413,12 +414,12 @@ int main( int argc, const char** argv )
       learn = new ConstLearner;
       if( par.pattern.empty() )
         par.pattern = ".*";
-      seltr = new SelectiveTrainer( rg, learn, par.pattern );
+      seltr = new SelectiveTrainer( *rg, learn, par.pattern );
       seltr->setFiltAttributes( attrs );
     }
 
     CGraph::CliqueSet::iterator	ic, ec;
-    ModelFinder		& mf = rg.modelFinder();
+    ModelFinder		& mf = rg->modelFinder();
     AttributedObject		*modAO;
     Model			*mod;
     vector<double>		potv;
@@ -484,10 +485,10 @@ int main( int argc, const char** argv )
       //	Pr�paration des cliques
       cout << "Init cliques..." << endl;
       if( sel.begin() == sel.end() )
-        rg.modelFinder().initCliques( fg, par.verbose, false, true,
+        rg->modelFinder().initCliques( fg, par.verbose, false, true,
                                       false );
       else	// using a selection
-        rg.modelFinder().initCliques( fg, par.verbose, false, true,
+        rg->modelFinder().initCliques( fg, par.verbose, false, true,
                                       false, &sel );
       cout << "nb of nodes: " << fg.order() << endl;
       cout << "nb of cliques: " << fg.cliques().size() << endl;
@@ -610,5 +611,7 @@ int main( int argc, const char** argv )
   {
     cerr << e.what() << endl;
   }
+
+  delete rg;
   return EXIT_FAILURE;
 }
