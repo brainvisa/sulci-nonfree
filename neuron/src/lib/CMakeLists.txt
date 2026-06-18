@@ -2,6 +2,7 @@ BRAINVISA_GET_FILE_LIST_FROM_PRO(  ${CMAKE_CURRENT_SOURCE_DIR}/neuron.pro "HEADE
 BRAINVISA_COPY_AND_INSTALL_HEADERS( _headers neur headersTarget )
 set(HEADERS ${_headers} PARENT_SCOPE)
 add_library( neuron SHARED ${_sources} )
+target_link_libraries (neuron "m" )
 add_dependencies( neuron ${headersTarget} )
 set_property( TARGET neuron PROPERTY VERSION ${${PROJECT_NAME}_VERSION} )
 BRAINVISA_INSTALL( TARGETS neuron
