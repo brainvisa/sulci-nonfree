@@ -9,7 +9,7 @@
 namespace sigraph
 {
 
-/**	Itérateur de sous-graphe
+/**	Itï¿½rateur de sous-graphe
  */
 class SGIterator
 {
@@ -47,23 +47,23 @@ public:
   SGProvider( const CGraph & gr ) : _graph( gr ) {}
   virtual ~SGProvider();
 
-  /**@name	Itérateurs */
+  /**@name	Itï¿½rateurs */
   //@{
-  ///	Produit des pointeurs d'objets alloués avec new, qu'il faut effacer
+  ///	Produit des pointeurs d'objets allouï¿½s avec new, qu'il faut effacer
   SGIterator begin() const
     { return( SGIterator( _data.begin() ) ); }
   ///	Idem
   SGIterator end() const
     { return( SGIterator( _data.end() ) ); }
-  ///	Nombre d'éléments
+  ///	Nombre d'ï¿½lï¿½ments
   unsigned size() const { return( _data.size() ); }
   //@}
 
-  /**@name	Préparation */
+  /**@name	Prï¿½paration */
   //@{
-  /**	A appeler à chaque fois qu'on veut repréparer les données
+  /**	A appeler ï¿½ chaque fois qu'on veut reprï¿½parer les donnï¿½es
 	(par ex. avant chaque boucle begin..end s'il y a qqchose 
-	d'aléatoire) */
+	d'alï¿½atoire) */
   virtual void refresh() = 0;
   //@}
 
@@ -76,11 +76,10 @@ private:
 
 
 
-/**	"Functor" de comparaison aléatoire. \\
+/**	"Functor" de comparaison alï¿½atoire. \\
 	C'est imbitable comme nom, hein ? (cf STL)
 */
-class RandComp : public std::binary_function< const std::set<Vertex *> *, 
-		 const std::set<Vertex *> *, bool >
+class RandComp
 {
 public:
   bool operator () ( const std::set<Vertex *> *s1, 
@@ -94,52 +93,52 @@ private:
 
 
 
-/**	Fabrique de vertex simples, itérés dans un ordre aléatoire
+/**	Fabrique de vertex simples, itï¿½rï¿½s dans un ordre alï¿½atoire
  */
 class VertexProvider : public SGProvider
 {
 public:
-  ///	Le constructeur ne crée pas les données: appeler refresh() !
+  ///	Le constructeur ne crï¿½e pas les donnï¿½es: appeler refresh() !
   VertexProvider( const CGraph & gr ) : SGProvider( gr ) {}
   virtual ~VertexProvider();
 
-  /**@name	Préparation */
+  /**@name	Prï¿½paration */
   //@{
-  /**	A appeler à chaque fois qu'on veut repréparer les données
+  /**	A appeler ï¿½ chaque fois qu'on veut reprï¿½parer les donnï¿½es
 	(par ex. avant chaque boucle begin..end s'il y a qqchose 
-	d'aléatoire) */
+	d'alï¿½atoire) */
   virtual void refresh();
   //@}
 
 protected:
-  ///	Crée la liste, appelé par refresh au besoin
+  ///	Crï¿½e la liste, appelï¿½ par refresh au besoin
   virtual void init();
-  ///	Détruit les sets dans les listes (bref: fait le ménage)
+  ///	Dï¿½truit les sets dans les listes (bref: fait le mï¿½nage)
   virtual void cleanup();
 
 private:
 };
 
 
-/**	Fabrique de cliques de noeuds, itérées dans un ordre aléatoire
+/**	Fabrique de cliques de noeuds, itï¿½rï¿½es dans un ordre alï¿½atoire
  */
 class VertexCliqueProvider : public SGProvider
 {
 public:
-  ///	Le constructeur ne crée pas les données: appeler refresh() !
+  ///	Le constructeur ne crï¿½e pas les donnï¿½es: appeler refresh() !
   VertexCliqueProvider( const CGraph & gr ) : SGProvider( gr ) {}
   virtual ~VertexCliqueProvider();
 
-  /**@name	Préparation */
+  /**@name	Prï¿½paration */
   //@{
-  /**	A appeler à chaque fois qu'on veut repréparer les données
+  /**	A appeler ï¿½ chaque fois qu'on veut reprï¿½parer les donnï¿½es
 	(par ex. avant chaque boucle begin..end s'il y a qqchose 
-	d'aléatoire) */
+	d'alï¿½atoire) */
   virtual void refresh();
   //@}
 
 protected:
-  ///	Crée la liste, appelé par refresh au besoin
+  ///	Crï¿½e la liste, appelï¿½ par refresh au besoin
   virtual void init();
 
 private:
